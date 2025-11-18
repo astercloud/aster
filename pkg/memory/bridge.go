@@ -40,7 +40,7 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 	}
 
 	// 加载 Session 事件
-	sessPtr, err := b.Sessions.Get(ctx, &session.GetRequest{
+	sess, err := b.Sessions.Get(ctx, &session.GetRequest{
 		AppName:   appName,
 		UserID:    userID,
 		SessionID: sessionID,
@@ -48,12 +48,10 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 	if err != nil {
 		return fmt.Errorf("get session: %w", err)
 	}
-	if sessPtr == nil {
+	if sess == nil {
 		return fmt.Errorf("session not found")
 	}
 
-	// 解引用获取真正的 Session 接口
-	sess := *sessPtr
 	if sess.Events() == nil || sess.Events().Len() == 0 {
 		return fmt.Errorf("session has no events")
 	}
@@ -105,4 +103,3 @@ func tokenCount(text string) int {
 	}
 	return len(strings.Fields(text))
 }
-

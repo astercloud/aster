@@ -1,0 +1,22 @@
+version: 2
+
+run:
+  skip-dirs:
+    - examples
+  tests: false  # 暂时跳过测试文件
+  timeout: 5m
+
+linters:
+  enable:
+    - errcheck
+    - govet
+    - ineffassign
+    - staticcheck
+    - unused
+
+issues:
+  exclude-use-default: false
+  max-issues-per-linter: 0
+  max-same-issues: 0
+  exclude:
+    - "declared and not used"  # 某些示例代码可能有未使用的变量

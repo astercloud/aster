@@ -35,9 +35,9 @@ func TestSummarizationMiddleware_NoSummarization(t *testing.T) {
 	// 创建少量消息(不会触发总结)
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleSystem, Content: []types.ContentBlock{&types.TextBlock{Text: "You are a helpful assistant"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
+			{Role: types.MessageRoleSystem, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "You are a helpful assistant"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
 		},
 	}
 
@@ -47,7 +47,7 @@ func TestSummarizationMiddleware_NoSummarization(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -84,13 +84,13 @@ func TestSummarizationMiddleware_TriggerSummarization(t *testing.T) {
 	// 创建多条消息
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleSystem, Content: []types.ContentBlock{&types.TextBlock{Text: "You are a helpful assistant"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 3"}}},
+			{Role: types.MessageRoleSystem, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "You are a helpful assistant"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 3"}}},
 		},
 	}
 
@@ -100,7 +100,7 @@ func TestSummarizationMiddleware_TriggerSummarization(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -119,7 +119,7 @@ func TestSummarizationMiddleware_TriggerSummarization(t *testing.T) {
 	// 应该包含总结消息
 	hasSummary := false
 	for _, msg := range req.Messages {
-		for _, block := range msg.Content {
+		for _, block := range msg.ContentBlocks {
 			if tb, ok := block.(*types.TextBlock); ok {
 				if strings.Contains(tb.Text, "This is a summary") {
 					hasSummary = true
@@ -144,7 +144,7 @@ func TestSummarizationMiddleware_TriggerSummarization(t *testing.T) {
 	hasSystemMessage := false
 	for _, msg := range req.Messages {
 		if msg.Role == types.MessageRoleSystem {
-			for _, block := range msg.Content {
+			for _, block := range msg.ContentBlocks {
 				if tb, ok := block.(*types.TextBlock); ok {
 					if strings.Contains(tb.Text, "helpful assistant") {
 						hasSystemMessage = true
@@ -177,12 +177,12 @@ func TestSummarizationMiddleware_PreserveRecentMessages(t *testing.T) {
 
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Old message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Old response 1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Old message 2"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Old response 2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Recent message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Recent response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old message 2"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old response 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Recent message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Recent response 1"}}},
 		},
 	}
 
@@ -190,7 +190,7 @@ func TestSummarizationMiddleware_PreserveRecentMessages(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -203,7 +203,7 @@ func TestSummarizationMiddleware_PreserveRecentMessages(t *testing.T) {
 	// 验证最近的消息被保留
 	hasRecentMessage := false
 	for _, msg := range req.Messages {
-		for _, block := range msg.Content {
+		for _, block := range msg.ContentBlocks {
 			if tb, ok := block.(*types.TextBlock); ok {
 				if strings.Contains(tb.Text, "Recent message 1") ||
 					strings.Contains(tb.Text, "Recent response 1") {
@@ -236,11 +236,11 @@ func TestSummarizationMiddleware_SummarizerFailure(t *testing.T) {
 
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
 		},
 	}
 
@@ -250,7 +250,7 @@ func TestSummarizationMiddleware_SummarizerFailure(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -293,7 +293,7 @@ func TestSummarizationMiddleware_EmptyMessages(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -325,9 +325,9 @@ func TestSummarizationMiddleware_NotEnoughMessagesToSummarize(t *testing.T) {
 	// 只有 3 条消息,少于要保留的数量
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
 		},
 	}
 
@@ -337,7 +337,7 @@ func TestSummarizationMiddleware_NotEnoughMessagesToSummarize(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -376,12 +376,12 @@ func TestSummarizationMiddleware_CustomTokenCounter(t *testing.T) {
 	// 6 条消息 = 600 tokens,应该触发总结
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "2"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "3"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "3"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "2"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "3"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "3"}}},
 		},
 	}
 
@@ -389,7 +389,7 @@ func TestSummarizationMiddleware_CustomTokenCounter(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -487,8 +487,8 @@ func TestSummarizationMiddleware_NilConfig(t *testing.T) {
 // TestDefaultTokenCounter 测试默认 token 计数器
 func TestDefaultTokenCounter(t *testing.T) {
 	messages := []types.Message{
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "1234"}}},       // 4 chars
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "12345"}}}, // 5 chars
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "1234"}}},       // 4 chars
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "12345"}}}, // 5 chars
 	}
 
 	// 总共 4 + 5 + len("user") + len("assistant") = 9 + 4 + 9 = 22 chars
@@ -517,11 +517,11 @@ func TestSummarizationMiddleware_SystemMessagePreservation(t *testing.T) {
 
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleSystem, Content: []types.ContentBlock{&types.TextBlock{Text: "System instruction 1"}}},
-			{Role: types.MessageRoleSystem, Content: []types.ContentBlock{&types.TextBlock{Text: "System instruction 2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Old message"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Old response"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Recent message"}}},
+			{Role: types.MessageRoleSystem, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "System instruction 1"}}},
+			{Role: types.MessageRoleSystem, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "System instruction 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old message"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Old response"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Recent message"}}},
 		},
 	}
 
@@ -529,7 +529,7 @@ func TestSummarizationMiddleware_SystemMessagePreservation(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -558,10 +558,10 @@ func TestDefaultSummarizer(t *testing.T) {
 	ctx := context.Background()
 
 	messages := []types.Message{
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "How are you?"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "I'm good, thanks!"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "How are you?"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "I'm good, thanks!"}}},
 	}
 
 	summary, err := defaultSummarizer(ctx, messages)

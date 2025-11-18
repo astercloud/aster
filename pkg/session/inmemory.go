@@ -25,7 +25,7 @@ func NewInMemoryService() *InMemoryService {
 }
 
 // Create 创建新会话
-func (s *InMemoryService) Create(ctx context.Context, req *CreateRequest) (*Session, error) {
+func (s *InMemoryService) Create(ctx context.Context, req *CreateRequest) (Session, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -47,12 +47,11 @@ func (s *InMemoryService) Create(ctx context.Context, req *CreateRequest) (*Sess
 
 	s.sessions[sessionID] = session
 
-	var result Session = session
-	return &result, nil
+	return session, nil
 }
 
 // Get 获取会话
-func (s *InMemoryService) Get(ctx context.Context, req *GetRequest) (*Session, error) {
+func (s *InMemoryService) Get(ctx context.Context, req *GetRequest) (Session, error) {
 	s.mu.RLock()
 	defer s.mu.RUnlock()
 
@@ -65,8 +64,7 @@ func (s *InMemoryService) Get(ctx context.Context, req *GetRequest) (*Session, e
 		return nil, ErrSessionNotFound
 	}
 
-	var result Session = session
-	return &result, nil
+	return session, nil
 }
 
 // Update 更新会话

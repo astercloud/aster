@@ -174,10 +174,10 @@ var (
 // Service 定义 Session 服务接口
 type Service interface {
 	// Create 创建新会话
-	Create(ctx context.Context, req *CreateRequest) (*Session, error)
+	Create(ctx context.Context, req *CreateRequest) (Session, error)
 
 	// Get 获取会话
-	Get(ctx context.Context, req *GetRequest) (*Session, error)
+	Get(ctx context.Context, req *GetRequest) (Session, error)
 
 	// Update 更新会话
 	Update(ctx context.Context, req *UpdateRequest) error

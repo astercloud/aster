@@ -19,8 +19,8 @@ func BenchmarkSummarizationMiddleware_NoSummarization(b *testing.B) {
 
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Hi!"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hi!"}}},
 		},
 	}
 
@@ -28,7 +28,7 @@ func BenchmarkSummarizationMiddleware_NoSummarization(b *testing.B) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -51,11 +51,11 @@ func BenchmarkSummarizationMiddleware_WithSummarization(b *testing.B) {
 
 	req := &ModelRequest{
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
-			{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 1"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 1"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 2"}}},
+			{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response 2"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Message 3"}}},
 		},
 	}
 
@@ -63,7 +63,7 @@ func BenchmarkSummarizationMiddleware_WithSummarization(b *testing.B) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -95,7 +95,7 @@ func BenchmarkAgentMemoryMiddleware_LazyLoad(b *testing.B) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -131,7 +131,7 @@ func BenchmarkAgentMemoryMiddleware_AlreadyLoaded(b *testing.B) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -145,10 +145,10 @@ func BenchmarkAgentMemoryMiddleware_AlreadyLoaded(b *testing.B) {
 // BenchmarkDefaultTokenCounter 基准测试: 默认 token 计数器
 func BenchmarkDefaultTokenCounter(b *testing.B) {
 	messages := []types.Message{
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello, how are you?"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "I'm doing well, thank you!"}}},
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Can you help me with Go programming?"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Of course! What would you like to know?"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello, how are you?"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "I'm doing well, thank you!"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Can you help me with Go programming?"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Of course! What would you like to know?"}}},
 	}
 
 	b.ResetTimer()
@@ -162,12 +162,12 @@ func BenchmarkDefaultSummarizer(b *testing.B) {
 	ctx := context.Background()
 
 	messages := []types.Message{
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "How are you?"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "I'm good, thanks!"}}},
-		{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Can you help me?"}}},
-		{Role: types.MessageRoleAssistant, Content: []types.ContentBlock{&types.TextBlock{Text: "Sure, what do you need?"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hi there!"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "How are you?"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "I'm good, thanks!"}}},
+		{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Can you help me?"}}},
+		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Sure, what do you need?"}}},
 	}
 
 	b.ResetTimer()
@@ -199,7 +199,7 @@ func BenchmarkPhase4Stack(b *testing.B) {
 	req := &ModelRequest{
 		SystemPrompt: "Test prompt",
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
 		},
 	}
 
@@ -208,7 +208,7 @@ func BenchmarkPhase4Stack(b *testing.B) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -228,7 +228,7 @@ func BenchmarkPhase4Stack(b *testing.B) {
 func BenchmarkExtractMessageContent(b *testing.B) {
 	msg := types.Message{
 		Role: types.MessageRoleAssistant,
-		Content: []types.ContentBlock{
+		ContentBlocks: []types.ContentBlock{
 			&types.TextBlock{Text: "Hello, this is a test message"},
 			&types.ToolUseBlock{Name: "test_tool", Input: map[string]interface{}{"key": "value"}},
 			&types.TextBlock{Text: "Another text block"},

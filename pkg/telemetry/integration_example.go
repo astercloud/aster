@@ -37,7 +37,7 @@ func Example() {
 	span.AddEvent("processing_message", String("message", "Hello"))
 
 	// 模拟模型调用
-	modelCtx, modelSpan := tracer.StartSpan(ctx, "model.generate")
+	_, modelSpan := tracer.StartSpan(ctx, "model.generate")
 	modelSpan.SetAttributes(
 		String("model", "claude-3-5-sonnet"),
 		Int("input_tokens", 100),
@@ -49,7 +49,7 @@ func Example() {
 	agentMetrics.RecordTokens(agentID, 100, 200)
 
 	// 模拟工具调用
-	toolCtx, toolSpan := tracer.StartSpan(ctx, "tool.execute")
+	_, toolSpan := tracer.StartSpan(ctx, "tool.execute")
 	toolSpan.SetAttributes(String("tool.name", "search"))
 	time.Sleep(50 * time.Millisecond)
 	toolSpan.End()

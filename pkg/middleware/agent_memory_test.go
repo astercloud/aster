@@ -169,7 +169,7 @@ func TestAgentMemoryMiddleware_InjectToSystemPrompt(t *testing.T) {
 	req := &ModelRequest{
 		SystemPrompt: "Additional instructions here.",
 		Messages: []types.Message{
-			{Role: types.MessageRoleUser, Content: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
+			{Role: types.MessageRoleUser, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Hello"}}},
 		},
 	}
 
@@ -180,7 +180,7 @@ func TestAgentMemoryMiddleware_InjectToSystemPrompt(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -240,7 +240,7 @@ func TestAgentMemoryMiddleware_EmptySystemPrompt(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -381,7 +381,7 @@ func TestAgentMemoryMiddleware_CustomTemplate(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
@@ -494,7 +494,7 @@ func TestAgentMemoryMiddleware_LazyLoading(t *testing.T) {
 		return &ModelResponse{
 			Message: types.Message{
 				Role:    types.MessageRoleAssistant,
-				Content: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
+				ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Response"}},
 			},
 		}, nil
 	}
