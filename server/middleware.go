@@ -4,7 +4,6 @@ import (
 	"fmt"
 	"net/http"
 	"strings"
-	"sync"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -78,15 +77,6 @@ func corsMiddleware(config CORSConfig) gin.HandlerFunc {
 	}
 }
 
-// metricsMiddleware collects metrics
-func metricsMiddleware() gin.HandlerFunc {
-	return func(c *gin.Context) {
-		start := time.Now()
-		c.Next()
-		c.Set("metrics.latency", time.Since(start))
-	}
-}
-
 // apiKeyAuthMiddleware validates API key
 func apiKeyAuthMiddleware(config APIKeyConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
@@ -129,47 +119,6 @@ func jwtAuthMiddleware(config JWTConfig) gin.HandlerFunc {
 			return
 		}
 		c.Set("authenticated", true)
-		c.Next()
-	}
-}
-
-// rateLimitMiddleware implements rate limiting
-func rateLimitMiddleware(config RateLimitConfig) gin.HandlerFunc {
-	type client struct {
-		count     int
-		resetTime time.Time
-		mu        sync.Mutex
-	}
-
-	clients := make(map[string]*client)
-	var mu sync.RWMutex
-
-	return func(c *gin.Context) {
-		ip := c.ClientIP()
-
-		mu.Lock()
-		cl, exists := clients[ip]
-		if !exists {
-			cl = &client{count: 0, resetTime: time.Now().Add(config.WindowSize)}
-			clients[ip] = cl
-		}
-		mu.Unlock()
-
-		cl.mu.Lock()
-		defer cl.mu.Unlock()
-
-		if time.Now().After(cl.resetTime) {
-			cl.count = 0
-			cl.resetTime = time.Now().Add(config.WindowSize)
-		}
-
-		if cl.count >= config.RequestsPerIP {
-			c.JSON(http.StatusTooManyRequests, gin.H{"success": false, "error": gin.H{"code": "rate_limit_exceeded"}})
-			c.Abort()
-			return
-		}
-
-		cl.count++
 		c.Next()
 	}
 }
