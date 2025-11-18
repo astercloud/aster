@@ -30,7 +30,7 @@ srv.Start()
 
 ```bash
 export OTEL_EXPORTER_OTLP_ENDPOINT=http://localhost:4318
-export OTEL_SERVICE_NAME=agentsdk
+export OTEL_SERVICE_NAME=aster
 export OTEL_TRACES_SAMPLER=always_on
 ```
 
@@ -133,7 +133,7 @@ import (
 
 func (h *AgentHandler) Create(c *gin.Context) {
     ctx := c.Request.Context()
-    tracer := otel.Tracer("agentsdk")
+    tracer := otel.Tracer("aster")
     
     // 开始新的 span
     ctx, span := tracer.Start(ctx, "agent.create")
@@ -226,7 +226,7 @@ sdktrace.WithSampler(sdktrace.TraceIDRatioBased(config.SamplingRate))
 ### 查看 Trace
 
 在 Jaeger UI 中：
-1. 选择 Service: agentsdk
+1. 选择 Service: aster
 2. 选择 Operation: GET /v1/agents
 3. 点击 "Find Traces"
 
@@ -290,7 +290,7 @@ POST /v1/agents/chat
 
 ```promql
 # Prometheus query with exemplar
-rate(http_request_duration_seconds_bucket{job="agentsdk"}[5m])
+rate(http_request_duration_seconds_bucket{job="aster"}[5m])
 ```
 
 在 Grafana 中点击 exemplar 可直接跳转到对应的 trace。
@@ -404,7 +404,7 @@ if err != nil {
 3. **检查日志**
    ```bash
    # 查看 exporter 错误
-   docker logs agentsdk 2>&1 | grep "trace"
+   docker logs aster 2>&1 | grep "trace"
    ```
 
 ### 高延迟

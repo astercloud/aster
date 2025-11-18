@@ -158,7 +158,7 @@ func main() {
 ```go
 func defaultPrompt() string {
     return `请帮我完成一个两阶段的代码分析任务:
-1. 规划(Plan): 分析 agentsdk 仓库里 pkg/tools/builtin 目录下各个工具的职责和测试需求, 给出一个分步骤的实施计划。
+1. 规划(Plan): 分析 aster 仓库里 pkg/tools/builtin 目录下各个工具的职责和测试需求, 给出一个分步骤的实施计划。
 2. 探索(Explore): 按计划实际阅读相关文件, 重点关注 TodoWrite / ExitPlanMode / Task / subagent_manager 等实现细节。
 
 要求:
@@ -261,7 +261,7 @@ Explore(分析当前工具实现状态)
 
 ## 与 Task / 子代理系统结合
 
-本示例使用的是「单 Agent + TodoList 中间件」模式。如果结合前文实现的 `Task` + `agentsdk subagent` 子代理框架:
+本示例使用的是「单 Agent + TodoList 中间件」模式。如果结合前文实现的 `Task` + `aster subagent` 子代理框架:
 
 - 顶层 Agent 使用 `Task` 工具启动 `Plan` / `Explore` 子代理:
 

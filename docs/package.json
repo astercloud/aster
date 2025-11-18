@@ -1,5 +1,5 @@
 {
-  "name": "agentsdk-docs",
+  "name": "aster-docs",
   "scripts": {
     "dev": "nuxt dev --extends docus",
     "build": "nuxt build --extends docus",

@@ -69,7 +69,7 @@ authManager.Register(apiKeyAuth)
 // JWT 认证
 jwtAuth := auth.NewJWTAuthenticator(auth.JWTConfig{
     SecretKey: "your-secret",
-    Issuer: "agentsdk",
+    Issuer: "aster",
     ExpiryDuration: 24 * time.Hour,
 })
 authManager.Register(jwtAuth)
@@ -93,7 +93,7 @@ hasPermission := rbac.HasPermission(ctx, user, "agents", "create")
 
 #### Prometheus Metrics
 ```go
-metrics := observability.NewMetricsManager("agentsdk")
+metrics := observability.NewMetricsManager("aster")
 
 // HTTP 指标
 aster_http_requests_total{method,path,status}
@@ -334,11 +334,11 @@ if err := srv.Stop(ctx); err != nil {
 
 ## 部署模式
 
-### 开发模式 (`cmd/agentsdk`)
+### 开发模式 (`cmd/aster`)
 
 简化配置，快速启动：
 ```bash
-agentsdk serve --port 8080 --mode debug
+aster serve --port 8080 --mode debug
 ```
 
 特点：
@@ -347,12 +347,12 @@ agentsdk serve --port 8080 --mode debug
 - 详细日志
 - 热重载支持
 
-### 生产模式 (`cmd/agentsdk-server`)
+### 生产模式 (`cmd/aster-server`)
 
 完整特性：
 ```bash
 export API_KEY=your-secret-key
-agentsdk-server
+aster-server
 ```
 
 特点：

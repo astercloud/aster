@@ -15,10 +15,10 @@ navigation: false
 
 ## 1. 启动 HTTP Server
 
-确保使用 CLI 启动 `agentsdk serve`:
+确保使用 CLI 启动 `aster serve`:
 
 ```bash
-agentsdk serve --addr :8080 --workspace ./workspace --store .aster
+aster serve --addr :8080 --workspace ./workspace --store .aster
 ```
 
 启动后, 终端会显示:

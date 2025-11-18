@@ -269,10 +269,10 @@ import (
     "github.com/stretchr/testify/assert"
     "github.com/stretchr/testify/require"
 
-    "agentsdk/pkg/agent"
-    "agentsdk/pkg/provider"
-    "agentsdk/pkg/store"
-    "agentsdk/pkg/tools"
+    "aster/pkg/agent"
+    "aster/pkg/provider"
+    "aster/pkg/store"
+    "aster/pkg/tools"
 )
 
 // 测试 Agent 完整创建流程
@@ -823,10 +823,10 @@ go tool cover -func=coverage.out | grep total | awk '{print $3}' | sed 's/%//' |
 func TestCoverageGoal(t *testing.T) {
     // 确保关键包的覆盖率
     packages := map[string]float64{
-        "agentsdk/pkg/agent":      80.0,
-        "agentsdk/pkg/tools":      75.0,
-        "agentsdk/pkg/middleware": 70.0,
-        "agentsdk/pkg/store":      80.0,
+        "aster/pkg/agent":      80.0,
+        "aster/pkg/tools":      75.0,
+        "aster/pkg/middleware": 70.0,
+        "aster/pkg/store":      80.0,
     }
 
     for pkg, minCoverage := range packages {

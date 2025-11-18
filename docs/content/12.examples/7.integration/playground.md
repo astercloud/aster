@@ -14,7 +14,7 @@ description: 在浏览器中交互式体验 aster Chat 与流式事件
 >
 > ```bash
 > # 方式一: 使用 CLI
-> agentsdk serve --addr :8080 --workspace ./workspace --store .aster
+> aster serve --addr :8080 --workspace ./workspace --store .aster
 >
 > # 方式二: 直接运行示例
 > cd examples

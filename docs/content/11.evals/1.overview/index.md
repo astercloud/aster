@@ -12,7 +12,7 @@ navigation: false
 
 - 直接在 Go 代码中使用 `pkg/evals`;
 - 通过 HTTP 接口 `POST /v1/evals/text` 调用本地评估;
-- 使用 `agentsdk eval` CLI 在命令行中对文本进行评估。
+- 使用 `aster eval` CLI 在命令行中对文本进行评估。
 
 当前提供的评估器不依赖外部 LLM,仅使用启发式算法:
 
@@ -235,7 +235,7 @@ go run evals-session/main.go
 
 ## 7. 通过 HTTP API 使用 evals
 
-当你使用 `agentsdk serve` 启动 HTTP Server 后,会自动暴露一个本地评估接口:
+当你使用 `aster serve` 启动 HTTP Server 后,会自动暴露一个本地评估接口:
 
 - 路径1: `POST /v1/evals/text`
 - 路径2: `POST /v1/evals/session`
@@ -335,9 +335,9 @@ curl -X POST http://localhost:8080/v1/evals/session \
    - 将之前的 user/assistant 消息拼成 `Context`。
 2. 按 `scorers` 列表运行本地评估器, 返回与 `/v1/evals/text` 相同结构的 `scores` 数组。
 
-## 8. 使用 agentsdk CLI 进行评估
+## 8. 使用 aster CLI 进行评估
 
-除了 HTTP API,你还可以直接在命令行使用 `agentsdk eval` 进行本地评估,非常适合:
+除了 HTTP API,你还可以直接在命令行使用 `aster eval` 进行本地评估,非常适合:
 
 - 手工检查某个模型输出;
 - 在 shell 脚本/CI 中对输出做简单打分。
@@ -346,7 +346,7 @@ curl -X POST http://localhost:8080/v1/evals/session \
 
 ```bash
 echo "Paris is the capital of France." \
-  | agentsdk eval \
+  | aster eval \
       -reference "Paris is the capital city of France, a country in Europe." \
       -keywords "paris,capital,france,europe"
 ```
@@ -381,7 +381,7 @@ lexical_similarity: 0.8000
   以 JSON 格式输出评估结果,适合脚本消费:
 
   ```bash
-  echo "text..." | agentsdk eval -reference "ref..." -json
+  echo "text..." | aster eval -reference "ref..." -json
   ```
 
 - `-file path`  
@@ -394,7 +394,7 @@ lexical_similarity: 0.8000
   使用示例:
 
   ```bash
-  agentsdk eval -file cases.jsonl -json
+  aster eval -file cases.jsonl -json
   ```
 
   输出中每条结果(在 JSON 模式下)包含:

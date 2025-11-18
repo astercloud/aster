@@ -124,7 +124,7 @@ import "github.com/prometheus/client_golang/prometheus"
 // 创建自定义指标
 customCounter := prometheus.NewCounter(
     prometheus.CounterOpts{
-        Namespace: "agentsdk",
+        Namespace: "aster",
         Name:      "custom_operations_total",
         Help:      "Total custom operations",
     },

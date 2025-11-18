@@ -2,7 +2,7 @@
 export default {
   extends: ['docus'],
   app: {
-    baseURL: '/agentsdk/'
+    baseURL: '/aster/'
   },
   image: {
     provider: 'none'
@@ -12,6 +12,6 @@ export default {
     robotsTxt: false
   },
   llms: {
-    domain: 'https://agentsdk.local'
+    domain: 'https://aster.local'
   }
 }

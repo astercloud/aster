@@ -1,12 +1,12 @@
 ---
-title: agentsdk CLI 示例
-description: 使用 agentsdk serve 启动标准 HTTP Chat 服务
+title: aster CLI 示例
+description: 使用 aster serve 启动标准 HTTP Chat 服务
 navigation: false
 ---
 
-# agentsdk CLI 示例
+# aster CLI 示例
 
-aster 提供了一个简单的 CLI 可执行程序 `agentsdk`, 用于快速启动一个标准化的 HTTP Chat 服务(当前为最小可用版本)。
+aster 提供了一个简单的 CLI 可执行程序 `aster`, 用于快速启动一个标准化的 HTTP Chat 服务(当前为最小可用版本)。
 
 > 示例代码路径: `cmd/aster/main.go`
 
@@ -15,13 +15,13 @@ aster 提供了一个简单的 CLI 可执行程序 `agentsdk`, 用于快速启�
 在 aster 仓库根目录执行:
 
 ```bash
-go install ./cmd/agentsdk@latest
+go install ./cmd/aster@latest
 ```
 
 安装成功后, 你可以在终端中直接运行:
 
 ```bash
-agentsdk -h
+aster -h
 ```
 
 ## 2. 启动 HTTP Server
@@ -39,9 +39,9 @@ agentsdk -h
 ### 命令行参数
 
 ```bash
-agentsdk serve [flags]
-agentsdk mcp-serve [flags]
-agentsdk eval [flags]
+aster serve [flags]
+aster mcp-serve [flags]
+aster eval [flags]
 
 serve Flags:
   -addr string
@@ -74,7 +74,7 @@ serve Flags:
 export ANTHROPIC_API_KEY=your_api_key_here
 
 # 启动 HTTP Server
-agentsdk serve \
+aster serve \
   --addr :8080 \
   --workspace ./workspace \
   --store .aster
@@ -95,7 +95,7 @@ aster: HTTP server started at http://localhost:8080
 如果你希望通过配置文件统一管理模板和路由策略, 可以增加 `-config` 参数:
 
 ```bash
-agentsdk serve \
+aster serve \
   --addr :8080 \
   --workspace ./workspace \
   --store .aster \
@@ -131,7 +131,7 @@ routing:
 ### 启动 MCP Server
 
 ```bash
-agentsdk mcp-serve \
+aster mcp-serve \
   --addr :8090 \
   --docs ./docs/content
 ```

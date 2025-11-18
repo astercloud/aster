@@ -38,7 +38,7 @@ aster 的四层架构设计，包括核心 SDK、Server 层、HTTP 层和客户�
 - 生产部署就绪
 
 ### [4. HTTP 层架构](./3.http-layer.md)
-`cmd/agentsdk` 目录下的开发 HTTP 服务实现，可替换框架。
+`cmd/aster` 目录下的开发 HTTP 服务实现，可替换框架。
 
 **关键内容**:
 - 100+ REST API 端点

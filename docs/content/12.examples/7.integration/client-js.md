@@ -1,6 +1,6 @@
 ---
 title: JS 客户端示例
-description: 使用 @agentsdk/client-js 访问 HTTP Chat API
+description: 使用 @aster/client-js 访问 HTTP Chat API
 ---
 
 # JS 客户端示例
@@ -8,7 +8,7 @@ description: 使用 @agentsdk/client-js 访问 HTTP Chat API
 为方便前端/Node.js 应用集成, aster 提供了一个最小的 JS/TS 客户端包:
 
 - 包路径: `client-sdks/client-js`
-- NPM 名称: `@agentsdk/client-js`
+- NPM 名称: `@aster/client-js`
 - 封装了 `/v1/agents/chat` 同步接口
 
 > 当前版本仅对同步 Chat API 提供封装。Streaming 可以在应用侧使用 `fetch` + ReadableStream 或其他 SSE/WebSocket 方案自行实现。
@@ -18,16 +18,16 @@ description: 使用 @agentsdk/client-js 访问 HTTP Chat API
 在你的前端或 Node.js 项目中:
 
 ```bash
-npm install @agentsdk/client-js
+npm install @aster/client-js
 ```
 
 ## 2. 基本使用
 
 ```ts
-import { AgentsdkClient } from '@agentsdk/client-js';
+import { AgentsdkClient } from '@aster/client-js';
 
 const client = new AgentsdkClient({
-  baseUrl: 'http://localhost:8080', // agentsdk serve 的地址
+  baseUrl: 'http://localhost:8080', // aster serve 的地址
 });
 
 async function main() {
@@ -82,13 +82,13 @@ paths:
 
 有了:
 
-- `agentsdk serve` 提供的 HTTP Chat(同步/流式)接口
-- `@agentsdk/client-js` 封装的同步 Chat 客户端
-- MCP Server(`agentsdk mcp-serve`) 暴露 docs / 项目工具
+- `aster serve` 提供的 HTTP Chat(同步/流式)接口
+- `@aster/client-js` 封装的同步 Chat 客户端
+- MCP Server(`aster mcp-serve`) 暴露 docs / 项目工具
 
 你可以在自己的前端项目中构建一个简单的 Playground:
 
-- 使用 `@agentsdk/client-js` 完成交互式 Chat。
+- 使用 `@aster/client-js` 完成交互式 Chat。
 - 使用 `fetch` 对 `/v1/agents/chat/stream` 做 streaming 渲染。
 - 使用 MCP + `docs_search`/`docs_get` 在 IDE 或 Web UI 中集成文档检索能力。
 

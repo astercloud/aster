@@ -8,7 +8,7 @@ description: CLI、HTTP Server、路由、MCP、Logging、Evals 等运行时能�
 本章节汇总与「运行时部署与运维」相关的指南, 方便从一个入口了解:
 
 - 如何启动 HTTP Server / Streaming 接口
-- 如何使用 `agentsdk` CLI
+- 如何使用 `aster` CLI
 - 如何集成 MCP Server
 - 如何配置模型路由(Model Routing)
 - 如何接入 Logging / Evals
@@ -20,13 +20,13 @@ description: CLI、HTTP Server、路由、MCP、Logging、Evals 等运行时能�
 
 推荐用法:
 
-- 开发环境使用 `agentsdk serve` 快速启动一个标准化的 Chat 服务;
+- 开发环境使用 `aster serve` 快速启动一个标准化的 Chat 服务;
 - 生产环境将 `pkg/server` 集成到自己的 Web 服务中, 暴露 `/v1/agents/chat` 等接口;
 - 对工作流相关的 API, 可以参考工作流 HTTP 示例中的事件流处理方式。
 
 ## 🧰 CLI 与配置
 
-- [agentsdk CLI 示例](/guides/cli)
+- [aster CLI 示例](/guides/cli)
 
 CLI 适合:
 

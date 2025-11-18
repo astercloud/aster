@@ -478,7 +478,7 @@ import (
 
 // 初始化追踪
 func initTracer() trace.Tracer {
-    return otel.Tracer("agentsdk")
+    return otel.Tracer("aster")
 }
 
 var tracer = initTracer()

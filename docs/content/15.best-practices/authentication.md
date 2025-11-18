@@ -67,7 +67,7 @@ config := &server.Config{
         JWT: server.JWTConfig{
             Enabled: true,
             Secret: "your-jwt-secret-key",
-            Issuer: "agentsdk",
+            Issuer: "aster",
             Expiry: 86400, // 24 hours
         },
     },
@@ -79,7 +79,7 @@ config := &server.Config{
 ```go
 jwtAuth := auth.NewJWTAuthenticator(auth.JWTConfig{
     SecretKey: "your-secret",
-    Issuer: "agentsdk",
+    Issuer: "aster",
     ExpiryDuration: 24 * time.Hour,
 })
 
@@ -294,7 +294,7 @@ apiKeyInfo := &auth.APIKeyInfo{
 ```go
 jwtConfig := auth.JWTConfig{
     SecretKey: os.Getenv("JWT_SECRET"),  // 从环境变量
-    Issuer: "agentsdk",
+    Issuer: "aster",
     ExpiryDuration: 24 * time.Hour,      // 24 小时
 }
 ```
@@ -370,7 +370,7 @@ func main() {
     // 3. 注册 JWT 认证
     jwtAuth := auth.NewJWTAuthenticator(auth.JWTConfig{
         SecretKey: os.Getenv("JWT_SECRET"),
-        Issuer: "agentsdk",
+        Issuer: "aster",
         ExpiryDuration: 24 * time.Hour,
     })
     authManager.Register(jwtAuth)
