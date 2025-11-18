@@ -189,7 +189,6 @@ credentials/
 
 # 工作区
 workspace/
-sandbox/
 scratch/
 
 # 生成的文件
