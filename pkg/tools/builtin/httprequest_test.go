@@ -14,9 +14,9 @@ func TestHttpRequestTool_Success(t *testing.T) {
 	// 创建测试服务器
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("Hello, World!"))
+		_, _ = w.Write([]byte("Hello, World!"))
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -56,12 +56,12 @@ func TestHttpRequestTool_JsonResponse(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"message": "success",
 			"code":    0,
 		})
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -109,9 +109,9 @@ func TestHttpRequestTool_POST_WithBody(t *testing.T) {
 		}
 
 		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte("Created"))
+		_, _ = w.Write([]byte("Created"))
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -152,7 +152,7 @@ func TestHttpRequestTool_CustomHeaders(t *testing.T) {
 
 		w.WriteHeader(http.StatusOK)
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -215,9 +215,9 @@ func TestHttpRequestTool_404Status(t *testing.T) {
 	// 创建返回404的测试服务器
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
-		w.Write([]byte("Not Found"))
+		_, _ = w.Write([]byte("Not Found"))
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -253,7 +253,7 @@ func TestHttpRequestTool_EmptyResponse(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {

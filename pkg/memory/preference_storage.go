@@ -255,7 +255,7 @@ func (pm *PersistentPreferenceManager) AutoSave(ctx context.Context, interval in
 		select {
 		case <-ctx.Done():
 			// 上下文取消，执行最后一次保存
-			pm.SaveAll(context.Background())
+			_ = pm.SaveAll(context.Background())
 			return
 
 		case <-ticker.C:

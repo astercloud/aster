@@ -444,7 +444,7 @@ func (pe *PreferenceExtractor) ExtractFromMessage(
 
 	// 添加到管理器
 	for _, pref := range preferences {
-		pe.manager.AddPreference(ctx, pref)
+		_ = pe.manager.AddPreference(ctx, pref)
 	}
 
 	return preferences, nil

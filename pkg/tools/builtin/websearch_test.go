@@ -73,7 +73,7 @@ func TestWebSearchTool_SuccessfulSearch(t *testing.T) {
 		// 返回模拟的搜索结果
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]interface{}{
+		_ = json.NewEncoder(w).Encode(map[string]interface{}{
 			"results": []map[string]interface{}{
 				{
 					"title":   "Test Result 1",
@@ -91,7 +91,7 @@ func TestWebSearchTool_SuccessfulSearch(t *testing.T) {
 			"query": reqBody["query"],
 		})
 	}))
-	defer server.Close()
+	defer func() { _ = server.Close() }()
 
 	// 保存原有环境变量
 	oldAPIKey := os.Getenv("WF_TAVILY_API_KEY")

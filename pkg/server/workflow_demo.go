@@ -528,7 +528,7 @@ func (a *LLMWorkflowAgent) Execute(ctx context.Context, message string) iter.Seq
 			_ = yield(nil, err)
 			return
 		}
-		defer ag.Close()
+		defer func() { _ = ag.Close() }()
 
 		// 为当前工作流步骤构造提示词
 		prompt := fmt.Sprintf("[%s] %s - 处理: %s", a.name, a.description, message)

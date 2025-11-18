@@ -75,7 +75,7 @@ func main() {
 
 	// Override with environment variables if needed
 	if port := os.Getenv("PORT"); port != "" {
-		fmt.Sscanf(port, "%d", &config.Port)
+		_, _ = fmt.Sscanf(port, "%d", &config.Port)
 	}
 	if host := os.Getenv("HOST"); host != "" {
 		config.Host = host

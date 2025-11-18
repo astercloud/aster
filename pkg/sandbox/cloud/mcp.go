@@ -82,7 +82,7 @@ func (mc *MCPClient) CallTool(ctx context.Context, toolName string, params map[s
 	if err != nil {
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 读取响应
 	respBody, err := io.ReadAll(resp.Body)
@@ -138,7 +138,7 @@ func (mc *MCPClient) ListTools(ctx context.Context) ([]MCPTool, error) {
 	if err != nil {
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	respBody, err := io.ReadAll(resp.Body)
 	if err != nil {

@@ -23,10 +23,10 @@ func TestInMemoryService_Create(t *testing.T) {
 
 		sess, err := service.Create(ctx, req)
 		require.NoError(t, err)
-		assert.NotEmpty(t, sess.ID)
-		assert.Equal(t, "test-app", sess.AppName)
-		assert.Equal(t, "user-1", sess.UserID)
-		assert.Equal(t, "agent-1", sess.AgentID)
+		assert.NotEmpty(t, sess.ID())
+		assert.Equal(t, "test-app", sess.AppName())
+		assert.Equal(t, "user-1", sess.UserID())
+		assert.Equal(t, "agent-1", sess.AgentID())
 	})
 
 	t.Run("多个会话独立", func(t *testing.T) {
@@ -42,8 +42,8 @@ func TestInMemoryService_Create(t *testing.T) {
 			AgentID: "agent-2",
 		})
 
-		assert.NotEqual(t, sess1.ID, sess2.ID)
-		assert.NotEqual(t, sess1.AppName, sess2.AppName)
+		assert.NotEqual(t, sess1.ID(), sess2.ID())
+		assert.NotEqual(t, sess1.AppName(), sess2.AppName())
 	})
 }
 
@@ -60,10 +60,10 @@ func TestInMemoryService_Get(t *testing.T) {
 		})
 
 		// 获取会话
-		retrieved, err := service.Get(ctx, created.ID)
+		retrieved, err := service.Get(ctx, created.ID())
 		require.NoError(t, err)
-		assert.Equal(t, created.ID, retrieved.ID)
-		assert.Equal(t, created.AppName, retrieved.AppName)
+		assert.Equal(t, created.ID(), retrieved.ID())
+		assert.Equal(t, created.AppName(), retrieved.AppName())
 	})
 
 	t.Run("获取不存在的会话", func(t *testing.T) {
@@ -143,11 +143,11 @@ func TestInMemoryService_Delete(t *testing.T) {
 			AgentID: "agent-1",
 		})
 
-		err := service.Delete(ctx, sess.ID)
+		err := service.Delete(ctx, sess.ID())
 		require.NoError(t, err)
 
 		// 验证已删除
-		_, err = service.Get(ctx, sess.ID)
+		_, err = service.Get(ctx, sess.ID())
 		assert.ErrorIs(t, err, ErrSessionNotFound)
 	})
 
@@ -181,11 +181,11 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 			},
 		}
 
-		err := service.AppendEvent(ctx, sess.ID, event)
+		err := service.AppendEvent(ctx, sess.ID(), event)
 		require.NoError(t, err)
 
 		// 验证事件已追加
-		events, err := service.GetEvents(ctx, sess.ID, nil)
+		events, err := service.GetEvents(ctx, sess.ID(), nil)
 		require.NoError(t, err)
 		assert.Len(t, events, 1)
 		assert.Equal(t, "evt-1", events[0].ID)
@@ -205,10 +205,10 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 					Content: "Response",
 				},
 			}
-			service.AppendEvent(ctx, sess.ID, event)
+			service.AppendEvent(ctx, sess.ID(), event)
 		}
 
-		events, _ := service.GetEvents(ctx, sess.ID, nil)
+		events, _ := service.GetEvents(ctx, sess.ID(), nil)
 		assert.Len(t, events, 4) // 1 from previous test + 3 new
 	})
 
@@ -232,11 +232,11 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 			},
 		}
 
-		err := service.AppendEvent(ctx, sess.ID, event)
+		err := service.AppendEvent(ctx, sess.ID(), event)
 		require.NoError(t, err)
 
 		// 验证状态已更新
-		state, err := service.GetState(ctx, sess.ID, "")
+		state, err := service.GetState(ctx, sess.ID(), "")
 		require.NoError(t, err)
 		assert.Equal(t, 1, state["session:count"])
 		assert.Equal(t, "dark", state["user:theme"])
@@ -261,7 +261,7 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 			},
 		}
 
-		err := service.AppendEvent(ctx, sess.ID, event)
+		err := service.AppendEvent(ctx, sess.ID(), event)
 		require.NoError(t, err)
 	})
 
@@ -303,17 +303,17 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 				Content: "Message",
 			},
 		}
-		service.AppendEvent(ctx, sess.ID, event)
+		service.AppendEvent(ctx, sess.ID(), event)
 	}
 
 	t.Run("获取所有事件", func(t *testing.T) {
-		events, err := service.GetEvents(ctx, sess.ID, nil)
+		events, err := service.GetEvents(ctx, sess.ID(), nil)
 		require.NoError(t, err)
 		assert.Len(t, events, 10)
 	})
 
 	t.Run("限制返回数量", func(t *testing.T) {
-		events, err := service.GetEvents(ctx, sess.ID, &EventOptions{
+		events, err := service.GetEvents(ctx, sess.ID(), &EventOptions{
 			Limit: 5,
 		})
 		require.NoError(t, err)
@@ -322,7 +322,7 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 
 	t.Run("按 InvocationID 过滤", func(t *testing.T) {
 		// 添加不同 InvocationID 的事件
-		service.AppendEvent(ctx, sess.ID, &Event{
+		service.AppendEvent(ctx, sess.ID(), &Event{
 			ID:           "evt-special",
 			Timestamp:    time.Now(),
 			InvocationID: "inv-special",
@@ -331,7 +331,7 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 			Author:       "user",
 		})
 
-		events, err := service.GetEvents(ctx, sess.ID, &EventOptions{
+		events, err := service.GetEvents(ctx, sess.ID(), &EventOptions{
 			InvocationID: "inv-special",
 		})
 		require.NoError(t, err)
@@ -341,7 +341,7 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 
 	t.Run("按 Branch 过滤", func(t *testing.T) {
 		// 添加不同 Branch 的事件
-		service.AppendEvent(ctx, sess.ID, &Event{
+		service.AppendEvent(ctx, sess.ID(), &Event{
 			ID:           "evt-branch",
 			Timestamp:    time.Now(),
 			InvocationID: "inv-1",
@@ -350,7 +350,7 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 			Author:       "user",
 		})
 
-		events, err := service.GetEvents(ctx, sess.ID, &EventOptions{
+		events, err := service.GetEvents(ctx, sess.ID(), &EventOptions{
 			Branch: "root.sub",
 		})
 		require.NoError(t, err)
@@ -390,10 +390,10 @@ func TestInMemoryService_GetState(t *testing.T) {
 			},
 		},
 	}
-	service.AppendEvent(ctx, sess.ID, event)
+	service.AppendEvent(ctx, sess.ID(), event)
 
 	t.Run("获取所有状态", func(t *testing.T) {
-		state, err := service.GetState(ctx, sess.ID, "")
+		state, err := service.GetState(ctx, sess.ID(), "")
 		require.NoError(t, err)
 		assert.Len(t, state, 4)
 		assert.Equal(t, "1.0.0", state["app:version"])
@@ -402,7 +402,7 @@ func TestInMemoryService_GetState(t *testing.T) {
 	})
 
 	t.Run("按作用域过滤", func(t *testing.T) {
-		state, err := service.GetState(ctx, sess.ID, "user")
+		state, err := service.GetState(ctx, sess.ID(), "user")
 		require.NoError(t, err)
 		assert.Len(t, state, 1)
 		assert.Equal(t, "zh-CN", state["user:language"])
@@ -447,7 +447,7 @@ func TestInMemoryService_Concurrency(t *testing.T) {
 						Branch:       "root",
 						Author:       "user",
 					}
-					service.AppendEvent(ctx, sess.ID, event)
+					service.AppendEvent(ctx, sess.ID(), event)
 				}
 				done <- true
 			}(i)
@@ -459,7 +459,7 @@ func TestInMemoryService_Concurrency(t *testing.T) {
 		}
 
 		// 验证所有事件都已追加
-		events, _ := service.GetEvents(ctx, sess.ID, nil)
+		events, _ := service.GetEvents(ctx, sess.ID(), nil)
 		assert.Len(t, events, numGoroutines*eventsPerGoroutine)
 	})
 }
@@ -476,7 +476,7 @@ func TestInMemoryService_StateScopes(t *testing.T) {
 
 	t.Run("状态作用域隔离", func(t *testing.T) {
 		// App 级状态（所有用户共享）
-		service.AppendEvent(ctx, sess.ID, &Event{
+		service.AppendEvent(ctx, sess.ID(), &Event{
 			ID:           "evt-1",
 			Timestamp:    time.Now(),
 			InvocationID: "inv-1",
@@ -491,7 +491,7 @@ func TestInMemoryService_StateScopes(t *testing.T) {
 		})
 
 		// User 级状态（该用户所有会话共享）
-		service.AppendEvent(ctx, sess.ID, &Event{
+		service.AppendEvent(ctx, sess.ID(), &Event{
 			ID:           "evt-2",
 			Timestamp:    time.Now(),
 			InvocationID: "inv-1",
@@ -506,7 +506,7 @@ func TestInMemoryService_StateScopes(t *testing.T) {
 		})
 
 		// Session 级状态（当前会话）
-		service.AppendEvent(ctx, sess.ID, &Event{
+		service.AppendEvent(ctx, sess.ID(), &Event{
 			ID:           "evt-3",
 			Timestamp:    time.Now(),
 			InvocationID: "inv-1",
@@ -521,13 +521,13 @@ func TestInMemoryService_StateScopes(t *testing.T) {
 		})
 
 		// 验证各作用域
-		appState, _ := service.GetState(ctx, sess.ID, "app")
+		appState, _ := service.GetState(ctx, sess.ID(), "app")
 		assert.Len(t, appState, 1)
 
-		userState, _ := service.GetState(ctx, sess.ID, "user")
+		userState, _ := service.GetState(ctx, sess.ID(), "user")
 		assert.Len(t, userState, 1)
 
-		sessionState, _ := service.GetState(ctx, sess.ID, "session")
+		sessionState, _ := service.GetState(ctx, sess.ID(), "session")
 		assert.Len(t, sessionState, 1)
 	})
 }

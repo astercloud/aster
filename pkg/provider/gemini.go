@@ -136,7 +136,7 @@ func (p *GeminiProvider) Stream(
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, fmt.Errorf("Gemini API error: %d - %s", resp.StatusCode, string(body))
 	}
 
@@ -178,7 +178,7 @@ func (p *GeminiProvider) Complete(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
@@ -377,7 +377,7 @@ func (p *GeminiProvider) convertTools(tools []ToolSchema) GeminiTool {
 
 // parseSSEStream 解析 SSE 流
 func (p *GeminiProvider) parseSSEStream(body io.ReadCloser, chunks chan<- StreamChunk) {
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 	defer close(chunks)
 
 	scanner := bufio.NewScanner(body)

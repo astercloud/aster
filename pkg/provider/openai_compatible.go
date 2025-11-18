@@ -146,7 +146,7 @@ func (p *OpenAICompatibleProvider) Stream(
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, fmt.Errorf("%s API error: %d - %s", p.providerName, resp.StatusCode, string(body))
 	}
 
@@ -179,7 +179,7 @@ func (p *OpenAICompatibleProvider) Complete(
 	if err != nil {
 		return nil, err
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 检查响应状态
 	if resp.StatusCode != http.StatusOK {
@@ -417,7 +417,7 @@ func (p *OpenAICompatibleProvider) doRequestWithRetry(req *http.Request) (*http.
 		}
 
 		if shouldRetry && attempt < p.options.MaxRetries {
-			resp.Body.Close()
+			_ = resp.Body.Close()
 			time.Sleep(p.options.RetryDelay * time.Duration(attempt+1))
 			// 恢复 Body
 			if bodyBytes != nil {
@@ -434,7 +434,7 @@ func (p *OpenAICompatibleProvider) doRequestWithRetry(req *http.Request) (*http.
 
 // parseSSEStream 解析 SSE 流
 func (p *OpenAICompatibleProvider) parseSSEStream(body io.ReadCloser, chunks chan<- StreamChunk) {
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 	defer close(chunks)
 
 	scanner := bufio.NewScanner(body)
@@ -605,7 +605,7 @@ func (p *OpenAICompatibleProvider) parseCompleteResponse(apiResp map[string]inte
 			// 解析参数
 			var args map[string]interface{}
 			if argsStr, ok := function["arguments"].(string); ok {
-				json.Unmarshal([]byte(argsStr), &args)
+				_ = json.Unmarshal([]byte(argsStr), &args)
 			}
 
 			blocks = append(blocks, &types.ToolUseBlock{

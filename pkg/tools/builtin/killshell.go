@@ -267,7 +267,7 @@ func (t *KillShellTool) waitForProcessExit(ctx context.Context, pid int, timeout
 			waitCmd := fmt.Sprintf("wait %d 2>/dev/null; echo $?", pid)
 			if result, err := tc.Sandbox.Exec(ctx, waitCmd, &sandbox.ExecOptions{}); err == nil {
 				var exitCode int
-				fmt.Sscanf(strings.TrimSpace(result.Stdout), "%d", &exitCode)
+				_, _ = fmt.Sscanf(strings.TrimSpace(result.Stdout), "%d", &exitCode)
 				return exitCode
 			}
 			return 0 // 假设成功退出

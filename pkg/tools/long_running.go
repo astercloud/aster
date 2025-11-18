@@ -120,7 +120,7 @@ func (e *LongRunningExecutor) StartAsync(
 		defer cancel()
 
 		// 更新状态为 Running
-		e.updateState(taskID, TaskStateRunning)
+		_ = e.updateState(taskID, TaskStateRunning)
 
 		// 执行工具（传递 nil ToolContext，因为 long-running 工具不需要它）
 		result, err := tool.Execute(taskCtx, args, nil)
@@ -129,20 +129,20 @@ func (e *LongRunningExecutor) StartAsync(
 		now := time.Now()
 		if err != nil {
 			if taskCtx.Err() == context.Canceled {
-				e.updateStatus(taskID, func(s *TaskStatus) {
+				_ = e.updateStatus(taskID, func(s *TaskStatus) {
 					s.State = TaskStateCancelled
 					s.Error = fmt.Errorf("task cancelled")
 					s.EndTime = &now
 				})
 			} else {
-				e.updateStatus(taskID, func(s *TaskStatus) {
+				_ = e.updateStatus(taskID, func(s *TaskStatus) {
 					s.State = TaskStateFailed
 					s.Error = err
 					s.EndTime = &now
 				})
 			}
 		} else {
-			e.updateStatus(taskID, func(s *TaskStatus) {
+			_ = e.updateStatus(taskID, func(s *TaskStatus) {
 				s.State = TaskStateCompleted
 				s.Progress = 1.0
 				s.Result = result

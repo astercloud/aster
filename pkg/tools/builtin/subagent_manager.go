@@ -89,7 +89,7 @@ type FileSubagentManager struct {
 func NewFileSubagentManager() *FileSubagentManager {
 	// 创建数据目录
 	dataDir := filepath.Join(os.TempDir(), "agentsdk_subagents")
-	os.MkdirAll(dataDir, 0755)
+	_ = os.MkdirAll(dataDir, 0755)
 
 	sm := &FileSubagentManager{
 		agents:  make(map[string]*SubagentInstance),
@@ -97,7 +97,7 @@ func NewFileSubagentManager() *FileSubagentManager {
 	}
 
 	// 加载现有子代理
-	sm.loadSubagents()
+	_ = sm.loadSubagents()
 
 	return sm
 }
@@ -161,7 +161,7 @@ func (sm *FileSubagentManager) StartSubagent(ctx context.Context, config *Subage
 	// 启动进程
 	err = cmdObj.Start()
 	if err != nil {
-		outFile.Close()
+		_ = outFile.Close()
 		return nil, fmt.Errorf("failed to start subagent: %v", err)
 	}
 
@@ -170,7 +170,7 @@ func (sm *FileSubagentManager) StartSubagent(ctx context.Context, config *Subage
 	instance.Command = cmd
 	instance.PID = cmdObj.Process.Pid
 	sm.agents[config.ID] = instance
-	sm.saveSubagent(instance)
+	_ = sm.saveSubagent(instance)
 
 	// 启动监控协程
 	go sm.monitorSubagent(ctx, instance, cmdObj, outFile)
@@ -244,7 +244,7 @@ func (sm *FileSubagentManager) StopSubagent(taskID string) error {
 	if instance.PID > 0 {
 		proc, err := os.FindProcess(instance.PID)
 		if err == nil {
-			proc.Signal(os.Interrupt) // 发送SIGINT信号
+			_ = proc.Signal(os.Interrupt) // 发送SIGINT信号
 		}
 	}
 
@@ -257,7 +257,7 @@ func (sm *FileSubagentManager) StopSubagent(taskID string) error {
 	instance.EndTime = &now
 	instance.Duration = now.Sub(instance.StartTime)
 	instance.LastUpdate = now
-	sm.saveSubagent(instance)
+	_ = sm.saveSubagent(instance)
 
 	return nil
 }
@@ -309,21 +309,21 @@ func (sm *FileSubagentManager) CleanupSubagent(taskID string) error {
 	// 如果还在运行，先停止
 	if instance.Status == "running" {
 		sm.mu.Unlock()
-		sm.StopSubagent(taskID)
+		_ = sm.StopSubagent(taskID)
 		sm.mu.Lock()
 		_, _ = sm.agents[taskID] // 重新获取实例但忽略，因为即将删除
 	}
 
 	// 删除输出文件
 	outputFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.output", taskID))
-	os.Remove(outputFile)
+	_ = os.Remove(outputFile)
 
 	// 删除实例记录
 	delete(sm.agents, taskID)
 
 	// 删除实例文件
 	instanceFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.json", taskID))
-	os.Remove(instanceFile)
+	_ = os.Remove(instanceFile)
 
 	return nil
 }
@@ -371,7 +371,7 @@ func (sm *FileSubagentManager) buildSubagentCommand(config *SubagentConfig) (str
 // monitorSubagent 监控子代理执行
 func (sm *FileSubagentManager) monitorSubagent(ctx context.Context, instance *SubagentInstance, cmd *exec.Cmd, outFile *os.File) {
 	defer func() {
-		outFile.Close()
+		_ = outFile.Close()
 		sm.mu.Lock()
 		defer sm.mu.Unlock()
 
@@ -379,7 +379,7 @@ func (sm *FileSubagentManager) monitorSubagent(ctx context.Context, instance *Su
 		instance.EndTime = &now
 		instance.Duration = now.Sub(instance.StartTime)
 		instance.LastUpdate = now
-		sm.saveSubagent(instance)
+		_ = sm.saveSubagent(instance)
 	}()
 
 	// 等待命令完成
@@ -411,7 +411,7 @@ func (sm *FileSubagentManager) monitorSubagent(ctx context.Context, instance *Su
 
 	// 读取最终输出
 	sm.updateSubagentOutput(instance)
-	sm.saveSubagent(instance)
+	_ = sm.saveSubagent(instance)
 }
 
 // updateSubagentOutput 更新子代理输出
@@ -439,8 +439,8 @@ func (sm *FileSubagentManager) updateResourceUsage(instance *SubagentInstance) {
 	fields := strings.Fields(strings.TrimSpace(string(output)))
 	if len(fields) >= 2 {
 		var rss, pcpu float64
-		fmt.Sscanf(fields[0], "%f", &rss)
-		fmt.Sscanf(fields[1], "%f", &pcpu)
+		_, _ = fmt.Sscanf(fields[0], "%f", &rss)
+		_, _ = fmt.Sscanf(fields[1], "%f", &pcpu)
 
 		instance.ResourceUsage = &SubagentResourceUsage{
 			MemoryMB: rss / 1024, // 转换为MB

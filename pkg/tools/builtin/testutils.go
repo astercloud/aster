@@ -34,7 +34,7 @@ func NewTestHelper(t *testing.T) *TestHelper {
 		T:       t,
 		TmpDir:  tmpDir,
 		Context: context.Background(),
-		Cleanup: []func(){func() { os.RemoveAll(tmpDir) }},
+		Cleanup: []func(){func() { _ = os.RemoveAll(tmpDir) }},
 	}
 }
 

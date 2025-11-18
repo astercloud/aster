@@ -142,7 +142,7 @@ func (t *HttpRequestTool) Execute(ctx context.Context, input map[string]interfac
 			"url":     url,
 		}, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 7. 读取响应体
 	bodyBytes, err := io.ReadAll(resp.Body)

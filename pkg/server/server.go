@@ -183,7 +183,7 @@ func (s *Server) ChatHandler() http.Handler {
 			})
 			return
 		}
-		defer ag.Close()
+		defer func() { _ = ag.Close() }()
 
 		result, err := ag.Chat(ctx, req.Input)
 		latencyMs := time.Since(start).Milliseconds()
@@ -539,7 +539,7 @@ func (s *Server) ChatStreamHandler() http.Handler {
 			http.Error(w, "create agent failed: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer ag.Close()
+		defer func() { _ = ag.Close() }()
 
 		// 设置 SSE 响应头
 		w.Header().Set("Content-Type", "text/event-stream; charset=utf-8")
@@ -571,11 +571,11 @@ func (s *Server) ChatStreamHandler() http.Handler {
 				}
 
 				// 将 envelope 包装为一条 SSE 消息
-				w.Write([]byte("data: "))
+				_, _ = w.Write([]byte("data: "))
 				if err := enc.Encode(env); err != nil {
 					return
 				}
-				w.Write([]byte("\n"))
+				_, _ = w.Write([]byte("\n"))
 				flusher.Flush()
 
 				// 如果是 ProgressDoneEvent, 可以结束流
@@ -989,7 +989,7 @@ func (s *Server) BatchEvalHandler() http.Handler {
 						http.Error(w, "failed to create provider: "+err.Error(), http.StatusInternalServerError)
 						return
 					}
-					defer llmProvider.Close()
+					defer func() { _ = llmProvider.Close() }()
 				}
 
 				switch name {

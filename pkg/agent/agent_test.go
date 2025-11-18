@@ -33,7 +33,7 @@ func TestAgentCreate(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	if ag.ID() == "" {
 		t.Error("Agent ID should not be empty")
@@ -64,7 +64,7 @@ func TestAgentStatus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	status := ag.Status()
 	if status == nil {
@@ -100,7 +100,7 @@ func TestAgentEventBus(t *testing.T) {
 	if err != nil {
 		t.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	// 订阅事件
 	eventCh := ag.Subscribe([]types.AgentChannel{types.ChannelMonitor}, nil)

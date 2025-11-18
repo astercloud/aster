@@ -84,8 +84,8 @@ func NewFileTaskManager() *FileTaskManager {
 	outputDir := filepath.Join(dataDir, "outputs")
 
 	// 确保目录存在
-	os.MkdirAll(dataDir, 0755)
-	os.MkdirAll(outputDir, 0755)
+	_ = os.MkdirAll(dataDir, 0755)
+	_ = os.MkdirAll(outputDir, 0755)
 
 	tm := &FileTaskManager{
 		tasks:       make(map[string]*TaskInfo),
@@ -95,7 +95,7 @@ func NewFileTaskManager() *FileTaskManager {
 	}
 
 	// 加载现有任务
-	tm.loadTasks()
+	_ = tm.loadTasks()
 
 	// 启动清理协程
 	go tm.cleanupRoutine()
@@ -167,7 +167,7 @@ func (tm *FileTaskManager) StartTask(ctx context.Context, cmd string, opts *Task
 
 		errFile, err := os.Create(errorFile)
 		if err != nil {
-			outFile.Close()
+			_ = outFile.Close()
 			return nil, fmt.Errorf("failed to create error file: %v", err)
 		}
 
@@ -176,8 +176,8 @@ func (tm *FileTaskManager) StartTask(ctx context.Context, cmd string, opts *Task
 
 		// 延迟关闭文件
 		go func() {
-			defer outFile.Close()
-			defer errFile.Close()
+			defer func() { _ = outFile.Close() }()
+			defer func() { _ = errFile.Close() }()
 		}()
 	}
 
@@ -193,7 +193,7 @@ func (tm *FileTaskManager) StartTask(ctx context.Context, cmd string, opts *Task
 
 	// 保存任务
 	tm.tasks[taskID] = taskInfo
-	tm.saveTask(taskInfo)
+	_ = tm.saveTask(taskInfo)
 
 	// 启动监控协程
 	go tm.monitorTask(ctx, taskInfo, cmdObj)
@@ -295,7 +295,7 @@ func (tm *FileTaskManager) KillTask(taskID string, signal string, timeout int) e
 	// 更新任务状态
 	task.Status = "killed"
 	task.LastUpdate = time.Now()
-	tm.saveTask(task)
+	_ = tm.saveTask(task)
 
 	return nil
 }
@@ -341,15 +341,15 @@ func (tm *FileTaskManager) CleanupTask(taskID string) error {
 	outputFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stdout", taskID))
 	errorFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stderr", taskID))
 
-	os.Remove(outputFile)
-	os.Remove(errorFile)
+	_ = os.Remove(outputFile)
+	_ = os.Remove(errorFile)
 
 	// 删除任务信息
 	delete(tm.tasks, taskID)
 
 	// 删除任务文件
 	taskFile := filepath.Join(tm.dataDir, fmt.Sprintf("%s.json", taskID))
-	os.Remove(taskFile)
+	_ = os.Remove(taskFile)
 
 	return nil
 }
@@ -412,7 +412,7 @@ func (tm *FileTaskManager) monitorTask(ctx context.Context, task *TaskInfo, cmd 
 		task.Status = "completed"
 	}
 
-	tm.saveTask(task)
+	_ = tm.saveTask(task)
 }
 
 // updateTaskStatus 更新任务状态
@@ -435,7 +435,7 @@ func (tm *FileTaskManager) updateTaskStatus(task *TaskInfo) {
 		task.Duration = now.Sub(task.StartTime)
 		task.Status = "completed"
 		task.LastUpdate = now
-		tm.saveTask(task)
+		_ = tm.saveTask(task)
 	}
 }
 
@@ -458,7 +458,7 @@ func (tm *FileTaskManager) waitForProcessExit(task *TaskInfo, timeout int) {
 				task.Duration = now.Sub(task.StartTime)
 				task.Status = "completed"
 				task.LastUpdate = now
-				tm.saveTask(task)
+				_ = tm.saveTask(task)
 			}
 		}
 	}
@@ -510,7 +510,7 @@ func (tm *FileTaskManager) cleanupRoutine() {
 	for {
 		select {
 		case taskID := <-tm.cleanupChan:
-			tm.CleanupTask(taskID)
+			_ = tm.CleanupTask(taskID)
 		case <-time.After(1 * time.Hour):
 			// 定期清理完成的任务
 			tm.cleanupCompletedTasks()
@@ -530,7 +530,7 @@ func (tm *FileTaskManager) cleanupCompletedTasks() {
 				delete(tm.tasks, task.ID)
 
 				taskFile := filepath.Join(tm.dataDir, fmt.Sprintf("%s.json", task.ID))
-				os.Remove(taskFile)
+				_ = os.Remove(taskFile)
 			}
 		}
 	}

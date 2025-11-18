@@ -4,11 +4,11 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/gin-gonic/gin"
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/logging"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/types"
+	"github.com/gin-gonic/gin"
 )
 
 // AgentHandler handles agent-related requests
@@ -76,7 +76,7 @@ func (h *AgentHandler) Create(c *gin.Context) {
 		})
 		return
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	// 保存 Agent 记录
 	record := &AgentRecord{

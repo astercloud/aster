@@ -95,7 +95,7 @@ func (dp *DeepseekProvider) Complete(ctx context.Context, messages []types.Messa
 		logging.Error(ctx, fmt.Sprintf("❌ [DeepseekProvider] 请求失败: %v", err), nil)
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	logging.Info(ctx, fmt.Sprintf("✅ [DeepseekProvider] 收到响应, HTTP状态码: %d", resp.StatusCode), nil)
 
@@ -186,7 +186,7 @@ func (dp *DeepseekProvider) Stream(ctx context.Context, messages []types.Message
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		log.Printf("[DeepseekProvider] API error response: %s", string(body))
 		return nil, fmt.Errorf("deepseek api error: %d - %s", resp.StatusCode, string(body))
 	}
@@ -373,7 +373,7 @@ func (dp *DeepseekProvider) convertMessages(messages []types.Message) []map[stri
 // processStream 处理流式响应
 func (dp *DeepseekProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamChunk) {
 	defer close(chunkCh)
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 
 	scanner := bufio.NewScanner(body)
 	eventCount := 0

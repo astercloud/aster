@@ -78,7 +78,7 @@ func (rc *RemoteClient) Call(ctx context.Context, method, path string, body inte
 	if err != nil {
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 读取响应
 	respBody, err := io.ReadAll(resp.Body)

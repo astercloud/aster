@@ -131,7 +131,7 @@ func (t *BashOutputTool) Execute(ctx context.Context, input map[string]interface
 	if clearCache {
 		// 清理任务的输出文件缓存
 		tm := taskManager.(*FileTaskManager)
-		tm.cleanupOutputFiles(bashID)
+		_ = tm.cleanupOutputFiles(bashID)
 	}
 
 	duration := time.Since(start)
@@ -326,8 +326,8 @@ func (t *BashOutputTool) getResourceUsage(pid int) *ResourceUsage {
 
 	var cpu float64
 	var memory int64
-	fmt.Sscanf(fields[0], "%f", &cpu)
-	fmt.Sscanf(fields[1], "%d", &memory)
+	_, _ = fmt.Sscanf(fields[0], "%f", &cpu)
+	_, _ = fmt.Sscanf(fields[1], "%d", &memory)
 	memory *= 1024 // 转换为字节
 
 	return &ResourceUsage{

@@ -32,7 +32,7 @@ type PaginatedResponse struct {
 func JSON(w http.ResponseWriter, status int, data interface{}) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(&APIResponse{
+	_ = json.NewEncoder(w).Encode(&APIResponse{
 		Success: status < 400,
 		Data:    data,
 	})
@@ -42,7 +42,7 @@ func JSON(w http.ResponseWriter, status int, data interface{}) {
 func Error(w http.ResponseWriter, status int, code, message string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(&APIResponse{
+	_ = json.NewEncoder(w).Encode(&APIResponse{
 		Success: false,
 		Error: &APIError{
 			Code:    code,
@@ -55,7 +55,7 @@ func Error(w http.ResponseWriter, status int, code, message string) {
 func ErrorWithDetails(w http.ResponseWriter, status int, code, message, details string) {
 	w.Header().Set("Content-Type", "application/json; charset=utf-8")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(&APIResponse{
+	_ = json.NewEncoder(w).Encode(&APIResponse{
 		Success: false,
 		Error: &APIError{
 			Code:    code,

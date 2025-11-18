@@ -234,7 +234,7 @@ func (ls *LocalSandbox) Watch(paths []string, listener FileChangeListener) (stri
 
 // watchLoop 文件监听循环
 func (ls *LocalSandbox) watchLoop(watchID string, fw *fileWatcher) {
-	defer fw.watcher.Close()
+	defer func() { _ = fw.watcher.Close() }()
 
 	for {
 		select {

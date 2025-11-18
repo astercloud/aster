@@ -477,7 +477,7 @@ func (a *Agent) Send(ctx context.Context, text string) error {
 				a.template.SystemPrompt,
 				skillContext,
 			)
-			a.provider.SetSystemPrompt(enhancedSysPrompt)
+			_ = a.provider.SetSystemPrompt(enhancedSysPrompt)
 		} else {
 			// 不支持 system prompt，增强 user message
 			messageText = a.skillInjector.PrepareUserMessage(text, skillContext)

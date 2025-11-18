@@ -3,8 +3,8 @@ package server
 import (
 	"net/http"
 
-	"github.com/gin-gonic/gin"
 	"github.com/astercloud/aster/server/handlers"
+	"github.com/gin-gonic/gin"
 )
 
 // registerAgentRoutes registers all agent-related routes

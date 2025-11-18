@@ -381,7 +381,7 @@ func (t *GrepTool) parseContentOutput(lines []string, result *GrepResult, lineNu
 					if len(contentParts) >= 2 {
 						lineNumStr := strings.TrimSpace(contentParts[0])
 						var lineNum int
-						fmt.Sscanf(lineNumStr, "%d", &lineNum)
+						_, _ = fmt.Sscanf(lineNumStr, "%d", &lineNum)
 						content := contentParts[1]
 
 						result.matches = append(result.matches, GrepMatch{
@@ -425,7 +425,7 @@ func (t *GrepTool) parseCountOutput(lines []string, result *GrepResult) {
 				file := strings.TrimSpace(parts[0])
 				countStr := strings.TrimSpace(parts[1])
 				var count int
-				fmt.Sscanf(countStr, "%d", &count)
+				_, _ = fmt.Sscanf(countStr, "%d", &count)
 
 				result.fileCounts = append(result.fileCounts, FileCount{
 					File:  file,

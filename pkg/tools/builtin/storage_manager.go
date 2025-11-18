@@ -90,9 +90,9 @@ func NewFileStorageManager() *FileStorageManager {
 	dataDir := filepath.Join(os.TempDir(), "agentsdk_storage")
 
 	// 创建子目录
-	os.MkdirAll(filepath.Join(dataDir, "todos"), 0755)
-	os.MkdirAll(filepath.Join(dataDir, "plans"), 0755)
-	os.MkdirAll(filepath.Join(dataDir, "cache"), 0755)
+	_ = os.MkdirAll(filepath.Join(dataDir, "todos"), 0755)
+	_ = os.MkdirAll(filepath.Join(dataDir, "plans"), 0755)
+	_ = os.MkdirAll(filepath.Join(dataDir, "cache"), 0755)
 
 	return &FileStorageManager{
 		dataDir: dataDir,
@@ -182,7 +182,7 @@ func (fsm *FileStorageManager) Restore(backupPath string) error {
 	defer fsm.mu.Unlock()
 
 	// 清理现有数据
-	os.RemoveAll(fsm.dataDir)
+	_ = os.RemoveAll(fsm.dataDir)
 
 	// 创建数据目录
 	if err := os.MkdirAll(fsm.dataDir, 0755); err != nil {

@@ -187,7 +187,7 @@ func (r *Room) Broadcast(ctx context.Context, text string) error {
 		}
 
 		go func(agent *agent.Agent, txt string) {
-			agent.Send(ctx, txt)
+			_ = agent.Send(ctx, txt)
 		}(ag, text)
 	}
 

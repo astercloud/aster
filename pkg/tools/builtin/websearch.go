@@ -142,7 +142,7 @@ func (t *WebSearchTool) Execute(ctx context.Context, input map[string]interface{
 			"query": query,
 		}, nil
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	// 5. 解析响应
 	if resp.StatusCode != http.StatusOK {

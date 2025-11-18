@@ -127,7 +127,7 @@ func (m *Manager) InstallFromZip(ctx context.Context, skillID string, r io.Reade
 			return fmt.Errorf("open zip entry %s: %w", f.Name, err)
 		}
 		data, err := io.ReadAll(rc)
-		rc.Close()
+		_ = rc.Close()
 		if err != nil {
 			return fmt.Errorf("read zip entry %s: %w", f.Name, err)
 		}

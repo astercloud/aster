@@ -75,7 +75,7 @@ func (ap *AnthropicProvider) Complete(ctx context.Context, messages []types.Mess
 	if err != nil {
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -157,7 +157,7 @@ func (ap *AnthropicProvider) Stream(ctx context.Context, messages []types.Messag
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		return nil, fmt.Errorf("anthropic api error: %d - %s", resp.StatusCode, string(body))
 	}
 
@@ -318,7 +318,7 @@ func (ap *AnthropicProvider) convertMessages(messages []types.Message) []map[str
 // processStream 处理流式响应
 func (ap *AnthropicProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamChunk) {
 	defer close(chunkCh)
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 
 	scanner := bufio.NewScanner(body)
 	for scanner.Scan() {

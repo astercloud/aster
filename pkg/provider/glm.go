@@ -81,7 +81,7 @@ func (gp *GLMProvider) Complete(ctx context.Context, messages []types.Message, o
 	if err != nil {
 		return nil, fmt.Errorf("send request: %w", err)
 	}
-	defer resp.Body.Close()
+	defer func() { _ = resp.Body.Close() }()
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
@@ -164,7 +164,7 @@ func (gp *GLMProvider) Stream(ctx context.Context, messages []types.Message, opt
 
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
-		resp.Body.Close()
+		_ = resp.Body.Close()
 		log.Printf("[GLMProvider] API error response: %s", string(body))
 		return nil, fmt.Errorf("glm api error: %d - %s", resp.StatusCode, string(body))
 	}
@@ -351,7 +351,7 @@ func (gp *GLMProvider) convertMessages(messages []types.Message) []map[string]in
 // processStream 处理流式响应
 func (gp *GLMProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamChunk) {
 	defer close(chunkCh)
-	defer body.Close()
+	defer func() { _ = body.Close() }()
 
 	scanner := bufio.NewScanner(body)
 	eventCount := 0

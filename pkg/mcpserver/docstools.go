@@ -210,7 +210,7 @@ func (t *DocsSearchTool) Execute(ctx context.Context, input map[string]interface
 		if err != nil {
 			return nil
 		}
-		defer f.Close()
+		defer func() { _ = f.Close() }()
 
 		scanner := bufio.NewScanner(f)
 		lineNum := 0
