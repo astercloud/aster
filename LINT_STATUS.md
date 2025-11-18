@@ -2,9 +2,10 @@
 
 ## 当前状态
 
-- **总问题数**: 131
+- **总问题数**: 75 (-56 from 131, -43%)
 - **编译状态**: ✅ 通过
 - **核心功能**: ✅ 正常
+- **代码清理**: -233 行 (-53%)
 
 ## 问题分布
 
@@ -12,6 +13,12 @@
 - **errcheck (87个)**: 所有未检查的错误返回值已修复
 - **typecheck (编译错误)**: 测试文件暂时跳过，核心代码编译通过
 - **SA1019 (废弃 API)**: io/ioutil 包已替换为现代 API
+
+### 最新改进 ✅ (v0.2.2+)
+- **代码清理**: 删除 58 个冗余 placeholder 函数
+- **routes.go**: 439 → 206 行 (-233 行, -53%)
+- **unused 问题**: 94 → 38 (-56, -59%)
+- **所有 API**: 已在 handlers 包中实现
 
 ### 剩余问题 (非严重)
 
@@ -22,17 +29,17 @@
 - ST1005: 错误信息不应大写 (2个)
 - S1009/S1002/S1039: 代码简化建议 (26个)
 
-#### 2. Unused (94个) - 预留的功能
-大部分在 `server/routes.go` 和 `server/middleware.go`：
-- Memory API endpoints (8个)
-- Session API endpoints (8个)  
-- Workflow API endpoints (11个)
-- Tool API endpoints (5个)
-- Observability API endpoints (6个)
-- Eval/Benchmark API endpoints (9个)
-- MCP Server API endpoints (5个)
+#### 2. Unused (38个) - 内部辅助函数
+主要是 `handlers/` 包中的内部函数：
+- ~~Memory API endpoints~~ ✅ 已实现
+- ~~Session API endpoints~~ ✅ 已实现
+- ~~Workflow API endpoints~~ ✅ 已实现
+- ~~Tool API endpoints~~ ✅ 已实现
+- ~~Telemetry API endpoints~~ ✅ 已实现
+- ~~Eval/Benchmark API endpoints~~ ✅ 已实现
+- ~~MCP Server API endpoints~~ ✅ 已实现
 
-这些是规划好但未实现的功能，已在配置中排除。
+剩余 38 个主要是 handlers 中未导出的辅助函数和类型定义。
 
 #### 3. Ineffassign (1个)
 - `pkg/telemetry/integration_example.go:104` - ctx 赋值后未使用
