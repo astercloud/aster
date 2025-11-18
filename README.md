@@ -16,11 +16,11 @@
 
 ## 架构设计
 
-![aster 系统架构](docs/public/images/architecture-overview.svg)
+![aster 系统架构](https://raw.githubusercontent.com/astercloud/aster/main/docs/public/images/architecture-overview.svg)
 
 ### Middleware 洋葱模型
 
-![Middleware 洋葱模型](docs/public/images/middleware-onion.svg)
+![Middleware 洋葱模型](https://raw.githubusercontent.com/astercloud/aster/main/docs/public/images/middleware-onion.svg)
 
 aster 采用洋葱模型的 Middleware 架构，每个请求和响应都会依次通过多层中间件。优先级数值越大的中间件位于越外层，越早处理请求，越晚处理响应。这种设计使得功能可以清晰地分层，便于扩展和维护。
 

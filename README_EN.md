@@ -155,11 +155,11 @@ func main() {
 
 ### System Overview
 
-![Aster Architecture](docs/public/images/architecture-overview.svg)
+![Aster Architecture](https://raw.githubusercontent.com/astercloud/aster/main/docs/public/images/architecture-overview.svg)
 
 ### Middleware Onion Model
 
-![Middleware Onion](docs/public/images/middleware-onion.svg)
+![Middleware Onion](https://raw.githubusercontent.com/astercloud/aster/main/docs/public/images/middleware-onion.svg)
 
 The middleware architecture processes each request/response through multiple layers:
 - Higher priority middleware sits in outer layers
