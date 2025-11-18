@@ -117,6 +117,9 @@ dist/
 .nuxt/
 .cache/
 
+# 保留 docs 目录的 package-lock.json (GitHub Actions 需要)
+!docs/package-lock.json
+
 # ============================
 # Python (Skills)
 # ============================
