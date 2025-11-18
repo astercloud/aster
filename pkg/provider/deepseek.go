@@ -50,7 +50,7 @@ func NewDeepseekProvider(config *types.ModelConfig) (*DeepseekProvider, error) {
 
 // Complete 非流式对话(阻塞式,返回完整响应)
 func (dp *DeepseekProvider) Complete(ctx context.Context, messages []types.Message, opts *StreamOptions) (*CompleteResponse, error) {
-	logging.Info(ctx, fmt.Sprintf("🚀 [DeepseekProvider] 开始Complete API调用 (非流式)"), nil)
+	logging.Info(ctx, "🚀 [DeepseekProvider] 开始Complete API调用 (非流式)", nil)
 	logging.Info(ctx, fmt.Sprintf("📊 [DeepseekProvider] 请求参数: %d条消息, %d个工具", len(messages), len(opts.Tools)), nil)
 
 	// 构建请求体(非流式)
