@@ -194,3 +194,7 @@ scratch/
 # 生成的文件
 generated/
 proto/gen/
+
+# 编译产物
+/aster
+/aster-server
