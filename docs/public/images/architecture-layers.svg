@@ -59,7 +59,7 @@
   
   <!-- Server components -->
   <rect x="120" y="325" width="130" height="55" rx="4" class="component-box"/>
-  <text x="185" y="343" text-anchor="middle" class="text">Auth & RBAC</text>
+  <text x="185" y="343" text-anchor="middle" class="text">Auth &amp; RBAC</text>
   <text x="185" y="362" text-anchor="middle" class="small-text">(API Key+JWT)</text>
   
   <rect x="270" y="325" width="130" height="55" rx="4" class="component-box"/>
