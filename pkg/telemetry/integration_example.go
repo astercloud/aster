@@ -101,7 +101,7 @@ func ExampleWithError() {
 	ctx := context.Background()
 	agentID := "agent-002"
 
-	ctx, span := tracer.StartSpan(ctx, "agent.chat")
+	_, span := tracer.StartSpan(ctx, "agent.chat")
 	defer span.End()
 
 	// 模拟错误
