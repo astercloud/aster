@@ -16,7 +16,7 @@ func TestHttpRequestTool_Success(t *testing.T) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("Hello, World!"))
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -61,7 +61,7 @@ func TestHttpRequestTool_JsonResponse(t *testing.T) {
 			"code":    0,
 		})
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -111,7 +111,7 @@ func TestHttpRequestTool_POST_WithBody(t *testing.T) {
 		w.WriteHeader(http.StatusCreated)
 		_, _ = w.Write([]byte("Created"))
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -152,7 +152,7 @@ func TestHttpRequestTool_CustomHeaders(t *testing.T) {
 
 		w.WriteHeader(http.StatusOK)
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -217,7 +217,7 @@ func TestHttpRequestTool_404Status(t *testing.T) {
 		w.WriteHeader(http.StatusNotFound)
 		_, _ = w.Write([]byte("Not Found"))
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {
@@ -253,7 +253,7 @@ func TestHttpRequestTool_EmptyResponse(t *testing.T) {
 	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	tool, err := NewHttpRequestTool(nil)
 	if err != nil {

@@ -91,7 +91,7 @@ func TestWebSearchTool_SuccessfulSearch(t *testing.T) {
 			"query": reqBody["query"],
 		})
 	}))
-	defer func() { _ = server.Close() }()
+	defer server.Close()
 
 	// 保存原有环境变量
 	oldAPIKey := os.Getenv("WF_TAVILY_API_KEY")

@@ -78,10 +78,7 @@ jobs:
           cache: true
 
       - name: Run tests
-        run: |
-          # 排除需要适配新接口的测试包
-          go test -v -race -coverprofile=coverage.txt -covermode=atomic \
-            $(go list ./pkg/... | grep -v -E '(pkg/session|pkg/tools/builtin)$')
+        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./pkg/...
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
