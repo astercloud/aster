@@ -113,7 +113,7 @@ Remember: Working Memory is automatically loaded at the start of each conversati
 	if err != nil {
 		log.Fatalf("create agent failed: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	fmt.Printf("✅ Working Memory Agent created: %s\n", ag.ID())
 	fmt.Printf("📝 Thread ID: %s\n", config.Metadata["thread_id"])

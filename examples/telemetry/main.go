@@ -66,13 +66,13 @@ func basicOTelExample() {
 	if err != nil {
 		log.Fatalf("Failed to create tracer: %v", err)
 	}
-	defer tracer.Shutdown(ctx)
+	defer func() { _ = tracer.Shutdown(ctx) }()
 
 	// 3. 设置为全局 tracer
 	telemetry.SetGlobalTracer(tracer)
 
 	// 4. 创建 span
-	ctx, span := tracer.StartSpan(
+	_, span := tracer.StartSpan(
 		ctx,
 		"basic-operation",
 		telemetry.WithSpanKind(telemetry.SpanKindInternal),
@@ -145,7 +145,7 @@ func llmTracingExample() {
 	defer parentSpan.End()
 
 	// 创建 LLM 调用的子 span
-	ctx, span := tracer.StartSpan(
+	_, span := tracer.StartSpan(
 		ctx,
 		"llm.request",
 		telemetry.WithSpanKind(telemetry.SpanKindClient),
@@ -245,7 +245,7 @@ func distributedTracingExample() {
 	ctxB := context.Background()
 	ctxB = tracer.Extract(ctxB, carrier)
 
-	ctx, spanB := tracer.StartSpan(
+	_, spanB := tracer.StartSpan(
 		ctxB,
 		"service-b.handle",
 		telemetry.WithSpanKind(telemetry.SpanKindServer),
@@ -285,7 +285,7 @@ func processMiddleware(ctx context.Context, parentSpan telemetry.Span) {
 func processLLM(ctx context.Context, parentSpan telemetry.Span) {
 	tracer := telemetry.GetGlobalTracer()
 
-	ctx, span := tracer.StartSpan(
+	_, span := tracer.StartSpan(
 		ctx,
 		"llm.generate",
 		telemetry.WithSpanKind(telemetry.SpanKindClient),
@@ -299,7 +299,7 @@ func processLLM(ctx context.Context, parentSpan telemetry.Span) {
 // 与其他 Exporters 集成的示例
 
 // 使用 Jaeger Exporter
-func exampleJaegerExporter() {
+var _ = func() {
 	/*
 		import "go.opentelemetry.io/otel/exporters/jaeger"
 
@@ -320,7 +320,7 @@ func exampleJaegerExporter() {
 }
 
 // 使用 OTLP Exporter (Grafana Tempo, Honeycomb, etc.)
-func exampleOTLPExporter() {
+var _ = func() {
 	/*
 		import "go.opentelemetry.io/otel/exporters/otlp/otlptrace/otlptracehttp"
 
@@ -341,7 +341,7 @@ func exampleOTLPExporter() {
 }
 
 // 使用 Google Cloud Trace
-func exampleGoogleCloudTrace() {
+var _ = func() {
 	/*
 		import texporter "github.com/GoogleCloudPlatform/opentelemetry-operations-go/exporter/trace"
 
@@ -360,6 +360,8 @@ func exampleGoogleCloudTrace() {
 }
 
 // propagation.MapCarrier 实现（简化版）
+var _ propagation // 保留类型定义供参考
+
 type propagation struct{}
 type MapCarrier map[string]string
 

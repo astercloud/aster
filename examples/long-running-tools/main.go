@@ -252,7 +252,7 @@ func (t *MockFileUploadTool) StartAsync(ctx context.Context, args map[string]int
 		StartTime: time.Now(),
 		Metadata:  make(map[string]interface{}),
 	}
-	t.executor.UpdateProgress(taskID, 0.0, nil)
+	_ = t.executor.UpdateProgress(taskID, 0.0, nil)
 
 	// 异步执行
 	go func() {
@@ -266,7 +266,7 @@ func (t *MockFileUploadTool) StartAsync(ctx context.Context, args map[string]int
 				return
 			case <-time.After(100 * time.Millisecond):
 				progress := float64(i+1) / float64(chunks)
-				t.executor.UpdateProgress(taskID, progress, map[string]interface{}{
+				_ = t.executor.UpdateProgress(taskID, progress, map[string]interface{}{
 					"uploaded_chunks": i + 1,
 					"total_chunks":    chunks,
 				})
@@ -296,7 +296,8 @@ func (t *MockFileUploadTool) Execute(ctx context.Context, args map[string]interf
 // 实际应用场景
 // ============================================================
 
-func realWorldExamples() {
+// realWorldExamples 实际应用场景示例（仅作为文档参考）
+var _ = func() {
 	/*
 		1. 文件处理工具
 		   - 大文件上传/下载
@@ -365,7 +366,8 @@ func realWorldExamples() {
 // 最佳实践
 // ============================================================
 
-func bestPractices() {
+// bestPractices 最佳实践示例（仅作为文档参考）
+var _ = func() {
 	/*
 		1. 错误处理
 		   - 捕获所有错误并更新任务状态

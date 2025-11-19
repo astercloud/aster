@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== SubAgent Middleware 示例 ===\n")
+	fmt.Println("=== SubAgent Middleware 示例 ===")
 
 	// 1. 创建 Backend
 	backend := backends.NewStateBackend()
@@ -88,7 +88,7 @@ func main() {
 	}
 
 	// 8. 演示 task 工具执行
-	fmt.Println("=== 演示 Task 工具 ===\n")
+	fmt.Println("=== 演示 Task 工具 ===")
 
 	// 获取 task 工具
 	var taskTool *middleware.TaskTool
@@ -141,10 +141,10 @@ func main() {
 	}
 
 	// 9. 演示文件系统工具
-	fmt.Println("=== 演示文件系统工具 ===\n")
+	fmt.Println("=== 演示文件系统工具 ===")
 
 	// 写入测试文件
-	backend.Write(context.Background(), "/test/demo.txt", "Hello from SubAgent example!\nLine 2\nLine 3")
+	_, _ = backend.Write(context.Background(), "/test/demo.txt", "Hello from SubAgent example!\nLine 2\nLine 3")
 	fmt.Println("✓ 写入测试文件 /test/demo.txt")
 
 	// 列出文件

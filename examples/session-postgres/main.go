@@ -20,7 +20,7 @@ func main() {
 	// ====== 示例 1: 基础连接和配置 ======
 	fmt.Println("=== Example 1: Basic Connection ===")
 	service := setupPostgreSQLService()
-	defer service.Close()
+	defer func() { _ = service.Close() }()
 
 	// ====== 示例 2: 创建 Session ======
 	fmt.Println("\n=== Example 2: Create Session ===")
@@ -281,7 +281,7 @@ func truncate(s string, maxLen int) string {
 
 // 生产环境最佳实践
 
-func productionBestPractices() {
+var _ = func() {
 	/*
 		1. 连接字符串安全
 		   - 使用环境变量存储 DSN

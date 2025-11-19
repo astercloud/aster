@@ -51,7 +51,7 @@ func main() {
 		}
 	}
 
-	apiKeyEnv := "ANTHROPIC_API_KEY"
+	var apiKeyEnv string
 	switch providerName {
 	case "deepseek":
 		apiKeyEnv = "DEEPSEEK_API_KEY"
@@ -146,7 +146,7 @@ func runCliDemo(ctx context.Context, deps *agent.Dependencies, templateID, provi
 	if err != nil {
 		log.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	fmt.Printf("Plan/Explore UI demo agent created: %s\n\n", ag.ID())
 
@@ -217,7 +217,7 @@ func runWebUI(ctx context.Context, deps *agent.Dependencies, templateID, provide
 			return
 		}
 
-		flusher, ok := w.(http.Flusher)
+		_, ok := w.(http.Flusher)
 		if !ok {
 			http.Error(w, "streaming unsupported", http.StatusInternalServerError)
 			return
@@ -257,7 +257,7 @@ func runWebUI(ctx context.Context, deps *agent.Dependencies, templateID, provide
 			http.Error(w, "create agent failed: "+err.Error(), http.StatusInternalServerError)
 			return
 		}
-		defer ag.Close()
+		defer func() { _ = ag.Close() }()
 
 		eventCh := ag.Subscribe([]types.AgentChannel{
 			types.ChannelProgress,
@@ -313,21 +313,25 @@ func runWebUI(ctx context.Context, deps *agent.Dependencies, templateID, provide
 					payload["step"] = e.Step
 					payload["reason"] = e.Reason
 				case *types.MonitorStateChangedEvent:
-					payload["state"] = e.State
+					// 可以添加对状态变化的处理
 				}
 
+				// 发送 SSE 事件
 				uiEvt := uiEvent{
-					Cursor:  env.Cursor,
-					Channel: string(evt.Channel()),
 					Type:    evt.EventType(),
 					Payload: payload,
 				}
 
-				w.Write([]byte("data: "))
+				flusher, ok := w.(http.Flusher)
+				if !ok {
+					return
+				}
+
+				_, _ = w.Write([]byte("data: "))
 				if err := enc.Encode(uiEvt); err != nil {
 					return
 				}
-				w.Write([]byte("\n\n"))
+				_, _ = w.Write([]byte("\n\n"))
 				flusher.Flush()
 
 				if evt.EventType() == "done" {

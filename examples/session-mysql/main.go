@@ -20,7 +20,7 @@ func main() {
 	// ====== 示例 1: 连接 MySQL ======
 	fmt.Println("=== Example 1: Connect to MySQL 8.0+ ===")
 	service := setupMySQLService()
-	defer service.Close()
+	defer func() { _ = service.Close() }()
 
 	// ====== 示例 2: 创建 Session ======
 	fmt.Println("\n=== Example 2: Create Session ===")
@@ -199,7 +199,7 @@ func generateID() string {
 
 // MySQL 8.0+ JSON 高级用法
 
-func mysqlJSONAdvancedFeatures() {
+var _ = func() {
 	/*
 		1. JSON 路径查询
 		   SELECT JSON_EXTRACT(content, '$.role') FROM session_events;
@@ -249,7 +249,7 @@ func mysqlJSONAdvancedFeatures() {
 
 // 生产环境最佳实践
 
-func productionBestPractices() {
+var _ = func() {
 	/*
 		1. 连接字符串配置
 		   import "os"
@@ -305,7 +305,7 @@ func productionBestPractices() {
 
 // PostgreSQL vs MySQL 对比
 
-func postgresVsMySQL() {
+var _ = func() {
 	/*
 		特性对比:
 

@@ -207,7 +207,7 @@ func (a *SemanticQAWorkflowAgent) Execute(ctx context.Context, message string) i
 			_ = yield(nil, fmt.Errorf("create agent: %w", err))
 			return
 		}
-		defer ag.Close()
+		defer func() { _ = ag.Close() }()
 
 		prompt := fmt.Sprintf("Use the following context if it is helpful:\n\n%s\n\nQuestion: %s", contextText, message)
 		res, err := ag.Chat(ctx, prompt)

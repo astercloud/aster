@@ -170,7 +170,7 @@ func truncateContent(content string, maxLen int) string {
 
 // 性能对比示例
 
-func benchmarkComparison() {
+var _ = func() {
 	// 传统方式 - 加载所有事件到内存
 	// events := []Event{...}  // 可能包含数千个事件
 	// for _, event := range events {

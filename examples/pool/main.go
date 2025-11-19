@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Agent SDK - Agent Pool 示例 ===\n")
+	fmt.Println("=== Agent SDK - Agent Pool 示例 ===")
 
 	// 1. 创建依赖
 	deps := createDependencies()
@@ -27,7 +27,7 @@ func main() {
 		Dependencies: deps,
 		MaxAgents:    10, // 最多管理 10 个 Agent
 	})
-	defer pool.Shutdown()
+	defer func() { _ = pool.Shutdown() }()
 
 	fmt.Printf("Agent 池已创建,最大容量: 10\n\n")
 

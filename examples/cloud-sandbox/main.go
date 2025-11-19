@@ -29,7 +29,7 @@ func main() {
 }
 
 func testAliyun(ctx context.Context) {
-	fmt.Println("=== Testing Aliyun AgentBay Sandbox ===\n")
+	fmt.Println("=== Testing Aliyun AgentBay Sandbox ===")
 
 	// 创建阿里云沙箱
 	config := &cloud.AliyunConfig{
@@ -45,7 +45,7 @@ func testAliyun(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Failed to create Aliyun sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	fmt.Printf("Sandbox created: %s\n\n", sb.Kind())
 
@@ -68,7 +68,7 @@ func testAliyun(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Write failed: %v", err)
 	}
-	fmt.Println("File written successfully\n")
+	fmt.Println("File written successfully")
 
 	// 测试 3: 读取文件
 	fmt.Println("--- Test 3: Read file ---")
@@ -101,7 +101,7 @@ func testAliyun(ctx context.Context) {
 }
 
 func testVolcengine(ctx context.Context) {
-	fmt.Println("=== Testing Volcengine Sandbox ===\n")
+	fmt.Println("=== Testing Volcengine Sandbox ===")
 
 	// 创建火山引擎沙箱
 	config := &cloud.VolcengineConfig{
@@ -118,7 +118,7 @@ func testVolcengine(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Failed to create Volcengine sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	fmt.Printf("Sandbox created: %s\n", sb.Kind())
 	fmt.Printf("Session ID: %s\n\n", sb.SessionID())
@@ -142,7 +142,7 @@ func testVolcengine(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Write failed: %v", err)
 	}
-	fmt.Println("File written successfully\n")
+	fmt.Println("File written successfully")
 
 	// 测试 3: 读取文件
 	fmt.Println("--- Test 3: Read file ---")

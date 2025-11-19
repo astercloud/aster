@@ -1,44 +1,45 @@
 ---
-title: 工作流概述
-description: 使用 ParallelAgent、SequentialAgent、LoopAgent 编排复杂任务
+title: Workflow 系统概述
+description: 强大的工作流编排系统
 ---
 
-# 工作流 Agent
+# Workflow 系统
 
-工作流 Agent 提供三种编排模式，用于构建复杂的多步骤、多分支 AI 任务流程。基于 Google ADK-Go 的设计，使用 Go 1.23 的 `iter.Seq2` 实现高效的流式处理。
+Aster Workflow 是一个强大的工作流编排系统，提供了灵活的步骤组合、动态路由和智能编排能力。
 
-## 🎯 三种工作流模式
+## 🎯 核心特性
 
-### SequentialAgent - 顺序执行
+### 🧩 8种步骤类型
+- **FunctionStep** - 自定义函数执行
+- **AgentStep** - Agent 调用
+- **StarsStep** - Stars 团队协作
+- **ConditionStep** - 条件分支
+- **LoopStep** - 循环执行
+- **ParallelStep** - 并行执行
+- **RouterStep** - 简单路由
+- **StepsGroup** - 步骤组
 
-按顺序依次执行多个子 Agent，适合流水线式处理。
+### 🔀 Router 动态路由
+- **SimpleRouter** - 单步骤条件路由
+- **ChainRouter** - 多步骤链式路由
+- **DynamicRouter** - 完全自定义路由
 
-**使用场景**:
-- 数据处理流水线（收集 → 分析 → 报告）
-- 多阶段任务（需求分析 → 方案设计 → 代码实现）
-- 串行工作流（前一步的输出作为后一步的输入）
+### 🤖 WorkflowAgent 编排
+- Agentic Workflow - Agent 决定何时运行
+- 历史访问和上下文
+- 智能决策引擎
 
-### ParallelAgent - 并行执行
-
-同时执行多个子 Agent，收集所有结果。
-
-**使用场景**:
-- 多方案比较（算法A vs 算法B vs 算法C）
-- 并行数据收集（同时从多个数据源获取）
-- 候选生成（生成多个候选方案供选择）
-
-### LoopAgent - 循环优化
-
-重复执行子 Agent 直到满足终止条件。
-
-**使用场景**:
-- 迭代优化（代码质量提升循环）
-- 多轮对话（直到用户满意）
-- 任务重试（失败重试直到成功或达到上限）
+### 🔄 完整功能
+- ✅ 流式执行和事件系统
+- ✅ 会话管理和持久化
+- ✅ 历史记录和回放
+- ✅ 输入验证
+- ✅ 数据库集成
+- ✅ 性能指标收集
 
 ## 📝 快速开始
 
-### 1. SequentialAgent 示例
+### 创建基础 Workflow
 
 ```go
 package main
@@ -46,40 +47,44 @@ package main
 import (
     "context"
     "fmt"
-
-    "github.com/astercloud/aster/pkg/agent/workflow"
+    "github.com/astercloud/aster/pkg/workflow"
 )
 
 func main() {
-    // 创建子 Agent
-    collector := NewDataCollectorAgent()
-    analyzer := NewAnalyzerAgent()
-    reporter := NewReporterAgent()
-
-    // 创建顺序工作流
-    sequential, err := workflow.NewSequentialAgent(workflow.SequentialConfig{
-        Name: "DataPipeline",
-        SubAgents: []workflow.Agent{
-            collector,  // 步骤1: 收集数据
-            analyzer,   // 步骤2: 分析数据
-            reporter,   // 步骤3: 生成报告
+    ctx := context.Background()
+    
+    // 创建 Workflow
+    wf := workflow.New("DataPipeline").
+        WithStream().   // 启用流式
+        WithDebug()     // 启用调试
+    
+    // 添加步骤
+    wf.AddStep(workflow.NewFunctionStep("collect",
+        func(ctx context.Context, input *workflow.StepInput) (*workflow.StepOutput, error) {
+            return &workflow.StepOutput{
+                Content: map[string]interface{}{"data": "collected"},
+            }, nil
         },
-    })
-    if err != nil {
-        panic(err)
-    }
-
-    // 执行工作流
-    for event, err := range sequential.Execute(context.Background(), "处理用户数据") {
+    ))
+    
+    wf.AddStep(workflow.NewFunctionStep("process",
+        func(ctx context.Context, input *workflow.StepInput) (*workflow.StepOutput, error) {
+            prevData := input.PreviousStepContent  // 访问前一步输出
+            return &workflow.StepOutput{
+                Content: fmt.Sprintf("processed: %v", prevData),
+            }, nil
+        },
+    ))
+    
+    // 执行
+    input := &workflow.WorkflowInput{Input: "start"}
+    for event, err := range wf.Execute(ctx, input) {
         if err != nil {
-            fmt.Printf("错误: %v\n", err)
-            break
+            panic(err)
         }
-
-        fmt.Printf("步骤 %d/%d: %s\n",
-            event.Metadata["sequential_step"],
-            event.Metadata["total_steps"],
-            event.Content.Content)
+        if event.Type == workflow.EventWorkflowCompleted {
+            fmt.Println("完成:", event.Data.(map[string]interface{})["output"])
+        }
     }
 }
 ```

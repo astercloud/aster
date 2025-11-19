@@ -224,7 +224,7 @@ func demonstrateSessionListing(ctx context.Context, service *session.InMemorySer
 
 	// 创建多个会话
 	for i := 1; i <= 3; i++ {
-		service.Create(ctx, &session.CreateRequest{
+		_, _ = service.Create(ctx, &session.CreateRequest{
 			AppName: "my-app",
 			UserID:  "user-123",
 			AgentID: fmt.Sprintf("agent-%03d", i),

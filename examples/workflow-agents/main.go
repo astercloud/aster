@@ -17,7 +17,7 @@ import (
 func main() {
 	ctx := context.Background()
 
-	fmt.Println("=== 工作流 Agent 演示 ===\n")
+	fmt.Println("=== 工作流 Agent 演示 ===")
 
 	// ====== 示例 1: SequentialAgent - 顺序工作流 ======
 	fmt.Println("📝 示例 1: SequentialAgent - 多步骤流水线")

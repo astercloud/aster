@@ -7,8 +7,6 @@ import (
 
 	"github.com/astercloud/aster/pkg/backends"
 	"github.com/astercloud/aster/pkg/memory"
-	"github.com/astercloud/aster/pkg/middleware"
-	"github.com/astercloud/aster/pkg/tools"
 )
 
 // 本示例演示如何使用 Working Memory 管理跨会话状态
@@ -297,6 +295,8 @@ func demonstrateFindAndReplace(ctx context.Context, backend backends.BackendProt
 	fmt.Println("\n✅ Find and Replace 实现增量更新")
 }
 
+// demonstrateWithMiddleware 演示通过 Middleware 使用 Working Memory（已注释，需要时取消注释）
+/*
 func demonstrateWithMiddleware(ctx context.Context, backend backends.BackendProtocol) {
 	fmt.Println("\n=== 示例 5: 通过 Middleware 使用 Working Memory ===")
 
@@ -342,3 +342,4 @@ Status: Testing Working Memory Middleware`,
 
 	fmt.Println("\n✅ Middleware 简化了 Working Memory 的集成")
 }
+*/

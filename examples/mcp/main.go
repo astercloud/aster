@@ -17,7 +17,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Agent SDK - MCP 集成示例 ===\n")
+	fmt.Println("=== Agent SDK - MCP 集成示例 ===")
 
 	// 1. 创建工具注册表
 	toolRegistry := tools.NewRegistry()
@@ -52,7 +52,7 @@ func main() {
 	if err != nil {
 		log.Printf("⚠️  添加 MCP Server 失败: %v", err)
 		log.Println("   提示: 如果没有实际的 MCP Server，这是正常的")
-		log.Println("   继续使用内置工具运行示例...\n")
+		log.Println("   继续使用内置工具运行示例...")
 	} else {
 		fmt.Printf("✓ MCP Server 已添加: %s\n", server.GetServerID())
 
@@ -61,7 +61,7 @@ func main() {
 		if err := mcpManager.ConnectServer(ctx, "my-mcp-server"); err != nil {
 			log.Printf("⚠️  连接 MCP Server 失败: %v\n", err)
 			log.Println("   提示: 确保 MCP Server 正在运行并且可访问")
-			log.Println("   继续使用内置工具运行示例...\n")
+			log.Println("   继续使用内置工具运行示例...")
 		} else {
 			fmt.Printf("✓ 已连接到 MCP Server\n")
 			fmt.Printf("  发现工具数量: %d\n\n", server.GetToolCount())
@@ -100,9 +100,9 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建 Agent 失败: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
-	fmt.Println("✓ Agent 创建成功\n")
+	fmt.Println("✓ Agent 创建成功")
 
 	// 7. 订阅事件
 	eventCh := ag.Subscribe([]types.AgentChannel{types.ChannelProgress}, nil)
@@ -122,7 +122,7 @@ func main() {
 	}()
 
 	// 8. 与 Agent 对话
-	fmt.Println("开始对话 (Agent 可以使用内置工具和 MCP 工具):\n")
+	fmt.Println("开始对话 (Agent 可以使用内置工具和 MCP 工具):")
 	fmt.Println("---")
 
 	message := "请列出当前目录的文件，然后创建一个 hello.txt 文件，内容是 'Hello from Agent SDK with MCP!'"

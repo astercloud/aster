@@ -24,7 +24,7 @@ func main() {
 	)
 	flag.Parse()
 
-	fmt.Println("=== Agent Skills 调试模式 ===\n")
+	fmt.Println("=== Agent Skills 调试模式 ===")
 	if *debug {
 		log.SetFlags(log.LstdFlags | log.Lshortfile)
 	}
@@ -69,7 +69,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建 Agent 失败: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	fmt.Printf("Agent 创建成功: %s\n\n", ag.ID())
 

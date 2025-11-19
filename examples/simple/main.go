@@ -54,7 +54,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建沙箱失败: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	fmt.Printf("  Kind: %s\n", sb.Kind())
 	fmt.Printf("  WorkDir: %s\n", sb.WorkDir())

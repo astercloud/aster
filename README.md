@@ -36,11 +36,12 @@ aster 采用洋葱模型的 Middleware 架构，每个请求和响应都会依�
 ## 特性
 
 ### 🎯 核心能力
-- **事件驱动架构**: Progress/Control/Monitor 三通道设计,清晰分离数据流、审批流、治理流
+- **事件驱动架构**: Progress/Control/Monitor 三通道设计，清晰分离数据流、审批流、治理流
 - **流式处理**: 基于 Go 1.23 iter.Seq2 的流式接口，内存占用降低 80%+，支持实时响应和背压控制
-- **工作流 Agent**: 提供 ParallelAgent（并行）、SequentialAgent（顺序）、LoopAgent（循环）三种工作流模式
-- **云端沙箱集成**: 原生支持阿里云AgentBay、火山引擎等云平台安全沙箱
-- **高性能并发**: 基于Go goroutine的并发模型,支持100+并发Agent
+- **完整 Workflow 系统**: 8种步骤类型 + Router 动态路由 + WorkflowAgent 智能编排，支持复杂业务流程
+- **安全防护栏 (Guardrails)**: PII 检测、提示注入防护、OpenAI 内容审核，企业级安全保障
+- **云端沙箱集成**: 原生支持阿里云 AgentBay、火山引擎等云平台安全沙箱
+- **高性能并发**: 基于 Go goroutine 的并发模型，支持 100+ 并发 Agent
 
 ### 🛠️ 开发体验
 - **三层记忆系统**: Text Memory（文本记忆）、Working Memory（工作记忆）、Semantic Memory（语义记忆），完整支持短期和长期记忆管理
@@ -155,7 +156,50 @@ func main() {
 }
 ```
 
-完整示例见 [examples/agent](./examples/agent)
+### Workflow 示例
+
+```go
+import "github.com/astercloud/aster/pkg/workflow"
+
+// 创建 Workflow
+wf := workflow.New("DataPipeline").
+    WithStream().
+    WithDebug()
+
+// 添加步骤
+wf.AddStep(workflow.NewFunctionStep("collect", collectData))
+wf.AddStep(workflow.NewConditionStep("check", checkQuality, highQualityStep, lowQualityStep))
+wf.AddStep(workflow.NewParallelStep("finalize", validateTask, saveTask))
+
+// 执行
+for event, err := range wf.Execute(ctx, input) {
+    // 处理事件
+}
+```
+
+### Guardrails 安全防护示例
+
+```go
+import "github.com/astercloud/aster/pkg/guardrails"
+
+// 创建防护栏链
+chain := guardrails.NewGuardrailChain(
+    guardrails.NewPIIDetectionGuardrail(),
+    guardrails.NewPromptInjectionGuardrail(),
+    guardrails.NewOpenAIModerationGuardrail(),
+)
+
+// 检查输入
+err := chain.Check(ctx, &guardrails.GuardrailInput{
+    Content: userInput,
+})
+```
+
+完整示例见:
+- [examples/agent](./examples/agent) - Agent 基础示例
+- [examples/workflow_complete](./examples/workflow_complete) - Workflow 完整功能
+- [examples/guardrails](./examples/guardrails) - 安全防护栏
+- [examples/comprehensive](./examples/comprehensive) - 综合示例
 
 ### MCP 工具集成
 

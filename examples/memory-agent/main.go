@@ -92,7 +92,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("create agent failed: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	fmt.Printf("✅ Memory Agent created: %s\n", ag.ID())
 

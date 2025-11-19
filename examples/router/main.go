@@ -89,7 +89,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("create quality-first agent: %v", err)
 	}
-	defer qualityAgent.Close()
+	defer func() { _ = qualityAgent.Close() }()
 
 	// 创建一个 “cost-first” Agent
 	costAgent, err := agent.Create(ctx, &types.AgentConfig{
@@ -102,7 +102,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("create cost-first agent: %v", err)
 	}
-	defer costAgent.Close()
+	defer func() { _ = costAgent.Close() }()
 
 	// 简单调用，打印结果（真正的模型调用依赖你在环境中配置好对应 API Key）
 	runDemo := func(name string, a *agent.Agent) {

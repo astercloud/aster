@@ -82,7 +82,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	fmt.Printf("Agent created: %s\n", ag.ID())
 
@@ -172,6 +172,6 @@ func handleMonitorEvent(event interface{}) {
 	case *types.MonitorErrorEvent:
 		fmt.Printf("[Error] [%s] %s: %s\n", e.Severity, e.Phase, e.Message)
 	case *types.MonitorBreakpointChangedEvent:
-		fmt.Printf("[Breakpoint] %s -> %s\n", e.Previous, e.Current)
+		fmt.Printf("[Breakpoint] %v -> %v\n", e.Previous, e.Current)
 	}
 }

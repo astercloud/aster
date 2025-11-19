@@ -27,7 +27,7 @@ func main() {
 	if err != nil {
 		panic(fmt.Sprintf("failed to create file transport: %v", err))
 	}
-	defer fileTransport.Close()
+	defer func() { _ = fileTransport.Close() }()
 
 	fileLogger := logging.NewLogger(logging.LevelInfo, fileTransport)
 

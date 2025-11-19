@@ -10,7 +10,7 @@ import (
 )
 
 func main() {
-	fmt.Println("=== Agent SDK - Scheduler 示例 ===\n")
+	fmt.Println("=== Agent SDK - Scheduler 示例 ===")
 
 	// 示例 1: 步骤触发
 	demonstrateStepTrigger()
@@ -121,19 +121,19 @@ func demonstrateMultipleTasks() {
 	defer scheduler.Shutdown()
 
 	// 任务 1: 每 2 步
-	scheduler.EverySteps(2, func(ctx context.Context, stepCount int) error {
+	_, _ = scheduler.EverySteps(2, func(ctx context.Context, stepCount int) error {
 		fmt.Printf("  [任务A] 每2步 - 第 %d 步\n", stepCount)
 		return nil
 	})
 
 	// 任务 2: 每 5 步
-	scheduler.EverySteps(5, func(ctx context.Context, stepCount int) error {
+	_, _ = scheduler.EverySteps(5, func(ctx context.Context, stepCount int) error {
 		fmt.Printf("  [任务B] 每5步 - 第 %d 步\n", stepCount)
 		return nil
 	})
 
 	// 任务 3: 每 300ms
-	scheduler.EveryInterval(300*time.Millisecond, func(ctx context.Context) error {
+	_, _ = scheduler.EveryInterval(300*time.Millisecond, func(ctx context.Context) error {
 		fmt.Printf("  [任务C] 定时触发\n")
 		return nil
 	})
@@ -198,14 +198,20 @@ func demonstrateTriggerMonitoring() {
 	defer scheduler.Shutdown()
 
 	// 创建步骤任务
-	scheduler.EverySteps(2, func(ctx context.Context, stepCount int) error {
+	_, err := scheduler.EverySteps(2, func(ctx context.Context, stepCount int) error {
 		return nil
 	})
+	if err != nil {
+		log.Fatalf("创建步骤任务失败: %v", err)
+	}
 
 	// 创建定时任务
-	scheduler.EveryInterval(200*time.Millisecond, func(ctx context.Context) error {
+	_, err = scheduler.EveryInterval(200*time.Millisecond, func(ctx context.Context) error {
 		return nil
 	})
+	if err != nil {
+		log.Fatalf("创建定时任务失败: %v", err)
+	}
 
 	// 模拟执行
 	for i := 1; i <= 6; i++ {
