@@ -1,0 +1,11 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(golangci-lint config verify:*)",
+      "Bash(golangci-lint migrate:*)",
+      "Bash(golangci-lint run:*)"
+    ],
+    "deny": [],
+    "ask": []
+  }
+}

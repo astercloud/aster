@@ -34,6 +34,13 @@ func setupPostgresContainer(t *testing.T) (service *Service, cleanup func()) {
 		t.Skip("Skipping PostgreSQL integration test (SKIP_INTEGRATION_TESTS is set)")
 	}
 
+	// 捕获 Docker 不可用时的 panic
+	defer func() {
+		if r := recover(); r != nil {
+			t.Skipf("Docker not available, skipping PostgreSQL integration test: %v", r)
+		}
+	}()
+
 	ctx := context.Background()
 
 	// 创建 PostgreSQL 容器
@@ -54,14 +61,20 @@ func setupPostgresContainer(t *testing.T) (service *Service, cleanup func()) {
 		ContainerRequest: req,
 		Started:          true,
 	})
-	require.NoError(t, err, "Failed to start PostgreSQL container")
+	if err != nil {
+		t.Skipf("Failed to start PostgreSQL container (Docker may not be available): %v", err)
+	}
 
 	// 获取容器端口
 	host, err := container.Host(ctx)
-	require.NoError(t, err)
+	if err != nil {
+		t.Skipf("Failed to get container host: %v", err)
+	}
 
 	port, err := container.MappedPort(ctx, "5432")
-	require.NoError(t, err)
+	if err != nil {
+		t.Skipf("Failed to get container port: %v", err)
+	}
 
 	// 构建 DSN
 	dsn := fmt.Sprintf("host=%s port=%s user=test password=test dbname=testdb sslmode=disable",

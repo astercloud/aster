@@ -95,7 +95,10 @@ func RunBatch(ctx context.Context, cfg *BatchConfig) (*BatchEvalResult, error) {
 
 	for i, testCase := range cfg.TestCases {
 		// 检查是否应该停止
-		if cfg.StopOnError && firstErr != nil {
+		mu.Lock()
+		shouldStop := cfg.StopOnError && firstErr != nil
+		mu.Unlock()
+		if shouldStop {
 			break
 		}
 

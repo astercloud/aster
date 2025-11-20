@@ -1,17 +1,23 @@
-# golangci-lint v2.x configuration
-# Minimal valid configuration for compatibility
-
 version: "2"
-
 run:
-  timeout: 5m
+  go: "1.21"
   tests: false
-  go: '1.21'
-
 linters:
-  enable:
-    - errcheck
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
+  exclusions:
+    generated: lax
+    presets:
+      - comments
+      - common-false-positives
+      - legacy
+      - std-error-handling
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
+formatters:
+  exclusions:
+    generated: lax
+    paths:
+      - third_party$
+      - builtin$
+      - examples$
