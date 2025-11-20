@@ -81,6 +81,18 @@ func (t *EditTool) Execute(ctx context.Context, input map[string]interface{}, tc
 		return NewClaudeErrorResponse(fmt.Errorf("old_string cannot be empty")), nil
 	}
 
+	// 如果 old_string 和 new_string 相同，直接返回成功但没有修改
+	if oldString == newString {
+		return map[string]interface{}{
+			"ok":           true,
+			"success":      true,
+			"changes_made": 0,
+			"file_path":    filePath,
+			"message":      "old_string and new_string are identical, no changes made",
+			"duration_ms":  0,
+		}, nil
+	}
+
 	// 验证文件路径安全性
 	if err := t.validatePath(filePath); err != nil {
 		return NewClaudeErrorResponse(
@@ -191,6 +203,8 @@ func (t *EditTool) Execute(ctx context.Context, input map[string]interface{}, tc
 
 	return map[string]interface{}{
 		"ok":                   true,
+		"success":              true,
+		"changes_made":         replacements,
 		"file_path":            filePath,
 		"old_string":           oldString,
 		"new_string":           newString,

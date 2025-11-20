@@ -157,7 +157,11 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]interfa
 		"plan":                  plan,
 		"status":                "pending_approval",
 		"confirmation_required": confirmationRequired,
-		"created_at":            planRecord.CreatedAt.Unix(),
+		"created_at":            planRecord.CreatedAt,
+		"updated_at":            planRecord.UpdatedAt,
+		"agent_id":              planRecord.AgentID,
+		"session_id":            planRecord.SessionID,
+		"metadata":              planRecord.Metadata,
 		"duration_ms":           duration.Milliseconds(),
 		"storage":               "persistent",
 		"storage_backend":       "FilePlanManager",
@@ -168,17 +172,10 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]interfa
 		response["estimated_duration"] = estimatedDuration
 	}
 
-	if len(dependencies) > 0 {
-		response["dependencies"] = dependencies
-	}
-
-	if len(risks) > 0 {
-		response["risks"] = risks
-	}
-
-	if len(successCriteria) > 0 {
-		response["success_criteria"] = successCriteria
-	}
+	// 总是包含数组字段，即使为空
+	response["dependencies"] = dependencies
+	response["risks"] = risks
+	response["success_criteria"] = successCriteria
 
 	// 添加计划统计
 	response["dependencies_count"] = len(dependencies)
@@ -219,6 +216,11 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]interfa
 // getStringSlice 获取字符串数组参数
 func (t *ExitPlanModeTool) getStringSlice(input map[string]interface{}, key string) []string {
 	if value, exists := input[key]; exists {
+		// 尝试直接转换为 []string
+		if slice, ok := value.([]string); ok {
+			return slice
+		}
+		// 尝试转换为 []interface{}
 		if slice, ok := value.([]interface{}); ok {
 			result := make([]string, len(slice))
 			for i, item := range slice {
