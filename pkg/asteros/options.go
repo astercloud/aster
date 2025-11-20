@@ -1,7 +1,7 @@
 package asteros
 
 import (
-	"github.com/astercloud/aster/pkg/cosmos"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // Options AsterOS 配置选项
@@ -11,7 +11,7 @@ type Options struct {
 	Port int    // HTTP 服务端口，默认 8080
 
 	// 核心组件
-	Cosmos *cosmos.Cosmos // Cosmos 实例（必需）
+	Pool *core.Pool // Pool 实例（必需）
 
 	// 自动发现
 	AutoDiscover bool // 是否自动发现和注册资源，默认 true
@@ -51,8 +51,8 @@ func DefaultOptions() *Options {
 
 // Validate 验证配置
 func (o *Options) Validate() error {
-	if o.Cosmos == nil {
-		return ErrCosmosRequired
+	if o.Pool == nil {
+		return ErrPoolRequired
 	}
 	if o.Port <= 0 || o.Port > 65535 {
 		return ErrInvalidPort

@@ -10,10 +10,9 @@ import (
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/asteros"
-	"github.com/astercloud/aster/pkg/cosmos"
+	"github.com/astercloud/aster/pkg/core"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/sandbox"
-	"github.com/astercloud/aster/pkg/stars"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/tools"
 	"github.com/astercloud/aster/pkg/types"
@@ -29,9 +28,9 @@ func main() {
 	// 1. 创建依赖
 	deps := createDependencies()
 
-	// 2. 创建 Cosmos
-	fmt.Println("1. 创建 Cosmos...")
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	// 2. 创建 Pool
+	fmt.Println("1. 创建 Pool...")
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    10,
 	})
@@ -41,7 +40,7 @@ func main() {
 	aster, err := asteros.New(&asteros.Options{
 		Name:          "MyAsterOS",
 		Port:          8080,
-		Cosmos:        cosmosInstance,
+		Pool:          pool,
 		EnableLogging: true,
 		EnableCORS:    true,
 		EnableMetrics: true,
@@ -107,16 +106,16 @@ func main() {
 		}
 	}
 
-	// 5. 创建并注册 Stars
-	fmt.Println("4. 创建并注册 Stars...")
+	// 5. 创建并注册 Room
+	fmt.Println("4. 创建并注册 Room...")
 
-	devTeam := stars.New(cosmosInstance, "DevTeam")
-	_ = devTeam.Join("leader-1", stars.RoleLeader)
-	_ = devTeam.Join("worker-1", stars.RoleWorker)
-	_ = devTeam.Join("worker-2", stars.RoleWorker)
+	devTeam := core.NewRoom(pool)
+	_ = devTeam.Join("leader", "leader-1")
+	_ = devTeam.Join("worker1", "worker-1")
+	_ = devTeam.Join("worker2", "worker-2")
 
-	if err := aster.RegisterStars("DevTeam", devTeam); err != nil {
-		log.Fatalf("Failed to register stars: %v", err)
+	if err := aster.RegisterRoom("DevTeam", devTeam); err != nil {
+		log.Fatalf("Failed to register room: %v", err)
 	}
 
 	// 6. 打印 API 端点
@@ -129,11 +128,11 @@ func main() {
 	fmt.Println("     POST http://localhost:8080/agents/leader-1/run")
 	fmt.Println("     GET  http://localhost:8080/agents/leader-1/status")
 	fmt.Println()
-	fmt.Println("   Stars API:")
-	fmt.Println("     GET  http://localhost:8080/stars")
-	fmt.Println("     POST http://localhost:8080/stars/DevTeam/run")
-	fmt.Println("     POST http://localhost:8080/stars/DevTeam/join")
-	fmt.Println("     GET  http://localhost:8080/stars/DevTeam/members")
+	fmt.Println("   Room API:")
+	fmt.Println("     GET  http://localhost:8080/rooms")
+	fmt.Println("     POST http://localhost:8080/rooms/DevTeam/say")
+	fmt.Println("     POST http://localhost:8080/rooms/DevTeam/join")
+	fmt.Println("     GET  http://localhost:8080/rooms/DevTeam/members")
 	fmt.Println()
 
 	// 7. 启动 AsterOS
@@ -160,9 +159,9 @@ func main() {
 		log.Printf("Shutdown error: %v", err)
 	}
 
-	// 关闭 Cosmos
-	if err := cosmosInstance.Shutdown(); err != nil {
-		log.Printf("Cosmos shutdown error: %v", err)
+	// 关闭 Pool
+	if err := pool.Shutdown(); err != nil {
+		log.Printf("Pool shutdown error: %v", err)
 	}
 
 	fmt.Println("✓ 示例完成!")

@@ -12,7 +12,7 @@ Aster Workflow 是一个强大的工作流编排系统，提供了灵活的步�
 ### 🧩 8种步骤类型
 - **FunctionStep** - 自定义函数执行
 - **AgentStep** - Agent 调用
-- **StarsStep** - Stars 团队协作
+- **RoomStep** - Room 协作
 - **ConditionStep** - 条件分支
 - **LoopStep** - 循环执行
 - **ParallelStep** - 并行执行

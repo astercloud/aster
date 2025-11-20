@@ -150,8 +150,6 @@ func (r *Room) Say(ctx context.Context, from string, text string) error {
 			if err := agent.Send(ctx, txt); err != nil {
 				log.Printf("[Room] Failed to send message to agent %s: %v", memberName, err)
 			}
-			// 记录错误但不中断其他消息发送
-			// 这里可以通过回调或事件通知上层
 		}(ag, formattedText, name)
 	}
 
@@ -249,7 +247,6 @@ func (r *Room) GetMembers() []RoomMember {
 			AgentID: agentID,
 		})
 	}
-
 	return members
 }
 
@@ -298,8 +295,8 @@ func (r *Room) ClearHistory() {
 func (r *Room) extractMentions(text string) []string {
 	matches := r.mentionRegex.FindAllStringSubmatch(text, -1)
 	mentions := make([]string, 0, len(matches))
-
 	seen := make(map[string]bool)
+
 	for _, match := range matches {
 		if len(match) > 1 {
 			name := match[1]

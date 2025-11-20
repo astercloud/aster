@@ -109,11 +109,6 @@ func (m *SessionMemoryManager) AddMemory(
 	m.mu.Lock()
 	defer m.mu.Unlock()
 
-	// 验证作用域
-	if scope == ScopeGlobal && !m.config.EnableGlobal {
-		return "", fmt.Errorf("global scope is disabled")
-	}
-
 	// 生成记忆 ID
 	memID := fmt.Sprintf("mem-%s-%d", sessionID, time.Now().UnixNano())
 

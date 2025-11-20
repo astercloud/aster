@@ -8,7 +8,7 @@ import (
 	"time"
 
 	"github.com/astercloud/aster/pkg/agent"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 	"github.com/google/uuid"
 )
 
@@ -89,24 +89,24 @@ func (s *AgentStep) WithTimeout(timeout time.Duration) *AgentStep {
 	return s
 }
 
-// ===== StarsStep =====
+// ===== RoomStep =====
 
-type StarsStep struct {
+type RoomStep struct {
 	id          string
 	name        string
 	description string
-	stars       *stars.Stars
+	room        *core.Room
 	config      *StepConfig
 }
 
-func NewStarsStep(name string, stars *stars.Stars) *StarsStep {
-	return &StarsStep{
+func NewRoomStep(name string, room *core.Room) *RoomStep {
+	return &RoomStep{
 		id:    uuid.New().String(),
 		name:  name,
-		stars: stars,
+		room:  room,
 		config: &StepConfig{
 			Name:        name,
-			Type:        StepTypeStars,
+			Type:        StepTypeRoom,
 			MaxRetries:  3,
 			Timeout:     10 * time.Minute,
 			SkipOnError: false,
@@ -114,13 +114,13 @@ func NewStarsStep(name string, stars *stars.Stars) *StarsStep {
 	}
 }
 
-func (s *StarsStep) ID() string          { return s.id }
-func (s *StarsStep) Name() string        { return s.name }
-func (s *StarsStep) Type() StepType      { return StepTypeStars }
-func (s *StarsStep) Description() string { return s.description }
-func (s *StarsStep) Config() *StepConfig { return s.config }
+func (s *RoomStep) ID() string          { return s.id }
+func (s *RoomStep) Name() string        { return s.name }
+func (s *RoomStep) Type() StepType      { return StepTypeRoom }
+func (s *RoomStep) Description() string { return s.description }
+func (s *RoomStep) Config() *StepConfig { return s.config }
 
-func (s *StarsStep) Execute(ctx context.Context, input *StepInput) iter.Seq2[*StepOutput, error] {
+func (s *RoomStep) Execute(ctx context.Context, input *StepInput) iter.Seq2[*StepOutput, error] {
 	return func(yield func(*StepOutput, error) bool) {
 		startTime := time.Now()
 
@@ -134,8 +134,8 @@ func (s *StarsStep) Execute(ctx context.Context, input *StepInput) iter.Seq2[*St
 		output := &StepOutput{
 			StepID:    s.id,
 			StepName:  s.name,
-			StepType:  StepTypeStars,
-			Content:   fmt.Sprintf("Stars team %s processed: %s", s.name, inputMessage),
+			StepType:  StepTypeRoom,
+			Content:   fmt.Sprintf("Room %s processed: %s", s.name, inputMessage),
 			StartTime: startTime,
 			EndTime:   time.Now(),
 			Metadata:  make(map[string]interface{}),
@@ -146,7 +146,7 @@ func (s *StarsStep) Execute(ctx context.Context, input *StepInput) iter.Seq2[*St
 	}
 }
 
-func (s *StarsStep) WithDescription(desc string) *StarsStep {
+func (s *RoomStep) WithDescription(desc string) *RoomStep {
 	s.description = desc
 	return s
 }

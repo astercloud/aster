@@ -5,7 +5,7 @@ import (
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // ResourceType 资源类型
@@ -13,7 +13,7 @@ type ResourceType string
 
 const (
 	ResourceTypeAgent    ResourceType = "agent"
-	ResourceTypeStars    ResourceType = "stars"
+	ResourceTypeRoom     ResourceType = "room"
 	ResourceTypeWorkflow ResourceType = "workflow"
 )
 
@@ -22,14 +22,14 @@ type Resource struct {
 	ID   string       // 资源 ID
 	Name string       // 资源名称
 	Type ResourceType // 资源类型
-	Data interface{}  // 资源数据（Agent、Stars 或 Workflow）
+	Data interface{}  // 资源数据（Agent、Room 或 Workflow）
 }
 
 // Registry 资源注册表
 type Registry struct {
 	mu        sync.RWMutex
 	agents    map[string]*agent.Agent
-	stars     map[string]*stars.Stars
+	rooms     map[string]*core.Room
 	workflows map[string]workflow.Agent
 }
 
@@ -37,7 +37,7 @@ type Registry struct {
 func NewRegistry() *Registry {
 	return &Registry{
 		agents:    make(map[string]*agent.Agent),
-		stars:     make(map[string]*stars.Stars),
+		rooms:     make(map[string]*core.Room),
 		workflows: make(map[string]workflow.Agent),
 	}
 }
@@ -55,16 +55,16 @@ func (r *Registry) RegisterAgent(id string, ag *agent.Agent) error {
 	return nil
 }
 
-// RegisterStars 注册 Stars
-func (r *Registry) RegisterStars(id string, s *stars.Stars) error {
+// RegisterRoom 注册 Room
+func (r *Registry) RegisterRoom(id string, room *core.Room) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, exists := r.stars[id]; exists {
+	if _, exists := r.rooms[id]; exists {
 		return ErrResourceExists
 	}
 
-	r.stars[id] = s
+	r.rooms[id] = room
 	return nil
 }
 
@@ -90,13 +90,13 @@ func (r *Registry) GetAgent(id string) (*agent.Agent, bool) {
 	return ag, exists
 }
 
-// GetStars 获取 Stars
-func (r *Registry) GetStars(id string) (*stars.Stars, bool) {
+// GetRoom 获取 Room
+func (r *Registry) GetRoom(id string) (*core.Room, bool) {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	s, exists := r.stars[id]
-	return s, exists
+	room, exists := r.rooms[id]
+	return room, exists
 }
 
 // GetWorkflow 获取 Workflow
@@ -120,13 +120,13 @@ func (r *Registry) ListAgents() []string {
 	return ids
 }
 
-// ListStars 列出所有 Stars
-func (r *Registry) ListStars() []string {
+// ListRooms 列出所有 Rooms
+func (r *Registry) ListRooms() []string {
 	r.mu.RLock()
 	defer r.mu.RUnlock()
 
-	ids := make([]string, 0, len(r.stars))
-	for id := range r.stars {
+	ids := make([]string, 0, len(r.rooms))
+	for id := range r.rooms {
 		ids = append(ids, id)
 	}
 	return ids
@@ -160,12 +160,12 @@ func (r *Registry) ListAll() []Resource {
 		})
 	}
 
-	for id, s := range r.stars {
+	for id, room := range r.rooms {
 		resources = append(resources, Resource{
 			ID:   id,
-			Name: s.Name(),
-			Type: ResourceTypeStars,
-			Data: s,
+			Name: id, // Room 没有 Name() 方法，使用 ID
+			Type: ResourceTypeRoom,
+			Data: room,
 		})
 	}
 
@@ -194,16 +194,16 @@ func (r *Registry) UnregisterAgent(id string) error {
 	return nil
 }
 
-// UnregisterStars 注销 Stars
-func (r *Registry) UnregisterStars(id string) error {
+// UnregisterRoom 注销 Room
+func (r *Registry) UnregisterRoom(id string) error {
 	r.mu.Lock()
 	defer r.mu.Unlock()
 
-	if _, exists := r.stars[id]; !exists {
-		return ErrStarsNotFound
+	if _, exists := r.rooms[id]; !exists {
+		return ErrRoomNotFound
 	}
 
-	delete(r.stars, id)
+	delete(r.rooms, id)
 	return nil
 }
 
@@ -226,6 +226,6 @@ func (r *Registry) Clear() {
 	defer r.mu.Unlock()
 
 	r.agents = make(map[string]*agent.Agent)
-	r.stars = make(map[string]*stars.Stars)
+	r.rooms = make(map[string]*core.Room)
 	r.workflows = make(map[string]workflow.Agent)
 }

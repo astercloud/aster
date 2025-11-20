@@ -11,10 +11,9 @@ import (
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/asteros"
 	"github.com/astercloud/aster/pkg/asteros/interfaces"
-	"github.com/astercloud/aster/pkg/cosmos"
+	"github.com/astercloud/aster/pkg/core"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/sandbox"
-	"github.com/astercloud/aster/pkg/stars"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/tools"
 	"github.com/astercloud/aster/pkg/types"
@@ -30,9 +29,9 @@ func main() {
 	// 1. 创建依赖
 	deps := createDependencies()
 
-	// 2. 创建 Cosmos
-	fmt.Println("1. 创建 Cosmos...")
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	// 2. 创建 Pool
+	fmt.Println("1. 创建 Pool...")
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    20,
 	})
@@ -42,7 +41,7 @@ func main() {
 	aster, err := asteros.New(&asteros.Options{
 		Name:          "MultiInterfaceOS",
 		Port:          8080,
-		Cosmos:        cosmosInstance,
+		Pool:          pool,
 		EnableLogging: true,
 		EnableCORS:    true,
 		EnableMetrics: true,
@@ -138,17 +137,17 @@ func main() {
 		}
 	}
 
-	// 6. 创建并注册 Stars
-	fmt.Println("\n5. 创建并注册 Stars...")
+	// 6. 创建并注册 Room
+	fmt.Println("\n5. 创建并注册 Room...")
 
-	devTeam := stars.New(cosmosInstance, "DevTeam")
-	_ = devTeam.Join("leader-1", stars.RoleLeader)
-	_ = devTeam.Join("worker-1", stars.RoleWorker)
-	_ = devTeam.Join("worker-2", stars.RoleWorker)
-	_ = devTeam.Join("worker-3", stars.RoleWorker)
+	devTeam := core.NewRoom(pool)
+	_ = devTeam.Join("leader", "leader-1")
+	_ = devTeam.Join("worker1", "worker-1")
+	_ = devTeam.Join("worker2", "worker-2")
+	_ = devTeam.Join("worker3", "worker-3")
 
-	if err := aster.RegisterStars("DevTeam", devTeam); err != nil {
-		log.Fatalf("Failed to register stars: %v", err)
+	if err := aster.RegisterRoom("DevTeam", devTeam); err != nil {
+		log.Fatalf("Failed to register room: %v", err)
 	}
 
 	// 7. 打印可用的 API
@@ -226,9 +225,9 @@ func main() {
 		log.Printf("Shutdown error: %v", err)
 	}
 
-	// 关闭 Cosmos
-	if err := cosmosInstance.Shutdown(); err != nil {
-		log.Printf("Cosmos shutdown error: %v", err)
+	// 关闭 Pool
+	if err := pool.Shutdown(); err != nil {
+		log.Printf("Pool shutdown error: %v", err)
 	}
 
 	fmt.Println("\n✓ 示例完成!")

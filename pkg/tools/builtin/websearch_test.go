@@ -3,6 +3,7 @@ package builtin
 import (
 	"context"
 	"encoding/json"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"os"
@@ -10,6 +11,19 @@ import (
 
 	"github.com/astercloud/aster/pkg/tools"
 )
+
+// newLocalHTTPServer 启动绑定 IPv4 的测试服务器，避免某些环境禁用 IPv6 loopback。
+func newLocalHTTPServerWS(t *testing.T, handler http.Handler) *httptest.Server {
+	t.Helper()
+	ln, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		t.Skipf("skip: unable to listen on IPv4 loopback: %v", err)
+	}
+	srv := httptest.NewUnstartedServer(handler)
+	srv.Listener = ln
+	srv.Start()
+	return srv
+}
 
 func TestWebSearchTool_MissingAPIKey(t *testing.T) {
 	// 保存原有环境变量
@@ -51,7 +65,7 @@ func TestWebSearchTool_MissingAPIKey(t *testing.T) {
 
 func TestWebSearchTool_SuccessfulSearch(t *testing.T) {
 	// 创建模拟 Tavily API 的测试服务器
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServerWS(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// 验证请求方法和头部
 		if r.Method != "POST" {
 			t.Errorf("Expected POST method, got %s", r.Method)

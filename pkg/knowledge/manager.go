@@ -8,6 +8,7 @@ import (
 	"sync"
 	"time"
 
+	"github.com/astercloud/aster/pkg/knowledge/core"
 	"github.com/astercloud/aster/pkg/memory"
 	"github.com/astercloud/aster/pkg/security"
 	"github.com/astercloud/aster/pkg/vector"
@@ -28,21 +29,18 @@ type manager struct {
 	stats   map[string]*KnowledgeStats
 	running bool
 
-	// 审计和安全
-	auditor     *auditor
-	piiRedactor *piiRedactor
+	// 审计和安全（策略可选）
+	auditStrategy AuditStrategy
+	piiStrategy   PIIStrategy
+
+	// 轻量核心管线（可选）
+	corePipeline *core.Pipeline
 }
 
 // cacheEntry 缓存条目
 type cacheEntry struct {
 	item   *KnowledgeItem
 	expire time.Time
-}
-
-// auditor 审计记录器
-type auditor struct {
-	enabled bool
-	records []AuditRecord
 }
 
 // AuditRecord 审计记录
@@ -54,10 +52,44 @@ type AuditRecord struct {
 	Details   string    `json:"details"`
 }
 
-// piiRedactor 包装器，为PIIDetector添加Redact方法
-type piiRedactor struct {
-	detector security.PIIDetector
+// defaultAuditor 默认审计策略：内存记录、可选启用
+type defaultAuditor struct {
+	enabled bool
+	limit   int
+	records []AuditRecord
+}
+
+func (a *defaultAuditor) Record(action, userID, itemID, details string) {
+	if !a.enabled {
+		return
+	}
+	a.records = append(a.records, AuditRecord{
+		Timestamp: time.Now(),
+		Action:    action,
+		UserID:    userID,
+		ItemID:    itemID,
+		Details:   details,
+	})
+	if a.limit > 0 && len(a.records) > a.limit {
+		// 保留最新记录
+		a.records = a.records[len(a.records)-a.limit:]
+	}
+}
+
+// redactionStrategy 默认 PII 脱敏策略
+type redactionStrategy struct {
 	redactor security.ContentRedactor
+}
+
+func (r *redactionStrategy) Sanitize(item *KnowledgeItem) *KnowledgeItem {
+	if r == nil || r.redactor == nil || item == nil {
+		return item
+	}
+	s := *item
+	s.Content = r.redactor.Redact(item.Content)
+	s.Description = r.redactor.Redact(item.Description)
+	s.Title = r.redactor.Redact(item.Title)
+	return &s
 }
 
 // NewManager 创建知识管理器
@@ -85,18 +117,41 @@ func NewManager(config *ManagerConfig) (Manager, error) {
 		embedder:      config.Embedder,
 		cache:         make(map[string]*cacheEntry),
 		stats:         make(map[string]*KnowledgeStats),
-		auditor: &auditor{
-			enabled: config.EnableAudit,
-			records: make([]AuditRecord, 0),
-		},
 	}
 
-	if config.EnablePII {
+	// PII 策略注入
+	if config.PIIStrategy != nil {
+		m.piiStrategy = config.PIIStrategy
+	} else if config.EnablePII {
 		detector := security.NewRegexPIIDetector()
-		m.piiRedactor = &piiRedactor{
-			detector: detector,
+		m.piiStrategy = &redactionStrategy{
 			redactor: security.NewPIIRedactor(detector),
 		}
+	}
+
+	// 审计策略注入
+	if config.AuditStrategy != nil {
+		m.auditStrategy = config.AuditStrategy
+	} else if config.EnableAudit {
+		m.auditStrategy = &defaultAuditor{
+			enabled: true,
+			limit:   10000,
+			records: make([]AuditRecord, 0),
+		}
+	}
+
+	// 可选：构建轻量核心管线
+	if config.UseCorePipeline && config.VectorStore != nil && config.Embedder != nil {
+		p, err := core.NewPipeline(core.PipelineConfig{
+			Store:       config.VectorStore,
+			Embedder:    config.Embedder,
+			Namespace:   config.Namespace,
+			DefaultTopK: config.MaxResults,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("knowledge: init core pipeline: %w", err)
+		}
+		m.corePipeline = p
 	}
 
 	return m, nil
@@ -169,7 +224,7 @@ func (m *manager) Add(ctx context.Context, item *KnowledgeItem) error {
 	}
 
 	// PII检测
-	if m.config.EnablePII && m.piiRedactor != nil {
+	if m.piiStrategy != nil {
 		if sanitized := m.sanitizeContent(item); sanitized != item {
 			item = sanitized
 		}
@@ -291,7 +346,7 @@ func (m *manager) Update(ctx context.Context, item *KnowledgeItem) error {
 	item.CreatedAt = existing.CreatedAt // 保持创建时间
 
 	// PII检测
-	if m.config.EnablePII && m.piiRedactor != nil {
+	if m.piiStrategy != nil {
 		if sanitized := m.sanitizeContent(item); sanitized != item {
 			item = sanitized
 		}
@@ -395,6 +450,22 @@ func (m *manager) Search(ctx context.Context, query *SearchQuery) ([]*SearchResu
 		return nil, fmt.Errorf("knowledge: search query cannot be nil")
 	}
 
+	// 轻量路径：仅使用向量检索，避开复杂策略
+	if m.corePipeline != nil && (query.Strategy == "" || query.Strategy == StrategyVector) {
+		meta := map[string]interface{}{}
+		for k, v := range query.Filters {
+			meta[k] = v
+		}
+		if query.Namespace != "" {
+			meta["namespace"] = query.Namespace
+		}
+		hits, err := m.corePipeline.Search(ctx, query.Query, query.MaxResults, meta)
+		if err != nil {
+			return nil, fmt.Errorf("knowledge: core search failed: %w", err)
+		}
+		return convertCoreHits(hits), nil
+	}
+
 	m.mu.RLock()
 	defer m.mu.RUnlock()
 
@@ -452,18 +523,33 @@ func (m *manager) SearchSimilar(ctx context.Context, id string, maxResults int) 
 		return nil, fmt.Errorf("knowledge: failed to get item for similarity search: %w", err)
 	}
 
-	if len(item.Embedding) == 0 {
+	if len(item.Embedding) == 0 && m.corePipeline == nil {
 		return nil, fmt.Errorf("knowledge: item has no embedding for similarity search")
 	}
 
-	query := &SearchQuery{
-		Vector:     item.Embedding,
-		Strategy:   StrategyVector,
-		Namespace:  item.Namespace,
-		MaxResults: maxResults,
+	// 优先使用原有向量
+	if len(item.Embedding) > 0 {
+		query := &SearchQuery{
+			Vector:     item.Embedding,
+			Strategy:   StrategyVector,
+			Namespace:  item.Namespace,
+			MaxResults: maxResults,
+		}
+		return m.Search(ctx, query)
 	}
 
-	return m.Search(ctx, query)
+	// 回退到核心管线的向量检索（使用文本重新嵌入）
+	if m.corePipeline != nil {
+		hits, err := m.corePipeline.Search(ctx, item.Content, maxResults, map[string]interface{}{
+			"namespace": item.Namespace,
+		})
+		if err != nil {
+			return nil, fmt.Errorf("knowledge: core similarity search failed: %w", err)
+		}
+		return convertCoreHits(hits), nil
+	}
+
+	return nil, fmt.Errorf("knowledge: no embedding available for similarity search")
 }
 
 // AddRelation 添加知识关系
@@ -753,19 +839,10 @@ func (m *manager) calculateQuality(item *KnowledgeItem) float64 {
 
 // sanitizeContent 内容净化（PII检测）
 func (m *manager) sanitizeContent(item *KnowledgeItem) *KnowledgeItem {
-	if m.piiRedactor == nil {
+	if m.piiStrategy == nil {
 		return item
 	}
-
-	// 创建副本
-	sanitized := *item
-
-	// 净化内容
-	sanitized.Content = m.piiRedactor.redactor.Redact(item.Content)
-	sanitized.Description = m.piiRedactor.redactor.Redact(item.Description)
-	sanitized.Title = m.piiRedactor.redactor.Redact(item.Title)
-
-	return &sanitized
+	return m.piiStrategy.Sanitize(item)
 }
 
 // updateCache 更新缓存
@@ -783,24 +860,10 @@ func (m *manager) updateCache(item *KnowledgeItem) {
 
 // audit 记录审计日志
 func (m *manager) audit(action, userID, itemID, details string) {
-	if !m.config.EnableAudit {
+	if m.auditStrategy == nil {
 		return
 	}
-
-	record := AuditRecord{
-		Timestamp: time.Now(),
-		Action:    action,
-		UserID:    userID,
-		ItemID:    itemID,
-		Details:   details,
-	}
-
-	m.auditor.records = append(m.auditor.records, record)
-
-	// 限制审计记录数量
-	if len(m.auditor.records) > 10000 {
-		m.auditor.records = m.auditor.records[5000:]
-	}
+	m.auditStrategy.Record(action, userID, itemID, details)
 }
 
 // cleanupRoutine 清理协程

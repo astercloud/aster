@@ -6,10 +6,9 @@ import (
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
-	"github.com/astercloud/aster/pkg/cosmos"
+	"github.com/astercloud/aster/pkg/core"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/sandbox"
-	"github.com/astercloud/aster/pkg/stars"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/tools"
 	"github.com/astercloud/aster/pkg/types"
@@ -61,14 +60,14 @@ func createTestAgentConfig(agentID string) *types.AgentConfig {
 // TestNew 测试创建 AsterOS
 func TestNew(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
-	// 默认配置需要提供 cosmos
+	// 默认配置需要提供 pool
 	defaultOpts := DefaultOptions()
-	defaultOpts.Cosmos = cosmosInstance
+	defaultOpts.Pool = pool
 	os, err := New(defaultOpts)
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS with default options: %v", err)
@@ -80,9 +79,9 @@ func TestNew(t *testing.T) {
 
 	// 自定义配置
 	os, err = New(&Options{
-		Name:   "TestOS",
-		Port:   8081,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8081,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
@@ -95,26 +94,26 @@ func TestNew(t *testing.T) {
 
 // TestNewValidation 测试配置验证
 func TestNewValidation(t *testing.T) {
-	// 无 Cosmos 配置
+	// 无 Pool 配置
 	_, err := New(&Options{
 		Name: "TestOS",
 		Port: 8080,
 	})
 	if err == nil {
-		t.Error("Expected error for missing cosmos")
+		t.Error("Expected error for missing pool")
 	}
 
 	// 无效端口
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	_, err = New(&Options{
-		Name:   "TestOS",
-		Port:   -1, // 无效端口
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: -1, // 无效端口
+		Pool: pool,
 	})
 	if err == nil {
 		t.Error("Expected error for invalid port")
@@ -125,15 +124,15 @@ func TestNewValidation(t *testing.T) {
 func TestRegisterAgent(t *testing.T) {
 	ctx := context.Background()
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
@@ -165,51 +164,51 @@ func TestRegisterAgent(t *testing.T) {
 	}
 }
 
-// TestRegisterStars 测试注册 Stars
-func TestRegisterStars(t *testing.T) {
+// TestRegisterRoom 测试注册 Room
+func TestRegisterRoom(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
 	}
 
-	// 创建 Stars
-	starsInstance := stars.New(cosmosInstance, "TestStars")
+	// 创建 Room
+	room := core.NewRoom(pool)
 
-	// 注册 Stars
-	err = os.RegisterStars("test-stars", starsInstance)
+	// 注册 Room
+	err = os.RegisterRoom("test-room", room)
 	if err != nil {
-		t.Fatalf("Failed to register stars: %v", err)
+		t.Fatalf("Failed to register room: %v", err)
 	}
 
-	// 验证 Stars 已注册
-	_, exists := os.Registry().GetStars("test-stars")
+	// 验证 Room 已注册
+	_, exists := os.Registry().GetRoom("test-room")
 	if !exists {
-		t.Error("Stars not found in registry")
+		t.Error("Room not found in registry")
 	}
 }
 
 // TestRegisterWorkflow 测试注册 Workflow
 func TestRegisterWorkflow(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
@@ -234,15 +233,15 @@ func TestRegisterWorkflow(t *testing.T) {
 // TestAddInterface 测试添加 Interface
 func TestAddInterface(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
@@ -282,15 +281,15 @@ func TestAddInterface(t *testing.T) {
 // TestLifecycle 测试生命周期
 func TestLifecycle(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
@@ -311,23 +310,23 @@ func TestLifecycle(t *testing.T) {
 // TestGetters 测试 Getter 方法
 func TestGetters(t *testing.T) {
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	os, err := New(&Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	})
 	if err != nil {
 		t.Fatalf("Failed to create AsterOS: %v", err)
 	}
 
 	// 测试 Getter 方法
-	if os.Cosmos() == nil {
-		t.Error("Cosmos should not be nil")
+	if os.Pool() == nil {
+		t.Error("Pool should not be nil")
 	}
 
 	if os.Registry() == nil {
@@ -392,7 +391,7 @@ func (i *TestInterface) OnAgentRegistered(agent *agent.Agent) error {
 	return nil
 }
 
-func (i *TestInterface) OnStarsRegistered(stars *stars.Stars) error {
+func (i *TestInterface) OnRoomRegistered(room *core.Room) error {
 	return nil
 }
 
@@ -443,24 +442,24 @@ func TestDefaultOptions(t *testing.T) {
 
 // TestOptionsValidation 测试配置验证
 func TestOptionsValidation(t *testing.T) {
-	// 测试 nil Cosmos
+	// 测试 nil Pool
 	opts := &Options{}
 	err := opts.Validate()
 	if err == nil {
-		t.Error("Expected error for nil cosmos")
+		t.Error("Expected error for nil pool")
 	}
 
 	// 测试无效端口
 	deps := createTestDependencies(t)
-	cosmosInstance := cosmos.New(&cosmos.Options{
+	pool := core.NewPool(&core.PoolOptions{
 		Dependencies: deps,
 		MaxAgents:    5,
 	})
 
 	opts = &Options{
-		Name:   "TestOS",
-		Port:   70000, // 无效端口
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 70000, // 无效端口
+		Pool: pool,
 	}
 	err = opts.Validate()
 	if err == nil {
@@ -469,9 +468,9 @@ func TestOptionsValidation(t *testing.T) {
 
 	// 测试有效配置
 	opts = &Options{
-		Name:   "TestOS",
-		Port:   8080,
-		Cosmos: cosmosInstance,
+		Name: "TestOS",
+		Port: 8080,
+		Pool: pool,
 	}
 	err = opts.Validate()
 	if err != nil {

@@ -330,7 +330,7 @@ ag.Close()
 
 - [自定义工具](/examples/tools/custom) - 创建业务专用工具
 - [中间件](/examples/middleware) - 添加洋葱模型中间件
-- [多 Agent 协作](/examples/multi-agent) - Agent Pool 和 Scheduler
+- [多 Agent 协作](/examples/multi-agent) - Pool 和 Room
 
 ## ❓ 常见问题
 

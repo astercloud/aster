@@ -1,4 +1,4 @@
-<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1040" width="1400" height="1040">
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1400 1190" width="1400" height="1190">
   <defs>
     <!-- 渐变定义 -->
     <linearGradient id="bgGradient" x1="0%" y1="0%" x2="0%" y2="100%">
@@ -52,11 +52,11 @@
   </defs>
 
   <!-- 背景 -->
-  <rect width="1400" height="1040" fill="url(#bgGradient)"/>
+  <rect width="1400" height="1190" fill="url(#bgGradient)"/>
 
   <!-- 标题 -->
   <text x="700" y="40" font-family="Arial, sans-serif" font-size="28" font-weight="bold" fill="#F8FAFC" text-anchor="middle">
-    AgentSDK 系统架构
+    Aster 系统架构
   </text>
 
   <!-- 客户端层 -->
@@ -73,16 +73,39 @@
   <!-- 连接箭头 -->
   <path d="M 700 160 L 700 195" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
 
-  <!-- Agent Runtime 层 -->
+  <!-- AsterOS 层 -->
   <g transform="translate(100, 200)">
-    <rect x="0" y="0" width="1200" height="390" rx="12" fill="url(#agentGradient)" opacity="0.15" filter="url(#shadow)"/>
-    <rect x="0" y="0" width="1200" height="45" rx="12" fill="url(#agentGradient)" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="1200" height="100" rx="12" fill="#1E40AF" opacity="0.2" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="1200" height="45" rx="12" fill="#1E40AF" filter="url(#shadow)"/>
     <text x="20" y="30" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">
-      Agent Runtime
+      🌌 AsterOS - 统一运行时系统
+    </text>
+
+    <g transform="translate(40, 60)">
+      <rect x="0" y="0" width="360" height="30" rx="6" fill="#3B82F6" opacity="0.8"/>
+      <text x="180" y="20" font-family="Arial, sans-serif" font-size="13" fill="#FFFFFF" text-anchor="middle">HTTP/A2A/AGUI Interfaces</text>
+
+      <rect x="390" y="0" width="360" height="30" rx="6" fill="#3B82F6" opacity="0.8"/>
+      <text x="570" y="20" font-family="Arial, sans-serif" font-size="13" fill="#FFFFFF" text-anchor="middle">Registry (Agents/Rooms/Workflows)</text>
+
+      <rect x="780" y="0" width="360" height="30" rx="6" fill="#3B82F6" opacity="0.8"/>
+      <text x="960" y="20" font-family="Arial, sans-serif" font-size="13" fill="#FFFFFF" text-anchor="middle">Auto API Generation</text>
+    </g>
+  </g>
+
+  <!-- 连接箭头 -->
+  <path d="M 700 300 L 700 335" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
+
+  <!-- Agent Runtime 层 -->
+  <g transform="translate(100, 340)">
+    <rect x="0" y="0" width="1200" height="400" rx="12" fill="url(#agentGradient)" opacity="0.15" filter="url(#shadow)"/>
+    <rect x="0" y="0" width="1200" height="60" rx="12" fill="url(#agentGradient)" filter="url(#shadow)"/>
+    <text x="20" y="38" font-family="Arial, sans-serif" font-size="20" font-weight="bold" fill="#FFFFFF">
+      🔄 Agent Runtime (Pool + Room)
     </text>
 
     <!-- Agent Types (v0.4.0 新增) -->
-    <g transform="translate(40, 60)">
+    <g transform="translate(40, 80)">
       <text x="0" y="0" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#A78BFA">
         Agent Types
       </text>
@@ -113,14 +136,14 @@
     </g>
 
     <!-- Skills Injector -->
-    <g transform="translate(40, 125)">
+    <g transform="translate(40, 145)">
       <rect x="0" y="0" width="1120" height="50" rx="8" fill="#7C3AED" opacity="0.6" filter="url(#shadow)" stroke="#A78BFA" stroke-width="2"/>
       <text x="20" y="25" font-family="Arial, sans-serif" font-size="16" fill="#FFFFFF" font-weight="bold">🎯 Skills Injector</text>
       <text x="20" y="42" font-family="Arial, sans-serif" font-size="12" fill="#E0E7FF">动态加载 Skills Package · 触发机制（keyword/context/always/file_pattern） · 知识库注入</text>
     </g>
 
     <!-- 三通道事件总线 -->
-    <g transform="translate(40, 220)">
+    <g transform="translate(40, 240)">
       <!-- Progress Channel -->
       <rect x="0" y="0" width="350" height="120" rx="8" fill="#1E293B" stroke="url(#channelGradient)" stroke-width="2" filter="url(#glow)"/>
       <circle cx="25" cy="25" r="8" fill="#EC4899"/>
@@ -172,10 +195,10 @@
   </g>
 
   <!-- 连接箭头 -->
-  <path d="M 700 590 L 700 625" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
+  <path d="M 700 740 L 700 775" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
 
   <!-- Middleware 层 -->
-  <g transform="translate(100, 630)">
+  <g transform="translate(100, 780)">
     <rect x="0" y="0" width="1200" height="130" rx="12" fill="#2D1B69" opacity="0.3" filter="url(#shadow)"/>
     <text x="20" y="30" font-family="Arial, sans-serif" font-size="18" font-weight="bold" fill="#A78BFA">
       Middleware Stack (洋葱模型)
@@ -201,12 +224,12 @@
   </g>
 
   <!-- 连接箭头 -->
-  <path d="M 700 760 L 700 795" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
+  <path d="M 700 910 L 700 945" stroke="#94A3B8" stroke-width="3" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
 
   <!-- Backend / Session / Provider 三栏布局 -->
 
   <!-- Backend 层 -->
-  <g transform="translate(100, 800)">
+  <g transform="translate(100, 950)">
     <rect x="0" y="0" width="370" height="110" rx="12" fill="url(#backendGradient)" opacity="0.15" filter="url(#shadow)"/>
     <rect x="0" y="0" width="370" height="40" rx="12" fill="url(#backendGradient)" filter="url(#shadow)"/>
     <text x="20" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">
@@ -230,7 +253,7 @@
   </g>
 
   <!-- Session Store 层 -->
-  <g transform="translate(490, 800)">
+  <g transform="translate(490, 950)">
     <rect x="0" y="0" width="380" height="110" rx="12" fill="url(#sessionGradient)" opacity="0.15" filter="url(#shadow)"/>
     <rect x="0" y="0" width="380" height="40" rx="12" fill="url(#sessionGradient)" filter="url(#shadow)"/>
     <text x="20" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">
@@ -253,7 +276,7 @@
   </g>
 
   <!-- Provider 层 -->
-  <g transform="translate(890, 800)">
+  <g transform="translate(890, 950)">
     <rect x="0" y="0" width="410" height="180" rx="12" fill="url(#providerGradient)" opacity="0.15" filter="url(#shadow)"/>
     <rect x="0" y="0" width="410" height="40" rx="12" fill="url(#providerGradient)" filter="url(#shadow)"/>
     <text x="20" y="28" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#FFFFFF">
@@ -312,7 +335,7 @@
   </g>
 
   <!-- Provider 图例 -->
-  <g transform="translate(890, 990)">
+  <g transform="translate(890, 1140)">
     <rect x="0" y="0" width="410" height="30" rx="6" fill="#1E293B" opacity="0.6"/>
     <text x="10" y="20" font-family="Arial, sans-serif" font-size="10" fill="#CBD5E1">
       🎬 视频  🧠 推理  💰 缓存  ⚡ 速度  🏠 本地  📚 长文本
@@ -320,10 +343,10 @@
   </g>
 
   <!-- 连接箭头 -->
-  <path d="M 285 910 L 285 945" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
+  <path d="M 285 1060 L 285 1095" stroke="#94A3B8" stroke-width="2" fill="none" marker-end="url(#arrowhead)" stroke-dasharray="8,4"/>
 
   <!-- Sandbox 层 -->
-  <g transform="translate(100, 950)">
+  <g transform="translate(100, 1100)">
     <rect x="0" y="0" width="370" height="80" rx="12" fill="#334155" filter="url(#shadow)"/>
     <text x="20" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#F8FAFC">
       Sandbox Layer
@@ -342,7 +365,7 @@
   </g>
 
   <!-- 工具生态 -->
-  <g transform="translate(490, 950)">
+  <g transform="translate(490, 1100)">
     <rect x="0" y="0" width="810" height="80" rx="12" fill="#1E3A8A" opacity="0.3" filter="url(#shadow)"/>
     <text x="20" y="30" font-family="Arial, sans-serif" font-size="16" font-weight="bold" fill="#93C5FD">
       工具生态与扩展

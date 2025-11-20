@@ -7,7 +7,7 @@ type StepType string
 
 const (
 	StepTypeAgent     StepType = "agent"
-	StepTypeStars     StepType = "stars"
+	StepTypeRoom      StepType = "room"
 	StepTypeFunction  StepType = "function"
 	StepTypeCondition StepType = "condition"
 	StepTypeLoop      StepType = "loop"

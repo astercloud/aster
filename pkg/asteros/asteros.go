@@ -9,20 +9,22 @@ import (
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
-	"github.com/astercloud/aster/pkg/cosmos"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 	"github.com/gin-gonic/gin"
 )
 
 // AsterOS Aster 框架的统一运行时系统
-// AsterOS 负责管理所有 Agents、Stars、Workflows，
+// AsterOS 负责管理所有 Agents、Rooms、Workflows，
 // 并自动生成 REST API 端点，支持多种 Interface。
 type AsterOS struct {
 	// 核心组件
-	cosmos   *cosmos.Cosmos
+	pool     *core.Pool
 	registry *Registry
 	router   *gin.Engine
 	server   *http.Server
+
+	// 依赖
+	deps *agent.Dependencies
 
 	// Interface 层
 	interfaces map[string]Interface
@@ -55,7 +57,7 @@ func New(opts *Options) (*AsterOS, error) {
 
 	// 创建 AsterOS
 	os := &AsterOS{
-		cosmos:     opts.Cosmos,
+		pool:       opts.Pool,
 		registry:   NewRegistry(),
 		interfaces: make(map[string]Interface),
 		opts:       opts,
@@ -119,14 +121,14 @@ func (os *AsterOS) initRouter() {
 			agents.GET("/:id/status", os.handleAgentStatus)
 		}
 
-		// Stars 路由
-		starsGroup := api.Group("/stars")
+		// Rooms 路由
+		rooms := api.Group("/rooms")
 		{
-			starsGroup.GET("", os.handleListStars)
-			starsGroup.POST("/:id/run", os.handleStarsRun)
-			starsGroup.POST("/:id/join", os.handleStarsJoin)
-			starsGroup.POST("/:id/leave", os.handleStarsLeave)
-			starsGroup.GET("/:id/members", os.handleStarsMembers)
+			rooms.GET("", os.handleListRooms)
+			rooms.POST("/:id/say", os.handleRoomSay)
+			rooms.POST("/:id/join", os.handleRoomJoin)
+			rooms.POST("/:id/leave", os.handleRoomLeave)
+			rooms.GET("/:id/members", os.handleRoomMembers)
 		}
 
 		// Workflow 路由
@@ -151,15 +153,15 @@ func (os *AsterOS) RegisterAgent(id string, ag *agent.Agent) error {
 	return nil
 }
 
-// RegisterStars 注册 Stars
-func (os *AsterOS) RegisterStars(id string, s *stars.Stars) error {
+// RegisterRoom 注册 Room
+func (os *AsterOS) RegisterRoom(id string, r *core.Room) error {
 	// 注册到 Registry
-	if err := os.registry.RegisterStars(id, s); err != nil {
+	if err := os.registry.RegisterRoom(id, r); err != nil {
 		return err
 	}
 
 	// 通知所有 Interfaces
-	os.notifyStarsRegistered(s)
+	os.notifyRoomRegistered(r)
 
 	return nil
 }
@@ -266,9 +268,9 @@ func (os *AsterOS) Shutdown() error {
 	return nil
 }
 
-// Cosmos 获取 Cosmos 实例
-func (os *AsterOS) Cosmos() *cosmos.Cosmos {
-	return os.cosmos
+// Pool 获取 Pool 实例
+func (os *AsterOS) Pool() *core.Pool {
+	return os.pool
 }
 
 // Registry 获取 Registry 实例
@@ -334,14 +336,14 @@ func (os *AsterOS) notifyAgentRegistered(ag *agent.Agent) {
 	}
 }
 
-// notifyStarsRegistered 通知所有 Interfaces Stars 已注册
-func (os *AsterOS) notifyStarsRegistered(s *stars.Stars) {
+// notifyRoomRegistered 通知所有 Interfaces Room 已注册
+func (os *AsterOS) notifyRoomRegistered(r *core.Room) {
 	os.ifMu.RLock()
 	defer os.ifMu.RUnlock()
 
 	for _, iface := range os.interfaces {
-		if err := iface.OnStarsRegistered(s); err != nil {
-			fmt.Printf("Warning: interface %s OnStarsRegistered: %v\n", iface.Name(), err)
+		if err := iface.OnRoomRegistered(r); err != nil {
+			fmt.Printf("Warning: interface %s OnRoomRegistered: %v\n", iface.Name(), err)
 		}
 	}
 }

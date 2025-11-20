@@ -9,7 +9,7 @@ import (
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
 	"github.com/astercloud/aster/pkg/asteros"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // AGUIInterfaceOptions AGUI Interface 配置
@@ -120,15 +120,15 @@ func (i *AGUIInterface) OnAgentRegistered(ag *agent.Agent) error {
 	return i.syncAgent(ag)
 }
 
-// OnStarsRegistered Stars 注册事件
-func (i *AGUIInterface) OnStarsRegistered(s *stars.Stars) error {
+// OnRoomRegistered Room 注册事件
+func (i *AGUIInterface) OnRoomRegistered(r *core.Room) error {
 	if i.opts.EnableLogging {
-		fmt.Printf("  [AGUI] Stars registered: %s\n", s.Name())
+		fmt.Printf("  [AGUI] Room registered with %d members\n", r.GetMemberCount())
 		fmt.Printf("    → Syncing to Control Plane\n")
 	}
 
 	// 同步到控制平面
-	return i.syncStars(s)
+	return i.syncRoom(r)
 }
 
 // OnWorkflowRegistered Workflow 注册事件
@@ -227,14 +227,14 @@ func (i *AGUIInterface) syncAgent(ag *agent.Agent) error {
 	return nil
 }
 
-// syncStars 同步 Stars
-func (i *AGUIInterface) syncStars(s *stars.Stars) error {
+// syncRoom 同步 Room
+func (i *AGUIInterface) syncRoom(r *core.Room) error {
 	if !i.isConnected() {
 		return nil // 静默失败
 	}
 
 	// TODO: 实现实际的同步逻辑
-	// 发送 Stars 信息到控制平面
+	// 发送 Room 信息到控制平面
 
 	return nil
 }

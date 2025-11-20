@@ -3,6 +3,7 @@ package builtin
 import (
 	"context"
 	"encoding/json"
+	"net"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -10,9 +11,22 @@ import (
 	"github.com/astercloud/aster/pkg/tools"
 )
 
+// newLocalHTTPServer 启动绑定 IPv4 本地地址的测试服务器，避免某些环境禁用 IPv6 loopback。
+func newLocalHTTPServer(t *testing.T, handler http.Handler) *httptest.Server {
+	t.Helper()
+	ln, err := net.Listen("tcp4", "127.0.0.1:0")
+	if err != nil {
+		t.Skipf("skip: unable to listen on IPv4 loopback: %v", err)
+	}
+	srv := httptest.NewUnstartedServer(handler)
+	srv.Listener = ln
+	srv.Start()
+	return srv
+}
+
 func TestHttpRequestTool_Success(t *testing.T) {
 	// 创建测试服务器
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 		_, _ = w.Write([]byte("Hello, World!"))
 	}))
@@ -53,7 +67,7 @@ func TestHttpRequestTool_Success(t *testing.T) {
 
 func TestHttpRequestTool_JsonResponse(t *testing.T) {
 	// 创建返回JSON的测试服务器
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.Header().Set("Content-Type", "application/json")
 		w.WriteHeader(http.StatusOK)
 		_ = json.NewEncoder(w).Encode(map[string]interface{}{
@@ -95,7 +109,7 @@ func TestHttpRequestTool_JsonResponse(t *testing.T) {
 
 func TestHttpRequestTool_POST_WithBody(t *testing.T) {
 	// 创建测试服务器,验证POST请求
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if r.Method != "POST" {
 			t.Errorf("Expected POST method, got %s", r.Method)
 		}
@@ -141,7 +155,7 @@ func TestHttpRequestTool_POST_WithBody(t *testing.T) {
 
 func TestHttpRequestTool_CustomHeaders(t *testing.T) {
 	// 创建测试服务器,验证自定义请求头
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		if auth := r.Header.Get("Authorization"); auth != "Bearer test-token" {
 			t.Errorf("Expected Authorization header, got '%s'", auth)
 		}
@@ -213,7 +227,7 @@ func TestHttpRequestTool_InvalidURL(t *testing.T) {
 
 func TestHttpRequestTool_404Status(t *testing.T) {
 	// 创建返回404的测试服务器
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNotFound)
 		_, _ = w.Write([]byte("Not Found"))
 	}))
@@ -250,7 +264,7 @@ func TestHttpRequestTool_404Status(t *testing.T) {
 
 func TestHttpRequestTool_EmptyResponse(t *testing.T) {
 	// 创建返回空响应的测试服务器
-	server := httptest.NewServer(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+	server := newLocalHTTPServer(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusNoContent)
 	}))
 	defer server.Close()

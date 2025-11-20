@@ -28,13 +28,14 @@ func NewAgentHandler(st store.Store, deps *agent.Dependencies) *AgentHandler {
 // Create creates a new agent
 func (h *AgentHandler) Create(c *gin.Context) {
 	var req struct {
-		TemplateID    string                     `json:"template_id" binding:"required"`
-		Name          string                     `json:"name"`
-		ModelConfig   *types.ModelConfig         `json:"model_config"`
-		Sandbox       *types.SandboxConfig       `json:"sandbox"`
-		Middlewares   []string                   `json:"middlewares"`
-		Metadata      map[string]interface{}     `json:"metadata"`
-		SkillsPackage *types.SkillsPackageConfig `json:"skills_package"`
+		TemplateID    string                            `json:"template_id" binding:"required"`
+		Name          string                            `json:"name"`
+		ModelConfig   *types.ModelConfig                `json:"model_config"`
+		Sandbox       *types.SandboxConfig              `json:"sandbox"`
+		Middlewares   []string                          `json:"middlewares"`
+		MiddlewareCfg map[string]map[string]interface{} `json:"middleware_config"`
+		Metadata      map[string]interface{}            `json:"metadata"`
+		SkillsPackage *types.SkillsPackageConfig        `json:"skills_package"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -52,12 +53,13 @@ func (h *AgentHandler) Create(c *gin.Context) {
 
 	// 创建 Agent 配置
 	config := &types.AgentConfig{
-		TemplateID:    req.TemplateID,
-		ModelConfig:   req.ModelConfig,
-		Sandbox:       req.Sandbox,
-		Middlewares:   req.Middlewares,
-		Metadata:      req.Metadata,
-		SkillsPackage: req.SkillsPackage,
+		TemplateID:       req.TemplateID,
+		ModelConfig:      req.ModelConfig,
+		Sandbox:          req.Sandbox,
+		Middlewares:      req.Middlewares,
+		MiddlewareConfig: req.MiddlewareCfg,
+		Metadata:         req.Metadata,
+		SkillsPackage:    req.SkillsPackage,
 	}
 
 	// 创建 Agent 实例

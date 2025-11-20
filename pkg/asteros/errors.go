@@ -4,12 +4,12 @@ import "errors"
 
 var (
 	// 配置错误
-	ErrCosmosRequired = errors.New("cosmos is required")
-	ErrInvalidPort    = errors.New("invalid port number")
+	ErrPoolRequired = errors.New("pool is required")
+	ErrInvalidPort  = errors.New("invalid port number")
 
 	// 资源错误
 	ErrAgentNotFound    = errors.New("agent not found")
-	ErrStarsNotFound    = errors.New("stars not found")
+	ErrRoomNotFound     = errors.New("room not found")
 	ErrWorkflowNotFound = errors.New("workflow not found")
 	ErrResourceExists   = errors.New("resource already exists")
 

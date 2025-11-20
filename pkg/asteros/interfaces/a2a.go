@@ -8,7 +8,7 @@ import (
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
 	"github.com/astercloud/aster/pkg/asteros"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // A2AInterfaceOptions A2A Interface 配置
@@ -93,10 +93,10 @@ func (i *A2AInterface) OnAgentRegistered(ag *agent.Agent) error {
 	return nil
 }
 
-// OnStarsRegistered Stars 注册事件
-func (i *A2AInterface) OnStarsRegistered(s *stars.Stars) error {
+// OnRoomRegistered Room 注册事件
+func (i *A2AInterface) OnRoomRegistered(r *core.Room) error {
 	if i.opts.EnableLogging {
-		fmt.Printf("  [A2A] Stars registered: %s\n", s.Name())
+		fmt.Printf("  [A2A] Room registered with %d members\n", r.GetMemberCount())
 		fmt.Printf("    → Members can communicate via A2A\n")
 	}
 	return nil

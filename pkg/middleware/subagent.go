@@ -5,8 +5,10 @@ import (
 	"fmt"
 	"log"
 	"sync"
+	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
+	"github.com/astercloud/aster/pkg/tools/builtin"
 	"github.com/astercloud/aster/pkg/types"
 )
 
@@ -41,10 +43,14 @@ type SubAgent interface {
 
 // SubAgentMiddlewareConfig 子代理中间件配置
 type SubAgentMiddlewareConfig struct {
-	Specs                  []SubAgentSpec  // 子代理规格列表
-	Factory                SubAgentFactory // 子代理工厂
-	EnableParallel         bool            // 是否支持并行执行
-	EnableGeneralPurpose   bool            // 是否启用通用子代理(默认 true)
+	Specs                  []SubAgentSpec           // 子代理规格列表
+	Factory                SubAgentFactory          // 子代理工厂
+	Manager                builtin.SubagentManager  // 子代理管理器（可选，默认使用 FileSubagentManager）
+	EnableParallel         bool                     // 是否支持并行执行
+	EnableGeneralPurpose   bool                     // 是否启用通用子代理(默认 true)
+	EnableAsync            bool                     // 是否启用异步执行（默认 false）
+	EnableProcessIsolation bool                     // 是否启用进程级隔离（默认 false）
+	DefaultTimeout         time.Duration            // 默认超时时间（默认 1 小时）
 	ParentMiddlewareGetter func() []Middleware
 }
 
@@ -54,21 +60,48 @@ type SubAgentMiddlewareConfig struct {
 // 2. 提供 task 工具启动子代理
 // 3. 支持任务上下文隔离
 // 4. 支持并发执行
+// 5. 支持异步执行和状态查询
+// 6. 支持 Resume 机制
+// 7. 支持资源监控和限制
 type SubAgentMiddleware struct {
 	*BaseMiddleware
-	agents         map[string]SubAgent
-	factory        SubAgentFactory
-	enableParallel bool
-	mu             sync.RWMutex
+	agents                 map[string]SubAgent
+	factory                SubAgentFactory
+	manager                builtin.SubagentManager
+	enableParallel         bool
+	enableAsync            bool
+	enableProcessIsolation bool
+	defaultTimeout         time.Duration
+	mu                     sync.RWMutex
 }
 
 // NewSubAgentMiddleware 创建子代理中间件
 func NewSubAgentMiddleware(config *SubAgentMiddlewareConfig) (*SubAgentMiddleware, error) {
+	// 设置默认超时
+	defaultTimeout := config.DefaultTimeout
+	if defaultTimeout == 0 {
+		defaultTimeout = 1 * time.Hour
+	}
+
+	// 创建或使用提供的管理器
+	var manager builtin.SubagentManager
+	if config.Manager != nil {
+		manager = config.Manager
+	} else if config.EnableProcessIsolation || config.EnableAsync {
+		// 如果启用进程隔离或异步执行，使用 FileSubagentManager
+		manager = builtin.NewFileSubagentManager()
+		log.Printf("[SubAgentMiddleware] Using FileSubagentManager for process isolation/async execution")
+	}
+
 	m := &SubAgentMiddleware{
-		BaseMiddleware: NewBaseMiddleware("subagent", 200),
-		agents:         make(map[string]SubAgent),
-		factory:        config.Factory,
-		enableParallel: config.EnableParallel,
+		BaseMiddleware:         NewBaseMiddleware("subagent", 200),
+		agents:                 make(map[string]SubAgent),
+		factory:                config.Factory,
+		manager:                manager,
+		enableParallel:         config.EnableParallel,
+		enableAsync:            config.EnableAsync,
+		enableProcessIsolation: config.EnableProcessIsolation,
+		defaultTimeout:         defaultTimeout,
 	}
 
 	// 默认启用 general-purpose 子代理
@@ -103,13 +136,25 @@ func NewSubAgentMiddleware(config *SubAgentMiddlewareConfig) (*SubAgentMiddlewar
 	return m, nil
 }
 
-// Tools 返回 task 工具
+// Tools 返回 task 工具和管理工具
 func (m *SubAgentMiddleware) Tools() []tools.Tool {
-	return []tools.Tool{
+	baseTools := []tools.Tool{
 		&TaskTool{
 			middleware: m,
 		},
 	}
+
+	// 如果启用了管理器，添加管理工具
+	if m.manager != nil {
+		baseTools = append(baseTools,
+			&QuerySubagentTool{middleware: m},
+			&StopSubagentTool{middleware: m},
+			&ResumeSubagentTool{middleware: m},
+			&ListSubagentsTool{middleware: m},
+		)
+	}
+
+	return baseTools
 }
 
 // OnAgentStop 清理子代理
@@ -168,7 +213,7 @@ func (t *TaskTool) InputSchema() map[string]interface{} {
 	// 构建子代理类型枚举
 	subagentTypes := t.middleware.ListSubAgents()
 
-	return map[string]interface{}{
+	schema := map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
 			"description": map[string]interface{}{
@@ -187,6 +232,22 @@ func (t *TaskTool) InputSchema() map[string]interface{} {
 		},
 		"required": []string{"description", "subagent_type"},
 	}
+
+	// 如果启用异步执行，添加 async 参数
+	if t.middleware.enableAsync {
+		schema["properties"].(map[string]interface{})["async"] = map[string]interface{}{
+			"type":        "boolean",
+			"description": "Run asynchronously in background (default: false). If true, returns task_id immediately.",
+			"default":     false,
+		}
+		schema["properties"].(map[string]interface{})["timeout"] = map[string]interface{}{
+			"type":        "number",
+			"description": "Timeout in seconds (default: 3600)",
+			"default":     3600,
+		}
+	}
+
+	return schema
 }
 
 func (t *TaskTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
@@ -206,6 +267,29 @@ func (t *TaskTool) Execute(ctx context.Context, input map[string]interface{}, tc
 		parentContext = contextData
 	}
 
+	// 检查是否异步执行
+	async := false
+	if asyncVal, ok := input["async"].(bool); ok {
+		async = asyncVal
+	}
+
+	// 获取超时设置
+	timeout := t.middleware.defaultTimeout
+	if timeoutVal, ok := input["timeout"].(float64); ok {
+		timeout = time.Duration(timeoutVal) * time.Second
+	}
+
+	// 如果启用了管理器且请求异步执行
+	if t.middleware.manager != nil && async {
+		return t.executeAsync(ctx, subagentType, description, parentContext, timeout)
+	}
+
+	// 同步执行（原有逻辑）
+	return t.executeSync(ctx, subagentType, description, parentContext)
+}
+
+// executeSync 同步执行子代理
+func (t *TaskTool) executeSync(ctx context.Context, subagentType, description string, parentContext map[string]interface{}) (interface{}, error) {
 	// 获取子代理
 	subagent, err := t.middleware.GetSubAgent(subagentType)
 	if err != nil {
@@ -233,6 +317,39 @@ func (t *TaskTool) Execute(ctx context.Context, input map[string]interface{}, tc
 		"ok":            true,
 		"subagent_type": subagentType,
 		"result":        result,
+	}, nil
+}
+
+// executeAsync 异步执行子代理
+func (t *TaskTool) executeAsync(ctx context.Context, subagentType, description string, parentContext map[string]interface{}, timeout time.Duration) (interface{}, error) {
+	// 构建子代理配置
+	config := &builtin.SubagentConfig{
+		Type:    subagentType,
+		Prompt:  description,
+		Timeout: timeout,
+		Metadata: map[string]string{
+			"subagent_type": subagentType,
+			"description":   description,
+		},
+	}
+
+	// 启动子代理
+	instance, err := t.middleware.manager.StartSubagent(ctx, config)
+	if err != nil {
+		return map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("failed to start subagent: %v", err),
+		}, nil
+	}
+
+	log.Printf("[TaskTool] Started async subagent '%s' with task_id: %s", subagentType, instance.ID)
+
+	return map[string]interface{}{
+		"ok":            true,
+		"task_id":       instance.ID,
+		"subagent_type": subagentType,
+		"status":        instance.Status,
+		"message":       "SubAgent started in background. Use query_subagent to check status and get results.",
 	}, nil
 }
 
@@ -470,4 +587,333 @@ func BuildSubAgentMiddlewareStack(spec SubAgentSpec, parentMiddlewares []Middlew
 // 这是一个辅助函数,供 SubAgentFactory 实现使用
 func (m *SubAgentMiddleware) GetMiddlewareForSubAgent(spec SubAgentSpec, parentMiddlewares []Middleware) []Middleware {
 	return BuildSubAgentMiddlewareStack(spec, parentMiddlewares)
+}
+
+// QuerySubagentTool 查询子代理状态工具
+type QuerySubagentTool struct {
+	middleware *SubAgentMiddleware
+}
+
+func (t *QuerySubagentTool) Name() string {
+	return "query_subagent"
+}
+
+func (t *QuerySubagentTool) Description() string {
+	return "Query the status and output of a running or completed sub-agent task"
+}
+
+func (t *QuerySubagentTool) InputSchema() map[string]interface{} {
+	return map[string]interface{}{
+		"type": "object",
+		"properties": map[string]interface{}{
+			"task_id": map[string]interface{}{
+				"type":        "string",
+				"description": "The task ID returned by async task execution",
+			},
+		},
+		"required": []string{"task_id"},
+	}
+}
+
+func (t *QuerySubagentTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
+	taskID, ok := input["task_id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("task_id must be a string")
+	}
+
+	// 获取子代理实例
+	instance, err := t.middleware.manager.GetSubagent(taskID)
+	if err != nil {
+		return map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("failed to get subagent: %v", err),
+		}, nil
+	}
+
+	// 构建响应
+	response := map[string]interface{}{
+		"ok":            true,
+		"task_id":       instance.ID,
+		"subagent_type": instance.Type,
+		"status":        instance.Status,
+		"start_time":    instance.StartTime.Format(time.RFC3339),
+		"duration":      instance.Duration.Seconds(),
+	}
+
+	// 添加结束时间（如果已完成）
+	if instance.EndTime != nil {
+		response["end_time"] = instance.EndTime.Format(time.RFC3339)
+	}
+
+	// 添加输出（如果有）
+	if instance.Output != "" {
+		response["output"] = instance.Output
+	}
+
+	// 添加错误信息（如果有）
+	if instance.Error != "" {
+		response["error"] = instance.Error
+		response["exit_code"] = instance.ExitCode
+	}
+
+	// 添加资源使用情况（如果有）
+	if instance.ResourceUsage != nil {
+		response["resource_usage"] = map[string]interface{}{
+			"memory_mb":   instance.ResourceUsage.MemoryMB,
+			"cpu_percent": instance.ResourceUsage.CPUPercent,
+		}
+	}
+
+	return response, nil
+}
+
+func (t *QuerySubagentTool) Prompt() string {
+	return `查询异步子代理的执行状态和结果。
+
+使用场景：
+- 检查后台运行的子代理是否完成
+- 获取子代理的输出结果
+- 监控子代理的资源使用情况
+
+状态说明：
+- "starting": 正在启动
+- "running": 正在运行
+- "completed": 已完成（成功）
+- "failed": 执行失败
+- "stopped": 已停止
+- "timeout": 超时
+
+示例：
+query_subagent(task_id="subagent_1234567890")
+`
+}
+
+// StopSubagentTool 停止子代理工具
+type StopSubagentTool struct {
+	middleware *SubAgentMiddleware
+}
+
+func (t *StopSubagentTool) Name() string {
+	return "stop_subagent"
+}
+
+func (t *StopSubagentTool) Description() string {
+	return "Stop a running sub-agent task"
+}
+
+func (t *StopSubagentTool) InputSchema() map[string]interface{} {
+	return map[string]interface{}{
+		"type": "object",
+		"properties": map[string]interface{}{
+			"task_id": map[string]interface{}{
+				"type":        "string",
+				"description": "The task ID of the sub-agent to stop",
+			},
+		},
+		"required": []string{"task_id"},
+	}
+}
+
+func (t *StopSubagentTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
+	taskID, ok := input["task_id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("task_id must be a string")
+	}
+
+	// 停止子代理
+	err := t.middleware.manager.StopSubagent(taskID)
+	if err != nil {
+		return map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("failed to stop subagent: %v", err),
+		}, nil
+	}
+
+	log.Printf("[StopSubagentTool] Stopped subagent: %s", taskID)
+
+	return map[string]interface{}{
+		"ok":      true,
+		"task_id": taskID,
+		"message": "SubAgent stopped successfully",
+	}, nil
+}
+
+func (t *StopSubagentTool) Prompt() string {
+	return `停止正在运行的子代理任务。
+
+使用场景：
+- 子代理运行时间过长，需要手动停止
+- 发现子代理执行方向错误，需要中止
+- 资源紧张，需要释放资源
+
+注意：
+- 只能停止状态为 "running" 的子代理
+- 停止后可以使用 resume_subagent 恢复执行
+
+示例：
+stop_subagent(task_id="subagent_1234567890")
+`
+}
+
+// ResumeSubagentTool 恢复子代理工具
+type ResumeSubagentTool struct {
+	middleware *SubAgentMiddleware
+}
+
+func (t *ResumeSubagentTool) Name() string {
+	return "resume_subagent"
+}
+
+func (t *ResumeSubagentTool) Description() string {
+	return "Resume a stopped or failed sub-agent task"
+}
+
+func (t *ResumeSubagentTool) InputSchema() map[string]interface{} {
+	return map[string]interface{}{
+		"type": "object",
+		"properties": map[string]interface{}{
+			"task_id": map[string]interface{}{
+				"type":        "string",
+				"description": "The task ID of the sub-agent to resume",
+			},
+		},
+		"required": []string{"task_id"},
+	}
+}
+
+func (t *ResumeSubagentTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
+	taskID, ok := input["task_id"].(string)
+	if !ok {
+		return nil, fmt.Errorf("task_id must be a string")
+	}
+
+	// 恢复子代理
+	instance, err := t.middleware.manager.ResumeSubagent(taskID)
+	if err != nil {
+		return map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("failed to resume subagent: %v", err),
+		}, nil
+	}
+
+	log.Printf("[ResumeSubagentTool] Resumed subagent: %s (new task_id: %s)", taskID, instance.ID)
+
+	return map[string]interface{}{
+		"ok":            true,
+		"old_task_id":   taskID,
+		"new_task_id":   instance.ID,
+		"subagent_type": instance.Type,
+		"status":        instance.Status,
+		"message":       "SubAgent resumed successfully with new task_id",
+	}, nil
+}
+
+func (t *ResumeSubagentTool) Prompt() string {
+	return `恢复已停止或失败的子代理任务。
+
+使用场景：
+- 子代理因超时或错误而停止，需要重新执行
+- 手动停止的子代理，需要继续执行
+- 系统重启后，恢复未完成的任务
+
+注意：
+- 只能恢复状态为 "stopped"、"failed" 或 "completed" 的子代理
+- 恢复后会生成新的 task_id
+- 原有的元数据会被保留
+
+示例：
+resume_subagent(task_id="subagent_1234567890")
+`
+}
+
+// ListSubagentsTool 列出所有子代理工具
+type ListSubagentsTool struct {
+	middleware *SubAgentMiddleware
+}
+
+func (t *ListSubagentsTool) Name() string {
+	return "list_subagents"
+}
+
+func (t *ListSubagentsTool) Description() string {
+	return "List all sub-agent tasks (running, completed, or failed)"
+}
+
+func (t *ListSubagentsTool) InputSchema() map[string]interface{} {
+	return map[string]interface{}{
+		"type": "object",
+		"properties": map[string]interface{}{
+			"status_filter": map[string]interface{}{
+				"type":        "string",
+				"description": "Filter by status (optional): running, completed, failed, stopped",
+			},
+		},
+	}
+}
+
+func (t *ListSubagentsTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
+	// 获取状态过滤器（可选）
+	statusFilter := ""
+	if filter, ok := input["status_filter"].(string); ok {
+		statusFilter = filter
+	}
+
+	// 列出所有子代理
+	instances, err := t.middleware.manager.ListSubagents()
+	if err != nil {
+		return map[string]interface{}{
+			"ok":    false,
+			"error": fmt.Sprintf("failed to list subagents: %v", err),
+		}, nil
+	}
+
+	// 构建响应
+	subagents := make([]map[string]interface{}, 0)
+	for _, instance := range instances {
+		// 应用状态过滤
+		if statusFilter != "" && instance.Status != statusFilter {
+			continue
+		}
+
+		item := map[string]interface{}{
+			"task_id":       instance.ID,
+			"subagent_type": instance.Type,
+			"status":        instance.Status,
+			"start_time":    instance.StartTime.Format(time.RFC3339),
+			"duration":      instance.Duration.Seconds(),
+		}
+
+		if instance.EndTime != nil {
+			item["end_time"] = instance.EndTime.Format(time.RFC3339)
+		}
+
+		if instance.Error != "" {
+			item["error"] = instance.Error
+		}
+
+		subagents = append(subagents, item)
+	}
+
+	return map[string]interface{}{
+		"ok":        true,
+		"count":     len(subagents),
+		"subagents": subagents,
+	}, nil
+}
+
+func (t *ListSubagentsTool) Prompt() string {
+	return `列出所有子代理任务。
+
+使用场景：
+- 查看当前有哪些子代理正在运行
+- 检查历史任务的执行情况
+- 清理已完成的任务
+
+参数：
+- status_filter: 可选，按状态过滤（running, completed, failed, stopped）
+
+示例：
+list_subagents()  # 列出所有
+list_subagents(status_filter="running")  # 只列出正在运行的
+`
 }

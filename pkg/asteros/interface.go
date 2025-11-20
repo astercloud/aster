@@ -5,7 +5,7 @@ import (
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // InterfaceType Interface 类型
@@ -36,8 +36,8 @@ type Interface interface {
 	// OnAgentRegistered Agent 注册事件
 	OnAgentRegistered(agent *agent.Agent) error
 
-	// OnStarsRegistered Stars 注册事件
-	OnStarsRegistered(stars *stars.Stars) error
+	// OnRoomRegistered Room 注册事件
+	OnRoomRegistered(room *core.Room) error
 
 	// OnWorkflowRegistered Workflow 注册事件
 	OnWorkflowRegistered(wf workflow.Agent) error
@@ -83,8 +83,8 @@ func (i *BaseInterface) OnAgentRegistered(agent *agent.Agent) error {
 	return nil
 }
 
-// OnStarsRegistered Stars 注册事件（默认空实现）
-func (i *BaseInterface) OnStarsRegistered(stars *stars.Stars) error {
+// OnRoomRegistered Room 注册事件（默认空实现）
+func (i *BaseInterface) OnRoomRegistered(room *core.Room) error {
 	return nil
 }
 

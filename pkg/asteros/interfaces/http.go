@@ -7,7 +7,7 @@ import (
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/agent/workflow"
 	"github.com/astercloud/aster/pkg/asteros"
-	"github.com/astercloud/aster/pkg/stars"
+	"github.com/astercloud/aster/pkg/core"
 )
 
 // HTTPInterfaceOptions HTTP Interface 配置
@@ -74,14 +74,15 @@ func (i *HTTPInterface) OnAgentRegistered(agent *agent.Agent) error {
 	return nil
 }
 
-// OnStarsRegistered Stars 注册事件
-func (i *HTTPInterface) OnStarsRegistered(s *stars.Stars) error {
+// OnRoomRegistered Room 注册事件
+func (i *HTTPInterface) OnRoomRegistered(r *core.Room) error {
 	if i.opts.EnableLogging {
-		fmt.Printf("  [HTTP] Stars registered: %s\n", s.Name())
-		fmt.Printf("    → API: POST /stars/%s/run\n", s.ID())
-		fmt.Printf("    → API: POST /stars/%s/join\n", s.ID())
-		fmt.Printf("    → API: POST /stars/%s/leave\n", s.ID())
-		fmt.Printf("    → API: GET  /stars/%s/members\n", s.ID())
+		roomID := "room" // Room 没有 ID 方法，需要从注册时传入
+		fmt.Printf("  [HTTP] Room registered with %d members\n", r.GetMemberCount())
+		fmt.Printf("    → API: POST /rooms/%s/say\n", roomID)
+		fmt.Printf("    → API: POST /rooms/%s/join\n", roomID)
+		fmt.Printf("    → API: POST /rooms/%s/leave\n", roomID)
+		fmt.Printf("    → API: GET  /rooms/%s/members\n", roomID)
 	}
 	return nil
 }

@@ -49,8 +49,8 @@ navigation: false
     <p class="text-gray-600 dark:text-gray-400">内置文件系统、Bash、HTTP、Web搜索等工具，支持MCP协议和自定义工具。</p>
   </div>
   <div class="p-6 border border-gray-200 dark:border-gray-700 rounded-lg">
-    <h3 class="text-xl font-semibold mb-3">👥 多Agent协作</h3>
-    <p class="text-gray-600 dark:text-gray-400">支持Agent Pool和Room模式，内置Scheduler实现复杂任务的智能分发。</p>
+    <h3 class="text-xl font-semibold mb-3">🌌 AsterOS 运行时</h3>
+    <p class="text-gray-600 dark:text-gray-400">统一运行时系统，整合 Pool 生命周期管理、Room 协作空间，自动生成 REST API。</p>
   </div>
 </div>
 
@@ -154,11 +154,13 @@ aster采用事件驱动架构，通过Go channel实现异步通信：
 
 ![架构图](/images/architecture-overview.svg)
 
-aster采用三层架构：
+aster采用分层架构设计：
 
-1. **Agent层**: 中间件栈、Provider、工具执行器
-2. **Backend层**: 状态管理、存储、文件系统
-3. **基础设施层**: 沙箱、调度器、权限控制
+1. **AsterOS层**: 统一运行时系统，提供 API 网关、资源注册、多接口支持
+2. **Pool + Room层**: Agent 生命周期管理 + 多智能体协作空间
+3. **Agent Runtime层**: 中间件栈、Provider、工具执行器
+4. **Backend层**: 状态管理、存储、文件系统
+5. **基础设施层**: 沙箱、调度器、权限控制
 
 ## 📖 文档导航
 

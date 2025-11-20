@@ -226,11 +226,19 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 	if len(config.Middlewares) > 0 {
 		middlewareList := make([]middleware.Middleware, 0, len(config.Middlewares))
 		for _, name := range config.Middlewares {
+			var custom map[string]interface{}
+			if cfgMap := config.MiddlewareConfig; cfgMap != nil {
+				if v, ok := cfgMap[name]; ok {
+					custom = v
+				}
+			}
+
 			mw, err := middleware.DefaultRegistry.Create(name, &middleware.MiddlewareFactoryConfig{
-				Provider: prov,
-				AgentID:  config.AgentID,
-				Metadata: config.Metadata,
-				Sandbox:  sb,
+				Provider:     prov,
+				AgentID:      config.AgentID,
+				Metadata:     config.Metadata,
+				Sandbox:      sb,
+				CustomConfig: custom,
 			})
 			if err != nil {
 				log.Printf("[Agent Create] Failed to create middleware %s: %v", name, err)

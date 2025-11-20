@@ -171,6 +171,23 @@ type ManagerConfig struct {
 	// 安全配置
 	EnablePII   bool `json:"enable_pii"`   // 启用PII检测
 	EnableAudit bool `json:"enable_audit"` // 启用审计日志
+
+	// 轻量核心管线
+	UseCorePipeline bool `json:"use_core_pipeline"` // 启用轻量 ingest/search 管线
+
+	// 可选策略注入
+	PIIStrategy   PIIStrategy   `json:"-"`
+	AuditStrategy AuditStrategy `json:"-"`
+}
+
+// PIIStrategy 定义可插拔的脱敏策略。
+type PIIStrategy interface {
+	Sanitize(item *KnowledgeItem) *KnowledgeItem
+}
+
+// AuditStrategy 定义可插拔的审计策略。
+type AuditStrategy interface {
+	Record(action, userID, itemID, details string)
 }
 
 // Manager 统一知识管理器接口

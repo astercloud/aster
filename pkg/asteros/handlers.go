@@ -4,7 +4,6 @@ import (
 	"context"
 	"fmt"
 
-	"github.com/astercloud/aster/pkg/stars"
 	"github.com/gin-gonic/gin"
 )
 
@@ -89,154 +88,136 @@ func (os *AsterOS) handleAgentStatus(c *gin.Context) {
 	})
 }
 
-// handleListStars 列出所有 Stars
-func (os *AsterOS) handleListStars(c *gin.Context) {
-	starsList := os.registry.ListStars()
+// handleListRooms 列出所有 Rooms
+func (os *AsterOS) handleListRooms(c *gin.Context) {
+	roomsList := os.registry.ListRooms()
 	c.JSON(200, gin.H{
-		"stars": starsList,
-		"count": len(starsList),
+		"rooms": roomsList,
+		"count": len(roomsList),
 	})
 }
 
-// StarsRunRequest Stars 运行请求
-type StarsRunRequest struct {
-	Task    string                 `json:"task" binding:"required"`
-	Context map[string]interface{} `json:"context,omitempty"`
+// RoomSayRequest Room 发送消息请求
+type RoomSayRequest struct {
+	From string `json:"from" binding:"required"`
+	Text string `json:"text" binding:"required"`
 }
 
-// handleStarsRun 运行 Stars
-func (os *AsterOS) handleStarsRun(c *gin.Context) {
-	starsID := c.Param("id")
+// handleRoomSay 在 Room 中发送消息
+func (os *AsterOS) handleRoomSay(c *gin.Context) {
+	roomID := c.Param("id")
 
-	// 获取 Stars
-	s, exists := os.registry.GetStars(starsID)
+	// 获取 Room
+	room, exists := os.registry.GetRoom(roomID)
 	if !exists {
-		c.JSON(404, gin.H{"error": "stars not found"})
+		c.JSON(404, gin.H{"error": "room not found"})
 		return
 	}
 
 	// 解析请求
-	var req StarsRunRequest
+	var req RoomSayRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
-	// 运行 Stars
+	// 发送消息
 	ctx := context.Background()
-	events := make([]string, 0)
-
-	for event, err := range s.Run(ctx, req.Task) {
-		if err != nil {
-			c.JSON(500, gin.H{"error": err.Error()})
-			return
-		}
-
-		events = append(events, fmt.Sprintf("[%s] %s", event.Type, event.Content))
-	}
-
-	c.JSON(200, gin.H{
-		"status": "success",
-		"events": events,
-	})
-}
-
-// StarsJoinRequest Stars 加入请求
-type StarsJoinRequest struct {
-	AgentID string `json:"agent_id" binding:"required"`
-	Role    string `json:"role" binding:"required"`
-}
-
-// handleStarsJoin 添加成员到 Stars
-func (os *AsterOS) handleStarsJoin(c *gin.Context) {
-	starsID := c.Param("id")
-
-	// 获取 Stars
-	s, exists := os.registry.GetStars(starsID)
-	if !exists {
-		c.JSON(404, gin.H{"error": "stars not found"})
-		return
-	}
-
-	// 解析请求
-	var req StarsJoinRequest
-	if err := c.ShouldBindJSON(&req); err != nil {
-		c.JSON(400, gin.H{"error": err.Error()})
-		return
-	}
-
-	// 解析角色
-	var role stars.Role
-	switch req.Role {
-	case "leader":
-		role = stars.RoleLeader
-	case "worker":
-		role = stars.RoleWorker
-	default:
-		c.JSON(400, gin.H{"error": "invalid role"})
-		return
-	}
-
-	// 添加成员
-	if err := s.Join(req.AgentID, role); err != nil {
+	if err := room.Say(ctx, req.From, req.Text); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"status":  "success",
-		"message": fmt.Sprintf("agent %s joined as %s", req.AgentID, req.Role),
+		"message": "message sent",
 	})
 }
 
-// StarsLeaveRequest Stars 离开请求
-type StarsLeaveRequest struct {
+// RoomJoinRequest Room 加入请求
+type RoomJoinRequest struct {
+	Name    string `json:"name" binding:"required"`
 	AgentID string `json:"agent_id" binding:"required"`
 }
 
-// handleStarsLeave 从 Stars 移除成员
-func (os *AsterOS) handleStarsLeave(c *gin.Context) {
-	starsID := c.Param("id")
+// handleRoomJoin 添加成员到 Room
+func (os *AsterOS) handleRoomJoin(c *gin.Context) {
+	roomID := c.Param("id")
 
-	// 获取 Stars
-	s, exists := os.registry.GetStars(starsID)
+	// 获取 Room
+	room, exists := os.registry.GetRoom(roomID)
 	if !exists {
-		c.JSON(404, gin.H{"error": "stars not found"})
+		c.JSON(404, gin.H{"error": "room not found"})
 		return
 	}
 
 	// 解析请求
-	var req StarsLeaveRequest
+	var req RoomJoinRequest
+	if err := c.ShouldBindJSON(&req); err != nil {
+		c.JSON(400, gin.H{"error": err.Error()})
+		return
+	}
+
+	// 添加成员
+	if err := room.Join(req.Name, req.AgentID); err != nil {
+		c.JSON(500, gin.H{"error": err.Error()})
+		return
+	}
+
+	c.JSON(200, gin.H{
+		"status":  "success",
+		"message": fmt.Sprintf("member %s joined", req.Name),
+	})
+}
+
+// RoomLeaveRequest Room 离开请求
+type RoomLeaveRequest struct {
+	Name string `json:"name" binding:"required"`
+}
+
+// handleRoomLeave 从 Room 移除成员
+func (os *AsterOS) handleRoomLeave(c *gin.Context) {
+	roomID := c.Param("id")
+
+	// 获取 Room
+	room, exists := os.registry.GetRoom(roomID)
+	if !exists {
+		c.JSON(404, gin.H{"error": "room not found"})
+		return
+	}
+
+	// 解析请求
+	var req RoomLeaveRequest
 	if err := c.ShouldBindJSON(&req); err != nil {
 		c.JSON(400, gin.H{"error": err.Error()})
 		return
 	}
 
 	// 移除成员
-	if err := s.Leave(req.AgentID); err != nil {
+	if err := room.Leave(req.Name); err != nil {
 		c.JSON(500, gin.H{"error": err.Error()})
 		return
 	}
 
 	c.JSON(200, gin.H{
 		"status":  "success",
-		"message": fmt.Sprintf("agent %s left", req.AgentID),
+		"message": fmt.Sprintf("member %s left", req.Name),
 	})
 }
 
-// handleStarsMembers 获取 Stars 成员列表
-func (os *AsterOS) handleStarsMembers(c *gin.Context) {
-	starsID := c.Param("id")
+// handleRoomMembers 获取 Room 成员列表
+func (os *AsterOS) handleRoomMembers(c *gin.Context) {
+	roomID := c.Param("id")
 
-	// 获取 Stars
-	s, exists := os.registry.GetStars(starsID)
+	// 获取 Room
+	room, exists := os.registry.GetRoom(roomID)
 	if !exists {
-		c.JSON(404, gin.H{"error": "stars not found"})
+		c.JSON(404, gin.H{"error": "room not found"})
 		return
 	}
 
 	// 获取成员
-	members := s.Members()
+	members := room.GetMembers()
 
 	c.JSON(200, gin.H{
 		"members": members,

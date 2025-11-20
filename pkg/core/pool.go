@@ -135,17 +135,6 @@ func (p *Pool) Resume(ctx context.Context, agentID string, config *types.AgentCo
 	return ag, nil
 }
 
-// ResumeAll 恢复所有存储的 Agent
-func (p *Pool) ResumeAll(ctx context.Context, configFactory func(agentID string) *types.AgentConfig) ([]*agent.Agent, error) {
-	// 获取所有 Agent ID (需要 Store 实现 List 方法)
-	// 这里简化实现,假设外部提供 ID 列表
-	// 实际应该从 Store.ListAgents() 获取
-
-	resumed := make([]*agent.Agent, 0)
-	// TODO: 实现 Store.ListAgents() 方法
-	return resumed, fmt.Errorf("resumeAll not fully implemented: need Store.ListAgents()")
-}
-
 // Remove 从池中移除 Agent (不删除存储)
 func (p *Pool) Remove(agentID string) error {
 	p.mu.Lock()
