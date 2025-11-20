@@ -208,7 +208,7 @@ func TestParseTyped_WithValidation(t *testing.T) {
 		"priority": 10
 	}`
 
-	result, err = ParseTyped(context.Background(), invalidJSON, spec)
+	_, err = ParseTyped(context.Background(), invalidJSON, spec)
 	if err == nil {
 		t.Error("expected error for invalid priority")
 	}

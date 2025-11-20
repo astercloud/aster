@@ -23,9 +23,6 @@ type AsterOS struct {
 	router   *gin.Engine
 	server   *http.Server
 
-	// 依赖
-	deps *agent.Dependencies
-
 	// Interface 层
 	interfaces map[string]Interface
 	ifMu       sync.RWMutex

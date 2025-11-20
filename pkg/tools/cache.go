@@ -513,8 +513,8 @@ func (ct *CachedTool) Execute(ctx context.Context, input map[string]interface{},
 
 	// 缓存结果
 	if err := ct.cache.Set(ctx, key, result, ct.cache.config.TTL); err != nil {
-		// 缓存失败不影响结果返回
-		// 只记录错误
+		// 缓存失败不影响结果返回，只记录错误
+		_ = err // 忽略缓存错误
 	}
 
 	return result, nil

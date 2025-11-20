@@ -294,21 +294,21 @@ func (m *SessionSummaryManager) GetSummaryText(sessionID string) string {
 	text := fmt.Sprintf("会话摘要：\n%s\n", summary.Summary)
 
 	if len(summary.Topics) > 0 {
-		text += fmt.Sprintf("\n讨论主题：\n")
+		text += "\n讨论主题：\n"
 		for _, topic := range summary.Topics {
 			text += fmt.Sprintf("- %s\n", topic)
 		}
 	}
 
 	if len(summary.KeyPoints) > 0 {
-		text += fmt.Sprintf("\n关键要点：\n")
+		text += "\n关键要点：\n"
 		for _, point := range summary.KeyPoints {
 			text += fmt.Sprintf("- %s\n", point)
 		}
 	}
 
 	if len(summary.Decisions) > 0 {
-		text += fmt.Sprintf("\n决策：\n")
+		text += "\n决策：\n"
 		for _, decision := range summary.Decisions {
 			text += fmt.Sprintf("- %s\n", decision)
 		}
