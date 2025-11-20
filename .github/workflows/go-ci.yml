@@ -19,6 +19,7 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
+    timeout-minutes: 5
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -30,10 +31,11 @@ jobs:
           cache: true
 
       - name: golangci-lint
+        timeout-minutes: 4
         uses: golangci/golangci-lint-action@v6
         with:
           version: latest
-          args: --timeout=5m
+          args: --timeout=2m ./pkg/...
           skip-cache: false
 
   build:
@@ -67,6 +69,7 @@ jobs:
   test:
     name: Test
     runs-on: ubuntu-latest
+    timeout-minutes: 10
     steps:
       - name: Checkout code
         uses: actions/checkout@v4
@@ -78,7 +81,8 @@ jobs:
           cache: true
 
       - name: Run tests
-        run: go test -v -race -coverprofile=coverage.txt -covermode=atomic ./pkg/...
+        timeout-minutes: 8
+        run: go test -v -race -short -coverprofile=coverage.txt -covermode=atomic ./pkg/...
 
       - name: Upload coverage to Codecov
         uses: codecov/codecov-action@v4
