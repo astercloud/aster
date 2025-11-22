@@ -27,7 +27,7 @@
             <div
               v-for="comp in category.components"
               :key="comp.key"
-              :class="['nav-item', { active: currentComponent === comp.key }]"
+              :class="['nav-item', { active: currentComponent.value === comp.key }]"
               @click="selectComponent(comp.key)"
             >
               {{ comp.name }}
@@ -40,40 +40,9 @@
       <div class="docs-main">
         <ScrollView>
           <div class="docs-content">
-            <!-- 通用组件文档 -->
-            <div v-if="currentComponent && !['button', 'bubble', 'avatar'].includes(currentComponent)" class="component-doc-page">
-              <h1 class="doc-title">{{ getComponentName(currentComponent) }}</h1>
-              <p class="doc-subtitle">{{ getComponentDescription(currentComponent) }}</p>
-              
-              <div class="doc-section">
-                <h2 class="section-title">基础用法</h2>
-                <div class="code-block">
-                  <pre><code>{{ getComponentCode(currentComponent) }}</code></pre>
-                </div>
-              </div>
-              
-              <div class="doc-section">
-                <h2 class="section-title">Props</h2>
-                <div class="props-table">
-                  <p class="text-gray-600 dark:text-gray-400">
-                    详细的 Props 文档正在完善中...
-                  </p>
-                </div>
-              </div>
-              
-              <div class="doc-section">
-                <h2 class="section-title">示例</h2>
-                <div class="demo-area">
-                  <p class="text-gray-600 dark:text-gray-400">
-                    交互式示例正在开发中，请访问 <router-link to="/components" class="text-blue-600 hover:underline">组件展示页面</router-link> 查看实际效果。
-                  </p>
-                </div>
-              </div>
-            </div>
-
             <!-- Button 文档 -->
             <DocViewer
-              v-else-if="currentComponent === 'button'"
+              v-if="currentComponent.value === 'button'"
               :content="buttonDoc"
               :code="buttonCode"
             >
@@ -109,7 +78,7 @@
 
             <!-- Bubble 文档 -->
             <DocViewer
-              v-else-if="currentComponent === 'bubble'"
+              v-else-if="currentComponent.value === 'bubble'"
               :content="bubbleDoc"
               :code="bubbleCode"
             >
@@ -140,7 +109,7 @@
 
             <!-- Avatar 文档 -->
             <DocViewer
-              v-else-if="currentComponent === 'avatar'"
+              v-else-if="currentComponent.value === 'avatar'"
               :content="avatarDoc"
               :code="avatarCode"
             >
@@ -165,7 +134,38 @@
               </template>
             </DocViewer>
 
-            <!-- 默认页面 -->
+            <!-- 通用组件文档 -->
+            <div v-else-if="currentComponent.value" class="component-doc-page">
+              <h1 class="doc-title">{{ getComponentName(currentComponent.value) }}</h1>
+              <p class="doc-subtitle">{{ getComponentDescription(currentComponent.value) }}</p>
+              
+              <div class="doc-section">
+                <h2 class="section-title">基础用法</h2>
+                <div class="code-block">
+                  <pre><code>{{ getComponentCode(currentComponent.value) }}</code></pre>
+                </div>
+              </div>
+              
+              <div class="doc-section">
+                <h2 class="section-title">Props</h2>
+                <div class="props-table">
+                  <p class="text-gray-600 dark:text-gray-400">
+                    详细的 Props 文档正在完善中...
+                  </p>
+                </div>
+              </div>
+              
+              <div class="doc-section">
+                <h2 class="section-title">示例</h2>
+                <div class="demo-area">
+                  <p class="text-gray-600 dark:text-gray-400">
+                    交互式示例正在开发中，请访问 <router-link to="/components" class="text-blue-600 hover:underline">组件展示页面</router-link> 查看实际效果。
+                  </p>
+                </div>
+              </div>
+            </div>
+
+            <!-- 默认欢迎页面 -->
             <div v-else class="welcome-page">
               <h1 class="welcome-title">ChatUI 组件文档</h1>
               <p class="welcome-subtitle">
@@ -194,7 +194,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
+import { ref, computed } from 'vue';
+import { useRoute, useRouter } from 'vue-router';
 import {
   Navbar, Sidebar, ScrollView, Search, Button, Flex,
   Bubble, Avatar
@@ -207,8 +208,10 @@ import buttonDoc from '@/docs/components/Button.md?raw';
 import bubbleDoc from '@/docs/components/Bubble.md?raw';
 import avatarDoc from '@/docs/components/Avatar.md?raw';
 
+const route = useRoute();
+const router = useRouter();
 const searchQuery = ref('');
-const currentComponent = ref('');
+const currentComponent = computed(() => route.params.component as string || '');
 
 const categories = [
   {
@@ -295,7 +298,7 @@ const categories = [
 ];
 
 const selectComponent = (key: string) => {
-  currentComponent.value = key;
+  router.push(`/docs/${key}`);
 };
 
 const handleSearch = (query: string) => {
@@ -429,10 +432,13 @@ import { Avatar } from '@/components/ChatUI';
 
 .docs-sidebar {
   @apply w-64;
+  height: 100%;
+  overflow: visible;
 }
 
 .component-nav {
   @apply space-y-6;
+  min-height: 100%;
 }
 
 .nav-category {
@@ -445,6 +451,8 @@ import { Avatar } from '@/components/ChatUI';
 
 .nav-item {
   @apply px-3 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg cursor-pointer transition-colors;
+  position: relative;
+  z-index: 1;
 }
 
 .nav-item.active {

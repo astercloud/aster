@@ -18,6 +18,11 @@ const routes: RouteRecordRaw[] = [
     component: () => import('./views/ComponentDocs.vue'),
   },
   {
+    path: '/docs/:component',
+    name: 'ComponentDoc',
+    component: () => import('./views/ComponentDocs.vue'),
+  },
+  {
     path: '/components',
     name: 'Components',
     component: () => import('./views/ChatUIComponents.vue'),
