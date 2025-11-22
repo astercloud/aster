@@ -8,7 +8,7 @@ Aster Agent UI 是一个专门为 AI Agent 应用设计的组件库，提供了�
 
 ## ✨ 核心特性
 
-- 🤖 **Agent 专属** - 专为 AI Agent 场景设计的组件
+- 🤖 **67 个组件** - 包含 46 个 ChatUI 组件 + 21 个 Agent 专属组件
 - 💬 **对话界面** - 完整的 Agent 对话体验  
 - 🔄 **工作流** - Agent 工作流可视化
 - 👥 **多 Agent** - 支持多 Agent 协作

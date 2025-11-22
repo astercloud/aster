@@ -278,15 +278,60 @@ const sections = [
 ];
 
 const allComponents = [
-  { name: 'Chat', category: 'chat' },
-  { name: 'Bubble', category: 'chat' },
-  { name: 'ThinkBubble', category: 'chat' },
-  { name: 'Card', category: 'chat' },
-  { name: 'Button', category: 'basic' },
-  { name: 'Avatar', category: 'basic' },
-  { name: 'Tag', category: 'basic' },
-  { name: 'Input', category: 'form' },
-  { name: 'Search', category: 'form' },
+  // Chat 对话组件
+  { name: 'Chat 聊天容器', category: 'chat' },
+  { name: 'Bubble 消息气泡', category: 'chat' },
+  { name: 'ThinkBubble 思考气泡', category: 'chat' },
+  { name: 'TypingBubble 输入中', category: 'chat' },
+  { name: 'Card 卡片', category: 'chat' },
+  { name: 'FileCard 文件卡片', category: 'chat' },
+  { name: 'MessageStatus 消息状态', category: 'chat' },
+  { name: 'SystemMessage 系统消息', category: 'chat' },
+  
+  // Basic 基础组件
+  { name: 'Button 按钮', category: 'basic' },
+  { name: 'Icon 图标', category: 'basic' },
+  { name: 'Avatar 头像', category: 'basic' },
+  { name: 'Tag 标签', category: 'basic' },
+  { name: 'Image 图片', category: 'basic' },
+  { name: 'Divider 分割线', category: 'basic' },
+  
+  // Form 表单组件
+  { name: 'Input 输入框', category: 'form' },
+  { name: 'Search 搜索框', category: 'form' },
+  { name: 'Checkbox 复选框', category: 'form' },
+  { name: 'Radio 单选框', category: 'form' },
+  { name: 'Dropdown 下拉菜单', category: 'form' },
+  { name: 'MultimodalInput 多模态输入', category: 'form' },
+  
+  // Feedback 反馈组件
+  { name: 'Modal 对话框', category: 'feedback' },
+  { name: 'Notice 通知', category: 'feedback' },
+  { name: 'Tooltip 提示', category: 'feedback' },
+  { name: 'Popover 气泡卡片', category: 'feedback' },
+  { name: 'Progress 进度条', category: 'feedback' },
+  { name: 'Typing 打字效果', category: 'feedback' },
+  
+  // Layout 布局组件
+  { name: 'Flex 弹性布局', category: 'layout' },
+  { name: 'Navbar 导航栏', category: 'layout' },
+  { name: 'Sidebar 侧边栏', category: 'layout' },
+  { name: 'ScrollView 滚动视图', category: 'layout' },
+  { name: 'Tabs 标签页', category: 'layout' },
+  { name: 'Carousel 轮播图', category: 'layout' },
+  
+  // Data 数据展示
+  { name: 'List 列表', category: 'data' },
+  { name: 'RichText 富文本', category: 'data' },
+  
+  // Agent 专属组件
+  { name: 'AgentCard Agent卡片', category: 'agent' },
+  { name: 'ThinkingBlock 思考块', category: 'agent' },
+  { name: 'WorkflowTimeline 工作流', category: 'agent' },
+  { name: 'EditorPanel 编辑器', category: 'agent' },
+  { name: 'ProjectCard 项目卡片', category: 'agent' },
+  { name: 'RoomCard 房间卡片', category: 'agent' },
+  { name: 'WorkflowCard 工作流卡片', category: 'agent' },
 ];
 
 const inputValue = ref('');
