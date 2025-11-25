@@ -18,6 +18,10 @@ type Dependencies struct {
 	// Router 为可选依赖，如果为 nil，则沿用旧的静态 ModelConfig 行为。
 	Router           router.Router
 	TemplateRegistry *TemplateRegistry
+
+	// PromptCompressor 可选的 Prompt 压缩器
+	// 如果配置了且模板启用了压缩，将用于压缩 System Prompt
+	PromptCompressor *EnhancedPromptCompressor
 }
 
 // TemplateRegistry 模板注册表

@@ -92,13 +92,20 @@ func (r *Registry) registerBuiltin() {
 		maxTokens := 170000
 		messagesToKeep := 6
 		if config.CustomConfig != nil {
+			// 支持 int 和 float64 (JSON 解析可能产生 float64)
 			if mt, ok := config.CustomConfig["max_tokens"].(int); ok {
 				maxTokens = mt
+			} else if mt, ok := config.CustomConfig["max_tokens"].(float64); ok {
+				maxTokens = int(mt)
 			}
 			if mk, ok := config.CustomConfig["messages_to_keep"].(int); ok {
 				messagesToKeep = mk
+			} else if mk, ok := config.CustomConfig["messages_to_keep"].(float64); ok {
+				messagesToKeep = int(mk)
 			}
 		}
+		log.Printf("[SummarizationMiddleware] Creating with max_tokens=%d, messages_to_keep=%d",
+			maxTokens, messagesToKeep)
 
 		// 创建 summarizer 函数(使用Provider)
 		summarizer := func(ctx context.Context, messages []types.Message) (string, error) {
