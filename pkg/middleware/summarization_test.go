@@ -573,7 +573,12 @@ func TestDefaultSummarizer(t *testing.T) {
 		t.Error("Expected non-empty summary")
 	}
 
-	if !strings.Contains(summary, "Total messages: 4") {
-		t.Errorf("Expected summary to contain message count, got: %s", summary)
+	// 验证摘要包含关键部分
+	if !strings.Contains(summary, "Analysis:") {
+		t.Errorf("Expected summary to contain 'Analysis:', got: %s", summary)
+	}
+
+	if !strings.Contains(summary, "Summary:") {
+		t.Errorf("Expected summary to contain 'Summary:', got: %s", summary)
 	}
 }

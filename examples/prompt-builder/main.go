@@ -10,6 +10,7 @@ import (
 	"github.com/astercloud/aster/pkg/sandbox"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/tools"
+	"github.com/astercloud/aster/pkg/tools/builtin"
 	"github.com/astercloud/aster/pkg/types"
 )
 
@@ -77,14 +78,9 @@ func main() {
 }
 
 func createDependencies() *agent.Dependencies {
-	// 创建工具注册表
+	// 创建工具注册表并注册内置工具
 	toolRegistry := tools.NewRegistry()
-	toolRegistry.Register("Read", func(config map[string]interface{}) (tools.Tool, error) {
-		return &tools.ReadTool{}, nil
-	})
-	toolRegistry.Register("Write", func(config map[string]interface{}) (tools.Tool, error) {
-		return &tools.WriteTool{}, nil
-	})
+	builtin.RegisterAll(toolRegistry)
 
 	// 创建模板注册表
 	templateRegistry := agent.NewTemplateRegistry()
@@ -93,21 +89,21 @@ func createDependencies() *agent.Dependencies {
 	templateRegistry.Register(&types.AgentTemplateDefinition{
 		ID:           "code-assistant",
 		SystemPrompt: "You are a professional code assistant. Help users with software development tasks.",
-		Tools:        []string{"Read", "Write"},
+		Tools:        []interface{}{"Read", "Write"},
 	})
 
 	// 注册研究助手模板
 	templateRegistry.Register(&types.AgentTemplateDefinition{
 		ID:           "research-assistant",
 		SystemPrompt: "You are a research assistant. Help users gather and analyze information.",
-		Tools:        []string{"Read"},
+		Tools:        []interface{}{"Read"},
 	})
 
 	// 注册带 Todo 提醒的模板
 	templateRegistry.Register(&types.AgentTemplateDefinition{
 		ID:           "todo-assistant",
 		SystemPrompt: "You are a task management assistant.",
-		Tools:        []string{"Read", "Write"},
+		Tools:        []interface{}{"Read", "Write"},
 		Runtime: &types.AgentTemplateRuntime{
 			Todo: &types.TodoConfig{
 				Enabled:         true,
@@ -117,20 +113,23 @@ func createDependencies() *agent.Dependencies {
 	})
 
 	// 创建 Provider Factory
-	providerFactory := provider.NewFactory()
+	providerFactory := provider.NewMultiProviderFactory()
 
 	// 创建 Sandbox Factory
 	sandboxFactory := sandbox.NewFactory()
 
 	// 创建 Store
-	memStore := store.NewMemoryStore()
+	jsonStore, err := store.NewJSONStore(".aster-prompt-builder")
+	if err != nil {
+		log.Fatalf("Failed to create store: %v", err)
+	}
 
 	return &agent.Dependencies{
 		ToolRegistry:     toolRegistry,
 		TemplateRegistry: templateRegistry,
 		ProviderFactory:  providerFactory,
 		SandboxFactory:   sandboxFactory,
-		Store:            memStore,
+		Store:            jsonStore,
 	}
 }
 
