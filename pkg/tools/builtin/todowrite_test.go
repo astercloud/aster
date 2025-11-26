@@ -72,6 +72,9 @@ func TestNewTodoWriteTool(t *testing.T) {
 }
 
 func TestTodoWriteTool_CreateTodos(t *testing.T) {
+	// 重置全局存储管理器，避免测试间状态污染
+	ResetGlobalManagers()
+
 	tool, err := NewTodoWriteTool(nil)
 	if err != nil {
 		t.Fatalf("Failed to create TodoWrite tool: %v", err)
@@ -81,13 +84,13 @@ func TestTodoWriteTool_CreateTodos(t *testing.T) {
 		"todos": []interface{}{
 			map[string]interface{}{
 				"content":    "Implement user authentication",
-				"status":     "pending",
+				"status":     "in_progress", // 只有一个 in_progress 任务
 				"activeForm": "实现用户认证功能",
 				"priority":   1,
 			},
 			map[string]interface{}{
 				"content":    "Design database schema",
-				"status":     "in_progress",
+				"status":     "pending", // 其余为 pending
 				"activeForm": "设计数据库架构",
 				"priority":   2,
 			},
@@ -647,4 +650,162 @@ func BenchmarkTodoWriteTool_WithPriority(b *testing.B) {
 	}
 
 	BenchmarkTool(b, tool, input)
+}
+
+// TestTodoWriteTool_SingleInProgressConstraint 测试单一 in_progress 任务约束
+func TestTodoWriteTool_SingleInProgressConstraint(t *testing.T) {
+	// 重置全局存储管理器
+	ResetGlobalManagers()
+
+	tool, err := NewTodoWriteTool(nil)
+	if err != nil {
+		t.Fatalf("Failed to create TodoWrite tool: %v", err)
+	}
+
+	// 测试1: 创建单个 in_progress 任务应该成功
+	singleInput := map[string]interface{}{
+		"todos": []interface{}{
+			map[string]interface{}{
+				"content":    "First task",
+				"status":     "in_progress",
+				"activeForm": "Working on first task",
+			},
+		},
+		"action": "create",
+	}
+
+	result := ExecuteToolWithInput(t, tool, singleInput)
+	result = AssertToolSuccess(t, result)
+
+	if result["in_progress_count"].(int) != 1 {
+		t.Errorf("Expected 1 in_progress task, got %d", result["in_progress_count"])
+	}
+
+	// 测试2: 尝试添加第二个 in_progress 任务应该失败
+	secondInput := map[string]interface{}{
+		"todos": []interface{}{
+			map[string]interface{}{
+				"content":    "Second task",
+				"status":     "in_progress",
+				"activeForm": "Working on second task",
+			},
+		},
+		"action": "create",
+	}
+
+	result2 := ExecuteToolWithInput(t, tool, secondInput)
+
+	// 应该返回错误
+	if ok, exists := result2["ok"]; !exists || ok.(bool) {
+		t.Error("Expected failure when adding second in_progress task")
+	}
+
+	if errMsg, exists := result2["error"]; exists {
+		if !strings.Contains(errMsg.(string), "only one task can be in_progress") {
+			t.Errorf("Expected error message about single in_progress constraint, got: %s", errMsg)
+		}
+	} else {
+		t.Error("Expected error message in result")
+	}
+}
+
+// TestTodoWriteTool_InProgressWithPendingTasks 测试一个 in_progress 配合 pending 和 completed 任务
+func TestTodoWriteTool_InProgressWithPendingTasks(t *testing.T) {
+	// 重置全局存储管理器
+	ResetGlobalManagers()
+
+	tool, err := NewTodoWriteTool(nil)
+	if err != nil {
+		t.Fatalf("Failed to create TodoWrite tool: %v", err)
+	}
+
+	// 一个 in_progress + pending + completed 应该成功
+	// 关键测试点：只有一个 in_progress 时应该成功
+	mixedInput := map[string]interface{}{
+		"todos": []interface{}{
+			map[string]interface{}{
+				"content":    "Pending task",
+				"status":     "pending",
+				"activeForm": "Pending task in progress",
+			},
+			map[string]interface{}{
+				"content":    "Active task",
+				"status":     "in_progress",
+				"activeForm": "Working on active task",
+			},
+			map[string]interface{}{
+				"content":    "Completed task",
+				"status":     "completed",
+				"activeForm": "Completed task done",
+			},
+		},
+		"action": "create",
+	}
+
+	result := ExecuteToolWithInput(t, tool, mixedInput)
+	result = AssertToolSuccess(t, result)
+
+	// 关键验证: in_progress 数量必须为 1
+	inProgressCount := 0
+	if ipc, ok := result["in_progress_count"].(int); ok {
+		inProgressCount = ipc
+	}
+	if inProgressCount != 1 {
+		t.Errorf("Expected 1 in_progress task, got %d", inProgressCount)
+	}
+
+	// 验证任务被创建 (总数应该 >= 3)
+	totalTodos := 0
+	if tt, ok := result["total_todos"].(int); ok {
+		totalTodos = tt
+	}
+	if totalTodos < 3 {
+		t.Errorf("Expected at least 3 total tasks, got %d", totalTodos)
+	}
+
+	// 验证操作成功
+	if ok, exists := result["ok"]; !exists || !ok.(bool) {
+		t.Error("Expected operation to succeed with single in_progress task")
+	}
+}
+
+// TestTodoWriteTool_MultipleInProgressInSingleRequest 测试同一请求中多个 in_progress 任务
+func TestTodoWriteTool_MultipleInProgressInSingleRequest(t *testing.T) {
+	// 重置全局存储管理器
+	ResetGlobalManagers()
+
+	tool, err := NewTodoWriteTool(nil)
+	if err != nil {
+		t.Fatalf("Failed to create TodoWrite tool: %v", err)
+	}
+
+	// 同一请求中有两个 in_progress 任务应该失败
+	multipleInProgressInput := map[string]interface{}{
+		"todos": []interface{}{
+			map[string]interface{}{
+				"content":    "First in_progress",
+				"status":     "in_progress",
+				"activeForm": "Working on first",
+			},
+			map[string]interface{}{
+				"content":    "Second in_progress",
+				"status":     "in_progress",
+				"activeForm": "Working on second",
+			},
+		},
+		"action": "create",
+	}
+
+	result := ExecuteToolWithInput(t, tool, multipleInProgressInput)
+
+	// 应该返回错误
+	if ok, exists := result["ok"]; !exists || ok.(bool) {
+		t.Error("Expected failure when creating multiple in_progress tasks in single request")
+	}
+
+	if errMsg, exists := result["error"]; exists {
+		if !strings.Contains(errMsg.(string), "only one task can be in_progress") {
+			t.Errorf("Expected error message about single in_progress constraint, got: %s", errMsg)
+		}
+	}
 }

@@ -6,6 +6,7 @@ import (
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
+	"github.com/astercloud/aster/pkg/types"
 )
 
 // TodoWriteTool 任务管理工具
@@ -114,7 +115,8 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]interface{
 
 	// 转换为TodoItem
 	todos := make([]TodoItem, 0, len(todosData))
-	for _, todoData := range todosData {
+	baseTime := time.Now().UnixNano()
+	for i, todoData := range todosData {
 		todoMap, ok := todoData.(map[string]interface{})
 		if !ok {
 			return NewClaudeErrorResponse(fmt.Errorf("each todo must be an object")), nil
@@ -166,9 +168,9 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]interface{
 			}
 		}
 
-		// 生成ID（如果没有提供）
+		// 生成ID（如果没有提供），使用基础时间戳+索引确保唯一性
 		if todo.ID == "" {
-			todo.ID = fmt.Sprintf("todo_%d", time.Now().UnixNano())
+			todo.ID = fmt.Sprintf("todo_%d_%d", baseTime, i)
 		}
 
 		// 处理completed状态的完成时间
@@ -197,6 +199,14 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]interface{
 			UpdatedAt: time.Now(),
 			Metadata:  make(map[string]interface{}),
 		}
+	}
+
+	// 验证单一 in_progress 约束
+	if err := t.validateSingleInProgress(todoList, todos); err != nil {
+		return NewClaudeErrorResponse(err,
+			"Complete the current in_progress task before starting a new one",
+			"Mark the existing in_progress task as completed first",
+		), nil
 	}
 
 	// 执行操作
@@ -268,7 +278,87 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]interface{
 		}
 	}
 
+	// 发送 Todo 更新事件到 Progress 通道
+	t.emitTodoUpdateEvent(tc, todoList.Todos)
+
 	return response, nil
+}
+
+// emitTodoUpdateEvent 发送 Todo 列表更新事件
+func (t *TodoWriteTool) emitTodoUpdateEvent(tc *tools.ToolContext, todos []TodoItem) {
+	// 转换为 types.TodoItem 格式
+	typesTodos := make([]types.TodoItem, len(todos))
+	for i, todo := range todos {
+		typesTodos[i] = types.TodoItem{
+			ID:         todo.ID,
+			Content:    todo.Content,
+			ActiveForm: todo.ActiveForm,
+			Status:     todo.Status,
+			Priority:   todo.Priority,
+			CreatedAt:  todo.CreatedAt,
+			UpdatedAt:  todo.UpdatedAt,
+		}
+	}
+
+	// 通过 Reporter 发送中间结果
+	if tc != nil && tc.Reporter != nil {
+		tc.Reporter.Intermediate("todo_update", map[string]interface{}{
+			"todos":      typesTodos,
+			"event_type": "todo_update",
+		})
+	}
+
+	// 通过 Emit 函数发送事件
+	if tc != nil && tc.Emit != nil {
+		tc.Emit("todo_update", &types.ProgressTodoUpdateEvent{
+			Todos: typesTodos,
+		})
+	}
+}
+
+// validateSingleInProgress 验证同时只能有一个 in_progress 任务
+// 返回错误信息，如果验证通过返回 nil
+func (t *TodoWriteTool) validateSingleInProgress(todoList *TodoList, newTodos []TodoItem) error {
+	// 统计新任务中的 in_progress 数量
+	newInProgressCount := 0
+	for _, todo := range newTodos {
+		if todo.Status == "in_progress" {
+			newInProgressCount++
+		}
+	}
+
+	// 统计现有任务中的 in_progress 数量（排除将被更新的任务）
+	existingInProgressCount := 0
+	for _, existing := range todoList.Todos {
+		if existing.Status == "in_progress" {
+			// 检查是否在新任务列表中被更新
+			isBeingUpdated := false
+			for _, newTodo := range newTodos {
+				if newTodo.ID == existing.ID {
+					isBeingUpdated = true
+					break
+				}
+			}
+			if !isBeingUpdated {
+				existingInProgressCount++
+			}
+		}
+	}
+
+	totalInProgress := existingInProgressCount + newInProgressCount
+	if totalInProgress > 1 {
+		// 找出现有的 in_progress 任务
+		var existingInProgressTask string
+		for _, existing := range todoList.Todos {
+			if existing.Status == "in_progress" {
+				existingInProgressTask = existing.Content
+				break
+			}
+		}
+		return fmt.Errorf("only one task can be in_progress at a time. Current in_progress task: %q", existingInProgressTask)
+	}
+
+	return nil
 }
 
 // createTodos 创建新任务
@@ -406,27 +496,26 @@ func (t *TodoWriteTool) Prompt() string {
 
 任务状态：
 - pending: 待处理任务
-- in_progress: 进行中任务
+- in_progress: 进行中任务（同时只能有一个！）
 - completed: 已完成任务
 
 任务字段：
-- content: 任务描述内容（必需）
+- content: 任务描述内容，祈使句形式（必需），如"Run tests"
 - status: 任务状态（必需）
-- activeForm: 任务的主动形式描述（必需）
+- activeForm: 任务的进行时形式描述（必需），如"Running tests"
 - priority: 任务优先级（可选）
+
+重要约束：
+- 同时只能有一个任务处于 in_progress 状态
+- 完成当前 in_progress 任务后才能开始下一个
+- 任务完成后应立即标记为 completed
+- content 用祈使句，activeForm 用进行时
 
 注意事项：
 - 使用持久化存储系统，数据安全可靠
 - 支持任务完成时间自动记录
 - 提供详细的任务统计信息
-- 支持任务列表的备份和恢复
-
-存储特性：
-- 基于文件系统的JSON格式存储
-- 自动备份和恢复机制
-- 支持多任务列表管理
-- 数据导入导出功能
-- 集成全局存储管理器`
+- 支持任务列表的备份和恢复`
 }
 
 // Examples 返回 TodoWrite 工具的使用示例

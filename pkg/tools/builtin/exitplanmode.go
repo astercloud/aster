@@ -9,13 +9,16 @@ import (
 )
 
 // ExitPlanModeTool 规划模式退出工具
-// 支持在规划模式完成后展示实施计划并请求用户确认
-type ExitPlanModeTool struct{}
+// 读取计划文件内容并请求用户审批
+type ExitPlanModeTool struct {
+	planFileManager *PlanFileManager
+}
 
 // PlanRecord 计划记录
 type PlanRecord struct {
 	ID                   string                 `json:"id"`
 	Content              string                 `json:"content"`
+	FilePath             string                 `json:"file_path,omitempty"`
 	EstimatedDuration    string                 `json:"estimated_duration,omitempty"`
 	Dependencies         []string               `json:"dependencies,omitempty"`
 	Risks                []string               `json:"risks,omitempty"`
@@ -32,7 +35,14 @@ type PlanRecord struct {
 
 // NewExitPlanModeTool 创建ExitPlanMode工具
 func NewExitPlanModeTool(config map[string]interface{}) (tools.Tool, error) {
-	return &ExitPlanModeTool{}, nil
+	basePath := ".aster/plans"
+	if bp, ok := config["base_path"].(string); ok && bp != "" {
+		basePath = bp
+	}
+
+	return &ExitPlanModeTool{
+		planFileManager: NewPlanFileManager(basePath),
+	}, nil
 }
 
 func (t *ExitPlanModeTool) Name() string {
@@ -40,112 +50,85 @@ func (t *ExitPlanModeTool) Name() string {
 }
 
 func (t *ExitPlanModeTool) Description() string {
-	return "在规划模式完成后展示实施计划并请求用户确认"
+	return "完成规划模式，读取计划文件内容并请求用户审批"
 }
 
 func (t *ExitPlanModeTool) InputSchema() map[string]interface{} {
 	return map[string]interface{}{
 		"type": "object",
 		"properties": map[string]interface{}{
-			"plan": map[string]interface{}{
+			"plan_file_path": map[string]interface{}{
 				"type":        "string",
-				"description": "要展示给用户的实施计划，支持markdown格式",
-			},
-			"plan_id": map[string]interface{}{
-				"type":        "string",
-				"description": "计划的唯一标识符，用于跟踪",
-			},
-			"estimated_duration": map[string]interface{}{
-				"type":        "string",
-				"description": "预估的实施时间，如'2 hours', '3 days'",
-			},
-			"dependencies": map[string]interface{}{
-				"type":        "array",
-				"description": "计划的依赖项或前提条件",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
-			},
-			"risks": map[string]interface{}{
-				"type":        "array",
-				"description": "潜在风险和缓解措施",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
-			},
-			"success_criteria": map[string]interface{}{
-				"type":        "array",
-				"description": "成功标准",
-				"items": map[string]interface{}{
-					"type": "string",
-				},
-			},
-			"confirmation_required": map[string]interface{}{
-				"type":        "boolean",
-				"description": "是否需要用户确认才能开始实施，默认为true",
+				"description": "计划文件的路径（由 EnterPlanMode 返回），如果不提供则自动查找最新的计划文件",
 			},
 		},
-		"required": []string{"plan"},
+		"required": []string{},
 	}
 }
 
 func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]interface{}, tc *tools.ToolContext) (interface{}, error) {
-	// 验证必需参数
-	if err := ValidateRequired(input, []string{"plan"}); err != nil {
-		return NewClaudeErrorResponse(err), nil
-	}
-
-	plan := GetStringParam(input, "plan", "")
-	planID := GetStringParam(input, "plan_id", "")
-	estimatedDuration := GetStringParam(input, "estimated_duration", "")
-	confirmationRequired := GetBoolParam(input, "confirmation_required", true)
-
-	dependencies := t.getStringSlice(input, "dependencies")
-	risks := t.getStringSlice(input, "risks")
-	successCriteria := t.getStringSlice(input, "success_criteria")
-
-	if plan == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("plan cannot be empty")), nil
-	}
-
 	start := time.Now()
 
-	// 生成计划ID（如果没有提供）
-	if planID == "" {
-		planID = fmt.Sprintf("plan_%d", time.Now().UnixNano())
+	planFilePath := GetStringParam(input, "plan_file_path", "")
+
+	// 如果没有提供计划文件路径，查找最新的计划文件
+	if planFilePath == "" {
+		plans, err := t.planFileManager.List()
+		if err != nil {
+			return NewClaudeErrorResponse(fmt.Errorf("failed to list plan files: %w", err)), nil
+		}
+
+		if len(plans) == 0 {
+			return NewClaudeErrorResponse(
+				fmt.Errorf("no plan files found"),
+				"Please create a plan using EnterPlanMode first",
+				"Plan files should be in .aster/plans/ directory",
+			), nil
+		}
+
+		// 使用最新的计划文件（按修改时间排序）
+		latestPlan := plans[len(plans)-1]
+		planFilePath = latestPlan.Path
 	}
+
+	// 检查计划文件是否存在
+	if !t.planFileManager.Exists(planFilePath) {
+		return NewClaudeErrorResponse(
+			fmt.Errorf("plan file not found: %s", planFilePath),
+			"The specified plan file does not exist",
+			"Check the path returned by EnterPlanMode",
+		), nil
+	}
+
+	// 读取计划文件内容
+	planContent, err := t.planFileManager.Load(planFilePath)
+	if err != nil {
+		return NewClaudeErrorResponse(fmt.Errorf("failed to read plan file: %w", err)), nil
+	}
+
+	// 从文件路径提取计划 ID
+	planID := t.planFileManager.GenerateID()
 
 	// 创建计划记录
 	planRecord := &PlanRecord{
 		ID:                   planID,
-		Content:              plan,
-		EstimatedDuration:    estimatedDuration,
-		Dependencies:         dependencies,
-		Risks:                risks,
-		SuccessCriteria:      successCriteria,
-		ConfirmationRequired: confirmationRequired,
+		Content:              planContent,
+		FilePath:             planFilePath,
+		ConfirmationRequired: true,
 		Status:               "pending_approval",
 		CreatedAt:            time.Now(),
 		UpdatedAt:            time.Now(),
-		AgentID:              "agent_default",
-		SessionID:            "session_default",
 		Metadata: map[string]interface{}{
 			"exit_plan_mode_call": true,
+			"plan_file_path":      planFilePath,
 		},
 	}
 
-	// 获取全局计划管理器
+	// 获取全局计划管理器并存储
 	planManager := GetGlobalPlanManager()
-
-	// 存储计划记录
-	err := planManager.StorePlan(planRecord)
-	if err != nil {
-		return map[string]interface{}{
-			"ok":          false,
-			"error":       fmt.Sprintf("failed to store plan: %v", err),
-			"plan_id":     planID,
-			"duration_ms": time.Since(start).Milliseconds(),
-		}, nil
+	if err := planManager.StorePlan(planRecord); err != nil {
+		// 不阻断流程，只记录警告
+		fmt.Printf("[ExitPlanMode] Warning: failed to store plan record: %v\n", err)
 	}
 
 	duration := time.Since(start)
@@ -154,128 +137,58 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]interfa
 	response := map[string]interface{}{
 		"ok":                    true,
 		"plan_id":               planID,
-		"plan":                  plan,
+		"plan_file_path":        planFilePath,
+		"plan_content":          planContent,
 		"status":                "pending_approval",
-		"confirmation_required": confirmationRequired,
-		"created_at":            planRecord.CreatedAt,
-		"updated_at":            planRecord.UpdatedAt,
-		"agent_id":              planRecord.AgentID,
-		"session_id":            planRecord.SessionID,
-		"metadata":              planRecord.Metadata,
+		"confirmation_required": true,
 		"duration_ms":           duration.Milliseconds(),
-		"storage":               "persistent",
-		"storage_backend":       "FilePlanManager",
-	}
-
-	// 添加可选字段
-	if estimatedDuration != "" {
-		response["estimated_duration"] = estimatedDuration
-	}
-
-	// 总是包含数组字段，即使为空
-	response["dependencies"] = dependencies
-	response["risks"] = risks
-	response["success_criteria"] = successCriteria
-
-	// 添加计划统计
-	response["dependencies_count"] = len(dependencies)
-	response["risks_count"] = len(risks)
-	response["success_criteria_count"] = len(successCriteria)
-
-	// 添加下一步操作指导
-	if confirmationRequired {
-		response["next_steps"] = []string{
-			"用户需要审阅并确认计划",
-			"确认后可以开始实施",
-			"可以修改计划或提出建议",
-		}
-	} else {
-		response["next_steps"] = []string{
-			"计划已准备好，可以立即开始实施",
-			"按照计划步骤逐步执行",
-			"定期报告进度",
-		}
-		// 自动将计划状态设为已批准
-		planRecord.Status = "approved"
-		now := time.Now()
-		planRecord.ApprovedAt = &now
-		planRecord.UpdatedAt = now
-
-		// 更新存储的计划记录
-		if err := planManager.StorePlan(planRecord); err != nil {
-			// 记录错误但不中断响应
-			response["approval_warning"] = fmt.Sprintf("plan saved but approval update failed: %v", err)
-		}
-		response["status"] = "approved"
-		response["approved_at"] = now.Unix()
+		"message":               "Plan is ready for user review. The user will see the plan content and can approve or request changes.",
+		"next_steps": []string{
+			"User needs to review the plan",
+			"After approval, implementation can begin",
+			"User can request modifications if needed",
+		},
 	}
 
 	return response, nil
 }
 
-// getStringSlice 获取字符串数组参数
-func (t *ExitPlanModeTool) getStringSlice(input map[string]interface{}, key string) []string {
-	if value, exists := input[key]; exists {
-		// 尝试直接转换为 []string
-		if slice, ok := value.([]string); ok {
-			return slice
-		}
-		// 尝试转换为 []interface{}
-		if slice, ok := value.([]interface{}); ok {
-			result := make([]string, len(slice))
-			for i, item := range slice {
-				if str, ok := item.(string); ok {
-					result[i] = str
-				}
-			}
-			return result
-		}
-	}
-	return []string{}
-}
-
 func (t *ExitPlanModeTool) Prompt() string {
-	return `在规划模式完成后展示实施计划并请求用户确认。
+	return `完成规划模式，读取计划文件内容并请求用户审批。
 
-功能特性：
-- 支持详细的实施计划展示
-- 计划状态跟踪和管理
-- 依赖项和风险评估
-- 成功标准定义
-- 自动化确认流程
+## 使用时机
 
-使用指南：
-- plan: 必需参数，要展示的实施计划（支持markdown）
-- plan_id: 可选参数，计划的唯一标识符
-- estimated_duration: 可选参数，预估实施时间
-- dependencies: 可选参数，计划的依赖项列表
-- risks: 可选参数，潜在风险和缓解措施
-- success_criteria: 可选参数，成功标准列表
-- confirmation_required: 可选参数，是否需要用户确认
+当你在 Plan Mode 中完成了计划编写后，使用此工具：
+- 你已经通过 EnterPlanMode 进入规划模式
+- 你已经将计划写入到指定的计划文件中
+- 计划内容完整，可以提交给用户审批
 
-计划内容建议：
-- 详细的实施步骤
-- 所需的资源清单
-- 时间线和里程碑
-- 风险评估和应对策略
-- 成功标准和验收条件
+## 工作原理
 
-状态流程：
-- pending_approval: 等待用户确认
-- approved: 计划已批准，可以开始实施
-- rejected: 计划被拒绝，需要修改
-- completed: 计划已完成
+此工具会：
+1. 读取你写入的计划文件内容
+2. 将计划内容展示给用户
+3. 等待用户审批后才能开始实施
 
-注意事项：
-- 使用持久化存储系统，数据安全可靠
-- 支持计划的版本管理和历史记录
-- 可集成项目管理工具
-- 自动处理计划状态和时间戳
+## 参数
 
-存储特性：
-- 基于文件系统的JSON格式存储
-- 自动备份和恢复机制
-- 支持多计划管理
-- 计划状态跟踪和更新
-- 集成全局存储管理器`
+- plan_file_path: 可选，计划文件路径（由 EnterPlanMode 返回）
+  - 如果不提供，将自动查找最新的计划文件
+
+## 重要说明
+
+- 此工具不接受计划内容作为参数
+- 计划应该已经写入到 .aster/plans/ 目录下的 markdown 文件中
+- 用户必须审批后才能开始实施
+- 在用户审批前，你不能进行任何代码修改
+
+## 示例
+
+调用时通常不需要参数：
+{}
+
+或指定计划文件路径：
+{
+  "plan_file_path": ".aster/plans/sunny-singing-nygaard.md"
+}`
 }

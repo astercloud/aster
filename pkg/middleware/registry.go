@@ -293,6 +293,40 @@ func (r *Registry) registerBuiltin() {
 		}), nil
 	})
 
+	// Simplicity Checker Middleware (检测过度工程)
+	r.Register("simplicity", func(config *MiddlewareFactoryConfig) (Middleware, error) {
+		// 默认配置
+		enabled := true
+		maxHelpers := 3
+		warnPremature := true
+		warnUnused := true
+
+		// 从自定义配置读取
+		if config.CustomConfig != nil {
+			if e, ok := config.CustomConfig["enabled"].(bool); ok {
+				enabled = e
+			}
+			if mh, ok := config.CustomConfig["max_helper_functions"].(int); ok {
+				maxHelpers = mh
+			} else if mh, ok := config.CustomConfig["max_helper_functions"].(float64); ok {
+				maxHelpers = int(mh)
+			}
+			if wp, ok := config.CustomConfig["warn_on_premature_abstraction"].(bool); ok {
+				warnPremature = wp
+			}
+			if wu, ok := config.CustomConfig["warn_on_unused_params"].(bool); ok {
+				warnUnused = wu
+			}
+		}
+
+		return NewSimplicityCheckerMiddleware(&SimplicityCheckerConfig{
+			Enabled:                    enabled,
+			MaxHelperFunctions:         maxHelpers,
+			WarnOnPrematureAbstraction: warnPremature,
+			WarnOnUnusedParams:         warnUnused,
+		}), nil
+	})
+
 	log.Printf("[MiddlewareRegistry] Built-in middlewares registered: %v", r.List())
 }
 

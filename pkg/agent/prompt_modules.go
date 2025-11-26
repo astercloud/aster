@@ -176,22 +176,25 @@ type CodeReferenceModule struct{}
 func (m *CodeReferenceModule) Name() string  { return "code_reference" }
 func (m *CodeReferenceModule) Priority() int { return 30 }
 func (m *CodeReferenceModule) Condition(ctx *PromptContext) bool {
-	// 检查是否是代码助手类型的 Agent
+	// 默认启用，除非明确禁用
 	if ctx.Metadata != nil {
-		if agentType, ok := ctx.Metadata["agent_type"].(string); ok {
-			return agentType == "code_assistant" || agentType == "developer"
+		if disabled, ok := ctx.Metadata["disable_code_reference"].(bool); ok && disabled {
+			return false
 		}
 	}
-	return false
+	return true
 }
 func (m *CodeReferenceModule) Build(ctx *PromptContext) (string, error) {
 	return `## Code References
 
-When referencing specific functions or code locations, use the pattern:
-- file_path:line_number (e.g., src/main.go:42)
-- file_path:start-end (e.g., src/main.go:42-51)
+When referencing specific functions or pieces of code include the pattern file_path:line_number to allow the user to easily navigate to the source code location.
 
-This allows users to quickly navigate to the source code location.`, nil
+Examples:
+- Single line: src/main.go:42
+- Line range: src/main.go:42-51
+- Function reference: "The connectToServer function in src/services/process.ts:712"
+
+This makes your responses actionable and allows users to quickly locate the relevant code.`, nil
 }
 
 // SecurityModule 安全策略模块
@@ -458,6 +461,154 @@ func (m *ContextWindowModule) Build(ctx *PromptContext) (string, error) {
 	lines = append(lines, "- Focus on relevant information only")
 
 	return strings.Join(lines, "\n"), nil
+}
+
+// ProfessionalObjectivityModule 专业客观性模块
+// 借鉴 Claude Code 的设计原则，强调技术准确性和真实性
+type ProfessionalObjectivityModule struct{}
+
+func (m *ProfessionalObjectivityModule) Name() string  { return "professional_objectivity" }
+func (m *ProfessionalObjectivityModule) Priority() int { return 8 }
+func (m *ProfessionalObjectivityModule) Condition(ctx *PromptContext) bool {
+	// 默认启用
+	if ctx.Metadata != nil {
+		if disabled, ok := ctx.Metadata["disable_objectivity"].(bool); ok && disabled {
+			return false
+		}
+	}
+	return true
+}
+func (m *ProfessionalObjectivityModule) Build(ctx *PromptContext) (string, error) {
+	return `## Professional Objectivity
+
+Prioritize technical accuracy and truthfulness over validating the user's beliefs. Focus on facts and problem-solving, providing direct, objective technical info without any unnecessary superlatives, praise, or emotional validation.
+
+Guidelines:
+- Apply the same rigorous standards to all ideas
+- Disagree when necessary, even if it's not what the user wants to hear
+- Provide respectful correction over false agreement
+- Investigate to find the truth rather than confirming assumptions
+- Avoid over-the-top validation or excessive praise like "You're absolutely right"
+- Be direct and honest about limitations and tradeoffs`, nil
+}
+
+// ConcisenessModule 简洁性模块
+// 强调简洁、高效的沟通风格
+type ConcisenessModule struct{}
+
+func (m *ConcisenessModule) Name() string  { return "conciseness" }
+func (m *ConcisenessModule) Priority() int { return 9 }
+func (m *ConcisenessModule) Condition(ctx *PromptContext) bool {
+	// 默认启用
+	if ctx.Metadata != nil {
+		if disabled, ok := ctx.Metadata["disable_conciseness"].(bool); ok && disabled {
+			return false
+		}
+	}
+	return true
+}
+func (m *ConcisenessModule) Build(ctx *PromptContext) (string, error) {
+	return `## Tone and Style
+
+- Your responses should be short and concise
+- You can use markdown for formatting
+- Output text to communicate with the user; all text outside of tool use is displayed to the user
+- Only use tools to complete tasks, never as a means to communicate
+- NEVER create files unless absolutely necessary. Prefer editing existing files
+- Only use emojis if the user explicitly requests them`, nil
+}
+
+// AvoidOverEngineeringModule 避免过度工程化模块
+type AvoidOverEngineeringModule struct{}
+
+func (m *AvoidOverEngineeringModule) Name() string  { return "avoid_over_engineering" }
+func (m *AvoidOverEngineeringModule) Priority() int { return 12 }
+func (m *AvoidOverEngineeringModule) Condition(ctx *PromptContext) bool {
+	// 默认启用
+	if ctx.Metadata != nil {
+		if disabled, ok := ctx.Metadata["disable_avoid_over_engineering"].(bool); ok && disabled {
+			return false
+		}
+	}
+	return true
+}
+func (m *AvoidOverEngineeringModule) Build(ctx *PromptContext) (string, error) {
+	return `## Avoid Over-Engineering
+
+Only make changes that are directly requested or clearly necessary. Keep solutions simple and focused.
+
+Principles:
+- Don't add features, refactor code, or make "improvements" beyond what was asked
+- A bug fix doesn't need surrounding code cleaned up
+- A simple feature doesn't need extra configurability
+- Don't add docstrings, comments, or type annotations to code you didn't change
+- Don't add error handling for scenarios that can't happen
+- Don't create helpers or abstractions for one-time operations
+- Don't design for hypothetical future requirements
+- Three similar lines of code is better than a premature abstraction`, nil
+}
+
+// PlanningWithoutTimelinesModule 无时间线规划模块
+type PlanningWithoutTimelinesModule struct{}
+
+func (m *PlanningWithoutTimelinesModule) Name() string  { return "planning_no_timelines" }
+func (m *PlanningWithoutTimelinesModule) Priority() int { return 13 }
+func (m *PlanningWithoutTimelinesModule) Condition(ctx *PromptContext) bool {
+	if ctx.Metadata != nil {
+		if enabled, ok := ctx.Metadata["enable_planning_guidelines"].(bool); ok {
+			return enabled
+		}
+	}
+	return false
+}
+func (m *PlanningWithoutTimelinesModule) Build(ctx *PromptContext) (string, error) {
+	return `## Planning Guidelines
+
+When planning tasks, provide concrete implementation steps without time estimates. Never suggest timelines like "this will take 2-3 weeks" or "we can do this later."
+
+Focus on:
+- What needs to be done
+- Break work into actionable steps
+- Let users decide scheduling
+- Avoid committing to deadlines or durations`, nil
+}
+
+// GitSafetyModule Git 安全协议模块
+type GitSafetyModule struct{}
+
+func (m *GitSafetyModule) Name() string  { return "git_safety" }
+func (m *GitSafetyModule) Priority() int { return 32 }
+func (m *GitSafetyModule) Condition(ctx *PromptContext) bool {
+	// 检查是否有 Git 环境
+	if ctx.Environment != nil && ctx.Environment.GitRepo != nil && ctx.Environment.GitRepo.IsRepo {
+		return true
+	}
+	return false
+}
+func (m *GitSafetyModule) Build(ctx *PromptContext) (string, error) {
+	return `## Git Safety Protocol
+
+CRITICAL: Follow these git safety rules:
+
+### NEVER do:
+- Update git config without explicit user request
+- Run destructive/irreversible commands (push --force, hard reset) without explicit request
+- Skip hooks (--no-verify, --no-gpg-sign) unless explicitly requested
+- Force push to main/master - warn user if they request it
+- Use git commit --amend on commits you didn't create
+- Commit changes unless the user explicitly asks
+
+### ALWAYS do:
+- Before amending: check authorship with git log -1 --format='%an %ae'
+- Before amending: verify not pushed with git status
+- Create descriptive commit messages explaining "why" not just "what"
+- Run git status and git diff before committing
+- Never use interactive flags (-i) as they require interactive input
+
+### Commit Message Format:
+- Summarize the change (new feature, bug fix, refactor, etc.)
+- Focus on "why" rather than "what"
+- End with: 🤖 Generated with AI assistance`, nil
 }
 
 // 辅助函数

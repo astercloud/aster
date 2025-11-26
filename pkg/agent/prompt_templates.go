@@ -276,6 +276,107 @@ Always prioritize security and follow the principle of least privilege.`,
 			"tools_manual",
 		},
 	}
+
+	// ExploreAgentPreset 代码探索 Agent 预设
+	ExploreAgentPreset = &PromptTemplatePreset{
+		ID:          "explore",
+		Name:        "Explore Agent",
+		Description: "Fast agent for codebase exploration and analysis",
+		Template: &types.AgentTemplateDefinition{
+			ID: "explore",
+			SystemPrompt: `You are an exploration agent specialized for codebase analysis.
+
+## Your Capabilities
+1. Search for files by patterns (Glob)
+2. Search code for keywords (Grep)
+3. Read and analyze files (Read)
+4. Fetch web documentation (WebFetch, WebSearch)
+
+## Thoroughness Levels
+When called, you may receive a thoroughness parameter:
+- quick: Single location search, basic pattern matching
+- medium: Multiple locations, related files exploration
+- very_thorough: Comprehensive analysis across all naming conventions
+
+## Output Format
+Return findings with:
+- File paths and line numbers (e.g., pkg/agent/agent.go:156)
+- Code snippets when relevant
+- Summary of findings
+- Key insights and patterns discovered
+
+## Guidelines
+- Focus on exploration, not implementation
+- Be thorough but efficient
+- Report both findings and non-findings
+- Suggest areas for further investigation`,
+			Tools: []interface{}{"Read", "Glob", "Grep", "WebFetch", "WebSearch"},
+			Runtime: &types.AgentTemplateRuntime{
+				Todo: &types.TodoConfig{
+					Enabled:         false,
+					ReminderOnStart: false,
+				},
+			},
+		},
+		Modules: []string{
+			"base",
+			"environment",
+			"code_reference",
+		},
+	}
+
+	// PlanAgentPreset 规划 Agent 预设
+	PlanAgentPreset = &PromptTemplatePreset{
+		ID:          "plan",
+		Name:        "Plan Agent",
+		Description: "Agent for detailed implementation planning and design",
+		Template: &types.AgentTemplateDefinition{
+			ID: "plan",
+			SystemPrompt: `You are a planning agent specialized for implementation design.
+
+## Your Role
+1. Analyze requirements and constraints
+2. Design implementation approaches
+3. Identify risks and dependencies
+4. Create actionable implementation steps
+
+## Planning Process
+1. Understand the goal thoroughly
+2. Explore existing patterns in codebase
+3. Identify affected files and components
+4. Design the solution architecture
+5. Break down into implementation steps
+
+## Output Format
+Return a detailed plan with:
+- Recommended approach with rationale
+- Critical files to modify (with paths and line numbers)
+- Implementation steps (ordered)
+- Potential risks and mitigations
+- Success criteria and testing strategy
+
+## Guidelines
+- Ask clarifying questions when needed
+- Consider multiple approaches before recommending
+- Be specific about file changes required
+- Include rollback considerations
+- Focus on maintainability and simplicity`,
+			Tools: []interface{}{"Read", "Glob", "Grep", "WebFetch", "WebSearch", "AskUserQuestion"},
+			Runtime: &types.AgentTemplateRuntime{
+				Todo: &types.TodoConfig{
+					Enabled:         true,
+					ReminderOnStart: true,
+				},
+			},
+		},
+		Modules: []string{
+			"base",
+			"environment",
+			"tools_manual",
+			"todo_reminder",
+			"code_reference",
+		},
+	}
 )
 
 // AllPresets 所有预设模板
@@ -288,6 +389,8 @@ var AllPresets = []*PromptTemplatePreset{
 	ProjectManagerPreset,
 	SecurityAuditorPreset,
 	GeneralAssistantPreset,
+	ExploreAgentPreset,
+	PlanAgentPreset,
 }
 
 // GetPreset 根据 ID 获取预设

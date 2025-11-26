@@ -388,3 +388,22 @@ func GetGlobalPlanManager() PlanManager {
 func GetGlobalTodoManager() TodoManager {
 	return GlobalTodoManager
 }
+
+// ResetGlobalManagers 重置全局存储管理器（仅用于测试）
+func ResetGlobalManagers() {
+	GlobalStorageManager = NewFileStorageManagerWithDir(fmt.Sprintf("%s/agentsdk_storage_%d", os.TempDir(), time.Now().UnixNano()))
+	GlobalPlanManager = NewFilePlanManager(GlobalStorageManager)
+	GlobalTodoManager = NewFileTodoManager(GlobalStorageManager)
+}
+
+// NewFileStorageManagerWithDir 创建使用指定目录的存储管理器
+func NewFileStorageManagerWithDir(dataDir string) *FileStorageManager {
+	// 创建子目录
+	_ = os.MkdirAll(filepath.Join(dataDir, "todos"), 0755)
+	_ = os.MkdirAll(filepath.Join(dataDir, "plans"), 0755)
+	_ = os.MkdirAll(filepath.Join(dataDir, "cache"), 0755)
+
+	return &FileStorageManager{
+		dataDir: dataDir,
+	}
+}

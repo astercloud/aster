@@ -310,3 +310,63 @@ type MonitorToolManualUpdatedEvent struct {
 
 func (e *MonitorToolManualUpdatedEvent) Channel() AgentChannel { return ChannelMonitor }
 func (e *MonitorToolManualUpdatedEvent) EventType() string     { return "tool_manual_updated" }
+
+// ===================
+// AskUserQuestion Events (Control Channel)
+// ===================
+
+// QuestionOption 问题选项
+type QuestionOption struct {
+	Label       string `json:"label"`       // 选项标签，1-5个词
+	Description string `json:"description"` // 选项说明
+}
+
+// Question 结构化问题
+type Question struct {
+	Question    string           `json:"question"`     // 完整的问题文本
+	Header      string           `json:"header"`       // 简短标签，最多12字符
+	Options     []QuestionOption `json:"options"`      // 2-4个选项
+	MultiSelect bool             `json:"multi_select"` // 是否多选
+}
+
+// ControlAskUserEvent 请求用户回答问题事件
+type ControlAskUserEvent struct {
+	RequestID string                                     `json:"request_id"`
+	Questions []Question                                 `json:"questions"`
+	Respond   func(answers map[string]interface{}) error `json:"-"` // 响应回调
+}
+
+func (e *ControlAskUserEvent) Channel() AgentChannel { return ChannelControl }
+func (e *ControlAskUserEvent) EventType() string     { return "ask_user" }
+
+// ControlUserAnswerEvent 用户回答事件
+type ControlUserAnswerEvent struct {
+	RequestID string                 `json:"request_id"`
+	Answers   map[string]interface{} `json:"answers"` // question_index -> answer(s)
+}
+
+func (e *ControlUserAnswerEvent) Channel() AgentChannel { return ChannelControl }
+func (e *ControlUserAnswerEvent) EventType() string     { return "user_answer" }
+
+// ===================
+// Todo Events (Progress Channel)
+// ===================
+
+// TodoItem Todo项目
+type TodoItem struct {
+	ID         string    `json:"id"`
+	Content    string    `json:"content"`     // 祈使句形式: "Run tests"
+	ActiveForm string    `json:"active_form"` // 进行时形式: "Running tests"
+	Status     string    `json:"status"`      // "pending", "in_progress", "completed"
+	Priority   int       `json:"priority,omitempty"`
+	CreatedAt  time.Time `json:"created_at"`
+	UpdatedAt  time.Time `json:"updated_at"`
+}
+
+// ProgressTodoUpdateEvent Todo列表更新事件
+type ProgressTodoUpdateEvent struct {
+	Todos []TodoItem `json:"todos"`
+}
+
+func (e *ProgressTodoUpdateEvent) Channel() AgentChannel { return ChannelProgress }
+func (e *ProgressTodoUpdateEvent) EventType() string     { return "todo_update" }

@@ -418,6 +418,18 @@ func (a *Agent) buildSystemPrompt(ctx context.Context) error {
 	// 添加能力说明模块（如果启用）
 	builder.AddModule(&CapabilitiesModule{})
 
+	// 添加专业客观性模块（Claude Code 设计原则）
+	builder.AddModule(&ProfessionalObjectivityModule{})
+
+	// 添加简洁性模块
+	builder.AddModule(&ConcisenessModule{})
+
+	// 添加避免过度工程化模块
+	builder.AddModule(&AvoidOverEngineeringModule{})
+
+	// 添加规划指南模块
+	builder.AddModule(&PlanningWithoutTimelinesModule{})
+
 	// 收集环境信息
 	workDir := "."
 	if a.sandbox != nil {
@@ -447,6 +459,9 @@ func (a *Agent) buildSystemPrompt(ctx context.Context) error {
 
 	// 添加代码引用模块
 	builder.AddModule(&CodeReferenceModule{})
+
+	// 添加 Git 安全模块
+	builder.AddModule(&GitSafetyModule{})
 
 	// 添加安全策略模块
 	builder.AddModule(&SecurityModule{})

@@ -28,7 +28,11 @@ func RegisterAll(registry *tools.Registry) {
 	registry.Register("KillShell", NewKillShellTool)
 	registry.Register("Task", NewTaskTool)
 	registry.Register("ExitPlanMode", NewExitPlanModeTool)
+	registry.Register("EnterPlanMode", NewEnterPlanModeTool)
 	registry.Register("DemoLongTask", NewDemoLongTaskTool)
+
+	// 用户交互工具
+	registry.Register("AskUserQuestion", NewAskUserQuestionTool)
 
 	// 语义搜索工具
 	registry.Register("SemanticSearch", NewSemanticSearchTool)
@@ -59,7 +63,12 @@ func SkillTools() []string {
 
 // TaskManagementTools 返回任务管理工具列表
 func TaskManagementTools() []string {
-	return []string{"TodoWrite", "BashOutput", "KillShell", "Task", "ExitPlanMode"}
+	return []string{"TodoWrite", "BashOutput", "KillShell", "Task", "ExitPlanMode", "EnterPlanMode"}
+}
+
+// InteractionTools 返回用户交互工具列表
+func InteractionTools() []string {
+	return []string{"AskUserQuestion"}
 }
 
 // SemanticTools 返回语义工具列表
@@ -79,6 +88,7 @@ func AllTools() []string {
 	tools = append(tools, NetworkTools()...)
 	tools = append(tools, SkillTools()...)
 	tools = append(tools, TaskManagementTools()...)
+	tools = append(tools, InteractionTools()...)
 	tools = append(tools, SemanticTools()...)
 	tools = append(tools, DiscoveryTools()...)
 	return tools

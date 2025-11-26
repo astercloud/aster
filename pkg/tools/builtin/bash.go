@@ -115,6 +115,38 @@ func (t *BashTool) Execute(ctx context.Context, input map[string]interface{}, tc
 		return NewClaudeErrorResponse(fmt.Errorf("command cannot be empty")), nil
 	}
 
+	// Git 安全检查
+	gitCheck := GetGlobalGitSafetyValidator().Check(command)
+	if gitCheck.IsGitCommand {
+		if gitCheck.Blocked {
+			return map[string]interface{}{
+				"ok":              false,
+				"blocked":         true,
+				"is_git_command":  true,
+				"risk":            gitCheck.RiskName,
+				"reason":          gitCheck.Reason,
+				"warnings":        gitCheck.Warnings,
+				"recommendations": gitCheck.Recommendations,
+				"message":         gitCheck.FormatCheckResult(),
+				"command":         command,
+			}, nil
+		}
+
+		if gitCheck.RequiresApproval {
+			return map[string]interface{}{
+				"ok":                false,
+				"requires_approval": true,
+				"is_git_command":    true,
+				"risk":              gitCheck.RiskName,
+				"warnings":          gitCheck.Warnings,
+				"recommendations":   gitCheck.Recommendations,
+				"message":           gitCheck.FormatCheckResult(),
+				"command":           command,
+				"approval_prompt":   fmt.Sprintf("Git command requires approval [%s risk]: %s", gitCheck.RiskName, command),
+			}, nil
+		}
+	}
+
 	// 验证命令安全性
 	if err := t.validateCommand(command); err != nil {
 		return NewClaudeErrorResponse(
