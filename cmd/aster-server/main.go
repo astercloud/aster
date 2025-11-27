@@ -6,6 +6,7 @@ import (
 	"log"
 	"os"
 	"os/signal"
+	"strings"
 	"syscall"
 	"time"
 
@@ -19,6 +20,90 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 	"github.com/astercloud/aster/server"
 )
+
+// ProviderConfig 定义 provider 的默认配置
+type ProviderConfig struct {
+	DefaultModel string   // 默认模型名称
+	APIKeyEnvs   []string // 可能的 API Key 环境变量名称
+}
+
+// providerDefaults 定义各个 provider 的默认配置
+var providerDefaults = map[string]ProviderConfig{
+	"anthropic": {
+		DefaultModel: "claude-sonnet-4-5",
+		APIKeyEnvs:   []string{"ANTHROPIC_API_KEY"},
+	},
+	"deepseek": {
+		DefaultModel: "deepseek-chat",
+		APIKeyEnvs:   []string{"DEEPSEEK_API_KEY"},
+	},
+	"glm": {
+		DefaultModel: "glm-4-plus", // 或使用 glm-z1-airx 获得推理能力
+		APIKeyEnvs:   []string{"GLM_API_KEY", "ZHIPU_API_KEY", "BIGMODEL_API_KEY"},
+	},
+	"openai": {
+		DefaultModel: "gpt-4o",
+		APIKeyEnvs:   []string{"OPENAI_API_KEY"},
+	},
+	"gemini": {
+		DefaultModel: "gemini-2.0-flash",
+		APIKeyEnvs:   []string{"GEMINI_API_KEY", "GOOGLE_API_KEY"},
+	},
+	"moonshot": {
+		DefaultModel: "moonshot-v1-8k",
+		APIKeyEnvs:   []string{"MOONSHOT_API_KEY", "KIMI_API_KEY"},
+	},
+	"doubao": {
+		DefaultModel: "doubao-pro-32k",
+		APIKeyEnvs:   []string{"DOUBAO_API_KEY", "BYTEDANCE_API_KEY"},
+	},
+}
+
+// providerAliases 定义 provider 别名映射
+var providerAliases = map[string]string{
+	"zhipu":     "glm",
+	"bigmodel":  "glm",
+	"google":    "gemini",
+	"kimi":      "moonshot",
+	"bytedance": "doubao",
+}
+
+// resolveProviderConfig 解析 provider 配置
+func resolveProviderConfig(providerName, modelName string) (provider, model, apiKey string) {
+	// 解析别名
+	if alias, ok := providerAliases[providerName]; ok {
+		providerName = alias
+	}
+
+	// 获取 provider 配置
+	config, ok := providerDefaults[providerName]
+	if !ok {
+		// 未知 provider，使用通用方式获取 API Key
+		return providerName, modelName, os.Getenv(strings.ToUpper(providerName) + "_API_KEY")
+	}
+
+	// 使用默认模型（如果未指定）
+	if modelName == "" {
+		modelName = config.DefaultModel
+	}
+
+	// 尝试获取 API Key
+	for _, envName := range config.APIKeyEnvs {
+		if key := os.Getenv(envName); key != "" {
+			return providerName, modelName, key
+		}
+	}
+
+	return providerName, modelName, ""
+}
+
+// maskAPIKey 隐藏 API Key 的中间部分
+func maskAPIKey(key string) string {
+	if len(key) <= 8 {
+		return "***"
+	}
+	return key[:4] + "..." + key[len(key)-4:]
+}
 
 func main() {
 	fmt.Println("🚀 aster 星尘云枢 Production Server")
@@ -45,34 +130,19 @@ func main() {
 	registerDefaultTemplates(templateRegistry)
 
 	// Initialize router with environment-based configuration
-	provider := os.Getenv("PROVIDER")
-	if provider == "" {
-		provider = "anthropic"
+	providerEnv := os.Getenv("PROVIDER")
+	if providerEnv == "" {
+		providerEnv = "anthropic"
 	}
-	model := os.Getenv("MODEL")
-	if model == "" {
-		if provider == "deepseek" {
-			model = "deepseek-chat"
-		} else {
-			model = "claude-sonnet-4-5"
-		}
-	}
+	modelEnv := os.Getenv("MODEL")
 
-	var apiKey string
-	switch provider {
-	case "deepseek":
-		apiKey = os.Getenv("DEEPSEEK_API_KEY")
-	case "anthropic":
-		apiKey = os.Getenv("ANTHROPIC_API_KEY")
-	case "openai":
-		apiKey = os.Getenv("OPENAI_API_KEY")
-	default:
-		apiKey = os.Getenv(provider + "_API_KEY")
-	}
+	// 解析 provider 配置
+	resolvedProvider, resolvedModel, apiKey := resolveProviderConfig(providerEnv, modelEnv)
+	log.Printf("[Config] Provider: %s, Model: %s, APIKey: %s...", resolvedProvider, resolvedModel, maskAPIKey(apiKey))
 
 	defaultModel := &types.ModelConfig{
-		Provider: provider,
-		Model:    model,
+		Provider: resolvedProvider,
+		Model:    resolvedModel,
 		APIKey:   apiKey,
 	}
 	routes := []router.StaticRouteEntry{
@@ -83,8 +153,8 @@ func main() {
 	// Create prompt compressor for context compression
 	// 需要先创建一个 Provider 用于 LLM 压缩
 	compressionProvider, err := providerFactory.Create(&types.ModelConfig{
-		Provider: provider,
-		Model:    model,
+		Provider: resolvedProvider,
+		Model:    resolvedModel,
 		APIKey:   apiKey,
 	})
 	if err != nil {
@@ -160,20 +230,14 @@ func main() {
 
 // registerDefaultTemplates registers builtin agent templates
 func registerDefaultTemplates(registry *agent.TemplateRegistry) {
-	// Get provider and model from environment, with fallbacks
-	provider := os.Getenv("PROVIDER")
-	if provider == "" {
-		provider = "anthropic"
+	// Get provider and model from environment using the shared resolver
+	providerEnv := os.Getenv("PROVIDER")
+	if providerEnv == "" {
+		providerEnv = "anthropic"
 	}
+	modelEnv := os.Getenv("MODEL")
 
-	model := os.Getenv("MODEL")
-	if model == "" {
-		if provider == "deepseek" {
-			model = "deepseek-chat"
-		} else {
-			model = "claude-sonnet-4"
-		}
-	}
+	_, model, _ := resolveProviderConfig(providerEnv, modelEnv)
 
 	// Register "chat" template - simple chat agent with prompt compression
 	registry.Register(&types.AgentTemplateDefinition{
@@ -284,5 +348,5 @@ Explain what you're doing and why, but focus on actually solving the programming
 		Tools: "*",
 	})
 
-	fmt.Printf("✅ Registered default templates (Provider: %s, Model: %s)\n", provider, model)
+	fmt.Printf("✅ Registered default templates (Provider: %s, Model: %s)\n", providerEnv, model)
 }

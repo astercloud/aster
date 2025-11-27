@@ -608,9 +608,32 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 	currentBlockIndex := -1
 	textBuffers := make(map[int]string)
 	inputJSONBuffers := make(map[int]string)
+	reasoningStarted := false // 追踪是否已发送思考开始事件
+	reasoningBuffer := ""     // 累积思考内容
 
 	for chunk := range stream {
 		switch chunk.Type {
+		// 处理 reasoning_delta (DeepSeek Reasoner 模型的思考过程)
+		case "reasoning_delta":
+			if delta, ok := chunk.Delta.(map[string]interface{}); ok {
+				if content, ok := delta["content"].(string); ok && content != "" {
+					// 首次收到思考内容时，发送开始事件
+					if !reasoningStarted {
+						reasoningStarted = true
+						a.eventBus.EmitProgress(&types.ProgressThinkChunkStartEvent{
+							Step: a.stepCount,
+						})
+						log.Printf("[handleStreamResponse] Reasoning started for step %d", a.stepCount)
+					}
+					// 累积并发送思考内容增量
+					reasoningBuffer += content
+					a.eventBus.EmitProgress(&types.ProgressThinkChunkEvent{
+						Step:  a.stepCount,
+						Delta: content,
+					})
+				}
+			}
+
 		case "content_block_start":
 			currentBlockIndex = chunk.Index
 			if delta, ok := chunk.Delta.(map[string]interface{}); ok {
@@ -761,6 +784,14 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 				}
 			}
 		}
+	}
+
+	// 如果有思考过程，发送结束事件
+	if reasoningStarted {
+		a.eventBus.EmitProgress(&types.ProgressThinkChunkEndEvent{
+			Step: a.stepCount,
+		})
+		log.Printf("[handleStreamResponse] Reasoning ended for step %d, total length: %d", a.stepCount, len(reasoningBuffer))
 	}
 
 	return types.Message{

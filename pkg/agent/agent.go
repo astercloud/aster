@@ -84,10 +84,13 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 	// 创建Provider（支持可选 Router）
 	modelConfig := config.ModelConfig
 	if modelConfig == nil && template.Model != "" {
+		// 从模型名称推断 provider
+		inferredProvider := inferProviderFromModel(template.Model)
 		modelConfig = &types.ModelConfig{
-			Provider: "anthropic",
+			Provider: inferredProvider,
 			Model:    template.Model,
 		}
+		log.Printf("[Agent] Inferred provider '%s' from model '%s'", inferredProvider, template.Model)
 	}
 
 	// 如果定义了 Router，则优先通过 Router 决定最终模型
@@ -1325,4 +1328,23 @@ func (a *Agent) getExecutionMode() types.ExecutionMode {
 		return a.config.ModelConfig.ExecutionMode
 	}
 	return types.ExecutionModeStreaming // 默认流式（向后兼容）
+}
+
+// inferProviderFromModel 从模型名称推断 provider
+func inferProviderFromModel(model string) string {
+	model = strings.ToLower(model)
+	switch {
+	case strings.HasPrefix(model, "deepseek"):
+		return "deepseek"
+	case strings.HasPrefix(model, "gpt") || strings.HasPrefix(model, "o1") || strings.HasPrefix(model, "o3"):
+		return "openai"
+	case strings.HasPrefix(model, "claude"):
+		return "anthropic"
+	case strings.HasPrefix(model, "gemini"):
+		return "google"
+	case strings.HasPrefix(model, "llama") || strings.HasPrefix(model, "mistral"):
+		return "ollama"
+	default:
+		return "anthropic" // 默认 anthropic
+	}
 }

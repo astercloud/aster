@@ -36,7 +36,11 @@
       "Bash(/Users/coso/Documents/dev/ai/astercloud/aster/test_compression_quick.sh:*)",
       "Bash(./test_compression_quick.sh:*)",
       "Bash(PROVIDER=deepseek MODEL=deepseek-chat DEEPSEEK_API_KEY=sk-1730bab5cc9043d5aad9994be2490c55 TAVILY_API_KEY=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 PORT=8080 ./aster-server:*)",
-      "Bash(git tag:*)"
+      "Bash(git tag:*)",
+      "Bash(xargs basename:*)",
+      "Bash(gh pr checkout:*)",
+      "Bash(test:*)",
+      "Bash(npx vite build)"
     ],
     "deny": [],
     "ask": []

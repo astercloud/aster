@@ -1,137 +1,156 @@
 <template>
   <div v-if="hasError" class="error-boundary">
     <div class="error-content">
-      <div class="error-icon">
-        <svg class="w-16 h-16 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
-        </svg>
-      </div>
-      
-      <h2 class="error-title">出错了</h2>
-      <p class="error-message">{{ errorMessage }}</p>
-      
-      <div v-if="showDetails && errorDetails" class="error-details">
-        <button
-          @click="detailsExpanded = !detailsExpanded"
-          class="details-toggle"
-        >
-          {{ detailsExpanded ? '隐藏' : '查看' }}详细信息
-        </button>
-        
-        <pre v-if="detailsExpanded" class="details-content">{{ errorDetails }}</pre>
-      </div>
-      
+      <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
+        />
+      </svg>
+
+      <h3 class="error-title">{{ errorTitle }}</h3>
+      <p v-if="errorMessage" class="error-message">{{ errorMessage }}</p>
+
+      <!-- 错误详情 (仅开发模式) -->
+      <details v-if="showDetails && error" class="error-details">
+        <summary class="error-details-summary">查看错误详情</summary>
+        <pre class="error-stack">{{ error.stack || error.message }}</pre>
+      </details>
+
       <div class="error-actions">
-        <button @click="handleRetry" class="btn-retry">
+        <button @click="handleRetry" class="error-button error-button-primary">
+          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
+            />
+          </svg>
           重试
         </button>
-        <button @click="handleReset" class="btn-reset">
+
+        <button v-if="onReset" @click="handleReset" class="error-button error-button-secondary">
           重置
         </button>
       </div>
     </div>
   </div>
-  
+
+  <!-- 正常渲染子组件 -->
   <slot v-else></slot>
 </template>
 
 <script setup lang="ts">
-import { ref, onErrorCaptured } from 'vue';
+import { ref, onErrorCaptured, provide } from 'vue';
 
 interface Props {
+  errorTitle?: string;
+  errorMessage?: string;
   showDetails?: boolean;
+  onRetry?: () => void;
+  onReset?: () => void;
+  onError?: (error: Error) => void;
 }
 
-withDefaults(defineProps<Props>(), {
-  showDetails: true,
+const props = withDefaults(defineProps<Props>(), {
+  errorTitle: '出错了',
+  errorMessage: '渲染组件时发生错误',
+  showDetails: import.meta.env.DEV,
 });
 
-const emit = defineEmits<{
-  error: [error: Error];
-  retry: [];
-  reset: [];
-}>();
-
 const hasError = ref(false);
-const errorMessage = ref('');
-const errorDetails = ref('');
-const detailsExpanded = ref(false);
+const error = ref<Error | null>(null);
 
-onErrorCaptured((error: Error) => {
+// 捕获子组件错误
+onErrorCaptured((err: Error) => {
+  console.error('ErrorBoundary caught error:', err);
+
   hasError.value = true;
-  errorMessage.value = error.message || '发生了未知错误';
-  errorDetails.value = error.stack || '';
-  
-  emit('error', error);
-  
-  // 阻止错误继续传播
+  error.value = err;
+
+  // 调用外部错误处理函数
+  if (props.onError) {
+    props.onError(err);
+  }
+
+  // 阻止错误继续向上传播
   return false;
 });
 
-function handleRetry() {
+// 提供重置错误状态的方法给子组件
+provide('resetError', () => {
   hasError.value = false;
-  errorMessage.value = '';
-  errorDetails.value = '';
-  detailsExpanded.value = false;
-  emit('retry');
-}
+  error.value = null;
+});
 
-function handleReset() {
+const handleRetry = () => {
   hasError.value = false;
-  errorMessage.value = '';
-  errorDetails.value = '';
-  detailsExpanded.value = false;
-  emit('reset');
-}
+  error.value = null;
+
+  if (props.onRetry) {
+    props.onRetry();
+  }
+};
+
+const handleReset = () => {
+  if (props.onReset) {
+    props.onReset();
+  }
+
+  hasError.value = false;
+  error.value = null;
+};
 </script>
 
 <style scoped>
 .error-boundary {
-  @apply flex items-center justify-center min-h-screen p-4;
+  @apply flex items-center justify-center min-h-[200px] p-6;
 }
 
 .error-content {
-  @apply max-w-md w-full bg-surface dark:bg-surface-dark border border-red-200 dark:border-red-800 rounded-lg p-8 text-center;
+  @apply max-w-md w-full text-center;
 }
 
 .error-icon {
-  @apply flex justify-center mb-4;
+  @apply w-16 h-16 mx-auto mb-4 text-red-500 dark:text-red-400;
 }
 
 .error-title {
-  @apply text-2xl font-bold text-text dark:text-text-dark mb-2;
+  @apply text-xl font-semibold text-slate-900 dark:text-slate-100 mb-2;
 }
 
 .error-message {
-  @apply text-sm text-secondary dark:text-secondary-dark mb-6;
+  @apply text-sm text-slate-600 dark:text-slate-400 mb-4;
 }
 
 .error-details {
-  @apply mb-6;
+  @apply mt-4 text-left bg-slate-50 dark:bg-slate-900 border border-slate-200 dark:border-slate-700 rounded-lg overflow-hidden;
 }
 
-.details-toggle {
-  @apply text-sm text-primary hover:text-primary-hover dark:text-primary-light transition-colors mb-2;
+.error-details-summary {
+  @apply px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 cursor-pointer hover:bg-slate-100 dark:hover:bg-slate-800 transition-colors;
 }
 
-.details-content {
-  @apply text-xs text-left bg-background dark:bg-background-dark p-4 rounded border border-border dark:border-border-dark overflow-x-auto;
+.error-stack {
+  @apply px-4 py-3 text-xs font-mono text-red-600 dark:text-red-400 overflow-x-auto;
 }
 
 .error-actions {
-  @apply flex gap-2 justify-center;
+  @apply flex gap-2 justify-center mt-6;
 }
 
-.btn-retry,
-.btn-reset {
-  @apply px-4 py-2 rounded-lg text-sm font-medium transition-colors;
+.error-button {
+  @apply flex items-center gap-2 px-4 py-2 text-sm font-medium rounded-lg transition-colors;
 }
 
-.btn-retry {
-  @apply bg-primary hover:bg-primary-hover text-white;
+.error-button-primary {
+  @apply bg-blue-600 hover:bg-blue-700 text-white;
 }
 
-.btn-reset {
-  @apply bg-background dark:bg-background-dark hover:bg-border dark:hover:bg-border-dark text-text dark:text-text-dark border border-border dark:border-border-dark;
+.error-button-secondary {
+  @apply bg-slate-200 dark:bg-slate-700 hover:bg-slate-300 dark:hover:bg-slate-600 text-slate-700 dark:text-slate-300;
 }
 </style>

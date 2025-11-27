@@ -11,11 +11,238 @@ export type MessageType =
   | 'system'
   | 'thinking'
   | 'tool-call'
-  | 'tool-result';
+  | 'tool-result'
+  | 'ask-user';
 
 export type MessageRole = 'user' | 'assistant' | 'system';
 
 export type MessageStatus = 'pending' | 'sent' | 'delivered' | 'read' | 'error';
+
+// ==================
+// Agent Event Types (对应后端 pkg/types/events.go)
+// ==================
+
+export type AgentChannel = 'progress' | 'control' | 'monitor';
+
+export type ToolCallState = 
+  | 'pending'
+  | 'executing'
+  | 'paused'
+  | 'completed'
+  | 'failed'
+  | 'cancelled';
+
+// ToolCallSnapshot 工具调用快照 (对应后端 ToolCallSnapshot)
+export interface ToolCallSnapshot {
+  id: string;
+  name: string;
+  state?: ToolCallState;
+  progress?: number; // 0-1
+  arguments?: Record<string, any>;
+  result?: any;
+  error?: string;
+  intermediate?: Record<string, any>;
+  started_at?: string;
+  updated_at?: string;
+  cancelable?: boolean;
+  pausable?: boolean;
+}
+
+// Agent 事件封装
+export interface AgentEventEnvelope {
+  cursor: number;
+  bookmark: any;
+  event: AgentEvent;
+}
+
+// Agent 事件类型
+export type AgentEvent = 
+  | ProgressThinkChunkStartEvent
+  | ProgressThinkChunkEvent
+  | ProgressThinkChunkEndEvent
+  | ProgressTextChunkStartEvent
+  | ProgressTextChunkEvent
+  | ProgressTextChunkEndEvent
+  | ProgressToolStartEvent
+  | ProgressToolEndEvent
+  | ProgressToolProgressEvent
+  | ProgressToolIntermediateEvent
+  | ProgressToolCancelledEvent
+  | ProgressToolErrorEvent
+  | ProgressDoneEvent
+  | ProgressTodoUpdateEvent
+  | ControlPermissionRequiredEvent
+  | ControlPermissionDecidedEvent
+  | ControlAskUserEvent
+  | ControlUserAnswerEvent
+  | MonitorStateChangedEvent
+  | MonitorErrorEvent
+  | MonitorTokenUsageEvent;
+
+// Progress Channel Events
+export interface ProgressThinkChunkStartEvent {
+  type: 'think_chunk_start';
+  step: number;
+}
+
+export interface ProgressThinkChunkEvent {
+  type: 'think_chunk';
+  step: number;
+  delta: string;
+}
+
+export interface ProgressThinkChunkEndEvent {
+  type: 'think_chunk_end';
+  step: number;
+}
+
+export interface ProgressTextChunkStartEvent {
+  type: 'text_chunk_start';
+  step: number;
+}
+
+export interface ProgressTextChunkEvent {
+  type: 'text_chunk';
+  step: number;
+  delta: string;
+}
+
+export interface ProgressTextChunkEndEvent {
+  type: 'text_chunk_end';
+  step: number;
+  text: string;
+}
+
+export interface ProgressToolStartEvent {
+  type: 'tool:start';
+  call: ToolCallSnapshot;
+}
+
+export interface ProgressToolEndEvent {
+  type: 'tool:end';
+  call: ToolCallSnapshot;
+}
+
+export interface ProgressToolProgressEvent {
+  type: 'tool:progress';
+  call: ToolCallSnapshot;
+  progress: number;
+  message?: string;
+  step?: number;
+  total?: number;
+  metadata?: Record<string, any>;
+  eta_ms?: number;
+}
+
+export interface ProgressToolIntermediateEvent {
+  type: 'tool:intermediate';
+  call: ToolCallSnapshot;
+  label?: string;
+  data?: any;
+}
+
+export interface ProgressToolCancelledEvent {
+  type: 'tool:cancelled';
+  call: ToolCallSnapshot;
+  reason?: string;
+}
+
+export interface ProgressToolErrorEvent {
+  type: 'tool:error';
+  call: ToolCallSnapshot;
+  error: string;
+}
+
+export interface ProgressDoneEvent {
+  type: 'done';
+  step: number;
+  reason: 'completed' | 'interrupted';
+}
+
+// Todo Events
+export interface TodoItemData {
+  id: string;
+  content: string;
+  active_form: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  priority?: number;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ProgressTodoUpdateEvent {
+  type: 'todo_update';
+  todos: TodoItemData[];
+}
+
+// Control Channel Events
+export interface ControlPermissionRequiredEvent {
+  type: 'permission_required';
+  call: ToolCallSnapshot;
+}
+
+export interface ControlPermissionDecidedEvent {
+  type: 'permission_decided';
+  call_id: string;
+  decision: 'allow' | 'deny';
+  decided_by: string;
+  note?: string;
+}
+
+// AskUser Events (新增)
+export interface QuestionOption {
+  label: string;
+  description: string;
+}
+
+export interface Question {
+  question: string;
+  header: string;
+  options: QuestionOption[];
+  multi_select?: boolean;
+}
+
+export interface ControlAskUserEvent {
+  type: 'ask_user';
+  request_id: string;
+  questions: Question[];
+}
+
+export interface ControlUserAnswerEvent {
+  type: 'user_answer';
+  request_id: string;
+  answers: Record<string, any>;
+}
+
+// Monitor Channel Events
+export type AgentRuntimeState = 
+  | 'ready'
+  | 'working'
+  | 'idle'
+  | 'running'
+  | 'paused'
+  | 'completed'
+  | 'failed';
+
+export interface MonitorStateChangedEvent {
+  type: 'state_changed';
+  state: AgentRuntimeState;
+}
+
+export interface MonitorErrorEvent {
+  type: 'error';
+  severity: 'info' | 'warn' | 'error';
+  phase: 'model' | 'tool' | 'system' | 'lifecycle';
+  message: string;
+  detail?: Record<string, any>;
+}
+
+export interface MonitorTokenUsageEvent {
+  type: 'token_usage';
+  input_tokens: number;
+  output_tokens: number;
+  total_tokens: number;
+}
 
 /**
  * 基础消息接口
@@ -201,6 +428,20 @@ export interface ApprovalRequest {
 }
 
 /**
+ * AskUser 消息 (新增)
+ */
+export interface AskUserMessage extends BaseMessage {
+  type: 'ask-user';
+  role: 'assistant';
+  content: {
+    request_id: string;
+    questions: Question[];
+    answered?: boolean;
+    answers?: Record<string, any>;
+  };
+}
+
+/**
  * 消息联合类型
  */
 export type Message =
@@ -209,7 +450,8 @@ export type Message =
   | CardMessage
   | ListMessage
   | SystemMessage
-  | ThinkingMessage;
+  | ThinkingMessage
+  | AskUserMessage;
 
 /**
  * 快捷回复

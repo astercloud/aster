@@ -38,17 +38,23 @@
           v-model="newTodo.content"
           ref="newTodoInput"
           type="text"
-          placeholder="输入任务内容..."
+          placeholder="输入任务内容（祈使句，如：Run tests）..."
           class="todo-input"
           @keydown.enter="addTodo"
           @keydown.esc="showAddForm = false"
         />
+        <input
+          v-model="newTodo.activeForm"
+          type="text"
+          placeholder="进行时描述（可选，如：Running tests）..."
+          class="todo-input"
+        />
         <div class="form-actions">
-          <select v-model="newTodo.priority" class="priority-select">
-            <option value="">优先级</option>
-            <option value="low">低</option>
-            <option value="medium">中</option>
-            <option value="high">高</option>
+          <select v-model.number="newTodo.priority" class="priority-select">
+            <option :value="0">优先级</option>
+            <option :value="1">低</option>
+            <option :value="2">中</option>
+            <option :value="3">高</option>
           </select>
           <input
             v-model="newTodo.dueDate"
@@ -65,7 +71,7 @@
           </button>
           <button
             class="cancel-button"
-            @click="showAddForm = false; newTodo.content = ''"
+            @click="showAddForm = false; newTodo.content = ''; newTodo.activeForm = ''"
           >
             取消
           </button>
@@ -81,7 +87,7 @@
         :class="['filter-button', { active: currentFilter === filter.key }]"
         @click="currentFilter = filter.key"
       >
-        <Icon :type="filter.icon" size="sm" />
+        <Icon :type="filter.icon as any" size="sm" />
         {{ filter.label }}
         <span class="filter-count">{{ filter.count }}</span>
       </button>
@@ -93,35 +99,44 @@
         v-for="todo in filteredTodos"
         :key="todo.id"
         :class="['todo-item', {
-          'todo-completed': todo.completed,
-          'todo-priority-high': todo.priority === 'high',
-          'todo-priority-medium': todo.priority === 'medium',
-          'todo-priority-low': todo.priority === 'low'
+          'todo-completed': todo.status === 'completed',
+          'todo-in-progress': todo.status === 'in_progress',
+          'todo-priority-high': todo.priority >= 3,
+          'todo-priority-medium': todo.priority === 2,
+          'todo-priority-low': todo.priority === 1
         }]"
       >
         <div class="todo-main">
-          <div class="todo-checkbox">
-            <input
-              :id="`todo-${todo.id}`"
-              v-model="todo.completed"
-              type="checkbox"
-              @change="updateTodo(todo)"
-            />
+          <div class="todo-status-indicator">
+            <button
+              :class="['status-btn', `status-${todo.status}`]"
+              :title="getStatusText(todo.status)"
+              @click="toggleStatus(todo)"
+            >
+              <Icon 
+                :type="todo.status === 'completed' ? 'check' : todo.status === 'in_progress' ? 'play' : 'clock'" 
+                size="xs" 
+              />
+            </button>
           </div>
 
           <div class="todo-content">
             <div class="todo-text">
-              <span v-if="todo.completed" class="completed-text">{{ todo.content }}</span>
-              <span v-else>{{ todo.content }}</span>
+              <span :class="{ 'completed-text': todo.status === 'completed' }">
+                {{ todo.status === 'in_progress' ? todo.activeForm : todo.content }}
+              </span>
             </div>
 
             <div class="todo-meta">
-              <span v-if="todo.priority" :class="`priority-badge priority-${todo.priority}`">
+              <span :class="['status-badge', `status-${todo.status}`]">
+                {{ getStatusText(todo.status) }}
+              </span>
+              <span v-if="todo.priority > 0" :class="`priority-badge ${getPriorityClass(todo.priority)}`">
                 {{ getPriorityText(todo.priority) }}
               </span>
-              <span v-if="todo.dueDate" class="due-date" :class="{ 'overdue': isOverdue(todo.dueDate) }">
+              <span v-if="todo.metadata?.dueDate" class="due-date" :class="{ 'overdue': isOverdue(todo.metadata.dueDate) }">
                 <Icon type="calendar" size="xs" />
-                {{ formatDate(todo.dueDate) }}
+                {{ formatDate(todo.metadata.dueDate) }}
               </span>
               <span class="created-date">
                 创建于 {{ formatDateTime(todo.createdAt) }}
@@ -162,16 +177,16 @@
         <span class="stat-label">总计</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">{{ completedCount }}</span>
-        <span class="stat-label">已完成</span>
+        <span class="stat-value">{{ pendingCount }}</span>
+        <span class="stat-label">待处理</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">{{ activeCount }}</span>
+        <span class="stat-value">{{ inProgressCount }}</span>
         <span class="stat-label">进行中</span>
       </div>
       <div class="stat-item">
-        <span class="stat-value">{{ overdueCount }}</span>
-        <span class="stat-label">已逾期</span>
+        <span class="stat-value">{{ completedCount }}</span>
+        <span class="stat-label">已完成</span>
       </div>
     </div>
   </div>
@@ -181,15 +196,20 @@
 import { ref, computed, watch, nextTick, onMounted } from 'vue';
 import Icon from '../ChatUI/Icon.vue';
 
+// 对应后端 TodoItem 结构
 interface Todo {
   id: string;
   content: string;
-  completed: boolean;
-  priority: 'low' | 'medium' | 'high' | '';
-  dueDate: string;
+  status: 'pending' | 'in_progress' | 'completed';
+  activeForm: string;  // 进行时形式描述
+  priority: number;    // 数值优先级
   createdAt: string;
   updatedAt: string;
+  completedAt?: string;
+  metadata?: Record<string, any>;
 }
+
+
 
 interface Props {
   wsUrl?: string;
@@ -217,15 +237,17 @@ const websocket = ref<WebSocket | null>(null);
 
 const newTodo = ref({
   content: '',
-  priority: '' as 'low' | 'medium' | 'high' | '',
+  activeForm: '',
+  priority: 0,
   dueDate: '',
 });
 
 // 过滤器选项
 const filters = computed(() => [
   { key: 'all', label: '全部', icon: 'list', count: todos.value.length },
-  { key: 'active', label: '进行中', icon: 'play', count: todos.value.filter(t => !t.completed).length },
-  { key: 'completed', label: '已完成', icon: 'check', count: todos.value.filter(t => t.completed).length },
+  { key: 'pending', label: '待处理', icon: 'clock', count: todos.value.filter(t => t.status === 'pending').length },
+  { key: 'in_progress', label: '进行中', icon: 'play', count: todos.value.filter(t => t.status === 'in_progress').length },
+  { key: 'completed', label: '已完成', icon: 'check', count: todos.value.filter(t => t.status === 'completed').length },
   { key: 'overdue', label: '已逾期', icon: 'alert', count: overdueCount.value },
 ]);
 
@@ -234,22 +256,24 @@ const filteredTodos = computed(() => {
   let filtered = todos.value;
 
   switch (currentFilter.value) {
-    case 'active':
-      filtered = filtered.filter(t => !t.completed);
+    case 'pending':
+      filtered = filtered.filter(t => t.status === 'pending');
+      break;
+    case 'in_progress':
+      filtered = filtered.filter(t => t.status === 'in_progress');
       break;
     case 'completed':
-      filtered = filtered.filter(t => t.completed);
+      filtered = filtered.filter(t => t.status === 'completed');
       break;
     case 'overdue':
-      filtered = filtered.filter(t => !t.completed && t.dueDate && isOverdue(t.dueDate));
+      filtered = filtered.filter(t => t.status !== 'completed' && t.metadata?.dueDate && isOverdue(t.metadata.dueDate));
       break;
   }
 
   return filtered.sort((a, b) => {
-    // 优先级排序
-    const priorityOrder = { high: 0, medium: 1, low: 2, '': 3 };
-    if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
-      return priorityOrder[a.priority] - priorityOrder[b.priority];
+    // 优先级排序 (数值越大优先级越高)
+    if (b.priority !== a.priority) {
+      return b.priority - a.priority;
     }
 
     // 日期排序
@@ -257,10 +281,11 @@ const filteredTodos = computed(() => {
   });
 });
 
-const completedCount = computed(() => todos.value.filter(t => t.completed).length);
-const activeCount = computed(() => todos.value.filter(t => !t.completed).length);
+const completedCount = computed(() => todos.value.filter(t => t.status === 'completed').length);
+const pendingCount = computed(() => todos.value.filter(t => t.status === 'pending').length);
+const inProgressCount = computed(() => todos.value.filter(t => t.status === 'in_progress').length);
 const overdueCount = computed(() =>
-  todos.value.filter(t => !t.completed && t.dueDate && isOverdue(t.dueDate)).length
+  todos.value.filter(t => t.status !== 'completed' && t.metadata?.dueDate && isOverdue(t.metadata.dueDate)).length
 );
 
 // WebSocket 连接
@@ -297,12 +322,14 @@ const connectWebSocket = () => {
 };
 
 const handleWebSocketMessage = (message: any) => {
+  const payload = message.payload || message;
   switch (message.type) {
     case 'todo_list_response':
-      todos.value = message.todos || [];
+      // 转换后端格式到前端格式
+      todos.value = (payload.todos || []).map(normalizeTodo);
       break;
     case 'todo_created':
-      const newTodoFromServer = message.todo;
+      const newTodoFromServer = normalizeTodo(payload.todo);
       const existingIndex = todos.value.findIndex(t => t.id === newTodoFromServer.id);
       if (existingIndex === -1) {
         todos.value.push(newTodoFromServer);
@@ -310,7 +337,7 @@ const handleWebSocketMessage = (message: any) => {
       emit('todoCreated', newTodoFromServer);
       break;
     case 'todo_updated':
-      const updatedTodo = message.todo;
+      const updatedTodo = normalizeTodo(payload.todo);
       const index = todos.value.findIndex(t => t.id === updatedTodo.id);
       if (index !== -1) {
         todos.value[index] = updatedTodo;
@@ -318,11 +345,32 @@ const handleWebSocketMessage = (message: any) => {
       emit('todoUpdated', updatedTodo);
       break;
     case 'todo_deleted':
-      const deletedId = message.id;
+      const deletedId = payload.id;
       todos.value = todos.value.filter(t => t.id !== deletedId);
       emit('todoDeleted', deletedId);
       break;
+    // 处理 agent_event 中的 todo_update 事件
+    case 'agent_event':
+      if (payload.type === 'todo_update' && payload.event?.todos) {
+        todos.value = payload.event.todos.map(normalizeTodo);
+      }
+      break;
   }
+};
+
+// 标准化后端返回的 Todo 数据
+const normalizeTodo = (todo: any): Todo => {
+  return {
+    id: todo.id || todo.ID,
+    content: todo.content || todo.Content,
+    status: todo.status || todo.Status || 'pending',
+    activeForm: todo.activeForm || todo.ActiveForm || todo.active_form || '',
+    priority: todo.priority ?? todo.Priority ?? 0,
+    createdAt: todo.createdAt || todo.CreatedAt || todo.created_at || new Date().toISOString(),
+    updatedAt: todo.updatedAt || todo.UpdatedAt || todo.updated_at || new Date().toISOString(),
+    completedAt: todo.completedAt || todo.CompletedAt || todo.completed_at,
+    metadata: todo.metadata || todo.Metadata || {},
+  };
 };
 
 const sendWebSocketMessage = (message: any) => {
@@ -333,34 +381,53 @@ const sendWebSocketMessage = (message: any) => {
 
 // 任务操作方法
 const requestTodos = () => {
-  sendWebSocketMessage({ type: 'todo_list_request' });
+  sendWebSocketMessage({ 
+    type: 'todo_list_request',
+    payload: {
+      list_name: 'default',
+    },
+  });
 };
 
 const addTodo = () => {
   if (!newTodo.value.content.trim()) return;
 
-  const todo: Partial<Todo> = {
+  // 自动生成 activeForm（如果未提供）
+  const activeForm = newTodo.value.activeForm.trim() || `${newTodo.value.content.trim()}中`;
+
+  const todo = {
     content: newTodo.value.content.trim(),
+    status: 'pending',
+    activeForm,
     priority: newTodo.value.priority,
-    dueDate: newTodo.value.dueDate,
   };
 
   sendWebSocketMessage({
     type: 'todo_create',
-    todo,
+    payload: {
+      todo,
+      list_name: 'default',
+    },
   });
 
   // 重置表单
-  newTodo.value = { content: '', priority: '', dueDate: '' };
+  newTodo.value = { content: '', activeForm: '', priority: 0, dueDate: '' };
   showAddForm.value = false;
 };
 
 const updateTodo = (todo: Todo) => {
   sendWebSocketMessage({
     type: 'todo_update',
-    todo: {
-      ...todo,
-      updatedAt: new Date().toISOString(),
+    payload: {
+      todo: {
+        id: todo.id,
+        content: todo.content,
+        status: todo.status,
+        activeForm: todo.activeForm,
+        priority: todo.priority,
+        completed: todo.status === 'completed',
+      },
+      list_name: 'default',
     },
   });
 };
@@ -369,7 +436,10 @@ const deleteTodo = (id: string) => {
   if (confirm('确定要删除这个任务吗？')) {
     sendWebSocketMessage({
       type: 'todo_delete',
-      id,
+      payload: {
+        id,
+        list_name: 'default',
+      },
     });
   }
 };
@@ -394,9 +464,48 @@ const toggleViewMode = () => {
 };
 
 // 工具方法
-const getPriorityText = (priority: string) => {
-  const map = { high: '高', medium: '中', low: '低' };
-  return map[priority as keyof typeof map] || '';
+const getPriorityText = (priority: number) => {
+  if (priority >= 3) return '高';
+  if (priority >= 2) return '中';
+  if (priority >= 1) return '低';
+  return '';
+};
+
+const getPriorityClass = (priority: number) => {
+  if (priority >= 3) return 'priority-high';
+  if (priority >= 2) return 'priority-medium';
+  if (priority >= 1) return 'priority-low';
+  return '';
+};
+
+const getStatusText = (status: string) => {
+  const map = { pending: '待处理', in_progress: '进行中', completed: '已完成' };
+  return map[status as keyof typeof map] || status;
+};
+
+// 切换任务状态
+const toggleStatus = (todo: Todo) => {
+  let newStatus: 'pending' | 'in_progress' | 'completed';
+  
+  if (todo.status === 'pending') {
+    // 检查是否已有进行中的任务
+    const hasInProgress = todos.value.some(t => t.id !== todo.id && t.status === 'in_progress');
+    if (hasInProgress) {
+      alert('同时只能有一个任务处于进行中状态');
+      return;
+    }
+    newStatus = 'in_progress';
+  } else if (todo.status === 'in_progress') {
+    newStatus = 'completed';
+  } else {
+    newStatus = 'pending';
+  }
+
+  updateTodo({
+    ...todo,
+    status: newStatus,
+    activeForm: newStatus === 'completed' ? `已完成${todo.content}` : todo.activeForm,
+  });
 };
 
 const formatDate = (dateString: string) => {
@@ -525,6 +634,46 @@ onMounted(() => {
 
 .todo-completed .todo-text {
   @apply line-through;
+}
+
+.todo-in-progress {
+  @apply bg-blue-50 dark:bg-blue-900/20 border-blue-200 dark:border-blue-800;
+}
+
+.todo-status-indicator {
+  @apply flex-shrink-0;
+}
+
+.status-btn {
+  @apply w-6 h-6 rounded-full flex items-center justify-center transition-colors;
+}
+
+.status-btn.status-pending {
+  @apply bg-gray-200 dark:bg-gray-600 text-gray-500 dark:text-gray-400 hover:bg-gray-300 dark:hover:bg-gray-500;
+}
+
+.status-btn.status-in_progress {
+  @apply bg-blue-500 text-white hover:bg-blue-600;
+}
+
+.status-btn.status-completed {
+  @apply bg-green-500 text-white hover:bg-green-600;
+}
+
+.status-badge {
+  @apply text-xs px-1.5 py-0.5 rounded font-medium;
+}
+
+.status-badge.status-pending {
+  @apply bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300;
+}
+
+.status-badge.status-in_progress {
+  @apply bg-blue-100 dark:bg-blue-900/30 text-blue-700 dark:text-blue-300;
+}
+
+.status-badge.status-completed {
+  @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300;
 }
 
 .todo-priority-high {

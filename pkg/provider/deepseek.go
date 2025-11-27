@@ -202,6 +202,7 @@ func (dp *DeepseekProvider) Stream(ctx context.Context, messages []types.Message
 
 // buildRequest 构建请求体
 func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamOptions) map[string]interface{} {
+	log.Printf("[DeepseekProvider] 🎯 Building request with model: %s", dp.config.Model)
 	req := map[string]interface{}{
 		"model":    dp.config.Model,
 		"messages": dp.convertMessages(messages),
@@ -482,6 +483,17 @@ func (dp *DeepseekProvider) parseStreamEvent(event map[string]interface{}) *Stre
 					}
 				}
 
+				// 检查是否有 reasoning_content (DeepSeek Reasoner 模型的思考过程)
+				if reasoningContent, ok := delta["reasoning_content"].(string); ok && reasoningContent != "" {
+					chunk.Type = "reasoning_delta"
+					chunk.Delta = map[string]interface{}{
+						"type":    "reasoning_delta",
+						"content": reasoningContent,
+					}
+					log.Printf("[DeepseekProvider] Received reasoning_content: %s", truncateString(reasoningContent, 50))
+					return chunk
+				}
+
 				// 检查是否有文本内容
 				if content, ok := delta["content"].(string); ok && content != "" {
 					chunk.Type = "content_block_delta"
@@ -624,4 +636,12 @@ func (dp *DeepseekProvider) parseCompleteResponse(apiResp map[string]interface{}
 // Close 关闭连接
 func (dp *DeepseekProvider) Close() error {
 	return nil
+}
+
+// truncateString 截断字符串用于日志输出
+func truncateString(s string, maxLen int) string {
+	if len(s) <= maxLen {
+		return s
+	}
+	return s[:maxLen] + "..."
 }

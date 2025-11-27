@@ -4,19 +4,40 @@
  */
 
 import { ref, onMounted, reactive, computed } from 'vue';
-import type { Message, ChatConfig, TextMessage, Agent } from '@/types';
+import type {
+  Message,
+  ChatConfig,
+  TextMessage,
+  Agent,
+  AskUserMessage,
+  ToolCallSnapshot,
+  TodoItemData,
+  Question,
+} from '@/types';
 import { useAsterClient } from './useAsterClient';
 import { useWebSocket } from './useWebSocket';
 import { generateId } from '@/utils/format';
+import { useChatStore } from '@/stores/chat';
+import { useThinkingStore } from '@/stores/thinking';
+import { useToolsStore } from '@/stores/tools';
+import { useTodosStore } from '@/stores/todos';
+import { useApprovalStore } from '@/stores/approval';
+import { useWorkflowStore } from '@/stores/workflow';
 
 export function useChat(config: ChatConfig) {
-  const messages = ref<Message[]>([]);
-  const isTyping = ref(false);
+  // 初始化 Pinia Stores
+  const chatStore = useChatStore();
+  const thinkingStore = useThinkingStore();
+  const toolsStore = useToolsStore();
+  const todosStore = useTodosStore();
+  const approvalStore = useApprovalStore();
+  const workflowStore = useWorkflowStore();
+
+  // 保留部分本地状态 (不适合放在 store 中的)
   const currentInput = ref('');
   const demoConnection = ref(true);
   const isDemoMode = config.demoMode ?? true;
-  const toolRuns = ref<Record<string, any>>({});
-  const toolRunsList = computed(() => Object.values(toolRuns.value));
+  const pendingAskUser = ref<{ requestId: string; questions: Question[] } | null>(null);
   const agent = ref<Agent>({
     id: config.agentId || 'demo-agent',
     name: config.agentProfile?.name || 'Aster Copilot',
@@ -39,7 +60,8 @@ export function useChat(config: ChatConfig) {
   });
   
   const { connect, getInstance, isConnected: wsConnected } = useWebSocket();
-  const connectionState = isDemoMode ? demoConnection : wsConnected;
+  // connectionState 用于组件中判断连接状态
+  const connectionState = computed(() => isDemoMode ? demoConnection.value : wsConnected.value);
 
   // 初始化 WebSocket 连接
   onMounted(async () => {
@@ -90,7 +112,7 @@ export function useChat(config: ChatConfig) {
       createdAt: Date.now(),
       status: 'pending',
     };
-    messages.value.push(userMessage);
+    chatStore.messages.push(userMessage);
     console.log('✅ User message added to messages array');
 
     // 创建 AI 响应占位（使用 reactive 确保响应式）
@@ -101,10 +123,11 @@ export function useChat(config: ChatConfig) {
       content: { text: '' },
       createdAt: Date.now(),
     }) as TextMessage;
-    messages.value.push(assistantMessage);
+    chatStore.messages.push(assistantMessage);
+    chatStore.setActiveMessage(assistantMessage.id);
     console.log('✅ Assistant message placeholder added');
 
-    isTyping.value = true;
+    chatStore.isTyping = true;
     agent.value.status = 'thinking';
     userMessage.status = 'sent';
     currentInput.value = '';
@@ -114,7 +137,7 @@ export function useChat(config: ChatConfig) {
         await new Promise(resolve => setTimeout(resolve, config.demoDelay ?? 800));
         assistantMessage.content.text = pickDemoResponse(content);
         assistantMessage.status = 'sent';
-        isTyping.value = false;
+        chatStore.isTyping = false;
         agent.value.status = 'idle';
       } else {
         const ws = getInstance();
@@ -137,10 +160,10 @@ export function useChat(config: ChatConfig) {
               console.log('📝 Updated text:', assistantMessage.content.text.substring(0, 50) + '...');
             } else if (message.type === 'chat_complete') {
               assistantMessage.status = 'sent';
-              isTyping.value = false;
+              chatStore.isTyping = false;
               agent.value.status = 'idle';
               unsubscribe();
-              
+
               // 触发回调
               if (config.onReceive) {
                 config.onReceive(assistantMessage);
@@ -148,7 +171,7 @@ export function useChat(config: ChatConfig) {
             } else if (message.type === 'error') {
               assistantMessage.content.text = `❌ ${message.payload?.message || '发送失败'}`;
               userMessage.status = 'error';
-              isTyping.value = false;
+              chatStore.isTyping = false;
               agent.value.status = 'idle';
               unsubscribe();
               if (config.onError) {
@@ -182,23 +205,20 @@ export function useChat(config: ChatConfig) {
         } else {
           // 回退到 HTTP API
           console.log('⚠️ WebSocket not connected, using HTTP API');
-          const response = await client.agents.chat({
-            template_id: config.agentId || 'chat',
-            input: content,
-          } as any);
+          const response = await client.agents.chatDirect(content, config.agentId || 'chat');
 
-          assistantMessage.content.text = response.text || '无响应';
+          assistantMessage.content.text = response.text || response.data?.text || '无响应';
           assistantMessage.status = 'sent';
-          isTyping.value = false;
+          chatStore.isTyping = false;
           agent.value.status = 'idle';
         }
       }
     } catch (error: any) {
       console.error('Send message error:', error);
-      
+
       assistantMessage.content.text = `❌ 发送失败: ${error.message || '未知错误'}`;
       userMessage.status = 'error';
-      isTyping.value = false;
+      chatStore.isTyping = false;
       agent.value.status = 'idle';
 
       if (config.onError) {
@@ -219,7 +239,7 @@ export function useChat(config: ChatConfig) {
   const sendImage = async (file: File) => {
     // TODO: 实现图片上传
     console.log('Send image:', file.name);
-    
+
     // 创建图片消息占位
     const imageMessage: Message = {
       id: generateId('msg'),
@@ -232,7 +252,7 @@ export function useChat(config: ChatConfig) {
       createdAt: Date.now(),
       status: 'pending',
     };
-    messages.value.push(imageMessage);
+    chatStore.messages.push(imageMessage);
 
     // TODO: 上传到服务器并获取 URL
     // 当前只是本地预览
@@ -248,39 +268,266 @@ export function useChat(config: ChatConfig) {
 
   // 删除消息
   const deleteMessage = (messageId: string) => {
-    const index = messages.value.findIndex(m => m.id === messageId);
+    const index = chatStore.messages.findIndex(m => m.id === messageId);
     if (index !== -1) {
-      messages.value.splice(index, 1);
+      chatStore.messages.splice(index, 1);
     }
   };
 
   // 清空消息
   const clearMessages = () => {
-    messages.value = [];
+    chatStore.clearMessages();
   };
 
-  const handleAgentEvent = (type: string, ev: any) => {
-    if (!type.startsWith('tool')) return;
-    const call = ev.Call || ev.call || {};
-    const id = call.id || call.ID || call.tool_call_id;
-    if (!id) return;
-    const prev = toolRuns.value[id] || {};
-    const progress = ev.progress ?? call.progress ?? prev.progress ?? 0;
-    const state = call.state || ev.state || prev.state || 'executing';
-    toolRuns.value = {
-      ...toolRuns.value,
-      [id]: {
-        tool_call_id: id,
-        name: call.name || prev.name,
-        state,
-        progress,
-        message: ev.message || prev.message,
-        result: call.result || ev.result || prev.result,
-        error: ev.error || call.error || prev.error,
-        cancelable: call.cancelable ?? prev.cancelable,
-        pausable: call.pausable ?? prev.pausable,
+  const handleAgentEvent = (type: string, ev: any, messageId?: string) => {
+    // 获取当前活跃消息 ID (如果没有提供)
+    const currentMessageId = messageId || chatStore.activeMessageId || '';
+
+    // 1. 思维事件 → thinkingStore
+    if (type === 'think_chunk_start') {
+      thinkingStore.startThinking(currentMessageId);
+      chatStore.setActiveMessage(currentMessageId);
+      return;
+    }
+    if (type === 'think_chunk') {
+      thinkingStore.handleThinkChunk(ev.delta || ev.content || '');
+      return;
+    }
+    if (type === 'think_chunk_end') {
+      thinkingStore.endThinking(currentMessageId);
+      return;
+    }
+
+    // 2. 工具事件 → toolsStore + thinkingStore
+    if (type === 'tool:start' || type === 'tool_call_start' || type.startsWith('tool') && type.includes('start')) {
+      const call = ev.Call || ev.call || {};
+      const toolCall = {
+        id: call.id || call.ID || call.tool_call_id || generateId('tool'),
+        name: call.name || 'unknown',
+        state: 'executing' as const,
+        progress: 0,
+        arguments: call.arguments || {},
+        cancelable: call.cancelable ?? false,
+        pausable: call.pausable ?? false,
+      };
+
+      toolsStore.handleToolStart(toolCall);
+
+      // 同时添加到思维步骤
+      thinkingStore.addStep(currentMessageId, {
+        type: 'tool_call',
+        tool: {
+          name: toolCall.name,
+          args: toolCall.arguments,
+        },
+        timestamp: Date.now(),
+      });
+      return;
+    }
+
+    if (type === 'tool:progress' || type === 'tool_call_progress' || (type.startsWith('tool') && type.includes('progress'))) {
+      const call = ev.Call || ev.call || {};
+      const id = call.id || call.ID || call.tool_call_id;
+      if (id) {
+        toolsStore.handleToolProgress(id, ev.progress ?? call.progress ?? 0, ev.message || '');
+      }
+      return;
+    }
+
+    if (type === 'tool:end' || type === 'tool_call_end' || (type.startsWith('tool') && type.includes('end'))) {
+      const call = ev.Call || ev.call || {};
+      const id = call.id || call.ID || call.tool_call_id;
+      if (id) {
+        const toolCall = {
+          id,
+          name: call.name || 'unknown',
+          state: (call.error || ev.error ? 'failed' : 'completed') as const,
+          progress: 1,
+          arguments: call.arguments || {},
+          result: call.result || ev.result,
+          error: call.error || ev.error,
+        };
+
+        toolsStore.handleToolEnd(toolCall);
+
+        // 添加工具结果到思维步骤
+        thinkingStore.addStep(currentMessageId, {
+          type: 'tool_result',
+          tool: {
+            name: toolCall.name,
+            args: toolCall.arguments,
+          },
+          result: toolCall.result,
+          timestamp: Date.now(),
+        });
+      }
+      return;
+    }
+
+    // 处理旧版本工具事件 (向后兼容)
+    if (type.startsWith('tool')) {
+      const call = ev.Call || ev.call || {};
+      const id = call.id || call.ID || call.tool_call_id;
+      if (!id) return;
+
+      const toolCall = {
+        id,
+        name: call.name || 'unknown',
+        state: (call.state || ev.state || 'executing') as any,
+        progress: ev.progress ?? call.progress ?? 0,
+        arguments: call.arguments || {},
+        result: call.result || ev.result,
+        error: ev.error || call.error,
+        intermediate: ev.data || call.intermediate,
+        cancelable: call.cancelable ?? false,
+        pausable: call.pausable ?? false,
+      };
+
+      if (type.includes('start')) {
+        toolsStore.handleToolStart(toolCall);
+      } else if (type.includes('end')) {
+        toolsStore.handleToolEnd(toolCall);
+      } else {
+        toolsStore.handleToolProgress(id, toolCall.progress, '');
+      }
+      return;
+    }
+
+    // 3. 审批事件 → approvalStore + thinkingStore
+    if (type === 'permission_required') {
+      const call = ev.call || {};
+      const requestId = ev.request_id || generateId('approval');
+
+      approvalStore.addApprovalRequest({
+        id: requestId,
+        messageId: currentMessageId,
+        toolName: call.name || '',
+        args: call.arguments || {},
+        reason: ev.reason || '',
+        timestamp: Date.now(),
+      });
+
+      // 添加审批步骤到思维过程
+      thinkingStore.addStep(currentMessageId, {
+        type: 'approval',
+        tool: {
+          name: call.name,
+          args: call.arguments,
+        },
+        timestamp: Date.now(),
+      });
+
+      console.log('Permission required for tool:', call.name);
+      return;
+    }
+
+    // 4. Todo 事件 → todosStore
+    if (type === 'todo_update' || type === 'todos_updated') {
+      todosStore.updateTodos(ev.todos || []);
+      return;
+    }
+
+    // 5. 工作流事件 → workflowStore
+    if (type === 'workflow_start' || type === 'workflow:start') {
+      workflowStore.loadWorkflow({
+        id: ev.workflow_id || generateId('workflow'),
+        title: ev.title || '工作流',
+        steps: ev.steps || [],
+      });
+      return;
+    }
+
+    if (type === 'workflow_step_complete' || type === 'workflow:step_complete') {
+      workflowStore.completeStep(ev.step_id);
+      return;
+    }
+
+    if (type === 'workflow_step_update' || type === 'workflow:step_update') {
+      workflowStore.updateStep(ev.step_id, {
+        status: ev.status,
+        metadata: ev.metadata,
+      });
+      return;
+    }
+
+    // 6. 文本消息 → chatStore (使用 RAF 批量更新)
+    if (type === 'text_chunk' || type === 'message_delta') {
+      chatStore.handleTextChunk(currentMessageId, ev.delta || ev.content || ev.text || '');
+      return;
+    }
+
+    // 7. AskUser 事件
+    if (type === 'ask_user') {
+      pendingAskUser.value = {
+        requestId: ev.request_id,
+        questions: ev.questions || [],
+      };
+      // 添加 AskUser 消息到消息列表
+      const askUserMsg: AskUserMessage = {
+        id: generateId('msg'),
+        type: 'ask-user',
+        role: 'assistant',
+        content: {
+          request_id: ev.request_id,
+          questions: ev.questions || [],
+          answered: false,
+        },
+        createdAt: Date.now(),
+      };
+      chatStore.messages.push(askUserMsg);
+      return;
+    }
+
+    // 8. 状态变更事件
+    if (type === 'state_changed') {
+      const state = ev.state;
+      if (state === 'working' || state === 'running') {
+        agent.value.status = 'thinking';
+      } else if (state === 'idle' || state === 'ready' || state === 'completed') {
+        agent.value.status = 'idle';
+      } else if (state === 'failed') {
+        agent.value.status = 'error';
+      }
+      return;
+    }
+
+    // 9. Token 使用统计
+    if (type === 'token_usage') {
+      console.log('Token usage:', ev);
+      return;
+    }
+
+    // 10. 错误事件
+    if (type === 'error') {
+      console.error('Agent error:', ev.message, ev.detail);
+      return;
+    }
+  };
+
+  // 回答 AskUser 问题
+  const answerQuestion = async (requestId: string, answers: Record<string, any>) => {
+    const ws = getInstance();
+    if (!ws || !wsConnected.value) return;
+
+    ws.send({
+      type: 'user_answer',
+      payload: {
+        request_id: requestId,
+        answers,
       },
-    };
+    });
+
+    // 更新消息状态
+    const msgIndex = chatStore.messages.findIndex(
+      m => m.type === 'ask-user' && (m as AskUserMessage).content.request_id === requestId
+    );
+    if (msgIndex !== -1) {
+      const msg = chatStore.messages[msgIndex] as AskUserMessage;
+      msg.content.answered = true;
+      msg.content.answers = answers;
+    }
+
+    pendingAskUser.value = null;
   };
 
   const controlTool = async (toolCallId: string, action: 'cancel' | 'pause' | 'resume') => {
@@ -298,7 +545,7 @@ export function useChat(config: ChatConfig) {
   // 初始化
   onMounted(() => {
     // 添加欢迎消息
-    if (config.welcomeMessage && messages.value.length === 0) {
+    if (config.welcomeMessage && chatStore.messages.length === 0) {
       const welcomeText =
         typeof config.welcomeMessage === 'string'
           ? config.welcomeMessage
@@ -315,18 +562,32 @@ export function useChat(config: ChatConfig) {
         },
         createdAt: Date.now(),
       };
-      messages.value.push(welcomeMsg);
+      chatStore.messages.push(welcomeMsg);
     }
   });
 
   return {
-    // 状态
-    messages,
-    isTyping,
+    // 状态 (通过 computed 从 stores 获取)
+    messages: computed(() => chatStore.messages),
+    isTyping: computed(() => chatStore.isTyping),
     isConnected: wsConnected,
+    connectionState,
     currentInput,
     agent,
-    isThinking: isTyping,
+    isThinking: computed(() => thinkingStore.isThinking),
+    thinkingContent: computed(() => thinkingStore.currentThought),
+    currentStep: computed(() => 0), // 暂时返回 0,未来可以从 workflowStore 获取
+    todos: computed(() => todosStore.todos),
+    toolRunsList: computed(() => Array.from(toolsStore.toolRuns.values())),
+    pendingAskUser,
+
+    // Stores (暴露给组件使用)
+    chatStore,
+    thinkingStore,
+    toolsStore,
+    todosStore,
+    approvalStore,
+    workflowStore,
 
     // 方法
     sendMessage,
@@ -335,12 +596,17 @@ export function useChat(config: ChatConfig) {
     deleteMessage,
     clearMessages,
     approveAction: (requestId: string) => {
+      approvalStore.approve(requestId);
       config.onApproveAction?.(requestId);
     },
-    rejectAction: (requestId: string) => {
+    rejectAction: (requestId: string, reason?: string) => {
+      approvalStore.reject(requestId, reason);
       config.onRejectAction?.(requestId);
     },
-    toolRunsList,
     controlTool,
+    answerQuestion,
+    
+    // 暴露事件处理方法供外部组件使用
+    handleAgentEvent,
   };
 }

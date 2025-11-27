@@ -60,6 +60,25 @@
         </div>
       </div>
 
+      <!-- ThinkingBlock (仅显示助手消息) -->
+      <ThinkingBlock
+        v-if="message.role === 'assistant' && thinkingSteps.length > 0"
+        :message-id="message.id"
+        :steps="thinkingSteps"
+        :is-active="isThinking"
+        :summary="thinkingSummary"
+      />
+
+      <!-- WorkflowProgressView (仅当有激活工作流时显示) -->
+      <WorkflowProgressView
+        v-if="showWorkflow"
+        :steps="workflowStore.steps"
+        title="工作流进度"
+        :show-progress="true"
+        :show-steps="true"
+        :max-visible-steps="3"
+      />
+
       <!-- Timestamp -->
       <div v-if="showTimestamp" class="message-timestamp">
         {{ formatTime(message.createdAt) }}
@@ -104,6 +123,10 @@
 import { computed } from 'vue';
 import { renderMarkdown } from '@/utils/markdown';
 import { formatTime } from '@/utils/format';
+import { useThinkingStore } from '@/stores/thinking';
+import { useWorkflowStore } from '@/stores/workflow';
+import { ThinkingBlock } from '@/components/Thinking';
+import { WorkflowProgressView } from '@/components/Workflow';
 import type { Message } from '@/types';
 
 interface Props {
@@ -125,12 +148,42 @@ defineEmits<{
   delete: [message: Message];
 }>();
 
+const thinkingStore = useThinkingStore();
+const workflowStore = useWorkflowStore();
+
 const renderedContent = computed(() => {
   if (props.message.type === 'text') {
     const textMessage = props.message as import('@/types').TextMessage;
     return renderMarkdown(textMessage.content.text);
   }
   return '';
+});
+
+// 获取该消息的思维步骤
+const thinkingSteps = computed(() => {
+  return thinkingStore.getSteps(props.message.id);
+});
+
+// 判断是否正在思考（当前消息是否是正在思考的消息）
+const isThinking = computed(() => {
+  return thinkingStore.isThinking && thinkingStore.currentMessageId === props.message.id;
+});
+
+// 思维摘要（可选）
+const thinkingSummary = computed(() => {
+  // 可以根据步骤生成摘要
+  if (thinkingSteps.value.length > 0 && !isThinking.value) {
+    const toolCalls = thinkingSteps.value.filter(s => s.type === 'tool_call');
+    if (toolCalls.length > 0) {
+      return `执行了 ${toolCalls.length} 个工具调用`;
+    }
+  }
+  return '';
+});
+
+// 是否显示工作流进度（仅当有激活的工作流时）
+const showWorkflow = computed(() => {
+  return props.message.role === 'assistant' && workflowStore.hasActiveWorkflow;
 });
 </script>
 

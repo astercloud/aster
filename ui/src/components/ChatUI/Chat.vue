@@ -16,7 +16,15 @@
           :avatar="msg.user?.avatar"
         />
         
-        <!-- 思考气泡 -->
+        <!-- 思考过程块 -->
+        <ThinkingBlock
+          v-else-if="msg.type === 'thinking' && msg.thinkingSteps?.length"
+          :message-id="msg.id"
+          :steps="msg.thinkingSteps"
+          :is-active="msg.isThinkingActive"
+        />
+        
+        <!-- 简单思考气泡（无步骤时） -->
         <ThinkBubble
           v-else-if="msg.type === 'thinking'"
         />
@@ -104,6 +112,16 @@ import TypingBubble from './TypingBubble.vue';
 import Card from './Card.vue';
 import FileCard from './FileCard.vue';
 import Button from './Button.vue';
+import ThinkingBlock from '@/components/Thinking/ThinkingBlock.vue';
+
+interface ThinkingStep {
+  id?: string;
+  type: 'reasoning' | 'decision' | 'tool_call' | 'tool_result' | 'approval';
+  content?: string;
+  tool?: { name: string; args: any };
+  result?: any;
+  timestamp: number;
+}
 
 interface Message {
   id: string;
@@ -125,6 +143,9 @@ interface Message {
     size: number;
     url: string;
   };
+  // Thinking 相关字段
+  thinkingSteps?: ThinkingStep[];
+  isThinkingActive?: boolean;
 }
 
 interface QuickReply {

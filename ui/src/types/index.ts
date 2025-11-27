@@ -9,6 +9,15 @@ export * from './message';
 // Chat Types
 export * from './chat';
 
+// Thinking Types
+export * from './thinking';
+
+// Approval Types
+export * from './approval';
+
+// Workflow Types (new)
+export * from './workflow';
+
 // Agent Types
 export interface Agent {
   id: string;
@@ -86,11 +95,12 @@ export interface ToolResultData {
   result: Record<string, any>;
 }
 
-export interface ApprovalRequest {
-  id: string;
-  toolName: string;
-  args: Record<string, any>;
-}
+// ApprovalRequest 已移至 approval.ts
+// export interface ApprovalRequest {
+//   id: string;
+//   toolName: string;
+//   args: Record<string, any>;
+// }
 
 // Project Types
 export interface Project {

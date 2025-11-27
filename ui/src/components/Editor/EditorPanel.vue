@@ -11,6 +11,13 @@
           编辑
         </button>
         <button
+          :class="['tab-button', { active: mode === 'split' }]"
+          @click="setMode('split')"
+        >
+          <Icon type="columns" size="sm" />
+          分栏
+        </button>
+        <button
           :class="['tab-button', { active: mode === 'preview' }]"
           @click="setMode('preview')"
         >
@@ -32,17 +39,36 @@
     <!-- 内容区域 -->
     <div class="editor-content">
       <!-- 编辑模式 -->
-      <textarea
-        v-if="mode === 'edit'"
-        v-model="localContent"
-        class="editor-textarea"
-        placeholder="在这里编辑内容..."
-        @input="handleInput"
-      />
+      <div v-if="mode === 'edit'" class="content-pane">
+        <MarkdownEditor
+          v-model="localContent"
+          placeholder="在这里编辑 Markdown 内容..."
+          :min-height="300"
+          :show-toolbar="true"
+          @change="handleInput"
+        />
+      </div>
+
+      <!-- 分栏模式 -->
+      <div v-else-if="mode === 'split'" class="content-split">
+        <div class="split-pane">
+          <MarkdownEditor
+            v-model="localContent"
+            placeholder="在这里编辑 Markdown 内容..."
+            :min-height="300"
+            :show-toolbar="false"
+            @change="handleInput"
+          />
+        </div>
+        <div class="split-divider"></div>
+        <div class="split-pane">
+          <MarkdownPreview :content="localContent" />
+        </div>
+      </div>
 
       <!-- 预览模式 -->
-      <div v-else class="editor-preview">
-        <RichText :content="localContent || '暂无内容'" />
+      <div v-else class="content-pane">
+        <MarkdownPreview :content="localContent" />
       </div>
     </div>
 
@@ -74,11 +100,14 @@
 <script setup lang="ts">
 import { ref, computed, watch } from 'vue';
 import Icon from '../ChatUI/Icon.vue';
-import RichText from '../ChatUI/RichText.vue';
+import MarkdownEditor from './MarkdownEditor.vue';
+import MarkdownPreview from './MarkdownPreview.vue';
+
+type EditorMode = 'edit' | 'split' | 'preview';
 
 interface Props {
   modelValue: string;
-  mode?: 'edit' | 'preview';
+  mode?: EditorMode;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -87,7 +116,7 @@ const props = withDefaults(defineProps<Props>(), {
 
 const emit = defineEmits<{
   'update:modelValue': [value: string];
-  'update:mode': [mode: 'edit' | 'preview'];
+  'update:mode': [mode: EditorMode];
   save: [content: string];
   export: [content: string];
 }>();
@@ -111,7 +140,7 @@ const handleInput = () => {
   emit('update:modelValue', localContent.value);
 };
 
-const setMode = (newMode: 'edit' | 'preview') => {
+const setMode = (newMode: EditorMode) => {
   emit('update:mode', newMode);
 };
 
@@ -181,12 +210,20 @@ const handleClear = () => {
   @apply flex-1 overflow-hidden;
 }
 
-.editor-textarea {
-  @apply w-full h-full p-4 bg-white dark:bg-gray-800 text-gray-900 dark:text-white font-mono text-sm leading-relaxed resize-none focus:outline-none;
+.content-pane {
+  @apply h-full overflow-auto p-4;
 }
 
-.editor-preview {
-  @apply h-full overflow-y-auto p-6 prose dark:prose-invert max-w-none;
+.content-split {
+  @apply h-full flex;
+}
+
+.split-pane {
+  @apply flex-1 overflow-auto p-4;
+}
+
+.split-divider {
+  @apply w-px bg-gray-200 dark:bg-gray-700;
 }
 
 .editor-footer {
