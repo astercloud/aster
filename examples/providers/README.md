@@ -132,6 +132,8 @@ func main() {
 }
 ```
 
+**完整示例**：查看 [`examples/openrouter/`](../openrouter/) 获取包含工具调用验证的完整集成测试示例。
+
 ### 5. 多模态输入（图片）
 
 ```go
