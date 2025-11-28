@@ -70,7 +70,7 @@
                   :class="['action-button', action.variant || 'primary']"
                   @click="$emit('action', action)"
                 >
-                  <Icon v-if="action.icon" :type="action.icon" size="sm" />
+                  <Icon v-if="action.icon" :type="(action.icon as any)" size="sm" />
                   {{ action.label }}
                 </button>
               </div>

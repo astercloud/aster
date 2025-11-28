@@ -143,7 +143,7 @@
           :class="['tab-button', { active: activeTab === tab.key }]"
           @click="activeTab = tab.key"
         >
-          <Icon :type="tab.icon" size="xs" />
+          <Icon :type="(tab.icon as any)" size="xs" />
           {{ tab.label }}
           <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
         </button>
@@ -327,7 +327,7 @@
                     />
                     <button
                       class="file-select-btn"
-                      @click="$refs[`fileInput-${index}`][0].click()"
+                      @click="($refs[`fileInput-${index}`] as HTMLInputElement[])?.[0]?.click()"
                     >
                       <Icon type="file" size="xs" />
                       选择文件
@@ -445,7 +445,7 @@
               />
               <button
                 class="binary-select-btn"
-                @click="$refs.binaryFileInput.click()"
+                @click="(binaryFileInput as HTMLInputElement)?.click()"
               >
                 <Icon type="file" size="xs" />
                 选择文件
@@ -846,19 +846,19 @@ const requestSettings = ref({
 });
 
 // 选项卡配置
-const requestTabs = ref([
+const requestTabs = ref<Array<{ key: string; label: string; icon: string; badge?: number }>>([
   { key: 'params', label: '参数', icon: 'hash' },
   { key: 'headers', label: '头部', icon: 'list' },
   { key: 'body', label: '请求体', icon: 'file-text' },
-  { key: 'auth', label: '认证', icon: 'shield' },
-  { key: 'tests', label: '测试', icon: 'check-circle' },
+  { key: 'auth', label: '认证', icon: 'lock' },
+  { key: 'tests', label: '测试', icon: 'check' },
 ]);
 
-const responseTabs = ref([
+const responseTabs = ref<Array<{ key: string; label: string; icon: string; badge?: number }>>([
   { key: 'body', label: '响应体', icon: 'file-text' },
   { key: 'headers', label: '头部', icon: 'list' },
-  { key: 'cookies', label: 'Cookies', icon: 'cookie' },
-  { key: 'tests', label: '测试', icon: 'check-circle' },
+  { key: 'cookies', label: 'Cookies', icon: 'disc' },
+  { key: 'tests', label: '测试', icon: 'check' },
 ]);
 
 const binaryFileInput = ref<HTMLInputElement>();
@@ -912,7 +912,7 @@ const removeFormDataItem = (index: number) => {
 const handleFileSelect = (index: number, event: Event) => {
   const target = event.target as HTMLInputElement;
   const file = target.files?.[0];
-  if (file) {
+  if (file && currentRequest.value.formData[index]) {
     currentRequest.value.formData[index].filename = file.name;
     currentRequest.value.formData[index].value = URL.createObjectURL(file);
   }
@@ -953,13 +953,17 @@ const sendRequest = async () => {
 
     const responseTime = Date.now() - startTime;
     response.value = {
-      ...mockResponse,
+      status: mockResponse.status ?? 0,
+      statusText: mockResponse.statusText ?? '',
+      headers: mockResponse.headers ?? {},
+      data: mockResponse.data,
+      cookies: mockResponse.cookies ?? [],
       responseTime,
       size: JSON.stringify(mockResponse.data).length,
     };
 
     // 保存到历史记录
-    if (requestSettings.value.saveToHistory) {
+    if (requestSettings.value.saveToHistory && response.value) {
       addToHistory(currentRequest.value.method, currentRequest.value.url, response.value.status);
     }
 
@@ -968,14 +972,16 @@ const sendRequest = async () => {
       runTests();
     }
 
-    emit('requestSent', requestConfig, response.value);
-  } catch (error) {
+    if (response.value) {
+      emit('requestSent', requestConfig, response.value);
+    }
+  } catch (error: unknown) {
     console.error('Request failed:', error);
     response.value = {
       status: 0,
       statusText: 'Request Failed',
       headers: {},
-      data: error.message,
+      data: error instanceof Error ? error.message : String(error),
       responseTime: Date.now() - startTime,
       size: 0,
       cookies: [],
@@ -1113,17 +1119,17 @@ const runTests = () => {
     tests.forEach(testLine => {
       const match = testLine.match(/pm\.test\(['"`]([^'"`]+)['"`],/);
       if (match) {
-        const testName = match[1];
+        const testName = match[1] ?? '';
         let passed = false;
-        let error = '';
+        let errorMsg = '';
 
         try {
           // 简单的状态码测试
           if (testName.includes('状态码')) {
             const statusMatch = testName.match(/(\d+)/);
             if (statusMatch) {
-              const expectedStatus = parseInt(statusMatch[1]);
-              passed = response.value!.status === expectedStatus;
+              const expectedStatus = parseInt(statusMatch[1] ?? '0');
+              passed = response.value?.status === expectedStatus;
             }
           }
 
@@ -1131,26 +1137,26 @@ const runTests = () => {
           if (testName.includes('响应时间')) {
             const timeMatch = testName.match(/(\d+)ms/);
             if (timeMatch) {
-              const maxTime = parseInt(timeMatch[1]);
-              passed = response.value!.responseTime < maxTime;
+              const maxTime = parseInt(timeMatch[1] ?? '0');
+              passed = (response.value?.responseTime ?? 0) < maxTime;
             }
           }
-        } catch (e) {
-          error = e.message;
+        } catch (e: unknown) {
+          errorMsg = e instanceof Error ? e.message : String(e);
         }
 
         testResults.value.push({
           name: testName,
           passed,
-          error,
+          error: errorMsg,
         });
       }
     });
-  } catch (error) {
+  } catch (error: unknown) {
     testResults.value.push({
       name: '测试执行错误',
       passed: false,
-      error: error.message,
+      error: error instanceof Error ? error.message : String(error),
     });
   }
 };
@@ -1243,8 +1249,8 @@ const validateRawBody = () => {
     try {
       JSON.parse(currentRequest.value.bodyRaw);
       alert('JSON格式正确');
-    } catch (error) {
-      alert('JSON格式错误: ' + error.message);
+    } catch (error: unknown) {
+      alert('JSON格式错误: ' + (error instanceof Error ? error.message : String(error)));
     }
   }
 };

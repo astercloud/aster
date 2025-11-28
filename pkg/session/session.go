@@ -98,6 +98,9 @@ type Event struct {
 	// 内容
 	Content types.Message
 
+	// 推理/思考内容 (Kimi thinking, DeepSeek reasoner 等)
+	Reasoning string
+
 	// 动作
 	Actions EventActions
 

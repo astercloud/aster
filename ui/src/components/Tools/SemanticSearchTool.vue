@@ -106,7 +106,7 @@
             :class="['mode-btn', { active: currentMode === mode.key }]"
             @click="currentMode = mode.key"
           >
-            <Icon :type="mode.icon" size="xs" />
+            <Icon :type="(mode.icon as any)" size="xs" />
             {{ mode.label }}
           </button>
         </div>
@@ -149,7 +149,7 @@
                 :value="type.value"
                 class="filter-checkbox"
               />
-              <Icon :type="type.icon" size="xs" />
+              <Icon :type="(type.icon as any)" size="xs" />
               {{ type.label }}
             </label>
           </div>
@@ -249,7 +249,7 @@
             title="重新搜索"
             @click="performSearch"
           >
-            <Icon type="refresh-cw" size="xs" />
+            <Icon type="refresh" size="xs" />
           </button>
         </div>
       </div>
@@ -421,7 +421,7 @@
             @click="useExample(example)"
           >
             <div class="example-icon">
-              <Icon :type="example.icon" size="sm" />
+              <Icon :type="(example.icon as any)" size="sm" />
             </div>
             <div class="example-content">
               <div class="example-title">{{ example.title }}</div>
@@ -920,7 +920,7 @@ const handleSearchResults = (results: SearchResult[]) => {
 // 聚类分析
 const generateClusters = (results: SearchResult[]) => {
   // 简化的聚类算法
-  const clusters: SearchCluster[] = [];
+  const newClusters: SearchCluster[] = [];
   const usedIndices = new Set<number>();
 
   results.forEach((result, index) => {
@@ -945,7 +945,7 @@ const generateClusters = (results: SearchResult[]) => {
     if (clusterItems.length > 0) {
       const avgSimilarity = clusterItems.reduce((sum, item) => sum + item.similarity, 0) / clusterItems.length;
 
-      clusters.push({
+      newClusters.push({
         name: `${result.fileType} 相关内容`,
         avgSimilarity,
         items: clusterItems,
@@ -953,7 +953,7 @@ const generateClusters = (results: SearchResult[]) => {
     }
   });
 
-  clusters.value = clusters;
+  clusters.value = newClusters;
 };
 
 const findSimilar = async (result: SearchResult) => {

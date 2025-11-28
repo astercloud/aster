@@ -85,7 +85,7 @@ interface Props {
   request: ApprovalRequest;
 }
 
-const props = defineProps<Props>();
+defineProps<Props>();
 
 const emit = defineEmits<{
   approve: [];

@@ -106,7 +106,10 @@ export async function processBatch<T, R>(
     const batch = items.slice(i, i + batchSize);
 
     for (let j = 0; j < batch.length; j++) {
-      results.push(processor(batch[j], i + j));
+      const item = batch[j];
+      if (item !== undefined) {
+        results.push(processor(item, i + j));
+      }
     }
 
     // 让出主线程

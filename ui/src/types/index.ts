@@ -3,17 +3,23 @@
  * 导出所有类型定义
  */
 
-// Message Types
+// Import ApprovalRequest for use in this file
+import type { ApprovalRequest } from './message';
+
+// Message Types (includes ThinkingStep and ApprovalRequest)
 export * from './message';
 
 // Chat Types
 export * from './chat';
 
-// Thinking Types
-export * from './thinking';
+// Thinking Types (excluding ThinkingStep which is already exported from message)
+export type { ThinkingStepType, ThinkingState } from './thinking';
 
-// Approval Types
-export * from './approval';
+// Approval Types (excluding ApprovalRequest which is already exported from message)
+export type { ApprovalDecision, ApprovalRecord } from './approval';
+
+// Re-export ApprovalRequest for backward compatibility
+export type { ApprovalRequest } from './message';
 
 // Workflow Types (new)
 export * from './workflow';

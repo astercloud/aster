@@ -1,7 +1,7 @@
 package aster
 
 // Version represents the current version of aster
-const Version = "v0.17.0"
+const Version = "v0.17.1"
 
 // VersionInfo provides detailed version information
 type VersionInfo struct {

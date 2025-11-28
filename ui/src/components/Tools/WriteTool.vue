@@ -139,7 +139,7 @@
             @click="selectTemplate(template)"
           >
             <div class="template-icon">
-              <Icon :type="template.icon" size="sm" />
+              <Icon :type="(template.icon as any)" size="sm" />
             </div>
             <div class="template-info">
               <div class="template-name">{{ template.name }}</div>
@@ -160,7 +160,7 @@
             @click="openRecentFile(file)"
           >
             <div class="file-icon">
-              <Icon :type="getIconForFile(file)" size="sm" />
+              <Icon :type="(getIconForFile(file) as any)" size="sm" />
             </div>
             <div class="file-info">
               <div class="file-name">{{ file.name }}</div>
@@ -201,7 +201,7 @@
       <div class="file-info-bar">
         <div class="file-info">
           <div class="file-icon">
-            <Icon :type="getIconForFile(currentFile)" size="sm" />
+            <Icon :type="(getIconForFile(currentFile) as any)" size="sm" />
           </div>
           <div class="file-details">
             <div class="file-name">{{ currentFile.name }}</div>
@@ -528,6 +528,10 @@ const historyIndex = ref(-1);
 // 自动保存
 const autoSaveTimer = ref<NodeJS.Timeout | null>(null);
 
+// 错误和保存时间
+const error = ref<string | null>(null);
+const lastSaveTime = ref<number | null>(null);
+
 // 写入设置
 const writeSettings = ref({
   fontSize: 'text-sm',
@@ -541,6 +545,9 @@ const writeSettings = ref({
   backup: false,
   autoSave: false,
   autoSaveInterval: 30,
+  // 查找替换选项
+  regex: false,
+  caseSensitive: false,
 });
 
 const fileInput = ref<HTMLInputElement>();
@@ -1095,7 +1102,7 @@ const syncScroll = (event: Event) => {
 const undo = () => {
   if (historyIndex.value > 0) {
     historyIndex.value--;
-    fileContent.value = editHistory.value[historyIndex.value];
+    fileContent.value = editHistory.value[historyIndex.value] ?? '';
     canUndo.value = historyIndex.value > 0;
     canRedo.value = true;
   }
@@ -1104,7 +1111,7 @@ const undo = () => {
 const redo = () => {
   if (historyIndex.value < editHistory.value.length - 1) {
     historyIndex.value++;
-    fileContent.value = editHistory.value[historyIndex.value];
+    fileContent.value = editHistory.value[historyIndex.value] ?? '';
     canUndo.value = true;
     canRedo.value = historyIndex.value < editHistory.value.length - 1;
   }
@@ -1271,6 +1278,8 @@ const resetSettings = () => {
     backup: false,
     autoSave: false,
     autoSaveInterval: 30,
+    regex: false,
+    caseSensitive: false,
   };
   setupAutoSave();
 };

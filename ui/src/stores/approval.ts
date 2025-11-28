@@ -138,6 +138,14 @@ export const useApprovalStore = defineStore('approval', () => {
     approvalHistory.value = [];
   };
 
+  /**
+   * 清除所有数据（用于测试）
+   */
+  const clearAll = () => {
+    pendingApprovals.value.clear();
+    approvalHistory.value = [];
+  };
+
   // ==================
   // Return
   // ==================
@@ -155,5 +163,6 @@ export const useApprovalStore = defineStore('approval', () => {
     hasPendingApprovals,
     clearPendingApprovals,
     clearHistory,
+    clearAll,
   };
 });

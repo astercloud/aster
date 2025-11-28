@@ -8,7 +8,7 @@
           <span>文件编辑器</span>
         </div>
         <div v-if="currentFile" class="file-indicator">
-          <Icon :type="getIconForFile(currentFile)" size="xs" />
+          <Icon :type="(getIconForFile(currentFile) as any)" size="xs" />
           <span class="file-name">{{ currentFile.name }}</span>
           <span v-if="hasUnsavedChanges" class="unsaved-indicator">●</span>
         </div>
@@ -188,7 +188,7 @@
             @click="openFile(file)"
           >
             <div class="file-icon">
-              <Icon :type="getIconForFile(file)" size="sm" />
+              <Icon :type="(getIconForFile(file) as any)" size="sm" />
             </div>
             <div class="file-info">
               <div class="file-name">{{ file.name }}</div>
@@ -204,7 +204,7 @@
                 title="从磁盘重新加载"
                 @click.stop="reloadFromFile(file)"
               >
-                <Icon type="refresh-cw" size="xs" />
+                <Icon type="refresh" size="xs" />
               </button>
               <button
                 class="file-action-btn remove-btn"
@@ -281,7 +281,7 @@
             <button
               class="toolbar-btn"
               title="转到行"
-              @click="goToLine"
+              @click="goToLine()"
             >
               <Icon type="hash" size="xs" />
             </button>
@@ -470,7 +470,7 @@
                 @click="goToLine(item.line)"
               >
                 <span class="outline-icon">
-                  <Icon :type="getOutlineIcon(item.type)" size="xs" />
+                  <Icon :type="(getOutlineIcon(item.type) as any)" size="xs" />
                 </span>
                 <span class="outline-text">{{ item.text }}</span>
                 <span class="outline-line">{{ item.line }}</span>
@@ -485,7 +485,7 @@
                 :class="['symbol-item', symbol.type]"
                 @click="goToLine(symbol.line)"
               >
-                <Icon :type="getSymbolIcon(symbol.type)" size="xs" />
+                <Icon :type="(getSymbolIcon(symbol.type) as any)" size="xs" />
                 <span class="symbol-name">{{ symbol.name }}</span>
                 <span class="symbol-line">{{ symbol.line }}</span>
               </div>
@@ -499,7 +499,7 @@
                 :class="['problem-item', problem.severity]"
                 @click="goToLine(problem.line)"
               >
-                <Icon :type="getProblemIcon(problem.severity)" size="xs" />
+                <Icon :type="(getProblemIcon(problem.severity) as any)" size="xs" />
                 <span class="problem-message">{{ problem.message }}</span>
                 <span class="problem-line">{{ problem.line }}</span>
               </div>
@@ -1146,7 +1146,7 @@ const goToLine = (lineNumber?: number) => {
     const lines = contentLines.value;
     let offset = 0;
     for (let i = 0; i < line - 1; i++) {
-      offset += lines[i].length + 1; // +1 for newline
+      offset += (lines[i]?.length ?? 0) + 1; // +1 for newline
     }
 
     if (editorTextarea.value) {
@@ -1161,7 +1161,7 @@ const goToLine = (lineNumber?: number) => {
 const undo = () => {
   if (historyIndex.value > 0) {
     historyIndex.value--;
-    fileContent.value = editHistory.value[historyIndex.value];
+    fileContent.value = editHistory.value[historyIndex.value] ?? '';
     canUndo.value = historyIndex.value > 0;
     canRedo.value = true;
   }
@@ -1170,7 +1170,7 @@ const undo = () => {
 const redo = () => {
   if (historyIndex.value < editHistory.value.length - 1) {
     historyIndex.value++;
-    fileContent.value = editHistory.value[historyIndex.value];
+    fileContent.value = editHistory.value[historyIndex.value] ?? '';
     canUndo.value = true;
     canRedo.value = historyIndex.value < editHistory.value.length - 1;
   }
@@ -1470,11 +1470,11 @@ const analyzeSyntax = () => {
         outlineItems.value.push({
           line: lineNumber,
           level: 1,
-          text: match[2],
+          text: match[2] ?? '',
           type: 'function'
         });
         symbols.value.push({
-          name: match[2],
+          name: match[2] ?? '',
           type: 'function',
           line: lineNumber,
           description: trimmed
@@ -1489,11 +1489,11 @@ const analyzeSyntax = () => {
         outlineItems.value.push({
           line: lineNumber,
           level: 0,
-          text: match[2],
+          text: match[2] ?? '',
           type: 'class'
         });
         symbols.value.push({
-          name: match[2],
+          name: match[2] ?? '',
           type: 'class',
           line: lineNumber,
           description: trimmed

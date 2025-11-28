@@ -74,10 +74,22 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 
-type IconType = 
+type IconType =
   | 'send' | 'image' | 'mic' | 'attach' | 'emoji' | 'more' | 'close' | 'check' | 'loading'
   | 'list' | 'grid' | 'plus' | 'refresh' | 'clock' | 'play' | 'alert' | 'calendar'
-  | 'edit' | 'trash' | 'inbox' | 'help-circle' | 'pause' | 'stop';
+  | 'edit' | 'trash' | 'inbox' | 'help-circle' | 'pause' | 'stop'
+  | 'alert-circle' | 'align-left' | 'arrow-down' | 'arrow-left' | 'arrow-right' | 'arrow-up'
+  | 'bar-chart' | 'brain' | 'case-sensitive' | 'check-square' | 'chevron-down' | 'chevron-left'
+  | 'chevron-right' | 'chevron-up' | 'clipboard' | 'columns' | 'copy' | 'cpu' | 'disc'
+  | 'download' | 'external-link' | 'eye' | 'file' | 'file-pdf' | 'file-plus' | 'file-text'
+  | 'filter' | 'folder' | 'folder-open' | 'git-merge' | 'globe' | 'hard-drive' | 'hash'
+  | 'home' | 'layers' | 'link' | 'lock' | 'maximize' | 'message-square' | 'minimize'
+  | 'redo' | 'regex' | 'replace' | 'save' | 'scissors' | 'search' | 'server' | 'settings'
+  | 'sidebar' | 'spinner' | 'square' | 'star' | 'terminal' | 'text' | 'time' | 'undo'
+  | 'upload' | 'whole-word' | 'x-circle' | 'star-outline'
+  // 新增图标类型
+  | 'archive' | 'unlock' | 'lock-open' | 'check-circle' | 'file-code' | 'code' | 'eye-off' | 'type'
+  | 'shield' | 'cookie' | 'book-open' | 'file-spreadsheet';
 
 type IconSize = 'xs' | 'sm' | 'md' | 'lg';
 

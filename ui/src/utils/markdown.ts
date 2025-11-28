@@ -62,7 +62,7 @@ export function extractCodeBlocks(markdown: string): Array<{ language: string; c
   while ((match = regex.exec(markdown)) !== null) {
     blocks.push({
       language: match[1] || 'text',
-      code: match[2].trim(),
+      code: (match[2] ?? '').trim(),
     });
   }
   

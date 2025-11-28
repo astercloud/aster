@@ -18,7 +18,7 @@
           class="dropdown-item"
           @click="handleSelect(item)"
         >
-          <Icon v-if="item.icon" :type="item.icon" />
+          <Icon v-if="item.icon" :type="(item.icon as any)" />
           <span>{{ item.label }}</span>
         </div>
       </div>
@@ -27,14 +27,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from 'vue';
 import Button from './Button.vue';
 import Icon from './Icon.vue';
 
 interface DropdownItem {
   key: string;
   label: string;
-  icon?: string;
+  icon?: string; // IconType compatible string
 }
 
 interface Props {
@@ -42,7 +42,7 @@ interface Props {
   label?: string;
 }
 
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   label: '选择',
 });
 

@@ -209,7 +209,7 @@
             title="重新搜索"
             @click="performSearch"
           >
-            <Icon type="refresh-cw" size="xs" />
+            <Icon type="refresh" size="xs" />
             刷新
           </button>
           <button
@@ -515,6 +515,7 @@ const trendingSearches = ref([
 
 const searchInput = ref<HTMLInputElement>();
 const websocket = ref<WebSocket | null>(null);
+let searchDebounceTimer: ReturnType<typeof setTimeout> | null = null;
 
 // 计算属性
 const hasSearchResults = computed(() => searchResults.value.length > 0);
@@ -700,8 +701,10 @@ const handleSearchResults = (results: SearchResult[]) => {
 
 const handleSearchInput = () => {
   // 防抖搜索建议
-  clearTimeout(searchInput.value?.searchTimeout);
-  searchInput.value!.searchTimeout = setTimeout(() => {
+  if (searchDebounceTimer) {
+    clearTimeout(searchDebounceTimer);
+  }
+  searchDebounceTimer = setTimeout(() => {
     if (searchQuery.value.trim().length > 2) {
       fetchSuggestions();
     } else {
@@ -747,7 +750,7 @@ const highlightSuggestion = (direction: 'up' | 'down') => {
   }
 
   if (highlightedSuggestionIndex.value >= 0) {
-    searchQuery.value = suggestions.value[highlightedSuggestionIndex.value];
+    searchQuery.value = suggestions.value[highlightedSuggestionIndex.value] ?? '';
   }
 };
 

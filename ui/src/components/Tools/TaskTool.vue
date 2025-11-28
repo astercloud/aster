@@ -70,7 +70,7 @@
         :class="['filter-button', { active: currentFilter === filter.key }]"
         @click="currentFilter = filter.key"
       >
-        <Icon :type="filter.icon" size="sm" />
+        <Icon :type="(filter.icon as any)" size="sm" />
         {{ filter.label }}
         <span class="filter-count">{{ filter.count }}</span>
       </button>
@@ -162,7 +162,7 @@
       >
         <div class="progress-info">
           <span class="progress-command">{{ task.command }}</span>
-          <span class="progress-time">{{ formatDuration(Date.now() - task.startedAt) }}</span>
+          <span class="progress-time">{{ formatDuration(Date.now() - (task.startedAt ?? Date.now())) }}</span>
         </div>
         <div class="progress-bar">
           <div class="progress-fill" :style="{ width: task.progress + '%' }"></div>
@@ -221,7 +221,7 @@
               </div>
               <div class="detail-item">
                 <span class="detail-label">持续时间:</span>
-                <span class="detail-value">{{ formatDuration(selectedTask.duration) }}</span>
+                <span class="detail-value">{{ formatDuration(selectedTask.duration ?? 0) }}</span>
               </div>
               <div v-if="selectedTask.exitCode !== undefined" class="detail-item">
                 <span class="detail-label">退出码:</span>

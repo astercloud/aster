@@ -141,22 +141,26 @@ const handleInput = () => {
 // 处理快捷键
 const handleKeydown = (e: KeyboardEvent) => {
   if (e.ctrlKey || e.metaKey) {
+    const boldTool = tools.value[0];
+    const italicTool = tools.value[1];
+    const codeTool = tools.value[2];
+    const linkTool = tools.value[3];
     switch (e.key) {
       case 'b':
         e.preventDefault();
-        applyTool(tools.value[0]); // Bold
+        if (boldTool) applyTool(boldTool); // Bold
         break;
       case 'i':
         e.preventDefault();
-        applyTool(tools.value[1]); // Italic
+        if (italicTool) applyTool(italicTool); // Italic
         break;
       case '`':
         e.preventDefault();
-        applyTool(tools.value[2]); // Code
+        if (codeTool) applyTool(codeTool); // Code
         break;
       case 'k':
         e.preventDefault();
-        applyTool(tools.value[3]); // Link
+        if (linkTool) applyTool(linkTool); // Link
         break;
     }
   }

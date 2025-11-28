@@ -84,11 +84,11 @@ export function useChat(config: ChatConfig) {
     'Streaming 模式已打开，等待后端返回 token，平均延迟 220ms。',
   ];
 
-  const pickDemoResponse = (content: string) => {
+  const pickDemoResponse = (content: string): string => {
     const list = config.demoResponses?.length ? config.demoResponses : fallbackResponses;
     const index = demoCursor.value % list.length;
     demoCursor.value += 1;
-    const template = list[index];
+    const template = list[index] ?? '';
     return template.includes('{question}')
       ? template.split('{question}').join(content)
       : template;
@@ -294,7 +294,7 @@ export function useChat(config: ChatConfig) {
       return;
     }
     if (type === 'think_chunk_end') {
-      thinkingStore.endThinking(currentMessageId);
+      thinkingStore.endThinking();
       return;
     }
 
@@ -341,7 +341,7 @@ export function useChat(config: ChatConfig) {
         const toolCall = {
           id,
           name: call.name || 'unknown',
-          state: (call.error || ev.error ? 'failed' : 'completed') as const,
+          state: (call.error || ev.error ? 'failed' : 'completed') as 'failed' | 'completed',
           progress: 1,
           arguments: call.arguments || {},
           result: call.result || ev.result,
@@ -431,7 +431,8 @@ export function useChat(config: ChatConfig) {
     if (type === 'workflow_start' || type === 'workflow:start') {
       workflowStore.loadWorkflow({
         id: ev.workflow_id || generateId('workflow'),
-        title: ev.title || '工作流',
+        name: ev.name || ev.title || '工作流',
+        title: ev.title,
         steps: ev.steps || [],
       });
       return;

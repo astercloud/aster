@@ -516,6 +516,7 @@ interface Skill {
   downloads?: number
   stars?: number
   usageCount?: number
+  updatedAt?: string
   parameters?: Array<{
     name: string
     type: string
@@ -841,10 +842,11 @@ const executeSkill = async (skill: Skill) => {
     // 模拟执行完成
     setTimeout(() => {
       const index = executionHistory.value.findIndex(r => r.id === record.id)
-      if (index !== -1) {
-        executionHistory.value[index].status = 'success'
-        executionHistory.value[index].output = '技能执行成功，结果已生成。'
-        executionHistory.value[index].duration = Math.floor(Math.random() * 5000) + 1000
+      const historyRecord = executionHistory.value[index]
+      if (index !== -1 && historyRecord) {
+        historyRecord.status = 'success'
+        historyRecord.output = '技能执行成功，结果已生成。'
+        historyRecord.duration = Math.floor(Math.random() * 5000) + 1000
       }
 
       if (skill.usageCount !== undefined) {
@@ -890,11 +892,12 @@ const handleSocketMessage = (event: MessageEvent) => {
     const data = JSON.parse(event.data)
     if (data.type === 'skill_result') {
       const index = executionHistory.value.findIndex(r => r.id === data.id)
-      if (index !== -1) {
-        executionHistory.value[index].status = data.success ? 'success' : 'error'
-        executionHistory.value[index].output = data.output
-        executionHistory.value[index].error = data.error
-        executionHistory.value[index].duration = data.duration
+      const historyRecord = executionHistory.value[index]
+      if (index !== -1 && historyRecord) {
+        historyRecord.status = data.success ? 'success' : 'error'
+        historyRecord.output = data.output
+        historyRecord.error = data.error
+        historyRecord.duration = data.duration
       }
     }
   } catch (error) {

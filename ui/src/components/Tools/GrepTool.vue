@@ -369,7 +369,10 @@ const exportResults = () => {
 
 // 结果操作方法
 const toggleResultExpanded = (index: number) => {
-  searchResults.value[index].expanded = !searchResults.value[index].expanded;
+  const result = searchResults.value[index];
+  if (result) {
+    result.expanded = !result.expanded;
+  }
 };
 
 const toggleAllExpanded = () => {

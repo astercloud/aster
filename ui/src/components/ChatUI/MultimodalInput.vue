@@ -159,9 +159,9 @@ const handleImageUpload = (e: Event) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const result = e.target?.result as string;
-    const base64Data = result.split(',')[1];
+    const base64Data = result?.split(',')[1] ?? '';
     selectedImage.value = {
-      preview: result,
+      preview: result ?? '',
       data: base64Data,
     };
   };

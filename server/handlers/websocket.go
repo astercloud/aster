@@ -333,6 +333,11 @@ func (h *WebSocketHandler) handleChat(wsConn *WebSocketConnection, payload map[s
 		"agent_id": ag.ID(),
 	})
 
+	// 发送 think_chunk_start (思考开始)
+	h.sendMessage(wsConn, "think_chunk_start", map[string]interface{}{
+		"step": 0,
+	})
+
 	// Stream response
 	// 注意: 不在这里关闭 Agent,让 Agent 在整个 WebSocket 连接期间保持活跃
 	// Agent 会在 WebSocket 断开时由 handleDisconnect 关闭
@@ -359,11 +364,23 @@ func (h *WebSocketHandler) handleChat(wsConn *WebSocketConnection, payload map[s
 
 			if event != nil {
 				logging.Info(wsConn.ctx, "websocket.stream.event.received", map[string]interface{}{
-					"agent_id":    ag.ID(),
-					"event_id":    event.ID,
-					"author":      event.Author,
-					"has_content": len(event.Content.ContentBlocks) > 0,
+					"agent_id":      ag.ID(),
+					"event_id":      event.ID,
+					"author":        event.Author,
+					"has_content":   len(event.Content.ContentBlocks) > 0,
+					"has_reasoning": event.Reasoning != "",
 				})
+
+				// 处理推理内容 (Kimi thinking, DeepSeek reasoner)
+				if event.Reasoning != "" {
+					logging.Info(wsConn.ctx, "websocket.stream.sending_think_chunk", map[string]interface{}{
+						"agent_id":         ag.ID(),
+						"reasoning_length": len(event.Reasoning),
+					})
+					h.sendMessage(wsConn, "think_chunk", map[string]interface{}{
+						"delta": event.Reasoning,
+					})
+				}
 
 				// Extract text content from event
 				var textContent string
@@ -390,6 +407,11 @@ func (h *WebSocketHandler) handleChat(wsConn *WebSocketConnection, payload map[s
 			}
 		}
 
+		// 发送 think_chunk_end (思考结束)
+		h.sendMessage(wsConn, "think_chunk_end", map[string]interface{}{
+			"step": 0,
+		})
+
 		// Send completion event
 		h.sendMessage(wsConn, "chat_complete", map[string]interface{}{
 			"agent_id": ag.ID(),
@@ -403,6 +425,11 @@ func (h *WebSocketHandler) handleChat(wsConn *WebSocketConnection, payload map[s
 
 // sendMessage sends a message to the WebSocket client
 func (h *WebSocketHandler) sendMessage(wsConn *WebSocketConnection, msgType string, payload map[string]interface{}) {
+	// 检查 context 是否已取消
+	if wsConn.ctx.Err() != nil {
+		return
+	}
+
 	msg := WebSocketMessage{
 		Type:    msgType,
 		Payload: payload,
@@ -415,6 +442,17 @@ func (h *WebSocketHandler) sendMessage(wsConn *WebSocketConnection, msgType stri
 		})
 		return
 	}
+
+	// 使用 defer recover 防止发送到已关闭的 channel 导致 panic
+	defer func() {
+		if r := recover(); r != nil {
+			logging.Warn(wsConn.ctx, "websocket.send.recovered", map[string]interface{}{
+				"connection_id": wsConn.ID,
+				"message_type":  msgType,
+				"panic":         r,
+			})
+		}
+	}()
 
 	select {
 	case wsConn.Send <- data:

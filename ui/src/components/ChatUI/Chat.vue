@@ -10,7 +10,7 @@
         <!-- 气泡消息 -->
         <Bubble
           v-if="msg.type === 'text'"
-          :content="msg.content"
+          :content="msg.content ?? ''"
           :position="msg.position"
           :status="msg.status"
           :avatar="msg.user?.avatar"
@@ -37,15 +37,15 @@
         <!-- 卡片消息 -->
         <Card
           v-else-if="msg.type === 'card'"
-          :title="msg.card?.title"
-          :content="msg.card?.content"
+          :title="msg.card?.title ?? ''"
+          :content="msg.card?.content ?? ''"
           :actions="msg.card?.actions"
           @action="handleCardAction"
         />
         
         <!-- 文件卡片 -->
         <FileCard
-          v-else-if="msg.type === 'file'"
+          v-else-if="msg.type === 'file' && msg.file"
           :file="msg.file"
         />
       </div>

@@ -13,7 +13,7 @@
           :disabled="!currentFile"
           @click="reloadFile"
         >
-          <Icon type="refresh-cw" size="sm" />
+          <Icon type="refresh" size="sm" />
         </button>
         <button
           class="action-button"
@@ -185,7 +185,7 @@
             <pre
               ref="codeElement"
               :class="['code-block', fontSize, { 'readonly': isReadonly }]"
-              contenteditable="!isReadonly"
+              :contenteditable="!isReadonly"
               @blur="handleContentEdit"
               @keydown="handleKeydown"
             >{{ fileContent }}</pre>
@@ -362,7 +362,9 @@ const handleWebSocketMessage = (message: any) => {
       if (message.file && message.content !== undefined) {
         fileContent.value = message.content;
         currentFile.value = { ...message.file, content: message.content };
-        addToRecentFiles(currentFile.value);
+        if (currentFile.value) {
+          addToRecentFiles(currentFile.value);
+        }
         isLoading.value = false;
         error.value = '';
       }
@@ -371,7 +373,9 @@ const handleWebSocketMessage = (message: any) => {
       if (message.file && message.imageData) {
         imageData.value = message.imageData;
         currentFile.value = { ...message.file, imageData: message.imageData };
-        addToRecentFiles(currentFile.value);
+        if (currentFile.value) {
+          addToRecentFiles(currentFile.value);
+        }
         isLoading.value = false;
         error.value = '';
       }

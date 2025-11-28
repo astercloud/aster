@@ -197,11 +197,14 @@ const handleSubmit = () => {
     // 更新现有项目
     const index = projects.value.findIndex((p) => p.id === editingProject.value!.id);
     if (index !== -1) {
-      projects.value[index] = {
-        ...projects.value[index],
-        ...formData.value,
-        lastModified: new Date().toISOString(),
-      };
+      const existingProject = projects.value[index];
+      if (existingProject) {
+        projects.value[index] = {
+          ...existingProject,
+          ...formData.value,
+          lastModified: new Date().toISOString(),
+        };
+      }
     }
   } else {
     // 创建新项目

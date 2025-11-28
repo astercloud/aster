@@ -79,13 +79,17 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 完成当前步骤并激活下一步
    */
   const completeCurrentStep = () => {
-    if (currentStep.value) {
-      steps.value[currentStepIndex.value].status = 'completed';
+    const step = steps.value[currentStepIndex.value];
+    if (step) {
+      step.status = 'completed';
 
       // 激活下一步
       if (!isLastStep.value) {
         currentStepIndex.value++;
-        steps.value[currentStepIndex.value].status = 'active';
+        const nextStep = steps.value[currentStepIndex.value];
+        if (nextStep) {
+          nextStep.status = 'active';
+        }
       }
     }
   };
@@ -96,12 +100,18 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const completeStep = (stepId: string) => {
     const index = steps.value.findIndex(s => s.id === stepId);
     if (index !== -1) {
-      steps.value[index].status = 'completed';
+      const step = steps.value[index];
+      if (step) {
+        step.status = 'completed';
+      }
 
       // 如果是当前步骤，激活下一步
       if (index === currentStepIndex.value && index < steps.value.length - 1) {
         currentStepIndex.value = index + 1;
-        steps.value[currentStepIndex.value].status = 'active';
+        const nextStep = steps.value[currentStepIndex.value];
+        if (nextStep) {
+          nextStep.status = 'active';
+        }
       }
     }
   };
@@ -112,7 +122,10 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const failStep = (stepId: string) => {
     const index = steps.value.findIndex(s => s.id === stepId);
     if (index !== -1) {
-      steps.value[index].status = 'failed';
+      const step = steps.value[index];
+      if (step) {
+        step.status = 'failed';
+      }
     }
   };
 
@@ -123,13 +136,17 @@ export const useWorkflowStore = defineStore('workflow', () => {
     const index = steps.value.findIndex(s => s.id === stepId);
     if (index !== -1) {
       // 将当前激活步骤设为 pending
-      if (currentStep.value && currentStep.value.status === 'active') {
-        steps.value[currentStepIndex.value].status = 'pending';
+      const currentStepVal = steps.value[currentStepIndex.value];
+      if (currentStepVal && currentStepVal.status === 'active') {
+        currentStepVal.status = 'pending';
       }
 
       // 激活目标步骤
       currentStepIndex.value = index;
-      steps.value[index].status = 'active';
+      const targetStep = steps.value[index];
+      if (targetStep) {
+        targetStep.status = 'active';
+      }
     }
   };
 
@@ -148,13 +165,17 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const previousStep = () => {
     if (!isFirstStep.value) {
       // 将当前步骤设为 pending
-      if (currentStep.value) {
-        steps.value[currentStepIndex.value].status = 'pending';
+      const currentStepVal = steps.value[currentStepIndex.value];
+      if (currentStepVal) {
+        currentStepVal.status = 'pending';
       }
 
       // 回到上一步
       currentStepIndex.value--;
-      steps.value[currentStepIndex.value].status = 'active';
+      const prevStep = steps.value[currentStepIndex.value];
+      if (prevStep) {
+        prevStep.status = 'active';
+      }
     }
   };
 
@@ -183,10 +204,29 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const updateStepMetadata = (stepId: string, metadata: Record<string, any>) => {
     const index = steps.value.findIndex(s => s.id === stepId);
     if (index !== -1) {
-      steps.value[index].metadata = {
-        ...(steps.value[index].metadata || {}),
-        ...metadata,
-      };
+      const step = steps.value[index];
+      if (step) {
+        step.metadata = {
+          ...(step.metadata || {}),
+          ...metadata,
+        };
+      }
+    }
+  };
+
+  /**
+   * 更新步骤状态
+   */
+  const updateStep = (stepId: string, updates: Partial<WorkflowStep>) => {
+    const index = steps.value.findIndex(s => s.id === stepId);
+    if (index !== -1) {
+      const step = steps.value[index];
+      if (step) {
+        steps.value[index] = {
+          ...step,
+          ...updates,
+        };
+      }
     }
   };
 
@@ -221,5 +261,6 @@ export const useWorkflowStore = defineStore('workflow', () => {
     resetWorkflow,
     clearWorkflow,
     updateStepMetadata,
+    updateStep,
   };
 });

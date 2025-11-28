@@ -29,6 +29,11 @@
         </div>
       </div>
 
+      <!-- Provider 选择器 -->
+      <div class="provider-section">
+        <ProviderSelector @change="handleProviderChange" />
+      </div>
+
       <!-- 工作流进度 -->
       <div v-if="workflowSteps.length > 0" class="workflow-section">
         <WorkflowProgressView
@@ -56,13 +61,38 @@
         @card-action="handleCardAction"
       />
 
+      <!-- AskUser 问题卡片 -->
+      <div v-for="message in unansweredQuestions" :key="message.id" class="ask-user-stream">
+        <AskUserQuestionCard
+          :request-id="(message as any).content.request_id"
+          :questions="(message as any).content.questions"
+          :answered="(message as any).content.answered || false"
+          @submit="handleAskUserSubmit"
+        />
+      </div>
+
+      <!-- 审批卡片 -->
+      <div class="approval-stream" v-if="pendingApprovalsList.length > 0">
+        <div class="approval-stream-header">
+          <h3>待审批操作</h3>
+          <span class="hint">需要人工确认</span>
+        </div>
+        <ApprovalCard
+          v-for="request in pendingApprovalsList"
+          :key="request.id"
+          :request="request"
+          @approve="handleApprove(request.id)"
+          @reject="handleReject(request.id)"
+        />
+      </div>
+
       <!-- 工具流展示 -->
       <div class="tool-stream" v-if="toolRunsList.length">
         <div class="tool-stream-header">
           <h3>工具执行</h3>
           <span class="hint">实时状态 / 可取消</span>
         </div>
-        <div class="tool-run" v-for="run in toolRunsList" :key="run.tool_call_id">
+        <div class="tool-run" v-for="run in toolRunsList" :key="run.id">
           <div class="tool-run-head">
             <div class="tool-name">{{ run.name }}</div>
             <div class="tool-state" :class="run.state">{{ run.state }}</div>
@@ -73,13 +103,20 @@
             </div>
             <div class="meta">
               <span>{{ Math.round((run.progress || 0)*100) }}%</span>
-              <span v-if="run.message">{{ run.message }}</span>
+              <span v-if="run.intermediate?.message">{{ run.intermediate.message }}</span>
+            </div>
+          </div>
+          <!-- 中间结果展示 -->
+          <div v-if="run.intermediate && Object.keys(run.intermediate).length > 0" class="tool-intermediate">
+            <div v-for="(value, label) in run.intermediate" :key="label" class="intermediate-item">
+              <span class="intermediate-label">{{ label }}:</span>
+              <span class="intermediate-value">{{ formatIntermediateValue(value) }}</span>
             </div>
           </div>
           <div class="tool-actions">
-            <button v-if="run.cancelable && run.state === 'executing'" @click="controlTool(run.tool_call_id, 'cancel')">取消</button>
-            <button v-if="run.pausable && run.state === 'executing'" @click="controlTool(run.tool_call_id, 'pause')">暂停</button>
-            <button v-if="run.pausable && run.state === 'paused'" @click="controlTool(run.tool_call_id, 'resume')">继续</button>
+            <button v-if="run.cancelable && run.state === 'executing'" @click="controlTool(run.id, 'cancel')">取消</button>
+            <button v-if="run.pausable && run.state === 'executing'" @click="controlTool(run.id, 'pause')">暂停</button>
+            <button v-if="run.pausable && run.state === 'paused'" @click="controlTool(run.id, 'resume')">继续</button>
           </div>
           <pre v-if="run.result" class="tool-result">{{ formatResult(run.result) }}</pre>
           <pre v-if="run.error" class="tool-error">Error: {{ run.error }}</pre>
@@ -87,6 +124,16 @@
       </div>
     </div>
   </div>
+
+  <!-- Plan Mode 面板 -->
+  <PlanModeView
+    :active="chatStore.planMode.active"
+    :content="chatStore.planMode.planContent"
+    :plan-id="chatStore.planMode.planId"
+    @approve="handlePlanApprove"
+    @reject="handlePlanReject"
+    @close="handlePlanClose"
+  />
 </div>
 </template>
 
@@ -102,6 +149,10 @@ import { useTodosStore } from '@/stores/todos';
 import { useApprovalStore } from '@/stores/approval';
 import { useWorkflowStore } from '@/stores/workflow';
 import WorkflowProgressView from '@/components/Workflow/WorkflowProgressView.vue';
+import ApprovalCard from '@/components/Thinking/ApprovalCard.vue';
+import ProviderSelector from '@/components/Settings/ProviderSelector.vue';
+import AskUserQuestionCard from '@/components/Thinking/AskUserQuestionCard.vue';
+import PlanModeView from '@/components/Planning/PlanModeView.vue';
 
 interface Agent {
   id: string;
@@ -130,7 +181,7 @@ interface Message {
   hasThinking?: boolean; // 是否有思考过程
 }
 
-const { client, ensureWebSocket, onMessage, isConnected } = useAsterClient();
+const { ensureWebSocket, onMessage, isConnected } = useAsterClient();
 const wsConnected = isConnected;
 
 // 初始化 Pinia Stores
@@ -145,6 +196,10 @@ const workflowStore = useWorkflowStore();
 const isThinking = computed(() => thinkingStore.isThinking);
 const toolRunsList = computed(() => Array.from(toolsStore.toolRuns.values()));
 const workflowSteps = computed(() => workflowStore.steps);
+const pendingApprovalsList = computed(() => Array.from(approvalStore.pendingApprovals.values()));
+const unansweredQuestions = computed(() =>
+  chatStore.messages.filter((m: any) => m.type === 'ask-user' && !m.content?.answered)
+);
 
 // 转换消息，为 thinking 类型的消息注入 thinkingSteps
 const messages = computed(() => {
@@ -185,9 +240,10 @@ const agents = ref<Agent[]>([
   },
 ]);
 
-const selectedAgent = ref<Agent>(agents.value[0]);
+const selectedAgent = ref(agents.value[0] as Agent);
 let unsubscribeFn: (() => void) | null = null;
 let currentConversationId = ref<string>(''); // 跟踪当前对话回合
+const currentProvider = ref({ provider: 'deepseek', model: 'deepseek-chat' });
 
 const quickReplies = computed(() => [
   { name: '帮我写一篇文章', value: 'write_article' },
@@ -219,10 +275,100 @@ const selectAgent = (agent: Agent) => {
       content: `你好！我是${agent.name}，${agent.description}。`,
       position: 'left',
       user: {
+        id: agent.id,
         name: agent.name,
       },
-    },
+    } as any,
   ];
+};
+
+const handleProviderChange = (config: { provider: string; model: string }) => {
+  currentProvider.value = config;
+  console.log('🔄 Provider changed:', config);
+};
+
+const handleAskUserSubmit = async (payload: { requestId: string; answers: Record<string, any> }) => {
+  try {
+    const ws = await ensureWebSocket();
+    if (!ws) {
+      console.error('WebSocket not connected, cannot send answer');
+      return;
+    }
+
+    // 发送答案到后端
+    ws.send({
+      type: 'user_answer',
+      payload: {
+        request_id: payload.requestId,
+        answers: payload.answers,
+      },
+    });
+
+    // 标记问题为已回答
+    const msg = chatStore.messages.find(
+      (m: any) => m.type === 'ask-user' && m.content?.request_id === payload.requestId
+    );
+    if (msg && msg.type === 'ask-user') {
+      (msg as any).content.answered = true;
+      (msg as any).content.answers = payload.answers;
+    }
+
+    console.log('✅ User answers submitted:', payload);
+  } catch (error) {
+    console.error('Failed to submit user answers:', error);
+  }
+};
+
+const handlePlanApprove = async () => {
+  try {
+    const ws = await ensureWebSocket();
+    if (!ws || !chatStore.planMode.planId) {
+      console.error('WebSocket not connected or no plan ID');
+      return;
+    }
+
+    // 发送批准决策到后端
+    ws.send({
+      type: 'plan_decision',
+      payload: {
+        plan_id: chatStore.planMode.planId,
+        decision: 'approve',
+      },
+    });
+
+    console.log('✅ Plan approved:', chatStore.planMode.planId);
+    chatStore.exitPlanMode();
+  } catch (error) {
+    console.error('Failed to approve plan:', error);
+  }
+};
+
+const handlePlanReject = async () => {
+  try {
+    const ws = await ensureWebSocket();
+    if (!ws || !chatStore.planMode.planId) {
+      console.error('WebSocket not connected or no plan ID');
+      return;
+    }
+
+    // 发送拒绝决策到后端
+    ws.send({
+      type: 'plan_decision',
+      payload: {
+        plan_id: chatStore.planMode.planId,
+        decision: 'reject',
+      },
+    });
+
+    console.log('❌ Plan rejected:', chatStore.planMode.planId);
+    chatStore.exitPlanMode();
+  } catch (error) {
+    console.error('Failed to reject plan:', error);
+  }
+};
+
+const handlePlanClose = () => {
+  chatStore.exitPlanMode();
 };
 
 const handleSend = async (message: { type: string; content: string }) => {
@@ -230,25 +376,25 @@ const handleSend = async (message: { type: string; content: string }) => {
   currentConversationId.value = generateId('conversation');
 
   // 添加用户消息
-  const userMsg: Message = {
+  const userMsg = {
     id: generateId('user'),
     type: 'text',
     content: message.content,
     position: 'right',
     status: 'sent',
   };
-  chatStore.messages.push(userMsg);
+  chatStore.messages.push(userMsg as any);
 
   // 显示思考状态 - 创建 thinking 消息并关联 conversationId
   chatStore.isTyping = true;
   thinkingStore.startThinking(currentConversationId.value);
-  const thinkingMsg: Message = {
+  const thinkingMsg = {
     id: generateId('thinking'),
     type: 'thinking',
     position: 'left',
     conversationId: currentConversationId.value, // 关联对话ID，用于获取思考步骤
   };
-  chatStore.messages.push(thinkingMsg);
+  chatStore.messages.push(thinkingMsg as any);
 
   try {
     const ws = await ensureWebSocket();
@@ -260,6 +406,10 @@ const handleSend = async (message: { type: string; content: string }) => {
       payload: {
         input: message.content,
         template_id: 'chat',
+        model_config: {
+          provider: currentProvider.value.provider,
+          model: currentProvider.value.model,
+        },
       },
     });
   } catch (error) {
@@ -271,9 +421,9 @@ const handleSend = async (message: { type: string; content: string }) => {
       content: '抱歉，处理请求时出错了。请检查后端服务是否正常运行。',
       position: 'left',
       status: 'error',
-    });
+    } as any);
     chatStore.isTyping = false;
-    thinkingStore.endThinking(currentConversationId.value);
+    thinkingStore.endThinking();
   }
 };
 
@@ -284,8 +434,42 @@ const handleQuickReply = (reply: { name: string; value?: string }) => {
   });
 };
 
-const handleCardAction = (action: { value: string }) => {
+const handleCardAction = async (action: { value: string; metadata?: any }) => {
   console.log('Card action:', action);
+
+  // 如果是 ask_user 的回答，发送到后端
+  if (action.metadata?.askId) {
+    try {
+      const ws = await ensureWebSocket();
+      if (ws) {
+        ws.send({
+          type: 'ask_user_response',
+          payload: {
+            ask_id: action.metadata.askId,
+            answer: action.value,
+          },
+        });
+      }
+    } catch (err) {
+      console.error('Failed to send ask_user response:', err);
+    }
+  }
+};
+
+/**
+ * 批准审批请求
+ */
+const handleApprove = async (requestId: string) => {
+  console.log('Approving request:', requestId);
+  await approvalStore.approve(requestId);
+};
+
+/**
+ * 拒绝审批请求
+ */
+const handleReject = async (requestId: string, reason?: string) => {
+  console.log('Rejecting request:', requestId, 'reason:', reason);
+  await approvalStore.reject(requestId, reason);
 };
 
 // 处理 WS 入站消息
@@ -305,20 +489,17 @@ const handleWsMessage = (msg: any) => {
 
       console.log('✅ 处理 text_delta:', delta, '对话ID:', currentConversationId.value);
 
-      // 第一次收到文本时，移除thinking消息
-      if (chatStore.messages.some(m => m.type === 'thinking')) {
-        chatStore.messages = chatStore.messages.filter(m => m.type !== 'thinking');
-        console.log('🗑️ 移除思考状态消息');
-      }
+      // 不移除 thinking 消息，保留让用户可以查看思考过程
+      // thinking 消息会自动折叠显示
 
       // 查找属于当前对话的最后一个AI回复消息
       let last: Message | undefined;
       for (let i = chatStore.messages.length - 1; i >= 0; i--) {
-        const m = chatStore.messages[i];
+        const m = chatStore.messages[i] as any;
         // 查找属于当前对话的AI消息
-        if (m.position === 'left' && m.type === 'text' &&
-            m.status !== 'system' && !m.id.includes('welcome') &&
-            m.conversationId === currentConversationId.value) {
+        if (m?.position === 'left' && m?.type === 'text' &&
+            m?.status !== 'system' && !m?.id?.includes('welcome') &&
+            m?.conversationId === currentConversationId.value) {
           last = m;
           break;
         }
@@ -333,14 +514,14 @@ const handleWsMessage = (msg: any) => {
           user: { name: selectedAgent.value.name },
           conversationId: currentConversationId.value,
         };
-        chatStore.messages.push(last);
-        console.log('🆕 创建新的AI消息:', last.id);
+        chatStore.messages.push(last as any);
+        console.log('🆕 创建新的AI消息:', last!.id);
       }
 
       // 更新消息内容
-      const oldContent = last.content || '';
-      last.content = oldContent + delta;
-      console.log('📝 更新消息内容:', `"${oldContent}" -> "${last.content}"`);
+      const oldContent = last!.content || '';
+      last!.content = oldContent + delta;
+      console.log('📝 更新消息内容:', `"${oldContent}" -> "${last!.content}"`);
 
       // 强制触发响应式更新
       chatStore.messages = [...chatStore.messages];
@@ -348,7 +529,20 @@ const handleWsMessage = (msg: any) => {
     }
     case 'chat_complete': {
       chatStore.isTyping = false;
-      chatStore.messages = chatStore.messages.filter(m => !m.id.startsWith('thinking-'));
+      // 不移除 thinking 消息，保留让用户可以查看思考过程
+      break;
+    }
+    // 思考事件 - 直接路由到 handleAgentEvent
+    case 'think_chunk_start':
+    case 'think_chunk':
+    case 'think_chunk_end': {
+      handleAgentEvent(msg.type, msg.payload || {});
+      break;
+    }
+    // 错误事件 - 直接路由到 handleAgentEvent
+    case 'error':
+    case 'stream_error': {
+      handleAgentEvent(msg.type, msg.payload || {});
       break;
     }
     case 'agent_event': {
@@ -381,7 +575,16 @@ const handleAgentEvent = (type: string, ev: any) => {
     return;
   }
   if (type === 'think_chunk_end') {
-    thinkingStore.endThinking(messageId);
+    thinkingStore.endThinking();
+    
+    // 如果没有思考步骤（普通模型），移除当前对话的 thinking 消息
+    const steps = thinkingStore.getSteps(messageId);
+    if (!steps || steps.length === 0) {
+      // 只移除当前对话的 thinking 消息，不影响其他对话
+      chatStore.messages = chatStore.messages.filter(
+        (m: any) => !(m.type === 'thinking' && m.conversationId === messageId)
+      );
+    }
     return;
   }
 
@@ -421,6 +624,15 @@ const handleAgentEvent = (type: string, ev: any) => {
     return;
   }
 
+  if (type === 'tool:intermediate') {
+    const call = ev.Call || ev.call || {};
+    const id = call.id || call.ID || call.tool_call_id;
+    if (id) {
+      toolsStore.handleToolIntermediate(id, ev.label || '', ev.data);
+    }
+    return;
+  }
+
   if (type === 'tool:end' || type === 'tool_call_end' || (type.startsWith('tool') && type.includes('end'))) {
     const call = ev.Call || ev.call || {};
     const id = call.id || call.ID || call.tool_call_id;
@@ -428,7 +640,7 @@ const handleAgentEvent = (type: string, ev: any) => {
       const toolCall = {
         id,
         name: call.name || 'unknown',
-        state: (call.error || ev.error ? 'failed' : 'completed') as const,
+        state: (call.error || ev.error ? 'failed' : 'completed') as 'failed' | 'completed',
         progress: 1,
         arguments: call.arguments || {},
         result: call.result || ev.result,
@@ -517,7 +729,8 @@ const handleAgentEvent = (type: string, ev: any) => {
   if (type === 'workflow_start' || type === 'workflow:start') {
     workflowStore.loadWorkflow({
       id: ev.workflow_id || generateId('workflow'),
-      title: ev.title || '工作流',
+      name: ev.name || ev.title || '工作流',
+      title: ev.title,
       steps: ev.steps || [],
     });
     return;
@@ -547,7 +760,32 @@ const handleAgentEvent = (type: string, ev: any) => {
     return;
   }
 
-  // 6. 状态变更事件
+  // 6. Context Compression 事件 → 系统提示
+  if (type === 'context_compression') {
+    if (ev.phase === 'start') {
+      // 压缩开始
+      chatStore.messages.push({
+        id: generateId('system'),
+        type: 'system',
+        content: '🗜️ 正在压缩对话历史...',
+        position: 'left',
+        metadata: { type: 'info' },
+      } as any);
+    } else if (ev.phase === 'end') {
+      // 压缩完成，计算节省比率
+      const ratio = ev.ratio ? Math.round((1 - ev.ratio) * 100) : 0;
+      chatStore.messages.push({
+        id: generateId('system'),
+        type: 'system',
+        content: `✅ 对话历史压缩完成，节省 ${ratio}% 空间`,
+        position: 'left',
+        metadata: { type: 'success' },
+      } as any);
+    }
+    return;
+  }
+
+  // 7. 状态变更事件
   if (type === 'state_changed') {
     const state = ev.state;
     if (state === 'working' || state === 'running') {
@@ -558,9 +796,94 @@ const handleAgentEvent = (type: string, ev: any) => {
     return;
   }
 
-  // 7. 错误事件
-  if (type === 'error') {
-    console.error('Agent error:', ev.message, ev.detail);
+  // 8. AskUser 事件 → 显示问题卡片
+  if (type === 'ask_user') {
+    console.log('📝 Ask user:', ev.questions);
+
+    // 添加 AskUser 消息
+    chatStore.messages.push({
+      id: generateId('ask'),
+      type: 'ask-user',
+      role: 'assistant',
+      createdAt: Date.now(),
+      position: 'left',
+      content: {
+        request_id: ev.request_id || generateId('request'),
+        questions: ev.questions || [],
+        answered: false,
+      },
+    } as any);
+    return;
+  }
+
+  // 9. Plan Mode 事件
+  if (type === 'plan_mode_entered' || type === 'enter_plan_mode') {
+    console.log('📋 Entering Plan Mode:', ev.plan_id);
+    chatStore.enterPlanMode(ev.plan_id || generateId('plan'), ev.content || ev.plan_content || '');
+    return;
+  }
+
+  if (type === 'plan_mode_exited' || type === 'exit_plan_mode') {
+    console.log('📋 Exiting Plan Mode');
+    chatStore.exitPlanMode();
+    return;
+  }
+
+  // 10. Token Usage 统计
+  if (type === 'token_usage' || type === 'usage') {
+    const usage = {
+      inputTokens: ev.input_tokens || ev.prompt_tokens || 0,
+      outputTokens: ev.output_tokens || ev.completion_tokens || 0,
+      totalTokens: ev.total_tokens || 0,
+    };
+    console.log('📊 Token usage:', usage);
+    
+    // 可以存储到 chatStore 或显示在 UI
+    // chatStore.tokenUsage = usage;
+    return;
+  }
+
+  // 11. 错误事件
+  if (type === 'error' || type === 'stream_error') {
+    console.error('Agent error:', ev.message || ev.code, ev.detail);
+    
+    // 移除当前对话的思考中消息
+    chatStore.messages = chatStore.messages.filter(
+      (m: any) => !(m.type === 'thinking' && m.conversationId === messageId)
+    );
+    
+    // 结束思考状态
+    thinkingStore.endThinking();
+    chatStore.isTyping = false;
+    
+    // 解析错误类型
+    const errorMessage = ev.message || ev.code || '';
+    let friendlyMessage = '抱歉，处理请求时出错了。';
+    let errorType = 'error';
+    
+    if (errorMessage.includes('server_overloaded') || errorMessage.includes('overloaded')) {
+      friendlyMessage = '🔥 服务器当前负载过高，请稍后重试';
+      errorType = 'overloaded';
+    } else if (errorMessage.includes('rate_limit') || errorMessage.includes('too many')) {
+      friendlyMessage = '⏱️ 请求过于频繁，请稍后重试';
+      errorType = 'rate_limit';
+    } else if (errorMessage.includes('auth_error') || errorMessage.includes('api_key')) {
+      friendlyMessage = '🔑 API Key 无效或已过期';
+      errorType = 'auth';
+    } else if (errorMessage.includes('timeout')) {
+      friendlyMessage = '⏳ 请求超时，请稍后重试';
+      errorType = 'timeout';
+    }
+    
+    // 添加错误消息
+    chatStore.messages.push({
+      id: generateId('error'),
+      type: 'text',
+      content: friendlyMessage,
+      position: 'left',
+      status: 'error',
+      metadata: { errorType },
+    } as any);
     return;
   }
 };
@@ -589,129 +912,350 @@ const formatResult = (res: any) => {
   }
 };
 
+const formatIntermediateValue = (value: any) => {
+  try {
+    if (typeof value === 'string') return value;
+    if (typeof value === 'number' || typeof value === 'boolean') return String(value);
+    return JSON.stringify(value);
+  } catch {
+    return String(value);
+  }
+};
+
 onMounted(async () => {
   // 初始化时选中第一个agent并显示欢迎消息
-  selectAgent(selectedAgent.value);
+  if (selectedAgent.value) {
+    selectAgent(selectedAgent.value);
+  }
 
   await ensureWebSocket();
   if (unsubscribeFn) unsubscribeFn();
   unsubscribeFn = onMessage(handleWsMessage);
 
-  // 开发环境下暴露测试函数到 window
+  // 开发环境: 添加测试工具到浏览器控制台
   if (import.meta.env.DEV) {
-    const w = window as any;
-    
-    // 测试思考过程
-    w.testThinking = () => {
-      const msgId = generateId('conversation');
-      currentConversationId.value = msgId;
-      
-      // 1. 添加 thinking 消息到消息列表
-      const thinkingMsg = {
-        id: generateId('thinking'),
-        type: 'thinking',
-        position: 'left',
-        conversationId: msgId,
-      };
-      chatStore.messages.push(thinkingMsg as any);
-      
-      // 2. 启动思考过程
-      thinkingStore.startThinking(msgId);
-      thinkingStore.handleThinkChunk('正在分析问题...');
-      
-      // 3. 添加工具调用步骤
-      setTimeout(() => {
-        thinkingStore.addStep(msgId, {
-          type: 'tool_call',
-          tool: { name: 'bash', args: { command: 'ls -la' } },
-          timestamp: Date.now(),
-        });
-      }, 1000);
-      
-      // 4. 添加工具结果步骤
-      setTimeout(() => {
-        thinkingStore.addStep(msgId, {
-          type: 'tool_result',
-          tool: { name: 'bash', args: { command: 'ls -la' } },
-          result: 'total 48\ndrwxr-xr-x  12 user  staff   384 Nov 27 10:00 .',
-          timestamp: Date.now(),
-        });
-      }, 2000);
-      
-      console.log('✅ testThinking() 已触发，检查消息流中的 ThinkingBlock');
-    };
+    (window as any).testUI = {
+      /**
+       * 测试思考过程显示
+       * 模拟: 思考 → 工具调用 → 工具结果
+       */
+      thinking: () => {
+        const msgId = currentConversationId.value || generateId('test');
+        chatStore.setActiveMessage(msgId);
 
-    // 测试审批卡片
-    w.testApproval = () => {
-      const msgId = currentConversationId.value || generateId('test');
-      currentConversationId.value = msgId;
-      approvalStore.addApprovalRequest({
-        id: generateId('approval'),
-        messageId: msgId,
-        toolName: 'file_delete',
-        args: { path: '/important/config.json' },
-        reason: '需要删除重要配置文件',
-        timestamp: Date.now(),
-      });
-      thinkingStore.addStep(msgId, {
-        type: 'approval',
-        tool: { name: 'file_delete', args: { path: '/important/config.json' } },
-        timestamp: Date.now(),
-      });
-      console.log('✅ testApproval() 已触发，检查 ApprovalCard 是否显示');
-    };
+        // 创建测试消息
+        chatStore.messages.push({
+          id: msgId,
+          type: 'text',
+          content: '正在分析问题...',
+          position: 'left',
+          conversationId: msgId,
+        } as any);
 
-    // 测试工作流
-    w.testWorkflow = () => {
-      workflowStore.loadWorkflow({
-        id: generateId('workflow'),
-        title: '测试工作流',
-        steps: [
-          { id: 'step1', title: '准备环境', status: 'completed' },
-          { id: 'step2', title: '执行任务', status: 'active' },
-          { id: 'step3', title: '验证结果', status: 'pending' },
-        ],
-      });
-      console.log('✅ testWorkflow() 已触发，检查侧边栏 WorkflowProgressView 是否显示');
-    };
+        // 1. 开始思考
+        thinkingStore.startThinking(msgId);
+        console.log('✅ 启动思考过程');
 
-    // 测试工具执行
-    w.testTool = () => {
-      const toolId = generateId('tool');
-      toolsStore.handleToolStart({
-        id: toolId,
-        name: 'web_search',
-        state: 'executing',
-        progress: 0,
-        arguments: { query: 'Aster Agent Framework' },
-        cancelable: true,
-        pausable: false,
-      });
-      let progress = 0;
-      const interval = setInterval(() => {
-        progress += 0.2;
-        if (progress >= 1) {
-          clearInterval(interval);
-          toolsStore.handleToolEnd({
-            id: toolId,
-            name: 'web_search',
-            state: 'completed',
-            progress: 1,
-            arguments: { query: 'Aster Agent Framework' },
-            result: { results: ['Result 1', 'Result 2', 'Result 3'] },
+        // 2. 添加推理步骤
+        setTimeout(() => {
+          thinkingStore.handleThinkChunk('分析当前情况...\n');
+          thinkingStore.handleThinkChunk('考虑可能的解决方案...\n');
+          console.log('✅ 添加推理内容');
+        }, 500);
+
+        // 3. 添加工具调用步骤
+        setTimeout(() => {
+          thinkingStore.addStep(msgId, {
+            type: 'tool_call',
+            tool: { name: 'bash', args: { command: 'ls -la' } },
+            timestamp: Date.now(),
           });
-        } else {
-          toolsStore.handleToolProgress(toolId, progress, `搜索中... ${Math.round(progress * 100)}%`);
-        }
-      }, 500);
-      console.log('✅ testTool() 已触发，检查工具执行区域');
+          console.log('✅ 添加工具调用步骤');
+        }, 1500);
+
+        // 4. 添加工具结果步骤
+        setTimeout(() => {
+          thinkingStore.addStep(msgId, {
+            type: 'tool_result',
+            result: 'file1.txt\nfile2.js\npackage.json',
+            timestamp: Date.now(),
+          });
+          console.log('✅ 添加工具结果步骤');
+        }, 2500);
+
+        // 5. 结束思考
+        setTimeout(() => {
+          thinkingStore.endThinking();
+          console.log('✅ 结束思考,ThinkingBlock 应该可以折叠了');
+        }, 3500);
+
+        console.log('🧪 测试思考过程已启动,将在 3.5 秒内完成');
+      },
+
+      /**
+       * 测试审批卡片显示
+       * 显示需要用户审批的操作
+       */
+      approval: () => {
+        const msgId = currentConversationId.value || generateId('test');
+        chatStore.setActiveMessage(msgId);
+
+        // 添加审批请求
+        const approvalId = generateId('approval');
+        approvalStore.addApprovalRequest({
+          id: approvalId,
+          messageId: msgId,
+          toolName: 'file_delete',
+          args: { path: '/important/config.json' },
+          reason: '该操作将删除系统配置文件,可能影响应用正常运行。请确认是否继续?',
+          timestamp: Date.now(),
+        });
+
+        // 添加审批步骤到思考过程
+        thinkingStore.startThinking(msgId);
+        thinkingStore.addStep(msgId, {
+          type: 'approval',
+          tool: { name: 'file_delete', args: { path: '/important/config.json' } },
+          timestamp: Date.now(),
+        });
+
+        console.log('🧪 审批卡片已显示');
+        console.log('💡 提示: ThinkingBlock 应该自动展开并高亮');
+        console.log('💡 批准后可以调用: testUI.approveRequest("' + approvalId + '")');
+      },
+
+      /**
+       * 批准测试审批请求
+       */
+      approveRequest: (requestId: string) => {
+        approvalStore.approve(requestId);
+        console.log('✅ 已批准请求:', requestId);
+      },
+
+      /**
+       * 拒绝测试审批请求
+       */
+      rejectRequest: (requestId: string, reason?: string) => {
+        approvalStore.reject(requestId, reason);
+        console.log('❌ 已拒绝请求:', requestId);
+      },
+
+      /**
+       * 测试工作流进度显示
+       * 模拟多步骤任务执行
+       */
+      workflow: () => {
+        // 加载工作流
+        workflowStore.loadWorkflow({
+          id: 'test-wf-' + Date.now(),
+          name: '测试工作流: 构建项目',
+          title: '测试工作流: 构建项目',
+          steps: [
+            {
+              id: 'step1',
+              title: '准备环境',
+              description: '安装依赖包',
+            },
+            {
+              id: 'step2',
+              title: '运行测试',
+              description: '执行单元测试和集成测试',
+            },
+            {
+              id: 'step3',
+              title: '构建项目',
+              description: '编译 TypeScript 并打包',
+            },
+            {
+              id: 'step4',
+              title: '部署上线',
+              description: '上传到生产环境',
+            },
+          ],
+        });
+
+        console.log('✅ 工作流已加载,左侧边栏应该显示进度');
+
+        // 模拟步骤进行
+        setTimeout(() => {
+          workflowStore.completeStep('step2');
+          workflowStore.updateStep('step3', { status: 'active' });
+          console.log('✅ 步骤 2 完成,步骤 3 开始');
+        }, 2000);
+
+        setTimeout(() => {
+          workflowStore.completeStep('step3');
+          workflowStore.updateStep('step4', { status: 'active' });
+          console.log('✅ 步骤 3 完成,步骤 4 开始');
+        }, 4000);
+
+        setTimeout(() => {
+          workflowStore.completeStep('step4');
+          console.log('✅ 工作流全部完成!');
+        }, 6000);
+
+        console.log('🧪 工作流测试已启动,将在 6 秒内完成');
+      },
+
+      /**
+       * 测试工具执行进度
+       * 显示工具执行和进度条
+       */
+      tool: () => {
+        const toolCall = {
+          id: generateId('tool'),
+          name: 'web_search',
+          state: 'executing' as const,
+          progress: 0,
+          arguments: { query: 'latest AI news 2025' },
+          cancelable: true,
+          pausable: false,
+        };
+
+        // 开始执行工具
+        toolsStore.handleToolStart(toolCall);
+        console.log('✅ 工具开始执行');
+
+        // 模拟进度更新
+        let progress = 0;
+        const interval = setInterval(() => {
+          progress += 0.15;
+          if (progress >= 1) {
+            clearInterval(interval);
+            // 工具完成
+            toolsStore.handleToolEnd({
+              ...toolCall,
+              state: 'completed',
+              progress: 1,
+              result: {
+                articles: [
+                  { title: 'GPT-5 发布在即', url: 'https://example.com/1' },
+                  { title: 'Claude 4 性能提升 50%', url: 'https://example.com/2' },
+                  { title: 'AI 编程助手革新开发流程', url: 'https://example.com/3' },
+                ],
+              },
+            });
+            console.log('✅ 工具执行完成,显示结果');
+          } else {
+            // 更新进度
+            const messages = [
+              '正在连接搜索引擎...',
+              '解析查询参数...',
+              '检索相关文章...',
+              '过滤和排序结果...',
+              '准备返回数据...',
+            ];
+            const msg = messages[Math.floor(progress * messages.length)];
+            toolsStore.handleToolProgress(toolCall.id, progress, msg);
+          }
+        }, 400);
+
+        console.log('🧪 工具执行测试已启动,进度条应该实时更新');
+      },
+
+      /**
+       * 清除所有测试数据
+       */
+      clear: () => {
+        thinkingStore.clearAllSteps();
+        workflowStore.clearWorkflow();
+        toolsStore.clearAllTools();
+        approvalStore.clearAll();
+        console.log('🧹 已清除所有测试数据');
+      },
+
+      /**
+       * 测试 AskUser 问题卡片
+       * 模拟: Agent 向用户提问
+       */
+      askUser: () => {
+        const askId = generateId('ask-id');
+        chatStore.messages.push({
+          id: generateId('ask'),
+          type: 'card',
+          position: 'left',
+          card: {
+            title: '请选择操作',
+            content: '您想要如何处理这个文件？',
+            actions: [
+              { text: '编辑', value: 'edit' },
+              { text: '删除', value: 'delete' },
+              { text: '跳过', value: 'skip' },
+            ],
+          },
+          metadata: {
+            askId: askId,
+            questionType: 'single_choice',
+          },
+        } as any);
+        console.log('✅ AskUser 问题卡片已创建');
+        console.log(`💡 问题 ID: ${askId}`);
+      },
+
+      /**
+       * 测试 Token 使用统计
+       * 模拟: 显示 Token 消耗信息
+       */
+      tokenUsage: () => {
+        const usage = {
+          inputTokens: 1234,
+          outputTokens: 567,
+          totalTokens: 1801,
+        };
+        console.log('📊 Token Usage 统计:');
+        console.log(`   输入 Token: ${usage.inputTokens}`);
+        console.log(`   输出 Token: ${usage.outputTokens}`);
+        console.log(`   总计 Token: ${usage.totalTokens}`);
+        console.log('💡 实际使用时会从后端 token_usage 事件接收数据');
+      },
+
+      /**
+       * 显示帮助信息
+       */
+      help: () => {
+        console.log(`
+🧪 测试工具使用说明
+==================
+
+1. testUI.thinking()          - 测试思考过程 (ThinkingBlock)
+   显示: 推理 → 工具调用 → 工具结果
+
+2. testUI.approval()          - 测试审批卡片 (ApprovalCard)
+   显示: 需要批准的危险操作
+
+3. testUI.approveRequest(id)  - 批准审批请求
+   参数: approval request ID
+
+4. testUI.rejectRequest(id, reason?) - 拒绝审批请求
+   参数: approval request ID, 可选原因
+
+5. testUI.workflow()          - 测试工作流进度 (WorkflowProgressView)
+   显示: 多步骤任务执行进度
+
+6. testUI.tool()              - 测试工具执行 (工具流)
+   显示: 工具执行过程和进度条
+
+7. testUI.askUser()           - 测试问题卡片 (AskUser)
+   显示: Agent 向用户提问
+
+8. testUI.tokenUsage()        - 测试 Token 统计
+   显示: Token 消耗信息
+
+9. testUI.clear()             - 清除所有测试数据
+   重置: 所有 stores 到初始状态
+
+10. testUI.help()             - 显示此帮助信息
+
+💡 提示:
+- 可以多次调用测试函数观察效果
+- 使用 testUI.clear() 清理后重新测试
+- 打开 Vue DevTools 查看 Pinia stores 状态变化
+        `);
+      },
     };
 
-    console.log('🧪 开发测试函数已加载:');
-    console.log('  - testThinking()  测试思考过程');
-    console.log('  - testApproval()  测试审批卡片');
-    console.log('  - testWorkflow()  测试工作流');
-    console.log('  - testTool()      测试工具执行');
+    console.log('🧪 测试工具已加载!');
+    console.log('💡 输入 testUI.help() 查看使用说明');
   }
 });
 
@@ -747,6 +1291,10 @@ onBeforeUnmount(() => {
 
 .agent-selector {
   @apply overflow-y-auto p-4 space-y-2;
+}
+
+.provider-section {
+  @apply p-4 border-t border-gray-200 dark:border-gray-700;
 }
 
 .workflow-section {
@@ -827,6 +1375,28 @@ onBeforeUnmount(() => {
   @apply bg-green-500 animate-pulse;
 }
 
+/* AskUser 问题卡片样式 */
+.ask-user-stream {
+  @apply p-4 border-t border-gray-200 dark:border-gray-700;
+}
+
+/* 审批流展示样式 */
+.approval-stream {
+  @apply p-4 border-t border-gray-200 dark:border-gray-700 bg-amber-50/30 dark:bg-gray-900;
+}
+
+.approval-stream-header {
+  @apply flex items-center justify-between mb-4;
+}
+
+.approval-stream-header h3 {
+  @apply text-lg font-semibold text-amber-900 dark:text-amber-500;
+}
+
+.approval-stream-header .hint {
+  @apply text-xs text-amber-600 dark:text-amber-400 font-medium;
+}
+
 /* 工具流展示样式保持不变 */
 .tool-stream {
   @apply p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
@@ -890,6 +1460,22 @@ onBeforeUnmount(() => {
 
 .tool-progress .meta {
   @apply flex items-center justify-between text-xs text-gray-600 dark:text-gray-400;
+}
+
+.tool-intermediate {
+  @apply mb-3 p-2 bg-blue-50 dark:bg-blue-900/10 rounded-md border border-blue-200 dark:border-blue-800;
+}
+
+.intermediate-item {
+  @apply flex gap-2 text-xs mb-1 last:mb-0;
+}
+
+.intermediate-label {
+  @apply font-semibold text-blue-700 dark:text-blue-400;
+}
+
+.intermediate-value {
+  @apply text-gray-700 dark:text-gray-300 font-mono;
 }
 
 .tool-actions {

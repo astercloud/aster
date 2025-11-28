@@ -342,8 +342,26 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 			var assistantMessage types.Message
 			var contentBlocks []types.ContentBlock
 
+			var reasoningContent strings.Builder
 			for chunk := range chunkCh {
-				if chunk.Type == "content_block_delta" {
+				log.Printf("[Agent Stream] Middleware chunk: type=%s, textDelta=%s", chunk.Type, truncate(chunk.TextDelta, 30))
+
+				switch chunk.Type {
+				// OpenAI 兼容格式 - 直接文本类型
+				case "text":
+					if chunk.TextDelta != "" {
+						log.Printf("[Agent Stream] Middleware text chunk: %s", truncate(chunk.TextDelta, 50))
+						contentBlocks = append(contentBlocks, &types.TextBlock{Text: chunk.TextDelta})
+					}
+				// 推理内容 (Kimi thinking, DeepSeek reasoner)
+				case "reasoning":
+					if chunk.Reasoning != nil && chunk.Reasoning.ThoughtDelta != "" {
+						log.Printf("[Agent Stream] Middleware reasoning chunk: %s", truncate(chunk.Reasoning.ThoughtDelta, 50))
+						reasoningContent.WriteString(chunk.Reasoning.ThoughtDelta)
+						// TODO: 发送 think_chunk 事件到前端
+					}
+				// Anthropic 格式 - content_block_delta
+				case "content_block_delta":
 					if delta, ok := chunk.Delta.(map[string]interface{}); ok {
 						if chunkType, ok := delta["type"].(string); ok {
 							switch chunkType {
@@ -358,7 +376,11 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 					}
 				}
 			}
+			if reasoningContent.Len() > 0 {
+				log.Printf("[Agent Stream] Total reasoning content: %d chars", reasoningContent.Len())
+			}
 
+			log.Printf("[Agent Stream] Middleware collected %d content blocks", len(contentBlocks))
 			assistantMessage.ContentBlocks = contentBlocks
 			assistantMessage.Role = types.RoleAssistant
 
@@ -403,9 +425,56 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 		log.Printf("[Agent Stream] 开始处理流式响应")
 
 		for chunk := range chunkCh {
-			log.Printf("[Agent Stream] 处理chunk: type=%s, index=%d, delta=%v", chunk.Type, chunk.Index, chunk.Delta)
+			log.Printf("[Agent Stream] 处理chunk: type=%s, index=%d, delta=%v, textDelta=%s", chunk.Type, chunk.Index, chunk.Delta, truncate(chunk.TextDelta, 50))
 
 			switch chunk.Type {
+			// OpenAI 兼容格式 - 直接文本类型
+			case "text":
+				if chunk.TextDelta != "" {
+					log.Printf("[Agent Stream] 收到文本增量(text): %s", truncate(chunk.TextDelta, 50))
+					contentBlocks = append(contentBlocks, &types.TextBlock{Text: chunk.TextDelta})
+
+					// 立即为这个text chunk生成事件并yield
+					event := &session.Event{
+						ID:        generateEventID(),
+						Timestamp: a.createdAt,
+						AgentID:   a.id,
+						Author:    "assistant",
+						Content: types.Message{
+							Role:          types.RoleAssistant,
+							ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: chunk.TextDelta}},
+						},
+						Actions: session.EventActions{},
+					}
+
+					// 立即发送事件到流
+					if writer.Send(event, nil) {
+						log.Printf("[Agent Stream] Client cancelled stream during text streaming")
+						return true, nil
+					}
+				}
+			// 推理内容 (Kimi thinking, DeepSeek reasoner)
+			case "reasoning":
+				if chunk.Reasoning != nil && chunk.Reasoning.ThoughtDelta != "" {
+					log.Printf("[Agent Stream] 收到推理增量: %s", truncate(chunk.Reasoning.ThoughtDelta, 50))
+
+					// 发送带有 Reasoning 的事件
+					event := &session.Event{
+						ID:        generateEventID(),
+						Timestamp: a.createdAt,
+						AgentID:   a.id,
+						Author:    "assistant",
+						Reasoning: chunk.Reasoning.ThoughtDelta,
+						Actions:   session.EventActions{},
+					}
+
+					// 立即发送事件到流
+					if writer.Send(event, nil) {
+						log.Printf("[Agent Stream] Client cancelled stream during reasoning streaming")
+						return true, nil
+					}
+				}
+			// Anthropic 格式 - content_block_delta
 			case "content_block_delta":
 				if delta, ok := chunk.Delta.(map[string]interface{}); ok {
 					if chunkType, ok := delta["type"].(string); ok {

@@ -176,9 +176,9 @@ const submitAnswers = () => {
     } else {
       const answer = selectedAnswers.value[qIndex];
       if (Array.isArray(answer)) {
-        answers[qIndex] = answer.map(i => question.options[i].label);
+        answers[qIndex] = answer.map(i => question.options[i]?.label ?? '');
       } else if (answer !== undefined && answer >= 0) {
-        answers[qIndex] = question.options[answer].label;
+        answers[qIndex] = question.options[answer]?.label ?? '';
       }
     }
   });

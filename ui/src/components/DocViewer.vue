@@ -14,7 +14,7 @@
             v-for="tab in demoTabs"
             :key="tab.key"
             :class="['demo-tab', { active: activeTab === tab.key }]"
-            @click="activeTab = tab.key"
+            @click="activeTab = tab.key as 'code' | 'preview'"
           >
             {{ tab.label }}
           </button>

@@ -34,7 +34,7 @@ const props = withDefaults(defineProps<Props>(), {
 const error = ref(false);
 
 const placeholder = computed(() => {
-  return props.alt ? props.alt[0].toUpperCase() : '?';
+  return props.alt && props.alt.length > 0 ? props.alt[0]!.toUpperCase() : '?';
 });
 
 const sizeClass = computed(() => {

@@ -18,7 +18,7 @@
           title="刷新进程列表"
           @click="refreshProcesses"
         >
-          <Icon type="refresh-cw" size="sm" />
+          <Icon type="refresh" size="sm" />
         </button>
         <button
           class="action-button"
@@ -283,7 +283,7 @@
         没有运行中的后台进程，所有进程都已正常完成
       </p>
       <button class="refresh-btn" @click="refreshProcesses">
-        <Icon type="refresh-cw" size="sm" />
+        <Icon type="refresh" size="sm" />
         刷新进程列表
       </button>
     </div>
@@ -313,7 +313,7 @@
           title="手动更新"
           @click="refreshProcesses"
         >
-          <Icon type="refresh-cw" size="xs" />
+          <Icon type="refresh" size="xs" />
         </button>
       </div>
     </div>
@@ -351,7 +351,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted, onUnmounted, nextTick } from 'vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
 import Icon from '../ChatUI/Icon.vue';
 
 interface OutputLine {
@@ -839,10 +839,10 @@ const loadFocusedProcesses = () => {
 };
 
 // 工具方法
-const getStatusIcon = (status: string) => {
+const getStatusIcon = (status: string): any => {
   const icons: Record<string, string> = {
     running: 'play',
-    completed: 'check-circle',
+    completed: 'check',
     failed: 'x-circle',
     stopped: 'square',
   };

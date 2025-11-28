@@ -28,6 +28,7 @@ export interface WorkflowStep {
 export interface WorkflowConfig {
   id: string;
   name: string;
+  title?: string;
   steps: Omit<WorkflowStep, 'status'>[];
 }
 

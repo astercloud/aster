@@ -1344,6 +1344,10 @@ func inferProviderFromModel(model string) string {
 		return "google"
 	case strings.HasPrefix(model, "llama") || strings.HasPrefix(model, "mistral"):
 		return "ollama"
+	case strings.HasPrefix(model, "kimi") || strings.HasPrefix(model, "moonshot"):
+		return "moonshot"
+	case strings.HasPrefix(model, "glm"):
+		return "glm"
 	default:
 		return "anthropic" // 默认 anthropic
 	}

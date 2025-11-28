@@ -37,6 +37,17 @@ export const useChatStore = defineStore('chat', () => {
   // 当前激活的消息 ID (用于思维过程关联)
   const activeMessageId = ref<string>('');
 
+  // Plan Mode 状态
+  const planMode = ref<{
+    active: boolean;
+    planContent: string;
+    planId: string | null;
+  }>({
+    active: false,
+    planContent: '',
+    planId: null,
+  });
+
   // 流式文本块累积（用于批量更新）
   const pendingTextChunks = ref<Map<string, string[]>>(new Map());
 
@@ -109,10 +120,13 @@ export const useChatStore = defineStore('chat', () => {
   const updateMessage = (messageId: string, updates: Partial<Message>) => {
     const index = messages.value.findIndex(m => m.id === messageId);
     if (index !== -1) {
-      messages.value[index] = {
-        ...messages.value[index],
-        ...updates,
-      };
+      const msg = messages.value[index];
+      if (msg) {
+        messages.value[index] = {
+          ...msg,
+          ...updates,
+        } as Message;
+      }
     }
   };
 
@@ -228,6 +242,28 @@ export const useChatStore = defineStore('chat', () => {
   };
 
   /**
+   * 进入 Plan Mode
+   */
+  const enterPlanMode = (planId: string, content: string) => {
+    planMode.value = {
+      active: true,
+      planContent: content,
+      planId,
+    };
+  };
+
+  /**
+   * 退出 Plan Mode
+   */
+  const exitPlanMode = () => {
+    planMode.value = {
+      active: false,
+      planContent: '',
+      planId: null,
+    };
+  };
+
+  /**
    * 获取消息索引
    */
   const getMessageIndex = (messageId: string): number => {
@@ -252,6 +288,7 @@ export const useChatStore = defineStore('chat', () => {
     isTyping,
     currentInput,
     activeMessageId,
+    planMode,
 
     // Getters
     messageCount,
@@ -276,6 +313,8 @@ export const useChatStore = defineStore('chat', () => {
     setTyping,
     setCurrentInput,
     setActiveMessage,
+    enterPlanMode,
+    exitPlanMode,
     getMessageIndex,
     getMessage,
   };

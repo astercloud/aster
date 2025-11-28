@@ -72,7 +72,7 @@ export function useChat(config: ChatConfig) {
     const list = config.demoResponses?.length ? config.demoResponses : fallbackResponses;
     const index = demoCursor % list.length;
     demoCursor += 1;
-    const template = list[index];
+    const template = list[index] ?? '';
     return template.includes('{question}')
       ? template.split('{question}').join(content)
       : template;
@@ -264,7 +264,7 @@ export function useChat(config: ChatConfig) {
       if (isDemoMode) {
         // Demo 模式
         await new Promise(resolve => setTimeout(resolve, config.demoDelay ?? 800));
-        assistantMessage.content.text = pickDemoResponse(content);
+        (assistantMessage.content as { text: string }).text = pickDemoResponse(content);
         assistantMessage.status = 'sent';
         chatStore.setTyping(false);
         chatStore.updateAgentStatus('idle');

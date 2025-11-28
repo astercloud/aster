@@ -139,12 +139,15 @@ const pendingApproval = computed(() => {
 
 const hasPendingApproval = computed(() => !!pendingApproval.value);
 
-// 自动展开逻辑：运行中或有审批请求时自动展开
+// 自动展开逻辑：运行中或有审批请求时自动展开，完成后自动折叠
 watch(
   [() => props.isActive, hasPendingApproval],
-  ([active, pending]) => {
+  ([active, pending], [wasActive]) => {
     if (active || pending) {
       isExpanded.value = true;
+    } else if (wasActive && !active && !pending) {
+      // 思考刚完成，自动折叠
+      isExpanded.value = false;
     }
   },
   { immediate: true }

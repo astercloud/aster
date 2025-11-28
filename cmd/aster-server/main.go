@@ -50,7 +50,7 @@ var providerDefaults = map[string]ProviderConfig{
 		APIKeyEnvs:   []string{"GEMINI_API_KEY", "GOOGLE_API_KEY"},
 	},
 	"moonshot": {
-		DefaultModel: "moonshot-v1-8k",
+		DefaultModel: "moonshot-v1-8k", // 基础模型，测试用
 		APIKeyEnvs:   []string{"MOONSHOT_API_KEY", "KIMI_API_KEY"},
 	},
 	"doubao": {

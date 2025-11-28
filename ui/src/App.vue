@@ -388,8 +388,8 @@ const demoModes: DemoMode[] = [
   },
 ];
 
-const selectedModeId = ref(demoModes[0].id);
-const selectedMode = computed(() => demoModes.find((mode) => mode.id === selectedModeId.value) || demoModes[0]);
+const selectedModeId = ref(demoModes[0]?.id ?? 'http');
+const selectedMode = computed(() => demoModes.find((mode) => mode.id === selectedModeId.value) ?? demoModes[0]!);
 const selectMode = (modeId: string) => {
   selectedModeId.value = modeId;
 };
@@ -419,15 +419,15 @@ const heroDemoConfig = computed(() => ({
 
 const demoConfig = computed(() => ({
   ...defaultDemoConfig,
-  agentProfile: selectedMode.value.agentProfile,
+  agentProfile: selectedMode.value?.agentProfile,
   demoMode: false,
   apiUrl: 'http://localhost:8080',
   modelConfig: {
     provider: 'deepseek',
     model: 'deepseek-chat',
   },
-  enableImage: selectedMode.value.enableImage,
-  enableVoice: selectedMode.value.enableVoice,
+  enableImage: selectedMode.value?.enableImage,
+  enableVoice: selectedMode.value?.enableVoice,
 }));
 
 const builderSteps = [

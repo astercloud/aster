@@ -780,7 +780,7 @@ const docs: Record<string, string> = {};
 Object.keys(docModules).forEach(path => {
   // 从路径中提取文件名（不含扩展名）
   const match = path.match(/\/([^/]+)\.md$/);
-  if (match) {
+  if (match && match[1]) {
     const filename = match[1];
     // 转换为 kebab-case (例如: Button -> button, AgentCard -> agent-card)
     const key = filename
@@ -905,7 +905,7 @@ const getDocDescription = (key: string): string => {
   // 提取第一个标题后的第一段文字
   const lines = doc.split('\n');
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i].trim();
+    const line = lines[i]?.trim() ?? '';
     // 跳过标题行
     if (line.startsWith('#')) continue;
     // 跳过空行

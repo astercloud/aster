@@ -61,7 +61,7 @@
         </div>
         <div
           v-for="run in toolRunsList"
-          :key="run.tool_call_id"
+          :key="run.id"
           class="p-3 rounded-lg border border-border bg-surface/60"
         >
           <div class="flex items-center justify-between mb-2">
@@ -73,22 +73,22 @@
           </div>
           <div class="flex items-center justify-between text-xs text-secondary mt-1">
             <span>{{ Math.round((run.progress || 0) * 100) }}%</span>
-            <span v-if="run.message">{{ run.message }}</span>
+            <span v-if="(run as any).message">{{ (run as any).message }}</span>
           </div>
           <div class="flex gap-2 mt-2">
             <button
               v-if="run.cancelable && run.state === 'executing'"
-              @click="controlTool(run.tool_call_id, 'cancel')"
+              @click="controlTool(run.id, 'cancel')"
               class="px-2 py-1 rounded bg-red-500 text-white text-xs"
             >取消</button>
             <button
               v-if="run.pausable && run.state === 'executing'"
-              @click="controlTool(run.tool_call_id, 'pause')"
+              @click="controlTool(run.id, 'pause')"
               class="px-2 py-1 rounded bg-amber-500 text-white text-xs"
             >暂停</button>
             <button
               v-if="run.pausable && run.state === 'paused'"
-              @click="controlTool(run.tool_call_id, 'resume')"
+              @click="controlTool(run.id, 'resume')"
               class="px-2 py-1 rounded bg-emerald-500 text-white text-xs"
             >继续</button>
           </div>

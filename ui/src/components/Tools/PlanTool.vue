@@ -95,7 +95,7 @@
         :class="['filter-button', { active: currentFilter === filter.key }]"
         @click="currentFilter = filter.key"
       >
-        <Icon :type="filter.icon" size="sm" />
+        <Icon :type="(filter.icon as any)" size="sm" />
         {{ filter.label }}
         <span class="filter-count">{{ filter.count }}</span>
       </button>
@@ -467,24 +467,28 @@ const handleWebSocketMessage = (message: any) => {
       }
       emit('planUpdated', updatedPlan);
       break;
-    case 'plan_approved':
+    case 'plan_approved': {
       const approvedPlanId = message.plan_id;
       const approvedIndex = plans.value.findIndex(p => p.id === approvedPlanId);
-      if (approvedIndex !== -1) {
-        plans.value[approvedIndex].status = 'approved';
-        plans.value[approvedIndex].approvedAt = Date.now();
+      const approvedPlan = plans.value[approvedIndex];
+      if (approvedIndex !== -1 && approvedPlan) {
+        approvedPlan.status = 'approved';
+        approvedPlan.approvedAt = Date.now();
       }
       emit('planApproved', approvedPlanId);
       break;
-    case 'plan_completed':
+    }
+    case 'plan_completed': {
       const completedPlanId = message.plan_id;
       const completedIndex = plans.value.findIndex(p => p.id === completedPlanId);
-      if (completedIndex !== -1) {
-        plans.value[completedIndex].status = 'completed';
-        plans.value[completedIndex].completedAt = Date.now();
+      const completedPlan = plans.value[completedIndex];
+      if (completedIndex !== -1 && completedPlan) {
+        completedPlan.status = 'completed';
+        completedPlan.completedAt = Date.now();
       }
       emit('planCompleted', completedPlanId);
       break;
+    }
     case 'plan_deleted':
       const deletedId = message.id;
       plans.value = plans.value.filter(p => p.id !== deletedId);
@@ -601,7 +605,7 @@ const getStatusText = (status: string) => {
   return map[status as keyof typeof map] || status;
 };
 
-const formatDate = (timestamp: number) => {
+const formatDate = (timestamp: number | string) => {
   const date = new Date(timestamp);
   return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
 };
@@ -634,7 +638,8 @@ const getCompletedSteps = (plan: Plan) => {
 const getCurrentStep = (plan: Plan) => {
   if (!plan.steps) return -1;
   for (let i = 0; i < plan.steps.length; i++) {
-    if (!plan.steps[i].completed) {
+    const step = plan.steps[i];
+    if (step && !step.completed) {
       return i;
     }
   }

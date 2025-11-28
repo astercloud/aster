@@ -5,6 +5,7 @@
 
 import { ref, onUnmounted } from 'vue';
 import { aster, WebSocketClient, SubscriptionManager } from '@aster/client-js';
+import { setGlobalWebSocket } from './useWebSocket';
 
 export interface AsterClientConfig {
   baseUrl?: string;
@@ -34,10 +35,6 @@ export function useAsterClient(config: AsterClientConfig = {}) {
   
   // 创建 Aster Client 并添加 agent 管理方法
   const client = {
-    ...new aster({
-      baseUrl,
-      apiKey,
-    }),
     agents: {
       async list() {
         const response = await fetch(`${baseUrl}/v1/agents`, {
@@ -205,7 +202,10 @@ export function useAsterClient(config: AsterClientConfig = {}) {
       await ws.value.connect(wsUrl);
       isConnected.value = true;
       
-      subscriptionManager.value = new SubscriptionManager(ws.value);
+      // 设置全局 WebSocket 实例，供 approvalStore 等使用
+      setGlobalWebSocket(ws.value as any);
+      
+      subscriptionManager.value = new SubscriptionManager(ws.value as any);
       
       console.log('✅ Aster WebSocket connected to', wsUrl);
       console.log('✅ ws.value:', ws.value);

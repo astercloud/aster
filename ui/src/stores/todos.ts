@@ -7,6 +7,7 @@
 import { defineStore } from 'pinia';
 import { ref, computed } from 'vue';
 import type { TodoItemData } from '@/types';
+import { useWebSocket } from '@/composables/useWebSocket';
 
 export const useTodosStore = defineStore('todos', () => {
   // ==================
@@ -76,10 +77,13 @@ export const useTodosStore = defineStore('todos', () => {
   const updateTodo = (id: string, updates: Partial<TodoItemData>) => {
     const index = todos.value.findIndex(t => t.id === id);
     if (index !== -1) {
-      todos.value[index] = {
-        ...todos.value[index],
-        ...updates,
-      };
+      const todo = todos.value[index];
+      if (todo) {
+        todos.value[index] = {
+          ...todo,
+          ...updates,
+        };
+      }
     }
   };
 
@@ -157,6 +161,64 @@ export const useTodosStore = defineStore('todos', () => {
     todos.value = todos.value.filter(t => t.status !== 'completed');
   };
 
+  /**
+   * 创建新 Todo (发送到后端)
+   */
+  const createTodo = async (todo: Omit<TodoItemData, 'id' | 'created_at' | 'updated_at'>) => {
+    const { getInstance } = useWebSocket();
+    const ws = getInstance();
+    if (ws) {
+      ws.send({
+        type: 'todo_create',
+        payload: {
+          content: todo.content,
+          active_form: todo.active_form,
+          status: todo.status,
+          priority: todo.priority,
+        },
+      });
+    } else {
+      console.error('WebSocket not connected, cannot create todo');
+    }
+  };
+
+  /**
+   * 更新 Todo 状态 (发送到后端)
+   */
+  const updateTodoStatus = async (todoId: string, status: 'pending' | 'in_progress' | 'completed') => {
+    const { getInstance } = useWebSocket();
+    const ws = getInstance();
+    if (ws) {
+      ws.send({
+        type: 'todo_update',
+        payload: {
+          id: todoId,
+          status,
+        },
+      });
+    } else {
+      console.error('WebSocket not connected, cannot update todo');
+    }
+  };
+
+  /**
+   * 删除 Todo (发送到后端)
+   */
+  const deleteTodo = async (todoId: string) => {
+    const { getInstance } = useWebSocket();
+    const ws = getInstance();
+    if (ws) {
+      ws.send({
+        type: 'todo_delete',
+        payload: {
+          id: todoId,
+        },
+      });
+    } else {
+      console.error('WebSocket not connected, cannot delete todo');
+    }
+  };
+
   // ==================
   // Return
   // ==================
@@ -184,5 +246,8 @@ export const useTodosStore = defineStore('todos', () => {
     markAsCompleted,
     clearAllTodos,
     clearCompletedTodos,
+    createTodo,
+    updateTodoStatus,
+    deleteTodo,
   };
 });

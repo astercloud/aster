@@ -70,7 +70,7 @@
       </template>
       <template #default>
         <AgentForm
-          :agent="editingAgent"
+          :agent="editingAgent ?? undefined"
           :loading="formLoading"
           @submit="handleSubmit"
           @cancel="handleCancel"

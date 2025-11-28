@@ -196,7 +196,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
 import Icon from '../ChatUI/Icon.vue';
 
 interface OutputLine {
@@ -386,6 +386,7 @@ const closeTab = (tabId: string) => {
   if (tabIndex === -1) return;
 
   const tab = tabs.value[tabIndex];
+  if (!tab) return;
 
   // 如果进程正在运行，先终止
   if (tab.isRunning && tab.processId) {
@@ -401,7 +402,8 @@ const closeTab = (tabId: string) => {
   // 如果关闭的是当前标签页，切换到其他标签页
   if (activeTabId.value === tabId) {
     if (tabs.value.length > 0) {
-      activeTabId.value = tabs.value[Math.max(0, tabIndex - 1)].id;
+      const newTab = tabs.value[Math.max(0, tabIndex - 1)];
+      activeTabId.value = newTab?.id ?? '';
     } else {
       createNewTab();
     }
@@ -485,10 +487,9 @@ const handleCommandKeydown = (event: KeyboardEvent) => {
       handleAutocomplete(input);
       break;
 
-    case 'Ctrl':
-    case 'Meta':
+    case 'c':
       // 处理 Ctrl+C
-      if (event.ctrlKey && event.key === 'c') {
+      if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
         if (tab.isRunning && tab.processId) {
           // 发送中断信号
@@ -536,7 +537,7 @@ const navigateHistory = (direction: number) => {
     tab.historyIndex = newIndex;
     const input = commandInput.value[tabs.value.findIndex(t => t.id === tab.id)];
     if (input) {
-      input.value = tab.history[newIndex];
+      input.value = tab.history[newIndex] ?? '';
       moveCursorToEnd();
     }
   } else if (newIndex === tab.history.length) {
@@ -650,7 +651,7 @@ const parseAnsiColors = (text: string): string => {
     .replace(/\x1b\[35m/g, '<span class="ansi-magenta">')
     .replace(/\x1b\[36m/g, '<span class="ansi-cyan">')
     .replace(/\x1b\[37m/g, '<span class="ansi-white">')
-    .replace(/\x1b[0m/g, '</span>')
+    .replace(/\x1b\[0m/g, '</span>')
     .replace(/\x1b\[1m/g, '<span class="ansi-bold">')
     .replace(/\x1b\[22m/g, '</span>');
 };
@@ -793,7 +794,10 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
     event.preventDefault();
     const currentIndex = tabs.value.findIndex(tab => tab.id === activeTabId.value);
     const nextIndex = (currentIndex + 1) % tabs.value.length;
-    switchTab(tabs.value[nextIndex].id);
+    const nextTab = tabs.value[nextIndex];
+    if (nextTab) {
+      switchTab(nextTab.id);
+    }
   }
 };
 </script>

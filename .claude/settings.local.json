@@ -40,7 +40,9 @@
       "Bash(xargs basename:*)",
       "Bash(gh pr checkout:*)",
       "Bash(test:*)",
-      "Bash(npx vite build)"
+      "Bash(npx vite build)",
+      "mcp__context7__resolve-library-id",
+      "mcp__context7__get-library-docs"
     ],
     "deny": [],
     "ask": []

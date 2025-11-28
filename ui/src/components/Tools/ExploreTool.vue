@@ -678,7 +678,7 @@ const getIconClassForItem = (item: FileItem) => {
 
 const getFileExtension = (filename: string) => {
   const parts = filename.split('.');
-  return parts.length > 1 ? parts[parts.length - 1].toLowerCase() : '';
+  return parts.length > 1 ? (parts[parts.length - 1] ?? '').toLowerCase() : '';
 };
 
 const isImageFile = (item: FileItem) => {

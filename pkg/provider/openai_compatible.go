@@ -7,6 +7,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"log"
 	"net/http"
 	"strings"
 	"time"
@@ -148,6 +149,30 @@ func (p *OpenAICompatibleProvider) Stream(
 	if resp.StatusCode != http.StatusOK {
 		body, _ := io.ReadAll(resp.Body)
 		_ = resp.Body.Close()
+
+		// 解析错误响应
+		var errResp map[string]interface{}
+		if json.Unmarshal(body, &errResp) == nil {
+			if errObj, ok := errResp["error"].(map[string]interface{}); ok {
+				errType, _ := errObj["type"].(string)
+				errMsg, _ := errObj["message"].(string)
+
+				// 处理特定错误类型
+				switch errType {
+				case "engine_overloaded_error":
+					return nil, fmt.Errorf("server_overloaded: 服务器当前负载过高，请稍后重试")
+				case "rate_limit_error":
+					return nil, fmt.Errorf("rate_limited: 请求过于频繁，请稍后重试")
+				case "invalid_api_key":
+					return nil, fmt.Errorf("auth_error: API Key 无效或已过期")
+				default:
+					if errMsg != "" {
+						return nil, fmt.Errorf("%s: %s", errType, errMsg)
+					}
+				}
+			}
+		}
+
 		return nil, fmt.Errorf("%s API error: %d - %s", p.providerName, resp.StatusCode, string(body))
 	}
 
@@ -524,6 +549,7 @@ func (p *OpenAICompatibleProvider) parseSSEStream(body io.ReadCloser, chunks cha
 	scanner := bufio.NewScanner(body)
 	scanner.Split(bufio.ScanLines)
 
+	eventCount := 0
 	for scanner.Scan() {
 		line := scanner.Text()
 
@@ -535,8 +561,16 @@ func (p *OpenAICompatibleProvider) parseSSEStream(body io.ReadCloser, chunks cha
 		data := strings.TrimPrefix(line, "data: ")
 		data = strings.TrimSpace(data)
 
+		eventCount++
+		truncatedData := data
+		if len(truncatedData) > 200 {
+			truncatedData = truncatedData[:200] + "..."
+		}
+		log.Printf("[%s] SSE Event #%d: %s", p.providerName, eventCount, truncatedData)
+
 		// 结束标记
 		if data == "[DONE]" {
+			log.Printf("[%s] Received [DONE] marker", p.providerName)
 			chunks <- StreamChunk{
 				Type:         string(ChunkTypeDone),
 				FinishReason: "stop",
@@ -547,12 +581,17 @@ func (p *OpenAICompatibleProvider) parseSSEStream(body io.ReadCloser, chunks cha
 		// 解析 JSON
 		var chunk map[string]interface{}
 		if err := json.Unmarshal([]byte(data), &chunk); err != nil {
+			log.Printf("[%s] JSON parse error: %v", p.providerName, err)
 			continue
 		}
 
 		// 解析 chunk 并转换为 StreamChunk
 		streamChunks := p.parseStreamChunk(chunk)
+		log.Printf("[%s] Parsed %d chunks from event", p.providerName, len(streamChunks))
 		for _, sc := range streamChunks {
+			if sc.TextDelta != "" {
+				log.Printf("[%s] Text delta: %s", p.providerName, sc.TextDelta)
+			}
 			chunks <- sc
 		}
 	}
@@ -597,6 +636,22 @@ func (p *OpenAICompatibleProvider) parseStreamChunk(chunk map[string]interface{}
 			Type:      string(ChunkTypeText),
 			TextDelta: content,
 			Delta:     content, // 兼容旧版
+		})
+	}
+
+	// 解析推理内容 (Kimi thinking, DeepSeek reasoner 等)
+	if reasoningContent, ok := delta["reasoning_content"].(string); ok && reasoningContent != "" {
+		truncated := reasoningContent
+		if len(truncated) > 50 {
+			truncated = truncated[:50] + "..."
+		}
+		log.Printf("[%s] Reasoning content: %s", p.providerName, truncated)
+		result = append(result, StreamChunk{
+			Type: string(ChunkTypeReasoning),
+			Reasoning: &ReasoningTrace{
+				ThoughtDelta: reasoningContent,
+				Type:         "thinking",
+			},
 		})
 	}
 

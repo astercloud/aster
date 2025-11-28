@@ -11,6 +11,12 @@ let wsInstance: WebSocketClient | null = null;
 const isConnected = ref(false);
 const connectionUrl = ref('');
 
+// 设置全局 WebSocket 实例（供其他 composable 使用）
+export function setGlobalWebSocket(ws: WebSocketClient | null) {
+  wsInstance = ws;
+  isConnected.value = ws !== null;
+}
+
 export function useWebSocket() {
   const connect = async (url: string) => {
     if (wsInstance && connectionUrl.value === url) {
