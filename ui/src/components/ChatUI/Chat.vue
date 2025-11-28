@@ -174,6 +174,7 @@ const emit = defineEmits<{
   send: [message: { type: string; content: string }];
   quickReply: [reply: QuickReply];
   cardAction: [action: { value: string }];
+  askUserSubmit: [payload: { requestId: string; answers: Record<string, any> }];
 }>();
 
 const inputValue = ref('');

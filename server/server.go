@@ -7,6 +7,8 @@ import (
 	"time"
 
 	aster "github.com/astercloud/aster"
+	"github.com/astercloud/aster/pkg/a2a"
+	"github.com/astercloud/aster/pkg/actor"
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/server/auth"
@@ -27,6 +29,10 @@ type Server struct {
 
 	// Dependencies (will be injected)
 	deps *Dependencies
+
+	// A2A Protocol Support
+	actorSystem *actor.System
+	a2aServer   *a2a.Server
 
 	// Auth & Observability
 	authManager   *auth.Manager
@@ -70,6 +76,9 @@ func New(config *Config, deps *Dependencies, opts ...Option) (*Server, error) {
 
 	// Initialize auth and observability
 	s.initializeAuthAndObservability()
+
+	// Initialize A2A protocol support
+	s.initializeA2A()
 
 	// Apply options
 	for _, opt := range opts {
@@ -164,6 +173,22 @@ func (s *Server) initializeAuthAndObservability() {
 	}
 }
 
+// initializeA2A initializes A2A protocol support
+func (s *Server) initializeA2A() {
+	// 创建 Actor System
+	systemConfig := actor.DefaultSystemConfig()
+	systemConfig.MailboxSize = 10000
+	s.actorSystem = actor.NewSystemWithConfig("aster-server", systemConfig)
+
+	// 创建任务存储
+	taskStore := a2a.NewInMemoryTaskStore()
+
+	// 创建 A2A Server
+	s.a2aServer = a2a.NewServer(s.actorSystem, taskStore)
+
+	fmt.Println("✅ A2A protocol support initialized")
+}
+
 // setupMiddleware configures all middleware
 func (s *Server) setupMiddleware() {
 	// Recovery middleware
@@ -246,6 +271,7 @@ func (s *Server) setupRoutes() {
 	s.registerTelemetryRoutes(v1)
 	s.registerEvalRoutes(v1)
 	s.registerMCPRoutes(v1)
+	s.registerA2ARoutes(v1)
 }
 
 // Start starts the HTTP server

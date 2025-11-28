@@ -129,7 +129,7 @@ func (e *ActorEngine) ExecuteWithActors(ctx context.Context, workflowID string, 
 	case err := <-errCh:
 		return nil, err
 	case <-ctx.Done():
-		e.CancelExecution(execution.ID)
+		_ = e.CancelExecution(execution.ID)
 		return nil, ctx.Err()
 	}
 }

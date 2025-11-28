@@ -41,6 +41,9 @@ type WebSocketHandler struct {
 	// Connection management
 	connections map[string]*WebSocketConnection
 	mu          sync.RWMutex
+
+	// HITL Manager for Human-in-the-Loop approval
+	hitlManager *HITLManager
 }
 
 // WebSocketConnection represents a single WebSocket connection
@@ -64,13 +67,16 @@ func NewWebSocketHandler(st store.Store, deps *agent.Dependencies, reg *RuntimeA
 	if reg == nil {
 		reg = NewRuntimeAgentRegistry()
 	}
-	return &WebSocketHandler{
+	h := &WebSocketHandler{
 		store:       &st,
 		deps:        deps,
 		todoManager: builtin.GetGlobalTodoManager(),
 		registry:    reg,
 		connections: make(map[string]*WebSocketConnection),
 	}
+	// Initialize HITL Manager
+	h.hitlManager = NewHITLManager(h)
+	return h
 }
 
 // HandleWebSocket handles WebSocket upgrade and communication
@@ -207,6 +213,8 @@ func (h *WebSocketHandler) handleMessage(wsConn *WebSocketConnection, msg *WebSo
 		h.handleTodoDelete(wsConn, msg.Payload)
 	case "tool:control", "tool_control":
 		h.handleToolControl(wsConn, msg.Payload)
+	case "permission_decision":
+		h.handlePermissionDecision(wsConn, msg.Payload)
 	default:
 		h.sendError(wsConn, "unknown_message_type", fmt.Sprintf("Unknown message type: %s", msg.Type))
 	}
@@ -479,6 +487,11 @@ func (h *WebSocketHandler) closeConnection(wsConn *WebSocketConnection) {
 	h.mu.Lock()
 	delete(h.connections, wsConn.ID)
 	h.mu.Unlock()
+
+	// Cancel pending HITL requests for this connection
+	if h.hitlManager != nil {
+		h.hitlManager.CancelPendingRequests(wsConn.ID)
+	}
 
 	wsConn.cancel()
 	close(wsConn.Send)

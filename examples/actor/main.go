@@ -147,10 +147,10 @@ func (a *CounterActor) Receive(ctx *actor.Context, msg actor.Message) {
 
 // UnstableActor 不稳定的 Actor - 模拟故障
 type UnstableActor struct {
-	name       string
-	failCount  int
-	maxFails   int
-	recovered  bool
+	name      string
+	failCount int
+	maxFails  int
+	recovered bool
 }
 
 func (a *UnstableActor) Receive(ctx *actor.Context, msg actor.Message) {

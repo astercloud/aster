@@ -59,69 +59,8 @@
         @send="handleSend"
         @quick-reply="handleQuickReply"
         @card-action="handleCardAction"
+        @ask-user-submit="handleAskUserSubmit"
       />
-
-      <!-- AskUser 问题卡片 -->
-      <div v-for="message in unansweredQuestions" :key="message.id" class="ask-user-stream">
-        <AskUserQuestionCard
-          :request-id="(message as any).content.request_id"
-          :questions="(message as any).content.questions"
-          :answered="(message as any).content.answered || false"
-          @submit="handleAskUserSubmit"
-        />
-      </div>
-
-      <!-- 审批卡片 -->
-      <div class="approval-stream" v-if="pendingApprovalsList.length > 0">
-        <div class="approval-stream-header">
-          <h3>待审批操作</h3>
-          <span class="hint">需要人工确认</span>
-        </div>
-        <ApprovalCard
-          v-for="request in pendingApprovalsList"
-          :key="request.id"
-          :request="request"
-          @approve="handleApprove(request.id)"
-          @reject="handleReject(request.id)"
-        />
-      </div>
-
-      <!-- 工具流展示 -->
-      <div class="tool-stream" v-if="toolRunsList.length">
-        <div class="tool-stream-header">
-          <h3>工具执行</h3>
-          <span class="hint">实时状态 / 可取消</span>
-        </div>
-        <div class="tool-run" v-for="run in toolRunsList" :key="run.id">
-          <div class="tool-run-head">
-            <div class="tool-name">{{ run.name }}</div>
-            <div class="tool-state" :class="run.state">{{ run.state }}</div>
-          </div>
-          <div class="tool-progress">
-            <div class="bar">
-              <div class="bar-inner" :style="{ width: `${Math.round((run.progress || 0)*100)}%` }"></div>
-            </div>
-            <div class="meta">
-              <span>{{ Math.round((run.progress || 0)*100) }}%</span>
-              <span v-if="run.intermediate?.message">{{ run.intermediate.message }}</span>
-            </div>
-          </div>
-          <!-- 中间结果展示 -->
-          <div v-if="run.intermediate && Object.keys(run.intermediate).length > 0" class="tool-intermediate">
-            <div v-for="(value, label) in run.intermediate" :key="label" class="intermediate-item">
-              <span class="intermediate-label">{{ label }}:</span>
-              <span class="intermediate-value">{{ formatIntermediateValue(value) }}</span>
-            </div>
-          </div>
-          <div class="tool-actions">
-            <button v-if="run.cancelable && run.state === 'executing'" @click="controlTool(run.id, 'cancel')">取消</button>
-            <button v-if="run.pausable && run.state === 'executing'" @click="controlTool(run.id, 'pause')">暂停</button>
-            <button v-if="run.pausable && run.state === 'paused'" @click="controlTool(run.id, 'resume')">继续</button>
-          </div>
-          <pre v-if="run.result" class="tool-result">{{ formatResult(run.result) }}</pre>
-          <pre v-if="run.error" class="tool-error">Error: {{ run.error }}</pre>
-        </div>
-      </div>
     </div>
   </div>
 
@@ -1102,6 +1041,18 @@ onMounted(async () => {
        * 显示工具执行和进度条
        */
       tool: () => {
+        const msgId = currentConversationId.value || generateId('test');
+        // 确保有活动的 thinking 消息
+        if (!chatStore.messages.find((m: any) => m.type === 'thinking' && m.conversationId === msgId)) {
+          chatStore.messages.push({
+            id: generateId('thinking'),
+            type: 'thinking',
+            position: 'left',
+            conversationId: msgId,
+          } as any);
+          thinkingStore.startThinking(msgId);
+        }
+
         const toolCall = {
           id: generateId('tool'),
           name: 'web_search',
@@ -1112,8 +1063,13 @@ onMounted(async () => {
           pausable: false,
         };
 
-        // 开始执行工具
+        // 1. 开始执行工具
         toolsStore.handleToolStart(toolCall);
+        thinkingStore.addStep(msgId, {
+          type: 'tool_call',
+          tool: { name: toolCall.name, args: toolCall.arguments },
+          timestamp: Date.now(),
+        });
         console.log('✅ 工具开始执行');
 
         // 模拟进度更新
@@ -1123,34 +1079,37 @@ onMounted(async () => {
           if (progress >= 1) {
             clearInterval(interval);
             // 工具完成
+            const result = {
+              articles: [
+                { title: 'GPT-5 发布在即', url: 'https://example.com/1' },
+                { title: 'Claude 4 性能提升 50%', url: 'https://example.com/2' },
+              ],
+            };
+            
             toolsStore.handleToolEnd({
               ...toolCall,
               state: 'completed',
               progress: 1,
-              result: {
-                articles: [
-                  { title: 'GPT-5 发布在即', url: 'https://example.com/1' },
-                  { title: 'Claude 4 性能提升 50%', url: 'https://example.com/2' },
-                  { title: 'AI 编程助手革新开发流程', url: 'https://example.com/3' },
-                ],
-              },
+              result,
             });
+            
+            thinkingStore.addStep(msgId, {
+              type: 'tool_result',
+              tool: { name: toolCall.name, args: toolCall.arguments },
+              result,
+              timestamp: Date.now(),
+            });
+            
             console.log('✅ 工具执行完成,显示结果');
           } else {
             // 更新进度
-            const messages = [
-              '正在连接搜索引擎...',
-              '解析查询参数...',
-              '检索相关文章...',
-              '过滤和排序结果...',
-              '准备返回数据...',
-            ];
+            const messages = ['正在连接...', '检索中...', '处理数据...'];
             const msg = messages[Math.floor(progress * messages.length)];
             toolsStore.handleToolProgress(toolCall.id, progress, msg);
           }
         }, 400);
 
-        console.log('🧪 工具执行测试已启动,进度条应该实时更新');
+        console.log('🧪 工具执行测试已启动, 将在 ThinkingBlock 中显示');
       },
 
       /**
@@ -1375,127 +1334,5 @@ onBeforeUnmount(() => {
   @apply bg-green-500 animate-pulse;
 }
 
-/* AskUser 问题卡片样式 */
-.ask-user-stream {
-  @apply p-4 border-t border-gray-200 dark:border-gray-700;
-}
 
-/* 审批流展示样式 */
-.approval-stream {
-  @apply p-4 border-t border-gray-200 dark:border-gray-700 bg-amber-50/30 dark:bg-gray-900;
-}
-
-.approval-stream-header {
-  @apply flex items-center justify-between mb-4;
-}
-
-.approval-stream-header h3 {
-  @apply text-lg font-semibold text-amber-900 dark:text-amber-500;
-}
-
-.approval-stream-header .hint {
-  @apply text-xs text-amber-600 dark:text-amber-400 font-medium;
-}
-
-/* 工具流展示样式保持不变 */
-.tool-stream {
-  @apply p-4 border-t border-gray-200 dark:border-gray-700 bg-gray-50 dark:bg-gray-900;
-}
-
-.tool-stream-header {
-  @apply flex items-center justify-between mb-4;
-}
-
-.tool-stream-header h3 {
-  @apply text-lg font-semibold text-gray-900 dark:text-white;
-}
-
-.tool-stream-header .hint {
-  @apply text-xs text-gray-500 dark:text-gray-400;
-}
-
-.tool-run {
-  @apply bg-white dark:bg-gray-800 rounded-lg p-4 mb-3 border border-gray-200 dark:border-gray-700;
-}
-
-.tool-run-head {
-  @apply flex items-center justify-between mb-3;
-}
-
-.tool-name {
-  @apply font-mono text-sm font-semibold text-gray-900 dark:text-white;
-}
-
-.tool-state {
-  @apply text-xs px-2 py-1 rounded-full;
-}
-
-.tool-state.executing {
-  @apply bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400;
-}
-
-.tool-state.completed {
-  @apply bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400;
-}
-
-.tool-state.failed {
-  @apply bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400;
-}
-
-.tool-state.paused {
-  @apply bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400;
-}
-
-.tool-progress {
-  @apply mb-3;
-}
-
-.tool-progress .bar {
-  @apply w-full h-2 bg-gray-200 dark:bg-gray-700 rounded-full overflow-hidden mb-2;
-}
-
-.tool-progress .bar-inner {
-  @apply h-full bg-blue-500 transition-all duration-300;
-}
-
-.tool-progress .meta {
-  @apply flex items-center justify-between text-xs text-gray-600 dark:text-gray-400;
-}
-
-.tool-intermediate {
-  @apply mb-3 p-2 bg-blue-50 dark:bg-blue-900/10 rounded-md border border-blue-200 dark:border-blue-800;
-}
-
-.intermediate-item {
-  @apply flex gap-2 text-xs mb-1 last:mb-0;
-}
-
-.intermediate-label {
-  @apply font-semibold text-blue-700 dark:text-blue-400;
-}
-
-.intermediate-value {
-  @apply text-gray-700 dark:text-gray-300 font-mono;
-}
-
-.tool-actions {
-  @apply flex gap-2 mb-3;
-}
-
-.tool-actions button {
-  @apply px-3 py-1 text-sm rounded-md bg-gray-100 hover:bg-gray-200 dark:bg-gray-700 dark:hover:bg-gray-600 text-gray-700 dark:text-gray-300 transition-colors;
-}
-
-.tool-result,
-.tool-error {
-  @apply text-xs font-mono p-3 rounded-md overflow-x-auto;
-}
-
-.tool-result {
-  @apply bg-gray-100 dark:bg-gray-900 text-gray-800 dark:text-gray-200;
-}
-
-.tool-error {
-  @apply bg-red-50 dark:bg-red-900/20 text-red-700 dark:text-red-400;
-}
 </style>

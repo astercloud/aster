@@ -1,6 +1,7 @@
 package server
 
 import (
+	"github.com/astercloud/aster/pkg/a2a"
 	"github.com/astercloud/aster/pkg/core"
 	"github.com/astercloud/aster/server/handlers"
 	"github.com/gin-gonic/gin"
@@ -312,4 +313,17 @@ func (s *Server) registerRoomRoutes(rg *gin.RouterGroup) {
 		rooms.GET("/:id/members", h.GetMembers)
 		rooms.GET("/:id/history", h.GetHistory)
 	}
+}
+
+// registerA2ARoutes registers A2A protocol routes
+func (s *Server) registerA2ARoutes(rg *gin.RouterGroup) {
+	if s.a2aServer == nil {
+		return // A2A not initialized
+	}
+
+	// 创建 A2A handler
+	h := a2a.NewHandler(s.a2aServer)
+
+	// 注册路由 (直接在 v1 group 上注册以获取正确的路径)
+	h.RegisterRoutes(rg)
 }
