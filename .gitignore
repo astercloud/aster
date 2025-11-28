@@ -200,3 +200,6 @@ proto/gen/
 /aster-server
 .kiro
 article-writer-web-service/
+
+# claude
+.claude/settings.local.json

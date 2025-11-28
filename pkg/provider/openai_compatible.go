@@ -672,15 +672,16 @@ func (p *OpenAICompatibleProvider) parseCompleteResponse(apiResp map[string]inte
 		result.Content = content
 	}
 
+	// 构建 ContentBlocks
+	blocks := make([]types.ContentBlock, 0)
+
+	// 添加文本块
+	if result.Content != "" {
+		blocks = append(blocks, &types.TextBlock{Text: result.Content})
+	}
+
 	// 解析工具调用
 	if toolCalls, ok := message["tool_calls"].([]interface{}); ok && len(toolCalls) > 0 {
-		blocks := make([]types.ContentBlock, 0)
-
-		// 添加文本块
-		if result.Content != "" {
-			blocks = append(blocks, &types.TextBlock{Text: result.Content})
-		}
-
 		// 添加工具调用块
 		for _, tc := range toolCalls {
 			toolCall := tc.(map[string]interface{})
@@ -698,9 +699,11 @@ func (p *OpenAICompatibleProvider) parseCompleteResponse(apiResp map[string]inte
 				Input: args,
 			})
 		}
+	}
 
+	// 设置 ContentBlocks（即使只有文本也设置）
+	if len(blocks) > 0 {
 		result.ContentBlocks = blocks
-		result.Content = ""
 	}
 
 	return result, nil

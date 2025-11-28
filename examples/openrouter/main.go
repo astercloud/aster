@@ -1,12 +1,15 @@
+// Package main 演示如何使用 OpenRouter 作为 LLM Provider
 package main
 
 import (
+	"bufio"
 	"context"
 	"fmt"
 	"log/slog"
 	"os"
 	"strings"
-	"time"
+
+	"github.com/urfave/cli/v3"
 
 	"github.com/astercloud/aster/pkg/agent"
 	"github.com/astercloud/aster/pkg/provider"
@@ -17,91 +20,42 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// TestSuite 测试套件
-type TestSuite struct {
-	cases     []testCase
-	startTime time.Time
-}
-
-type testCase struct {
-	name     string
-	passed   bool
-	err      string
-	duration time.Duration
-}
-
-func newTestSuite() *TestSuite {
-	return &TestSuite{startTime: time.Now()}
-}
-
-func (ts *TestSuite) add(name string, err error, duration time.Duration) {
-	tc := testCase{name: name, duration: duration, passed: err == nil}
-	if err != nil {
-		tc.err = err.Error()
-	}
-	ts.cases = append(ts.cases, tc)
-}
-
-func (ts *TestSuite) summary() bool {
-	fmt.Println("\n" + strings.Repeat("=", 60))
-	fmt.Println("📊 测试结果总结")
-	fmt.Println(strings.Repeat("=", 60))
-
-	passed, failed := 0, 0
-	for _, tc := range ts.cases {
-		if tc.passed {
-			fmt.Printf("  ✅ PASS  %-30s  (%v)\n", tc.name, tc.duration.Round(time.Millisecond))
-			passed++
-		} else {
-			fmt.Printf("  ❌ FAIL  %-30s  (%v)\n", tc.name, tc.duration.Round(time.Millisecond))
-			fmt.Printf("         └─ %s\n", tc.err)
-			failed++
-		}
-	}
-
-	fmt.Println(strings.Repeat("-", 60))
-	fmt.Printf("  总计: %d 通过, %d 失败, 耗时 %v\n", passed, failed, time.Since(ts.startTime).Round(time.Millisecond))
-	if failed == 0 {
-		fmt.Println("  🎉 所有测试通过!")
-	}
-	fmt.Println(strings.Repeat("=", 60))
-	return failed == 0
-}
-
-// runChatTest 执行对话测试并验证
-func runChatTest(ctx context.Context, ag *agent.Agent, suite *TestSuite, name, prompt string, verify func() error) {
-	slog.Info("--- " + name + " ---")
-	start := time.Now()
-
-	result, err := ag.Chat(ctx, prompt)
-	if err != nil {
-		suite.add(name, err, time.Since(start))
-		return
-	}
-	if result == nil || result.Status != "ok" {
-		suite.add(name, fmt.Errorf("状态异常: %v", result), time.Since(start))
-		return
-	}
-
-	// 执行额外验证
-	if verify != nil {
-		time.Sleep(300 * time.Millisecond) // 等待文件操作完成
-		if err := verify(); err != nil {
-			suite.add(name, err, time.Since(start))
-			return
-		}
-	}
-
-	suite.add(name, nil, time.Since(start))
-	slog.Info("响应", "status", result.Status)
-}
-
 func main() {
+	cmd := &cli.Command{
+		Name:  "openrouter-agent",
+		Usage: "OpenRouter Agent 演示程序",
+		Flags: []cli.Flag{
+			&cli.StringFlag{
+				Name:    "print",
+				Aliases: []string{"p"},
+				Usage:   "非交互模式：直接执行指定提示词并退出",
+			},
+			&cli.BoolFlag{
+				Name:    "stream",
+				Aliases: []string{"s"},
+				Usage:   "使用流式模式（实时输出）",
+			},
+			&cli.StringFlag{
+				Name:    "model",
+				Aliases: []string{"m"},
+				Value:   "anthropic/claude-haiku-4.5",
+				Usage:   "指定模型",
+			},
+		},
+		Action: run,
+	}
+
+	if err := cmd.Run(context.Background(), os.Args); err != nil {
+		slog.Error("运行失败", "error", err)
+		os.Exit(1)
+	}
+}
+
+func run(ctx context.Context, cmd *cli.Command) error {
 	// 检查 API Key
 	apiKey := os.Getenv("OPENROUTER_API_KEY")
 	if apiKey == "" {
-		slog.Error("需要设置 OPENROUTER_API_KEY 环境变量")
-		os.Exit(1)
+		return fmt.Errorf("需要设置 OPENROUTER_API_KEY 环境变量")
 	}
 
 	baseURL := os.Getenv("OPENROUTER_BASE_URL")
@@ -109,18 +63,124 @@ func main() {
 		baseURL = "https://openrouter.ai/api/v1"
 	}
 
-	ctx := context.Background()
+	// 获取参数
+	prompt := cmd.String("print")
+	streaming := cmd.Bool("stream")
+	model := cmd.String("model")
 
-	// 创建依赖
+	// 创建 Agent
+	ag, err := createAgent(apiKey, baseURL, model, streaming)
+	if err != nil {
+		return fmt.Errorf("创建 Agent 失败: %w", err)
+	}
+	defer func() { _ = ag.Close() }()
+
+	// 非交互模式
+	if prompt != "" {
+		return runOnce(ctx, ag, prompt)
+	}
+
+	// 交互模式
+	return runInteractive(ctx, ag)
+}
+
+// runOnce 非交互模式：执行单次对话并退出
+func runOnce(ctx context.Context, ag *agent.Agent, prompt string) error {
+	// 订阅事件以捕获文本输出
+	var textOutput strings.Builder
+	eventCh := ag.Subscribe([]types.AgentChannel{types.ChannelProgress}, nil)
+
+	done := make(chan struct{})
+	go func() {
+		for envelope := range eventCh {
+			switch e := envelope.Event.(type) {
+			case *types.ProgressTextChunkEvent:
+				textOutput.WriteString(e.Delta)
+			}
+		}
+		close(done)
+	}()
+
+	result, err := ag.Chat(ctx, prompt)
+	ag.Unsubscribe(eventCh)
+	<-done
+
+	if err != nil {
+		return fmt.Errorf("对话失败: %w", err)
+	}
+
+	// 优先使用事件流收集的文本，其次使用 result.Text
+	output := textOutput.String()
+	if output == "" {
+		output = result.Text
+	}
+
+	if output != "" {
+		fmt.Println(output)
+	} else {
+		fmt.Println("[完成]")
+	}
+
+	return nil
+}
+
+// runInteractive 交互模式：REPL 循环
+func runInteractive(ctx context.Context, ag *agent.Agent) error {
+	slog.Info("Agent 创建成功", "id", ag.ID())
+
+	// 订阅事件
+	eventCh := ag.Subscribe([]types.AgentChannel{types.ChannelProgress}, nil)
+	go handleEvents(eventCh)
+
+	fmt.Println("\n🤖 OpenRouter Agent 演示")
+	fmt.Println("输入消息与 Agent 对话，输入 'quit' 退出")
+	fmt.Println(strings.Repeat("-", 50))
+
+	scanner := bufio.NewScanner(os.Stdin)
+	for {
+		fmt.Print("\n> ")
+		if !scanner.Scan() {
+			break
+		}
+
+		input := strings.TrimSpace(scanner.Text())
+		if input == "" {
+			continue
+		}
+		if input == "quit" || input == "exit" {
+			fmt.Println("👋 再见!")
+			break
+		}
+
+		result, err := ag.Chat(ctx, input)
+		if err != nil {
+			slog.Error("对话失败", "error", err)
+			continue
+		}
+
+		// 显示响应文本
+		if result.Text != "" {
+			fmt.Printf("\n%s\n", result.Text)
+		}
+		fmt.Printf("[状态: %s]\n", result.Status)
+	}
+
+	return nil
+}
+
+// createAgent 创建并配置 Agent
+func createAgent(apiKey, baseURL, model string, streaming bool) (*agent.Agent, error) {
+	// 工具注册
 	toolRegistry := tools.NewRegistry()
 	builtin.RegisterAll(toolRegistry)
 
+	// 持久化存储
 	jsonStore, err := store.NewJSONStore(".aster")
 	if err != nil {
-		slog.Error("创建 Store 失败", "error", err)
-		os.Exit(1)
+		return nil, fmt.Errorf("创建 Store 失败: %w", err)
 	}
 
+	// Agent 模板
 	templateRegistry := agent.NewTemplateRegistry()
 	templateRegistry.Register(&types.AgentTemplateDefinition{
 		ID:           "simple-assistant",
@@ -128,6 +188,7 @@ func main() {
 		Tools:        []interface{}{"Read", "Write", "Bash"},
 	})
 
+	// 依赖注入
 	deps := &agent.Dependencies{
 		Store:            jsonStore,
 		SandboxFactory:   sandbox.NewFactory(),
@@ -136,14 +197,21 @@ func main() {
 		TemplateRegistry: templateRegistry,
 	}
 
+	// 执行模式
+	execMode := types.ExecutionModeNonStreaming
+	if streaming {
+		execMode = types.ExecutionModeStreaming
+	}
+
+	// Agent 配置
 	config := &types.AgentConfig{
 		TemplateID: "simple-assistant",
 		ModelConfig: &types.ModelConfig{
 			Provider:      "openrouter",
-			Model:         "anthropic/claude-haiku-4.5",
+			Model:         model,
 			APIKey:        apiKey,
 			BaseURL:       baseURL,
-			ExecutionMode: types.ExecutionModeNonStreaming,
+			ExecutionMode: execMode,
 		},
 		Sandbox: &types.SandboxConfig{
 			Kind:    types.SandboxKindLocal,
@@ -151,77 +219,21 @@ func main() {
 		},
 	}
 
-	ag, err := agent.Create(ctx, config, deps)
-	if err != nil {
-		slog.Error("创建 Agent 失败", "error", err)
-		os.Exit(1)
-	}
-	defer func() { _ = ag.Close() }()
-
-	slog.Info("Agent 创建成功", "id", ag.ID())
-
-	// 准备测试
-	suite := newTestSuite()
-	testFile := "./workspace/test.txt"
-	_ = os.Remove(testFile)
-
-	// 订阅事件
-	eventCh := ag.Subscribe([]types.AgentChannel{types.ChannelProgress, types.ChannelMonitor}, nil)
-	go func() {
-		for envelope := range eventCh {
-			handleEvent(envelope.Event)
-		}
-	}()
-
-	// 执行测试
-	runChatTest(ctx, ag, suite, "创建测试文件",
-		"请创建一个名为 test.txt 的文件，内容为 'Hello World'",
-		func() error {
-			data, err := os.ReadFile(testFile)
-			if err != nil {
-				return fmt.Errorf("文件未创建: %w", err)
-			}
-			if strings.TrimSpace(string(data)) != "Hello World" {
-				return fmt.Errorf("内容不匹配: %s", string(data))
-			}
-			return nil
-		})
-
-	runChatTest(ctx, ag, suite, "读取文件内容",
-		"请读取 test.txt 文件的内容", nil)
-
-	runChatTest(ctx, ag, suite, "执行 Bash 命令",
-		"请执行 'ls -la' 命令", nil)
-
-	// 验证 Agent 状态
-	status := ag.Status()
-	if status.State != types.AgentStateReady || status.StepCount == 0 {
-		suite.add("Agent 状态检查", fmt.Errorf("状态: %s, 步骤: %d", status.State, status.StepCount), 0)
-	} else {
-		suite.add("Agent 状态检查", nil, 0)
-	}
-
-	// 输出结果
-	fmt.Printf("\n最终状态: Agent=%s, 状态=%s, 步骤=%d\n", status.AgentID, status.State, status.StepCount)
-
-	if !suite.summary() {
-		os.Exit(1)
-	}
+	return agent.Create(context.TODO(), config, deps)
 }
 
-func handleEvent(event interface{}) {
-	switch e := event.(type) {
-	case *types.ProgressToolStartEvent:
-		fmt.Printf("\n[工具] %s 开始\n", e.Call.Name)
-	case *types.ProgressToolEndEvent:
-		fmt.Printf("[工具] %s 完成\n", e.Call.Name)
-	case *types.ProgressToolErrorEvent:
-		fmt.Printf("[错误] %s: %s\n", e.Call.Name, e.Error)
-	case *types.ProgressDoneEvent:
-		fmt.Printf("[完成] 步骤 %d\n", e.Step)
-	case *types.MonitorStateChangedEvent:
-		fmt.Printf("[状态] %s\n", e.State)
-	case *types.MonitorErrorEvent:
-		fmt.Printf("[错误] %s: %s\n", e.Phase, e.Message)
+// handleEvents 处理 Agent 事件流
+func handleEvents(eventCh <-chan types.AgentEventEnvelope) {
+	for envelope := range eventCh {
+		switch e := envelope.Event.(type) {
+		case *types.ProgressToolStartEvent:
+			fmt.Printf("\n🔧 [工具] %s 开始执行...\n", e.Call.Name)
+		case *types.ProgressToolEndEvent:
+			fmt.Printf("✅ [工具] %s 完成\n", e.Call.Name)
+		case *types.ProgressToolErrorEvent:
+			fmt.Printf("❌ [错误] %s: %s\n", e.Call.Name, e.Error)
+		case *types.ProgressDoneEvent:
+			fmt.Printf("📝 [完成] 步骤 %d\n", e.Step)
+		}
 	}
 }

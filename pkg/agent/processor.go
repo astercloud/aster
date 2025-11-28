@@ -769,6 +769,95 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 					TotalTokens:  chunk.Usage.InputTokens + chunk.Usage.OutputTokens,
 				})
 			}
+
+		// OpenAI 兼容格式：处理 text 类型（来自 OpenRouter、DeepSeek 等）
+		case "text":
+			text := chunk.TextDelta
+			if text == "" {
+				text = chunk.Delta.(string)
+			}
+			if text != "" {
+				// 确保有文本块
+				if currentBlockIndex < 0 {
+					currentBlockIndex = 0
+				}
+				for len(assistantContent) <= currentBlockIndex {
+					assistantContent = append(assistantContent, nil)
+				}
+				if assistantContent[currentBlockIndex] == nil {
+					assistantContent[currentBlockIndex] = &types.TextBlock{Text: ""}
+					textBuffers[currentBlockIndex] = ""
+					// 发送文本开始事件
+					a.eventBus.EmitProgress(&types.ProgressTextChunkStartEvent{
+						Step: a.stepCount,
+					})
+				}
+
+				// 累积文本
+				textBuffers[currentBlockIndex] += text
+				if block, ok := assistantContent[currentBlockIndex].(*types.TextBlock); ok {
+					block.Text = textBuffers[currentBlockIndex]
+				}
+
+				// 发送文本增量事件
+				a.eventBus.EmitProgress(&types.ProgressTextChunkEvent{
+					Step:  a.stepCount,
+					Delta: text,
+				})
+			}
+
+		// OpenAI 兼容格式：处理 tool_call 类型
+		case "tool_call":
+			if chunk.ToolCall != nil {
+				tc := chunk.ToolCall
+				blockIndex := tc.Index
+				if blockIndex < 0 {
+					blockIndex = len(assistantContent)
+				}
+
+				// 确保有足够空间
+				for len(assistantContent) <= blockIndex {
+					assistantContent = append(assistantContent, nil)
+				}
+
+				// 初始化或更新工具调用块
+				if assistantContent[blockIndex] == nil {
+					assistantContent[blockIndex] = &types.ToolUseBlock{
+						ID:    tc.ID,
+						Name:  tc.Name,
+						Input: make(map[string]interface{}),
+					}
+					inputJSONBuffers[blockIndex] = ""
+				}
+
+				// 累积参数
+				if tc.ArgumentsDelta != "" {
+					inputJSONBuffers[blockIndex] += tc.ArgumentsDelta
+				}
+
+				currentBlockIndex = blockIndex
+			}
+
+		// OpenAI 兼容格式：处理 done 类型
+		case "done":
+			// 发送文本结束事件（如果有文本）
+			if currentBlockIndex >= 0 && currentBlockIndex < len(assistantContent) {
+				if _, ok := assistantContent[currentBlockIndex].(*types.TextBlock); ok {
+					a.eventBus.EmitProgress(&types.ProgressTextChunkEndEvent{
+						Step: a.stepCount,
+					})
+				}
+			}
+
+		// OpenAI 兼容格式：处理 usage 类型
+		case "usage":
+			if chunk.Usage != nil {
+				a.eventBus.EmitMonitor(&types.MonitorTokenUsageEvent{
+					InputTokens:  chunk.Usage.InputTokens,
+					OutputTokens: chunk.Usage.OutputTokens,
+					TotalTokens:  chunk.Usage.InputTokens + chunk.Usage.OutputTokens,
+				})
+			}
 		}
 	}
 
