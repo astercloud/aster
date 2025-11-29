@@ -183,7 +183,7 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 		log.Printf("[A2A] save task error: %v", err)
 	}
 
-	return NewSuccessResponse(req.ID, task)
+	return NewSuccessResponse(req.ID, &MessageSendResult{TaskID: taskID})
 }
 
 // handleMessageStream 处理 message/stream 方法
@@ -205,7 +205,7 @@ func (s *Server) handleTasksGet(ctx context.Context, agentID string, req *JSONRP
 		return NewErrorResponse(req.ID, ErrorCodeTaskNotFound, err.Error(), nil)
 	}
 
-	return NewSuccessResponse(req.ID, task)
+	return NewSuccessResponse(req.ID, &TasksGetResult{Task: task})
 }
 
 // handleTasksCancel 处理 tasks/cancel 方法
@@ -222,7 +222,10 @@ func (s *Server) handleTasksCancel(ctx context.Context, agentID string, req *JSO
 
 	// 检查是否可以取消
 	if task.IsFinalState() {
-		return NewSuccessResponse(req.ID, task)
+		return NewSuccessResponse(req.ID, &TasksCancelResult{
+			Success: false,
+			Message: "Task is already in final state",
+		})
 	}
 
 	// 设置取消信号
@@ -239,9 +242,11 @@ func (s *Server) handleTasksCancel(ctx context.Context, agentID string, req *JSO
 	if err := s.taskStore.Save(agentID, task); err != nil {
 		log.Printf("[A2A] save task error: %v", err)
 	}
-	s.taskStore.RemoveCancellation(params.TaskID)
 
-	return NewSuccessResponse(req.ID, task)
+	return NewSuccessResponse(req.ID, &TasksCancelResult{
+		Success: true,
+		Message: "Task cancelled successfully",
+	})
 }
 
 // loadOrCreateTask 加载或创建任务

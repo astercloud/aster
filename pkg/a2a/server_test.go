@@ -20,7 +20,7 @@ type MockAgentActor struct {
 }
 
 func (a *MockAgentActor) Receive(ctx *actor.Context, msg actor.Message) {
-	switch m := msg.(type) {
+	switch msg.(type) {
 	case *pkgagent.ChatMsg:
 		// 模拟延迟
 		time.Sleep(10 * time.Millisecond)
@@ -38,10 +38,8 @@ func (a *MockAgentActor) Receive(ctx *actor.Context, msg actor.Message) {
 			},
 		}
 
-		select {
-		case m.ReplyTo <- result:
-		case <-time.After(time.Second):
-		}
+		// 使用 ctx.Reply() 回复
+		ctx.Reply(result)
 	}
 }
 
