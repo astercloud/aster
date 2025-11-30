@@ -3,6 +3,7 @@ package builtin
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -14,6 +15,12 @@ import (
 type CodeExecuteTool struct {
 	runtimeManager *bridge.RuntimeManager
 	toolBridge     *bridge.ToolBridge
+
+	// PTC 支持
+	httpServer    *bridge.HTTPBridgeServer
+	bridgeURL     string
+	serverStarted bool
+	mu            sync.Mutex
 }
 
 // NewCodeExecuteTool 创建代码执行工具
@@ -38,7 +45,15 @@ func NewCodeExecuteToolWithBridge(toolBridge *bridge.ToolBridge) *CodeExecuteToo
 	return &CodeExecuteTool{
 		runtimeManager: bridge.NewRuntimeManager(nil),
 		toolBridge:     toolBridge,
+		bridgeURL:      "http://localhost:8080", // 默认桥接 URL
 	}
+}
+
+// SetBridgeURL 设置 HTTP 桥接服务器地址
+func (t *CodeExecuteTool) SetBridgeURL(url string) {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+	t.bridgeURL = url
 }
 
 func (t *CodeExecuteTool) Name() string {
@@ -71,7 +86,54 @@ func (t *CodeExecuteTool) InputSchema() map[string]any {
 	}
 }
 
+// ensureBridgeServer 确保 HTTP 桥接服务器已启动 (PTC 支持)
+func (t *CodeExecuteTool) ensureBridgeServer(tc *tools.ToolContext) error {
+	t.mu.Lock()
+	defer t.mu.Unlock()
+
+	// 如果已经启动,直接返回
+	if t.serverStarted {
+		return nil
+	}
+
+	// 如果没有 toolBridge,不启动服务器(非 PTC 模式)
+	if t.toolBridge == nil {
+		return nil
+	}
+
+	// 创建并启动 HTTP 桥接服务器
+	t.httpServer = bridge.NewHTTPBridgeServer(t.toolBridge, t.bridgeURL)
+
+	// 设置工具上下文工厂
+	t.httpServer.SetContextFactory(func() *tools.ToolContext {
+		return tc
+	})
+
+	// 异步启动服务器
+	if err := t.httpServer.StartAsync(); err != nil {
+		return fmt.Errorf("failed to start HTTP bridge server: %w", err)
+	}
+
+	// 获取可用工具列表
+	availableTools := t.toolBridge.ListAvailableTools()
+
+	// 设置 RuntimeManager 的工具列表和桥接 URL
+	t.runtimeManager.SetPythonTools(availableTools)
+	t.runtimeManager.SetPythonBridgeURL(t.bridgeURL)
+
+	t.serverStarted = true
+	return nil
+}
+
 func (t *CodeExecuteTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
+	// 确保 HTTP 桥接服务器已启动 (PTC 支持)
+	if err := t.ensureBridgeServer(tc); err != nil {
+		return map[string]any{
+			"success": false,
+			"error":   fmt.Sprintf("failed to start bridge server: %v", err),
+		}, nil
+	}
+
 	// 解析参数
 	langStr, ok := input["language"].(string)
 	if !ok {

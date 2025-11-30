@@ -33,13 +33,13 @@ type CodeRuntime interface {
 
 // ExecutionResult 代码执行结果
 type ExecutionResult struct {
-	Success  bool        `json:"success"`
-	Output   any `json:"output,omitempty"`
-	Stdout   string      `json:"stdout,omitempty"`
-	Stderr   string      `json:"stderr,omitempty"`
-	Error    string      `json:"error,omitempty"`
-	ExitCode int         `json:"exit_code"`
-	Duration int64       `json:"duration_ms"`
+	Success  bool   `json:"success"`
+	Output   any    `json:"output,omitempty"`
+	Stdout   string `json:"stdout,omitempty"`
+	Stderr   string `json:"stderr,omitempty"`
+	Error    string `json:"error,omitempty"`
+	ExitCode int    `json:"exit_code"`
+	Duration int64  `json:"duration_ms"`
 }
 
 // RuntimeConfig 运行时配置
@@ -62,8 +62,10 @@ func DefaultRuntimeConfig() *RuntimeConfig {
 
 // PythonRuntime Python 运行时
 type PythonRuntime struct {
-	config     *RuntimeConfig
-	pythonPath string
+	config         *RuntimeConfig
+	pythonPath     string
+	availableTools []string // PTC: 可用工具列表
+	bridgeURL      string   // PTC: HTTP 桥接服务器地址
 }
 
 // NewPythonRuntime 创建 Python 运行时
@@ -93,6 +95,16 @@ func (r *PythonRuntime) Language() Language {
 func (r *PythonRuntime) IsAvailable() bool {
 	_, err := exec.LookPath(r.pythonPath)
 	return err == nil
+}
+
+// SetTools 设置可用工具列表 (PTC 支持)
+func (r *PythonRuntime) SetTools(tools []string) {
+	r.availableTools = tools
+}
+
+// SetBridgeURL 设置 HTTP 桥接服务器地址 (PTC 支持)
+func (r *PythonRuntime) SetBridgeURL(url string) {
+	r.bridgeURL = url
 }
 
 func (r *PythonRuntime) Execute(ctx context.Context, code string, input map[string]any) (*ExecutionResult, error) {
@@ -174,7 +186,10 @@ func (r *PythonRuntime) Execute(ctx context.Context, code string, input map[stri
 
 func (r *PythonRuntime) wrapCode(code string, input map[string]any) string {
 	inputJSON, _ := json.Marshal(input)
-	return fmt.Sprintf(`import json
+
+	// 如果没有配置工具,使用简单包装
+	if len(r.availableTools) == 0 {
+		return fmt.Sprintf(`import json
 import sys
 
 # Input data
@@ -183,6 +198,148 @@ _input = json.loads('%s')
 # User code
 %s
 `, string(inputJSON), code)
+	}
+
+	// PTC 模式: 注入工具桥接代码
+	bridgeURL := r.bridgeURL
+	if bridgeURL == "" {
+		bridgeURL = "http://localhost:8080"
+	}
+
+	// 生成工具列表 JSON
+	toolsJSON, _ := json.Marshal(r.availableTools)
+
+	return fmt.Sprintf(`import json
+import asyncio
+import sys
+import os
+
+# ========== Aster Bridge SDK (内联) ==========
+try:
+    import aiohttp
+except ImportError:
+    print("Error: aiohttp is required. Install it with: pip install aiohttp", file=sys.stderr)
+    sys.exit(1)
+
+class _ToolExecutionError(Exception):
+    """工具执行错误"""
+    pass
+
+class _NetworkError(Exception):
+    """网络错误"""
+    pass
+
+class _AsterBridge:
+    def __init__(self, base_url, max_retries=3, retry_delay=0.5):
+        self.base_url = base_url
+        self.max_retries = max_retries
+        self.retry_delay = retry_delay
+        self._session = None
+
+    async def _get_session(self):
+        if self._session is None or self._session.closed:
+            self._session = aiohttp.ClientSession()
+        return self._session
+
+    async def call_tool(self, name, **kwargs):
+        last_error = None
+        for attempt in range(self.max_retries):
+            try:
+                session = await self._get_session()
+                async with session.post(
+                    f"{self.base_url}/tools/call",
+                    json={"tool": name, "input": kwargs},
+                    timeout=aiohttp.ClientTimeout(total=60),
+                ) as resp:
+                    if resp.status >= 500:
+                        error_text = await resp.text()
+                        last_error = _NetworkError(f"Server error (HTTP {resp.status}): {error_text}")
+                        if attempt < self.max_retries - 1:
+                            await asyncio.sleep(self.retry_delay * (2 ** attempt))
+                            continue
+                        raise last_error
+                    if resp.status >= 400:
+                        error_text = await resp.text()
+                        raise _NetworkError(f"Client error (HTTP {resp.status}): {error_text}")
+                    result = await resp.json()
+                    if not result.get("success"):
+                        error_msg = result.get("error", "Unknown error")
+                        raise _ToolExecutionError(f"Tool {name} failed: {error_msg}")
+                    return result.get("result")
+            except aiohttp.ClientConnectorError as e:
+                last_error = _NetworkError(f"Connection error: {str(e)}. Is bridge server running?")
+                if attempt < self.max_retries - 1:
+                    await asyncio.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise last_error
+            except aiohttp.ClientError as e:
+                last_error = _NetworkError(f"Network error: {str(e)}")
+                if attempt < self.max_retries - 1:
+                    await asyncio.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise last_error
+            except _ToolExecutionError:
+                raise
+            except asyncio.TimeoutError:
+                last_error = _NetworkError(f"Tool {name} timed out after 60 seconds")
+                if attempt < self.max_retries - 1:
+                    await asyncio.sleep(self.retry_delay * (2 ** attempt))
+                    continue
+                raise last_error
+        if last_error:
+            raise last_error
+        raise _NetworkError(f"Failed to call tool {name} after {self.max_retries} attempts")
+
+    async def close(self):
+        if self._session and not self._session.closed:
+            await self._session.close()
+
+# 初始化桥接
+_bridge = _AsterBridge("%s")
+
+# 动态生成工具函数
+def _create_tool_function(bridge, tool_name):
+    async def tool_func(**kwargs):
+        return await bridge.call_tool(tool_name, **kwargs)
+    tool_func.__name__ = tool_name
+    return tool_func
+
+# 注入工具到全局命名空间
+_available_tools = %s
+for _tool_name in _available_tools:
+    globals()[_tool_name] = _create_tool_function(_bridge, _tool_name)
+
+# ========== 用户代码开始 ==========
+
+# Input data
+_input = json.loads('%s')
+
+# 包装用户代码在 async main 中
+async def _user_main():
+%s
+
+# 运行用户代码
+if __name__ == "__main__":
+    try:
+        asyncio.run(_user_main())
+    finally:
+        # 确保关闭会话
+        asyncio.run(_bridge.close())
+`, bridgeURL, string(toolsJSON), string(inputJSON), indentCode(code, "    "))
+}
+
+// indentCode 缩进代码
+func indentCode(code string, indent string) string {
+	lines := strings.Split(code, "\n")
+	var indented []string
+	for _, line := range lines {
+		if strings.TrimSpace(line) == "" {
+			indented = append(indented, "")
+		} else {
+			indented = append(indented, indent+line)
+		}
+	}
+	return strings.Join(indented, "\n")
 }
 
 // NodeJSRuntime Node.js 运行时
@@ -474,6 +631,20 @@ func (m *RuntimeManager) AvailableLanguages() []Language {
 		}
 	}
 	return langs
+}
+
+// SetPythonTools 设置 Python 运行时的可用工具列表 (PTC 支持)
+func (m *RuntimeManager) SetPythonTools(tools []string) {
+	if runtime, ok := m.runtimes[LangPython].(*PythonRuntime); ok {
+		runtime.SetTools(tools)
+	}
+}
+
+// SetPythonBridgeURL 设置 Python 运行时的 HTTP 桥接服务器地址 (PTC 支持)
+func (m *RuntimeManager) SetPythonBridgeURL(url string) {
+	if runtime, ok := m.runtimes[LangPython].(*PythonRuntime); ok {
+		runtime.SetBridgeURL(url)
+	}
 }
 
 // DetectLanguage 根据文件扩展名检测语言

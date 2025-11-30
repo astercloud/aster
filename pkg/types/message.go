@@ -39,9 +39,19 @@ func (t *TextBlock) IsContentBlock() {}
 
 // ToolUseBlock 工具使用块
 type ToolUseBlock struct {
-	ID    string                 `json:"id"`
-	Name  string                 `json:"name"`
-	Input map[string]any `json:"input"`
+	ID     string         `json:"id"`
+	Name   string         `json:"name"`
+	Input  map[string]any `json:"input"`
+	Caller *ToolCaller    `json:"caller,omitempty"` // PTC: 调用者信息
+}
+
+// ToolCaller 工具调用者信息 (PTC 支持)
+type ToolCaller struct {
+	// Type 调用者类型: "direct" (LLM直接调用) 或 "code_execution_20250825" (代码执行中调用)
+	Type string `json:"type"`
+
+	// ToolID 代码执行工具的 ID (当 Type="code_execution_20250825" 时)
+	ToolID string `json:"tool_id,omitempty"`
 }
 
 func (t *ToolUseBlock) IsContentBlock() {}

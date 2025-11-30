@@ -27,6 +27,13 @@ aster 提供了强大的工具系统，让 Agent 能够与外部世界交互。
 - 工具注册
 - 工具生命周期
 
+### [Programmatic Tool Calling](/tools/ptc) ::badge{type="success"}新::
+- 让 LLM 生成的 Python 代码直接调用工具
+- HTTP 桥接服务器
+- 异步 Python SDK
+- 错误处理和重试
+- 性能优化
+
 ## 🚀 快速开始
 
 ```go
