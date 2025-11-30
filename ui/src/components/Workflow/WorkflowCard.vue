@@ -7,14 +7,14 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5H7a2 2 0 00-2 2v12a2 2 0 002 2h10a2 2 0 002-2V7a2 2 0 00-2-2h-2M9 5a2 2 0 002 2h2a2 2 0 002-2M9 5a2 2 0 012-2h2a2 2 0 012 2m-3 7h3m-3 4h3m-6-4h.01M9 16h.01"></path>
         </svg>
       </div>
-      
+
       <div class="workflow-info">
         <h3 class="workflow-name">{{ workflow.name }}</h3>
         <p v-if="workflow.description" class="workflow-description">
           {{ workflow.description }}
         </p>
       </div>
-      
+
       <div class="workflow-status">
         <span :class="['status-badge', statusClass]">
           <span class="status-dot"></span>
@@ -22,14 +22,14 @@
         </span>
       </div>
     </div>
-    
+
     <!-- Steps -->
     <div class="workflow-steps">
       <div class="steps-header">
         <span class="steps-label">步骤</span>
         <span class="steps-count">{{ workflow.steps.length }} 个</span>
       </div>
-      
+
       <div class="steps-progress">
         <div class="progress-bar">
           <div
@@ -39,7 +39,7 @@
         </div>
         <span class="progress-text">{{ progress }}%</span>
       </div>
-      
+
       <div class="steps-list">
         <div
           v-for="(step, index) in workflow.steps.slice(0, 3)"
@@ -57,7 +57,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- Actions -->
     <div class="workflow-actions">
       <button
@@ -72,7 +72,7 @@
         </svg>
         执行
       </button>
-      
+
       <button
         @click="$emit('edit', workflow)"
         class="action-btn btn-secondary"
@@ -82,7 +82,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
         </svg>
       </button>
-      
+
       <button
         @click="$emit('delete', workflow)"
         class="action-btn btn-danger"
@@ -96,65 +96,76 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed, type PropType } from 'vue';
 import type { Workflow } from '@/types';
 
-interface Props {
-  workflow: Workflow;
-}
+export default defineComponent({
+  name: 'WorkflowCard',
+  props: {
+    workflow: {
+      type: Object as PropType<Workflow>,
+      required: true,
+    },
+  },
+  emits: {
+    execute: (workflow: Workflow) => true,
+    edit: (workflow: Workflow) => true,
+    delete: (workflow: Workflow) => true,
+  },
+  setup(props) {
+    const statusClass = computed(() => {
+      const classes: Record<string, string> = {
+        idle: 'status-idle',
+        running: 'status-running',
+        paused: 'status-paused',
+        completed: 'status-completed',
+        error: 'status-error',
+      };
+      return classes[props.workflow.status] || 'status-idle';
+    });
 
-const props = defineProps<Props>();
+    const statusText = computed(() => {
+      const texts: Record<string, string> = {
+        idle: '空闲',
+        running: '运行中',
+        paused: '已暂停',
+        completed: '已完成',
+        error: '错误',
+      };
+      return texts[props.workflow.status] || '未知';
+    });
 
-defineEmits<{
-  execute: [workflow: Workflow];
-  edit: [workflow: Workflow];
-  delete: [workflow: Workflow];
-}>();
+    const progress = computed(() => {
+      const total = props.workflow.steps.length;
+      if (total === 0) return 0;
 
-const statusClass = computed(() => {
-  const classes: Record<string, string> = {
-    idle: 'status-idle',
-    running: 'status-running',
-    paused: 'status-paused',
-    completed: 'status-completed',
-    error: 'status-error',
-  };
-  return classes[props.workflow.status] || 'status-idle';
+      const completed = props.workflow.steps.filter(
+        s => s.status === 'completed'
+      ).length;
+
+      return Math.round((completed / total) * 100);
+    });
+
+    function getStepStatusText(status: string): string {
+      const texts: Record<string, string> = {
+        pending: '待执行',
+        running: '运行中',
+        completed: '已完成',
+        error: '错误',
+        skipped: '已跳过',
+      };
+      return texts[status] || status;
+    }
+
+    return {
+      statusClass,
+      statusText,
+      progress,
+      getStepStatusText,
+    };
+  },
 });
-
-const statusText = computed(() => {
-  const texts: Record<string, string> = {
-    idle: '空闲',
-    running: '运行中',
-    paused: '已暂停',
-    completed: '已完成',
-    error: '错误',
-  };
-  return texts[props.workflow.status] || '未知';
-});
-
-const progress = computed(() => {
-  const total = props.workflow.steps.length;
-  if (total === 0) return 0;
-  
-  const completed = props.workflow.steps.filter(
-    s => s.status === 'completed'
-  ).length;
-  
-  return Math.round((completed / total) * 100);
-});
-
-function getStepStatusText(status: string): string {
-  const texts: Record<string, string> = {
-    pending: '待执行',
-    running: '运行中',
-    completed: '已完成',
-    error: '错误',
-    skipped: '已跳过',
-  };
-  return texts[status] || status;
-}
 </script>
 
 <style scoped>

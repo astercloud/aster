@@ -22,7 +22,7 @@
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
       </svg>
     </button>
-    
+
     <!-- Expanded View -->
     <div v-else class="thinking-expanded">
       <!-- Header -->
@@ -46,7 +46,7 @@
           </svg>
         </button>
       </div>
-      
+
       <!-- Timeline -->
       <div class="thinking-timeline">
         <div
@@ -72,7 +72,7 @@
             </div>
             <div v-if="index < steps.length - 1" class="step-line"></div>
           </div>
-          
+
           <!-- Step Content -->
           <div class="step-content">
             <div class="step-header">
@@ -81,12 +81,12 @@
               </span>
               <span class="step-time">{{ formatTime(step.timestamp) }}</span>
             </div>
-            
+
             <!-- Reasoning -->
             <div v-if="step.type === 'reasoning' && step.content" class="step-body">
               <p class="text-sm text-text dark:text-text-dark">{{ step.content }}</p>
             </div>
-            
+
             <!-- Tool Call -->
             <div v-if="step.type === 'tool_call' && step.tool" class="step-body">
               <div class="tool-call">
@@ -99,7 +99,7 @@
                 <pre class="tool-args">{{ JSON.stringify(step.tool.args, null, 2) }}</pre>
               </div>
             </div>
-            
+
             <!-- Tool Result -->
             <div v-if="step.type === 'tool_result' && step.result" class="step-body">
               <div class="tool-result">
@@ -115,7 +115,7 @@
           </div>
         </div>
       </div>
-      
+
       <!-- Summary -->
       <div v-if="!isActive && summary" class="thinking-summary">
         <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -127,8 +127,8 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 
 interface ThinkingStep {
   id?: string;
@@ -136,52 +136,70 @@ interface ThinkingStep {
   content?: string;
   tool?: {
     name: string;
-    args: any;
+    args: unknown;
   };
-  result?: any;
+  result?: unknown;
   timestamp: number;
 }
 
-interface Props {
-  steps: ThinkingStep[];
-  isActive?: boolean;
-  summary?: string;
-}
+export default defineComponent({
+  name: 'ThinkingMessage',
 
-withDefaults(defineProps<Props>(), {
-  isActive: false,
+  props: {
+    steps: {
+      type: Array as () => ThinkingStep[],
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    summary: {
+      type: String,
+      default: undefined,
+    },
+  },
+
+  setup() {
+    const isExpanded = ref(false);
+
+    function getStepClass(step: ThinkingStep): string {
+      const classes: Record<string, string> = {
+        reasoning: 'step-reasoning',
+        tool_call: 'step-tool-call',
+        tool_result: 'step-tool-result',
+        decision: 'step-decision',
+      };
+      return classes[step.type] || '';
+    }
+
+    function getStepLabel(type: string): string {
+      const labels: Record<string, string> = {
+        reasoning: '推理',
+        tool_call: '工具调用',
+        tool_result: '执行结果',
+        decision: '决策',
+      };
+      return labels[type] || type;
+    }
+
+    function formatTime(timestamp: number): string {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    }
+
+    return {
+      isExpanded,
+      getStepClass,
+      getStepLabel,
+      formatTime,
+    };
+  },
 });
-
-const isExpanded = ref(false);
-
-function getStepClass(step: ThinkingStep): string {
-  const classes: Record<string, string> = {
-    reasoning: 'step-reasoning',
-    tool_call: 'step-tool-call',
-    tool_result: 'step-tool-result',
-    decision: 'step-decision',
-  };
-  return classes[step.type] || '';
-}
-
-function getStepLabel(type: string): string {
-  const labels: Record<string, string> = {
-    reasoning: '推理',
-    tool_call: '工具调用',
-    tool_result: '执行结果',
-    decision: '决策',
-  };
-  return labels[type] || type;
-}
-
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-}
 </script>
 
 <style scoped>

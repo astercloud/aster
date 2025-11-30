@@ -23,45 +23,64 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
 
-interface Props {
-  size?: 'sm' | 'md' | 'lg';
-  color?: 'primary' | 'secondary' | 'white';
-  text?: string;
-}
+type SpinnerSize = 'sm' | 'md' | 'lg';
+type SpinnerColor = 'primary' | 'secondary' | 'white';
 
-const props = withDefaults(defineProps<Props>(), {
-  size: 'md',
-  color: 'primary',
-});
+export default defineComponent({
+  name: 'LoadingSpinner',
 
-const sizeClass = computed(() => {
-  const sizes = {
-    sm: 'spinner-sm',
-    md: 'spinner-md',
-    lg: 'spinner-lg',
-  };
-  return sizes[props.size];
-});
+  props: {
+    size: {
+      type: String as () => SpinnerSize,
+      default: 'md',
+    },
+    color: {
+      type: String as () => SpinnerColor,
+      default: 'primary',
+    },
+    text: {
+      type: String,
+      default: undefined,
+    },
+  },
 
-const colorClass = computed(() => {
-  const colors = {
-    primary: 'text-primary',
-    secondary: 'text-secondary dark:text-secondary-dark',
-    white: 'text-white',
-  };
-  return colors[props.color];
-});
+  setup(props) {
+    const sizeClass = computed(() => {
+      const sizes: Record<SpinnerSize, string> = {
+        sm: 'spinner-sm',
+        md: 'spinner-md',
+        lg: 'spinner-lg',
+      };
+      return sizes[props.size];
+    });
 
-const textSizeClass = computed(() => {
-  const sizes = {
-    sm: 'text-xs',
-    md: 'text-sm',
-    lg: 'text-base',
-  };
-  return sizes[props.size];
+    const colorClass = computed(() => {
+      const colors: Record<SpinnerColor, string> = {
+        primary: 'text-primary',
+        secondary: 'text-secondary dark:text-secondary-dark',
+        white: 'text-white',
+      };
+      return colors[props.color];
+    });
+
+    const textSizeClass = computed(() => {
+      const sizes: Record<SpinnerSize, string> = {
+        sm: 'text-xs',
+        md: 'text-sm',
+        lg: 'text-base',
+      };
+      return sizes[props.size];
+    });
+
+    return {
+      sizeClass,
+      colorClass,
+      textSizeClass,
+    };
+  },
 });
 </script>
 

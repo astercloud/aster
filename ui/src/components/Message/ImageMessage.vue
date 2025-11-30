@@ -3,7 +3,7 @@
     <div v-if="message.content.caption" class="image-caption">
       {{ message.content.caption }}
     </div>
-    
+
     <div class="image-wrapper">
       <img
         :src="message.content.url"
@@ -13,14 +13,14 @@
         @error="handleError"
         loading="lazy"
       />
-      
+
       <!-- Loading State -->
       <div v-if="isLoading" class="image-loading">
         <svg class="w-8 h-8 animate-spin text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
         </svg>
       </div>
-      
+
       <!-- Error State -->
       <div v-if="hasError" class="image-error">
         <svg class="w-8 h-8 text-red-500" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -28,7 +28,7 @@
         </svg>
         <p class="text-xs text-red-600 mt-2">图片加载失败</p>
       </div>
-      
+
       <!-- Preview Button -->
       <button
         v-if="!isLoading && !hasError"
@@ -41,7 +41,7 @@
         </svg>
       </button>
     </div>
-    
+
     <!-- Metadata -->
     <div v-if="message.content.metadata" class="image-metadata">
       <span v-if="message.content.metadata.size" class="metadata-item">
@@ -54,36 +54,52 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 import type { ImageMessage as ImageMessageType } from '@/types';
 import { formatFileSize } from '@/utils/format';
 
-interface Props {
-  message: ImageMessageType;
-}
+export default defineComponent({
+  name: 'ImageMessage',
 
-const props = defineProps<Props>();
+  props: {
+    message: {
+      type: Object as () => ImageMessageType,
+      required: true,
+    },
+  },
 
-const emit = defineEmits<{
-  preview: [url: string];
-}>();
+  emits: {
+    preview: (url: string) => true,
+  },
 
-const isLoading = ref(true);
-const hasError = ref(false);
+  setup(props, { emit }) {
+    const isLoading = ref(true);
+    const hasError = ref(false);
 
-function handleLoad() {
-  isLoading.value = false;
-}
+    function handleLoad() {
+      isLoading.value = false;
+    }
 
-function handleError() {
-  isLoading.value = false;
-  hasError.value = true;
-}
+    function handleError() {
+      isLoading.value = false;
+      hasError.value = true;
+    }
 
-function openPreview() {
-  emit('preview', props.message.content.url);
-}
+    function openPreview() {
+      emit('preview', props.message.content.url);
+    }
+
+    return {
+      isLoading,
+      hasError,
+      handleLoad,
+      handleError,
+      openPreview,
+      formatFileSize,
+    };
+  },
+});
 </script>
 
 <style scoped>

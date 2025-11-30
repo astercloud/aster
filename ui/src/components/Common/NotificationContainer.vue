@@ -21,14 +21,14 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"></path>
             </svg>
           </div>
-          
+
           <div class="notification-content">
             <h4 v-if="notification.title" class="notification-title">
               {{ notification.title }}
             </h4>
             <p class="notification-message">{{ notification.message }}</p>
           </div>
-          
+
           <button
             v-if="notification.closable"
             @click="handleClose(notification.id)"
@@ -44,14 +44,26 @@
   </Teleport>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import { useNotification } from '@/composables/useNotification';
 
-const { notifications, remove } = useNotification();
+export default defineComponent({
+  name: 'NotificationContainer',
 
-function handleClose(id: string) {
-  remove(id);
-}
+  setup() {
+    const { notifications, remove } = useNotification();
+
+    function handleClose(id: string) {
+      remove(id);
+    }
+
+    return {
+      notifications,
+      handleClose,
+    };
+  },
+});
 </script>
 
 <style scoped>

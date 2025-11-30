@@ -206,3 +206,4 @@ article-writer-web-service/
 
 # claude
 .claude/settings.local.json
+*_PLAN.md

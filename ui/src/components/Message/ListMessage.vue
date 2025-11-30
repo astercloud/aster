@@ -7,7 +7,7 @@
         {{ message.content.items.length }} 项
       </span>
     </div>
-    
+
     <!-- List Items -->
     <div class="list-items">
       <div
@@ -28,7 +28,7 @@
             {{ item.icon }}
           </div>
         </div>
-        
+
         <!-- Item Content -->
         <div class="item-content">
           <h4 class="item-title">{{ item.title }}</h4>
@@ -45,7 +45,7 @@
             </span>
           </div>
         </div>
-        
+
         <!-- Item Action -->
         <div v-if="item.action" class="item-action">
           <svg class="w-5 h-5 text-secondary dark:text-secondary-dark" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -54,7 +54,7 @@
         </div>
       </div>
     </div>
-    
+
     <!-- List Footer -->
     <div v-if="message.content.footer" class="list-footer">
       <button
@@ -71,29 +71,42 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import type { ListMessage as ListMessageType } from '@/types';
 
-interface Props {
-  message: ListMessageType;
-}
+export default defineComponent({
+  name: 'ListMessage',
 
-defineProps<Props>();
+  props: {
+    message: {
+      type: Object as () => ListMessageType,
+      required: true,
+    },
+  },
 
-const emit = defineEmits<{
-  itemClick: [item: any];
-  footerAction: [];
-}>();
+  emits: {
+    itemClick: (item: unknown) => true,
+    footerAction: () => true,
+  },
 
-function handleItemClick(item: any) {
-  if (item.action) {
-    emit('itemClick', item);
-  }
-}
+  setup(props, { emit }) {
+    function handleItemClick(item: unknown & { action?: unknown }) {
+      if ((item as { action?: unknown }).action) {
+        emit('itemClick', item);
+      }
+    }
 
-function handleFooterAction() {
-  emit('footerAction');
-}
+    function handleFooterAction() {
+      emit('footerAction');
+    }
+
+    return {
+      handleItemClick,
+      handleFooterAction,
+    };
+  },
+});
 </script>
 
 <style scoped>

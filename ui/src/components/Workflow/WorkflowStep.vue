@@ -126,82 +126,101 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed, type PropType } from 'vue';
 import type { WorkflowStep, WorkflowAction } from '@/types/workflow';
 
-interface Props {
-  step: WorkflowStep;
-  isLast?: boolean;
-  isClickable?: boolean;
-  showMetadata?: boolean;
-}
+export default defineComponent({
+  name: 'WorkflowStep',
+  props: {
+    step: {
+      type: Object as PropType<WorkflowStep>,
+      required: true,
+    },
+    isLast: {
+      type: Boolean,
+      default: false,
+    },
+    isClickable: {
+      type: Boolean,
+      default: false,
+    },
+    showMetadata: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    click: (step: WorkflowStep) => true,
+    action: (action: WorkflowAction, step: WorkflowStep) => true,
+  },
+  setup(props, { emit }) {
+    const stepIconClass = computed(() => {
+      const classes: Record<string, string> = {
+        pending: 'step-icon--pending',
+        active: 'step-icon--active',
+        completed: 'step-icon--completed',
+        failed: 'step-icon--failed',
+      };
+      return classes[props.step.status] || 'step-icon--pending';
+    });
 
-const props = withDefaults(defineProps<Props>(), {
-  isLast: false,
-  isClickable: false,
-  showMetadata: false,
+    const stepConnectorClass = computed(() => {
+      // 如果当前步骤已完成,连接线也显示为完成状态
+      if (props.step.status === 'completed') {
+        return 'step-connector--completed';
+      }
+      return 'step-connector--default';
+    });
+
+    const stepBadgeClass = computed(() => {
+      const classes: Record<string, string> = {
+        pending: 'step-badge--pending',
+        active: 'step-badge--active',
+        completed: 'step-badge--completed',
+        failed: 'step-badge--failed',
+      };
+      return classes[props.step.status] || 'step-badge--pending';
+    });
+
+    const stepStatusLabel = computed(() => {
+      const labels: Record<string, string> = {
+        pending: '待执行',
+        active: '进行中',
+        completed: '已完成',
+        failed: '失败',
+      };
+      return labels[props.step.status] || props.step.status;
+    });
+
+    const handleClick = () => {
+      if (props.isClickable) {
+        emit('click', props.step);
+      }
+    };
+
+    const handleAction = (action: WorkflowAction) => {
+      emit('action', action, props.step);
+    };
+
+    const formatMetadataValue = (value: any): string => {
+      if (typeof value === 'object') {
+        return JSON.stringify(value);
+      }
+      return String(value);
+    };
+
+    return {
+      stepIconClass,
+      stepConnectorClass,
+      stepBadgeClass,
+      stepStatusLabel,
+      handleClick,
+      handleAction,
+      formatMetadataValue,
+    };
+  },
 });
-
-const emit = defineEmits<{
-  click: [step: WorkflowStep];
-  action: [action: WorkflowAction, step: WorkflowStep];
-}>();
-
-const stepIconClass = computed(() => {
-  const classes: Record<string, string> = {
-    pending: 'step-icon--pending',
-    active: 'step-icon--active',
-    completed: 'step-icon--completed',
-    failed: 'step-icon--failed',
-  };
-  return classes[props.step.status] || 'step-icon--pending';
-});
-
-const stepConnectorClass = computed(() => {
-  // 如果当前步骤已完成,连接线也显示为完成状态
-  if (props.step.status === 'completed') {
-    return 'step-connector--completed';
-  }
-  return 'step-connector--default';
-});
-
-const stepBadgeClass = computed(() => {
-  const classes: Record<string, string> = {
-    pending: 'step-badge--pending',
-    active: 'step-badge--active',
-    completed: 'step-badge--completed',
-    failed: 'step-badge--failed',
-  };
-  return classes[props.step.status] || 'step-badge--pending';
-});
-
-const stepStatusLabel = computed(() => {
-  const labels: Record<string, string> = {
-    pending: '待执行',
-    active: '进行中',
-    completed: '已完成',
-    failed: '失败',
-  };
-  return labels[props.step.status] || props.step.status;
-});
-
-const handleClick = () => {
-  if (props.isClickable) {
-    emit('click', props.step);
-  }
-};
-
-const handleAction = (action: WorkflowAction) => {
-  emit('action', action, props.step);
-};
-
-const formatMetadataValue = (value: any): string => {
-  if (typeof value === 'object') {
-    return JSON.stringify(value);
-  }
-  return String(value);
-};
 </script>
 
 <style scoped>

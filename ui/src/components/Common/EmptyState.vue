@@ -7,25 +7,35 @@
         </svg>
       </slot>
     </div>
-    
+
     <div class="empty-content">
       <h3 v-if="title" class="empty-title">{{ title }}</h3>
       <p v-if="description" class="empty-description">{{ description }}</p>
     </div>
-    
+
     <div v-if="$slots.action" class="empty-action">
       <slot name="action"></slot>
     </div>
   </div>
 </template>
 
-<script setup lang="ts">
-interface Props {
-  title?: string;
-  description?: string;
-}
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-defineProps<Props>();
+export default defineComponent({
+  name: 'EmptyState',
+
+  props: {
+    title: {
+      type: String,
+      default: undefined,
+    },
+    description: {
+      type: String,
+      default: undefined,
+    },
+  },
+});
 </script>
 
 <style scoped>
