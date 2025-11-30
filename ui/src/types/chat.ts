@@ -25,7 +25,7 @@ export interface ChatConfig {
   apiUrl?: string;
   wsUrl?: string;
   apiKey?: string;
-  
+
   // 模型配置
   modelConfig?: {
     provider?: string;
@@ -52,17 +52,17 @@ export interface ChatConfig {
   demoMode?: boolean;
   demoResponses?: string[];
   demoDelay?: number;
-  
+
   // 主题配置
   theme?: 'light' | 'dark' | 'auto';
   primaryColor?: string;
-  
+
   // 行为配置
   autoScroll?: boolean;
   showTimestamp?: boolean;
   showAvatar?: boolean;
   showUsername?: boolean;
-  
+
   // 回调函数
   onSend?: (message: Message) => void;
   onReceive?: (message: Message) => void;
@@ -92,4 +92,12 @@ export interface ChatActions {
   resendMessage: (id: string) => Promise<void>;
   approveAction: (requestId: string) => Promise<void>;
   rejectAction: (requestId: string) => Promise<void>;
+}
+
+/**
+ * Chat 组件 Props
+ */
+export interface ChatProps {
+  /** Chat 配置 */
+  config: ChatConfig;
 }

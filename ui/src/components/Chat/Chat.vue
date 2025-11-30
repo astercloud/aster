@@ -14,7 +14,7 @@
             <p v-if="config.subtitle" class="text-xs text-secondary dark:text-secondary-dark">{{ config.subtitle }}</p>
           </div>
         </div>
-        
+
         <div class="flex items-center gap-2">
           <div v-if="isConnected" class="flex items-center gap-1.5 text-xs text-secondary dark:text-secondary-dark">
             <div class="w-2 h-2 rounded-full bg-green-500 dark:bg-green-400"></div>
@@ -60,98 +60,142 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch, onMounted } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, watch, onMounted } from 'vue';
 import MessageList from './MessageList.vue';
 import QuickReplies from './QuickReplies.vue';
 import Composer from './Composer.vue';
 import { useChat } from '@/composables/useChat';
 import type { ChatConfig, Message, QuickReply } from '@/types';
 
-interface Props {
-  config: ChatConfig;
-}
+/**
+ * Chat 组件 - AI Agent 聊天界面
+ *
+ * @example
+ * ```vue
+ * <Chat :config="chatConfig" @send="onSend" @error="onError" />
+ * ```
+ */
+export default defineComponent({
+  name: 'Chat',
 
-const props = withDefaults(defineProps<Props>(), {
-  config: () => ({
-    showHeader: true,
-    placeholder: '输入消息...',
-    enableVoice: false,
-    enableImage: false,
-  }),
-});
+  components: {
+    MessageList,
+    QuickReplies,
+    Composer,
+  },
 
-const emit = defineEmits<{
-  send: [message: Message];
-  receive: [message: Message];
-  error: [error: Error];
-}>();
+  props: {
+    /**
+     * Chat 配置
+     */
+    config: {
+      type: Object as () => ChatConfig,
+      default: (): ChatConfig => ({
+        showHeader: true,
+        placeholder: '输入消息...',
+        enableVoice: false,
+        enableImage: false,
+      }),
+    },
+  },
 
-// Use chat composable
-const {
-  messages,
-  isTyping,
-  isConnected,
-  sendMessage,
-  sendImage,
-} = useChat(props.config);
+  emits: {
+    /**
+     * 发送消息事件
+     */
+    send: (message: Message) => true,
+    /**
+     * 接收消息事件
+     */
+    receive: (message: Message) => true,
+    /**
+     * 错误事件
+     */
+    error: (error: Error) => true,
+  },
 
-const inputText = ref('');
-const messageListRef = ref<InstanceType<typeof MessageList>>();
-const quickReplies = ref<QuickReply[]>(props.config.quickReplies || []);
+  setup(props, { emit }) {
+    // Use chat composable
+    const {
+      messages,
+      isTyping,
+      isConnected,
+      sendMessage,
+      sendImage,
+    } = useChat(props.config);
 
-// Handle send message
-const handleSend = async () => {
-  if (!inputText.value.trim()) return;
-  
-  const text = inputText.value;
-  inputText.value = '';
-  
-  try {
-    await sendMessage(text);
-    // Clear quick replies after first message
-    if (messages.value.length === 0) {
-      quickReplies.value = [];
-    }
-  } catch (error) {
-    console.error('Send message error:', error);
-    emit('error', error as Error);
-  }
-};
+    const inputText = ref('');
+    const messageListRef = ref<{ scrollToBottom: () => void } | null>(null);
+    const quickReplies = ref<QuickReply[]>(props.config.quickReplies || []);
 
-// Handle quick reply
-const handleQuickReply = async (reply: QuickReply) => {
-  inputText.value = reply.text;
-  await handleSend();
-};
+    // Handle send message
+    const handleSend = async () => {
+      if (!inputText.value.trim()) return;
 
-// Handle voice input
-const handleVoice = (blob: Blob) => {
-  // TODO: Implement voice input
-  console.log('Voice input:', blob);
-};
+      const text = inputText.value;
+      inputText.value = '';
 
-// Handle image upload
-const handleImage = async (file: File) => {
-  try {
-    await sendImage(file);
-  } catch (error) {
-    console.error('Send image error:', error);
-    emit('error', error as Error);
-  }
-};
+      try {
+        await sendMessage(text);
+        // Clear quick replies after first message
+        if (messages.value.length === 0) {
+          quickReplies.value = [];
+        }
+      } catch (error) {
+        console.error('Send message error:', error);
+        emit('error', error as Error);
+      }
+    };
 
-// Auto scroll to bottom
-watch(messages, () => {
-  messageListRef.value?.scrollToBottom();
-}, { deep: true });
+    // Handle quick reply
+    const handleQuickReply = async (reply: QuickReply) => {
+      inputText.value = reply.text;
+      await handleSend();
+    };
 
-// Initialize
-onMounted(() => {
-  // Show welcome message
-  if (props.config.welcomeMessage && messages.value.length === 0) {
-    // Welcome message will be added by useChat
-  }
+    // Handle voice input
+    const handleVoice = (blob: Blob) => {
+      // TODO: Implement voice input
+      console.log('Voice input:', blob);
+    };
+
+    // Handle image upload
+    const handleImage = async (file: File) => {
+      try {
+        await sendImage(file);
+      } catch (error) {
+        console.error('Send image error:', error);
+        emit('error', error as Error);
+      }
+    };
+
+    // Auto scroll to bottom
+    watch(messages, () => {
+      messageListRef.value?.scrollToBottom();
+    }, { deep: true });
+
+    // Initialize
+    onMounted(() => {
+      // Show welcome message
+      if (props.config.welcomeMessage && messages.value.length === 0) {
+        // Welcome message will be added by useChat
+      }
+    });
+
+    return {
+      messages,
+      isTyping,
+      isConnected,
+      inputText,
+      messageListRef,
+      quickReplies,
+      handleSend,
+      handleQuickReply,
+      handleVoice,
+      handleImage,
+    };
+  },
 });
 </script>
 

@@ -19,9 +19,9 @@
   ],
   "scripts": {
     "dev": "vite",
-    "build": "vue-tsc && vite build",
+    "build": "vue-tsc -p tsconfig.check.json --noEmit && vite build",
     "preview": "vite preview",
-    "type-check": "vue-tsc --noEmit",
+    "type-check": "vue-tsc -p tsconfig.check.json --noEmit",
     "test": "vitest",
     "test:run": "vitest run",
     "test:coverage": "vitest run --coverage",

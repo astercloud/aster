@@ -19,22 +19,34 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import type { QuickReply } from '@/types';
 
-interface Props {
-  replies: QuickReply[];
-}
+export default defineComponent({
+  name: 'QuickReplies',
 
-defineProps<Props>();
+  props: {
+    replies: {
+      type: Array as () => QuickReply[],
+      required: true,
+    },
+  },
 
-const emit = defineEmits<{
-  select: [reply: QuickReply];
-}>();
+  emits: {
+    select: (reply: QuickReply) => true,
+  },
 
-function handleSelect(reply: QuickReply) {
-  emit('select', reply);
-}
+  setup(props, { emit }) {
+    function handleSelect(reply: QuickReply) {
+      emit('select', reply);
+    }
+
+    return {
+      handleSelect,
+    };
+  },
+});
 </script>
 
 <style scoped>

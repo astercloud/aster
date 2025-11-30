@@ -72,7 +72,7 @@
       <!-- WorkflowProgressView (仅当有激活工作流时显示) -->
       <WorkflowProgressView
         v-if="showWorkflow"
-        :steps="workflowStore.steps"
+        :steps="workflowSteps"
         title="工作流进度"
         :show-progress="true"
         :show-steps="true"
@@ -119,71 +119,103 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
 import { renderMarkdown } from '@/utils/markdown';
 import { formatTime } from '@/utils/format';
 import { useThinkingStore } from '@/stores/thinking';
 import { useWorkflowStore } from '@/stores/workflow';
 import { ThinkingBlock } from '@/components/Thinking';
 import { WorkflowProgressView } from '@/components/Workflow';
-import type { Message } from '@/types';
+import type { Message, TextMessage } from '@/types';
 
-interface Props {
-  message: Message;
-  showAvatar?: boolean;
-  showTimestamp?: boolean;
-  showActions?: boolean;
-}
+export default defineComponent({
+  name: 'MessageBubble',
 
-const props = withDefaults(defineProps<Props>(), {
-  showAvatar: true,
-  showTimestamp: true,
-  showActions: true,
-});
+  components: {
+    ThinkingBlock,
+    WorkflowProgressView,
+  },
 
-defineEmits<{
-  copy: [message: Message];
-  retry: [message: Message];
-  delete: [message: Message];
-}>();
+  props: {
+    message: {
+      type: Object as () => Message,
+      required: true,
+    },
+    showAvatar: {
+      type: Boolean,
+      default: true,
+    },
+    showTimestamp: {
+      type: Boolean,
+      default: true,
+    },
+    showActions: {
+      type: Boolean,
+      default: true,
+    },
+  },
 
-const thinkingStore = useThinkingStore();
-const workflowStore = useWorkflowStore();
+  emits: {
+    copy: (message: Message) => true,
+    retry: (message: Message) => true,
+    delete: (message: Message) => true,
+  },
 
-const renderedContent = computed(() => {
-  if (props.message.type === 'text') {
-    const textMessage = props.message as import('@/types').TextMessage;
-    return renderMarkdown(textMessage.content.text);
-  }
-  return '';
-});
+  setup(props) {
+    const thinkingStore = useThinkingStore();
+    const workflowStore = useWorkflowStore();
 
-// 获取该消息的思维步骤
-const thinkingSteps = computed(() => {
-  return thinkingStore.getSteps(props.message.id);
-});
+    const renderedContent = computed(() => {
+      if (props.message.type === 'text') {
+        const textMessage = props.message as TextMessage;
+        return renderMarkdown(textMessage.content.text);
+      }
+      return '';
+    });
 
-// 判断是否正在思考（当前消息是否是正在思考的消息）
-const isThinking = computed(() => {
-  return thinkingStore.isThinking && thinkingStore.currentMessageId === props.message.id;
-});
+    // 获取该消息的思维步骤
+    const thinkingSteps = computed(() => {
+      return thinkingStore.getSteps(props.message.id);
+    });
 
-// 思维摘要（可选）
-const thinkingSummary = computed(() => {
-  // 可以根据步骤生成摘要
-  if (thinkingSteps.value.length > 0 && !isThinking.value) {
-    const toolCalls = thinkingSteps.value.filter(s => s.type === 'tool_call');
-    if (toolCalls.length > 0) {
-      return `执行了 ${toolCalls.length} 个工具调用`;
-    }
-  }
-  return '';
-});
+    // 判断是否正在思考（当前消息是否是正在思考的消息）
+    const isThinking = computed(() => {
+      return thinkingStore.isThinking && thinkingStore.currentMessageId === props.message.id;
+    });
 
-// 是否显示工作流进度（仅当有激活的工作流时）
-const showWorkflow = computed(() => {
-  return props.message.role === 'assistant' && workflowStore.hasActiveWorkflow;
+    // 思维摘要（可选）
+    const thinkingSummary = computed(() => {
+      // 可以根据步骤生成摘要
+      if (thinkingSteps.value.length > 0 && !isThinking.value) {
+        const toolCalls = thinkingSteps.value.filter(s => s.type === 'tool_call');
+        if (toolCalls.length > 0) {
+          return `执行了 ${toolCalls.length} 个工具调用`;
+        }
+      }
+      return '';
+    });
+
+    // 是否显示工作流进度（仅当有激活的工作流时）
+    const showWorkflow = computed(() => {
+      return props.message.role === 'assistant' && workflowStore.hasActiveWorkflow;
+    });
+
+    // 工作流步骤
+    const workflowSteps = computed(() => {
+      return workflowStore.steps;
+    });
+
+    return {
+      renderedContent,
+      thinkingSteps,
+      isThinking,
+      thinkingSummary,
+      showWorkflow,
+      workflowSteps,
+      formatTime,
+    };
+  },
 });
 </script>
 
