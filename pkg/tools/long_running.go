@@ -36,13 +36,13 @@ type LongRunningTool interface {
 
 // TaskStatus 任务状态
 type TaskStatus struct {
-	TaskID    string                 // 任务 ID
-	State     TaskState              // 当前状态
-	Progress  float64                // 进度 0.0 - 1.0
+	TaskID    string         // 任务 ID
+	State     TaskState      // 当前状态
+	Progress  float64        // 进度 0.0 - 1.0
 	Result    any            // 执行结果（完成时）
-	Error     error                  // 错误信息（失败时）
-	StartTime time.Time              // 开始时间
-	EndTime   *time.Time             // 结束时间（完成/失败/取消时）
+	Error     error          // 错误信息（失败时）
+	StartTime time.Time      // 开始时间
+	EndTime   *time.Time     // 结束时间（完成/失败/取消时）
 	Metadata  map[string]any // 额外元数据
 }
 

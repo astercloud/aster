@@ -244,15 +244,15 @@ type RAGOption func(*RAGOptions)
 
 // RAGOptions RAG选项
 type RAGOptions struct {
-	MaxResults     int                    `json:"max_results"`
-	KnowledgeType  KnowledgeType          `json:"knowledge_type"`
-	Category       string                 `json:"category"`
-	Tags           []string               `json:"tags"`
-	Namespace      string                 `json:"namespace"`
+	MaxResults     int            `json:"max_results"`
+	KnowledgeType  KnowledgeType  `json:"knowledge_type"`
+	Category       string         `json:"category"`
+	Tags           []string       `json:"tags"`
+	Namespace      string         `json:"namespace"`
 	Metadata       map[string]any `json:"metadata"`
-	TimeRange      *TimeRange             `json:"time_range"`
-	QualityFilter  *QualityFilter         `json:"quality_filter"`
-	DiversityBoost bool                   `json:"diversity_boost"`
+	TimeRange      *TimeRange     `json:"time_range"`
+	QualityFilter  *QualityFilter `json:"quality_filter"`
+	DiversityBoost bool           `json:"diversity_boost"`
 }
 
 // TimeRange 时间范围

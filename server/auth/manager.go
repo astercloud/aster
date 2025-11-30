@@ -24,10 +24,10 @@ const (
 
 // User 用户信息
 type User struct {
-	ID       string                 `json:"id"`
-	Username string                 `json:"username"`
-	Email    string                 `json:"email"`
-	Roles    []string               `json:"roles"`
+	ID       string         `json:"id"`
+	Username string         `json:"username"`
+	Email    string         `json:"email"`
+	Roles    []string       `json:"roles"`
 	Metadata map[string]any `json:"metadata,omitempty"`
 }
 
@@ -95,8 +95,8 @@ func (m *Manager) DefaultMethod() AuthMethod {
 
 // TokenInfo 令牌信息
 type TokenInfo struct {
-	Token     string                 `json:"token"`
-	ExpiresAt time.Time              `json:"expires_at"`
-	User      *User                  `json:"user,omitempty"`
+	Token     string         `json:"token"`
+	ExpiresAt time.Time      `json:"expires_at"`
+	User      *User          `json:"user,omitempty"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }

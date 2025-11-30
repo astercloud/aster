@@ -21,10 +21,10 @@ type SessionSummary struct {
 	UpdatedAt time.Time `json:"updated_at"`
 
 	// 详细信息
-	Topics      []string               `json:"topics"`       // 讨论的主题
-	KeyPoints   []string               `json:"key_points"`   // 关键要点
-	Decisions   []string               `json:"decisions"`    // 做出的决策
-	ActionItems []string               `json:"action_items"` // 行动项
+	Topics      []string       `json:"topics"`       // 讨论的主题
+	KeyPoints   []string       `json:"key_points"`   // 关键要点
+	Decisions   []string       `json:"decisions"`    // 做出的决策
+	ActionItems []string       `json:"action_items"` // 行动项
 	Metadata    map[string]any `json:"metadata"`
 
 	// 统计信息

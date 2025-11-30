@@ -20,9 +20,9 @@ const (
 
 // LogRecord 标准化日志记录结构
 type LogRecord struct {
-	Timestamp time.Time              `json:"ts"`
-	Level     Level                  `json:"level"`
-	Message   string                 `json:"message"`
+	Timestamp time.Time      `json:"ts"`
+	Level     Level          `json:"level"`
+	Message   string         `json:"message"`
 	Fields    map[string]any `json:"fields,omitempty"`
 }
 

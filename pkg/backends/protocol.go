@@ -25,18 +25,18 @@ type GrepMatch struct {
 // WriteResult 写入操作结果
 // 设计参考: DeepAgents backends/protocol.py:36-58
 type WriteResult struct {
-	Error        string                 `json:"error,omitempty"`         // 错误信息,空字符串表示成功
-	Path         string                 `json:"path,omitempty"`          // 写入文件路径,失败时为空
-	BytesWritten int64                  `json:"bytes_written,omitempty"` // 写入字节数
+	Error        string         `json:"error,omitempty"`         // 错误信息,空字符串表示成功
+	Path         string         `json:"path,omitempty"`          // 写入文件路径,失败时为空
+	BytesWritten int64          `json:"bytes_written,omitempty"` // 写入字节数
 	FilesUpdate  map[string]any `json:"files_update,omitempty"`  // StateBackend 状态更新,外部存储为 nil
 }
 
 // EditResult 编辑操作结果
 // 设计参考: DeepAgents backends/protocol.py:61-85
 type EditResult struct {
-	Error            string                 `json:"error,omitempty"`             // 错误信息,空字符串表示成功
-	Path             string                 `json:"path,omitempty"`              // 编辑文件路径,失败时为空
-	ReplacementsMade int                    `json:"replacements_made,omitempty"` // 替换次数,失败时为 0
+	Error            string         `json:"error,omitempty"`             // 错误信息,空字符串表示成功
+	Path             string         `json:"path,omitempty"`              // 编辑文件路径,失败时为空
+	ReplacementsMade int            `json:"replacements_made,omitempty"` // 替换次数,失败时为 0
 	FilesUpdate      map[string]any `json:"files_update,omitempty"`      // StateBackend 状态更新,外部存储为 nil
 }
 

@@ -23,21 +23,21 @@ type ConditionalAgent struct {
 
 // BranchCondition 分支条件
 type BranchCondition struct {
-	Name      string                 `json:"name"`
-	Condition string                 `json:"condition"` // 条件表达式
-	Agent     *AgentRef              `json:"agent"`     // 分支Agent
-	Weight    int                    `json:"weight"`    // 权重（用于概率选择）
-	Priority  int                    `json:"priority"`  // 优先级
+	Name      string         `json:"name"`
+	Condition string         `json:"condition"` // 条件表达式
+	Agent     *AgentRef      `json:"agent"`     // 分支Agent
+	Weight    int            `json:"weight"`    // 权重（用于概率选择）
+	Priority  int            `json:"priority"`  // 优先级
 	Metadata  map[string]any `json:"metadata"`
 }
 
 // ConditionalConfig 条件Agent配置
 type ConditionalConfig struct {
-	Name        string                 `json:"name"`
-	Conditions  []BranchCondition      `json:"conditions"`
-	Default     *AgentRef              `json:"default,omitempty"`
-	Variables   map[string]any `json:"variables,omitempty"`
-	EvalTimeout time.Duration          `json:"eval_timeout,omitempty"`
+	Name        string            `json:"name"`
+	Conditions  []BranchCondition `json:"conditions"`
+	Default     *AgentRef         `json:"default,omitempty"`
+	Variables   map[string]any    `json:"variables,omitempty"`
+	EvalTimeout time.Duration     `json:"eval_timeout,omitempty"`
 }
 
 // NewConditionalAgent 创建条件Agent
@@ -210,13 +210,13 @@ type ParallelConditionalAgent struct {
 
 // ParallelConditionalConfig 并行条件Agent配置
 type ParallelConditionalConfig struct {
-	Name        string                 `json:"name"`
-	Conditions  []BranchCondition      `json:"conditions"`
-	Default     *AgentRef              `json:"default,omitempty"`
-	MaxParallel int                    `json:"max_parallel"`
-	Timeout     time.Duration          `json:"timeout"`
-	Variables   map[string]any `json:"variables,omitempty"`
-	Strategy    ParallelStrategy       `json:"strategy"` // first, all, majority
+	Name        string            `json:"name"`
+	Conditions  []BranchCondition `json:"conditions"`
+	Default     *AgentRef         `json:"default,omitempty"`
+	MaxParallel int               `json:"max_parallel"`
+	Timeout     time.Duration     `json:"timeout"`
+	Variables   map[string]any    `json:"variables,omitempty"`
+	Strategy    ParallelStrategy  `json:"strategy"` // first, all, majority
 }
 
 // ParallelStrategy 并行策略
@@ -407,12 +407,12 @@ func (p *ParallelConditionalAgent) evaluateSingleCondition(ctx context.Context, 
 
 // BranchEvaluationResult 分支评估结果
 type BranchEvaluationResult struct {
-	Name      string                 `json:"name"`
-	Condition string                 `json:"condition"`
-	Agent     *AgentRef              `json:"agent"`
-	Matched   bool                   `json:"matched"`
-	Error     error                  `json:"error,omitempty"`
-	Duration  time.Duration          `json:"duration"`
+	Name      string         `json:"name"`
+	Condition string         `json:"condition"`
+	Agent     *AgentRef      `json:"agent"`
+	Matched   bool           `json:"matched"`
+	Error     error          `json:"error,omitempty"`
+	Duration  time.Duration  `json:"duration"`
 	Metadata  map[string]any `json:"metadata"`
 }
 
@@ -678,19 +678,19 @@ type MultiLevelConditionalAgent struct {
 
 // ConditionLevel 条件层级
 type ConditionLevel struct {
-	Name       string                 `json:"name"`
-	Conditions []BranchCondition      `json:"conditions"`
-	Level      int                    `json:"level"`
-	Else       *ConditionLevel        `json:"else,omitempty"` // else分支
-	Metadata   map[string]any `json:"metadata"`
+	Name       string            `json:"name"`
+	Conditions []BranchCondition `json:"conditions"`
+	Level      int               `json:"level"`
+	Else       *ConditionLevel   `json:"else,omitempty"` // else分支
+	Metadata   map[string]any    `json:"metadata"`
 }
 
 // MultiLevelConditionalConfig 多级条件Agent配置
 type MultiLevelConditionalConfig struct {
-	Name      string                 `json:"name"`
-	Levels    []ConditionLevel       `json:"levels"`
-	Variables map[string]any `json:"variables,omitempty"`
-	MaxDepth  int                    `json:"max_depth"`
+	Name      string           `json:"name"`
+	Levels    []ConditionLevel `json:"levels"`
+	Variables map[string]any   `json:"variables,omitempty"`
+	MaxDepth  int              `json:"max_depth"`
 }
 
 // NewMultiLevelConditionalAgent 创建多级条件Agent

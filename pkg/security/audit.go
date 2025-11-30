@@ -66,31 +66,31 @@ const (
 
 // AuditEvent 审计事件
 type AuditEvent struct {
-	ID         string                 `json:"id"`
-	Type       AuditType              `json:"type"`
-	Timestamp  time.Time              `json:"timestamp"`
-	Severity   AuditSeverity          `json:"severity"`
-	Category   AuditCategory          `json:"category"`
-	UserID     string                 `json:"user_id,omitempty"`
-	Username   string                 `json:"username,omitempty"`
-	AgentID    string                 `json:"agent_id,omitempty"`
-	SessionID  string                 `json:"session_id,omitempty"`
-	Resource   string                 `json:"resource,omitempty"`
-	Action     string                 `json:"action,omitempty"`
-	ObjectID   string                 `json:"object_id,omitempty"`
-	ObjectType string                 `json:"object_type,omitempty"`
-	IPAddress  string                 `json:"ip_address,omitempty"`
-	UserAgent  string                 `json:"user_agent,omitempty"`
-	Location   string                 `json:"location,omitempty"`
-	Result     AuditResult            `json:"result,omitempty"`
-	Message    string                 `json:"message"`
-	Details    string                 `json:"details,omitempty"`
-	Duration   time.Duration          `json:"duration,omitempty"`
-	RequestID  string                 `json:"request_id,omitempty"`
-	TraceID    string                 `json:"trace_id,omitempty"`
+	ID         string         `json:"id"`
+	Type       AuditType      `json:"type"`
+	Timestamp  time.Time      `json:"timestamp"`
+	Severity   AuditSeverity  `json:"severity"`
+	Category   AuditCategory  `json:"category"`
+	UserID     string         `json:"user_id,omitempty"`
+	Username   string         `json:"username,omitempty"`
+	AgentID    string         `json:"agent_id,omitempty"`
+	SessionID  string         `json:"session_id,omitempty"`
+	Resource   string         `json:"resource,omitempty"`
+	Action     string         `json:"action,omitempty"`
+	ObjectID   string         `json:"object_id,omitempty"`
+	ObjectType string         `json:"object_type,omitempty"`
+	IPAddress  string         `json:"ip_address,omitempty"`
+	UserAgent  string         `json:"user_agent,omitempty"`
+	Location   string         `json:"location,omitempty"`
+	Result     AuditResult    `json:"result,omitempty"`
+	Message    string         `json:"message"`
+	Details    string         `json:"details,omitempty"`
+	Duration   time.Duration  `json:"duration,omitempty"`
+	RequestID  string         `json:"request_id,omitempty"`
+	TraceID    string         `json:"trace_id,omitempty"`
 	Metadata   map[string]any `json:"metadata,omitempty"`
-	RiskScore  float64                `json:"risk_score,omitempty"`
-	Tags       []string               `json:"tags,omitempty"`
+	RiskScore  float64        `json:"risk_score,omitempty"`
+	Tags       []string       `json:"tags,omitempty"`
 }
 
 // AuditSeverity 审计严重级别
@@ -264,12 +264,12 @@ type AccessEventStats struct {
 
 // EventSummary 事件摘要
 type EventSummary struct {
-	TimeRange       TimeRange              `json:"time_range"`
-	TotalEvents     int64                  `json:"total_events"`
-	KeyMetrics      map[string]any `json:"key_metrics"`
-	Trends          []TrendData            `json:"trends"`
-	Alerts          []SecurityAlert        `json:"alerts"`
-	Recommendations []string               `json:"recommendations"`
+	TimeRange       TimeRange       `json:"time_range"`
+	TotalEvents     int64           `json:"total_events"`
+	KeyMetrics      map[string]any  `json:"key_metrics"`
+	Trends          []TrendData     `json:"trends"`
+	Alerts          []SecurityAlert `json:"alerts"`
+	Recommendations []string        `json:"recommendations"`
 }
 
 // TrendData 趋势数据
@@ -281,13 +281,13 @@ type TrendData struct {
 
 // SecurityAlert 安全警报
 type SecurityAlert struct {
-	ID          string                 `json:"id"`
-	Type        AlertType              `json:"type"`
-	Severity    AuditSeverity          `json:"severity"`
-	Message     string                 `json:"message"`
-	Description string                 `json:"description"`
-	Events      []string               `json:"events"` // 相关事件ID
-	DetectedAt  time.Time              `json:"detected_at"`
+	ID          string         `json:"id"`
+	Type        AlertType      `json:"type"`
+	Severity    AuditSeverity  `json:"severity"`
+	Message     string         `json:"message"`
+	Description string         `json:"description"`
+	Events      []string       `json:"events"` // 相关事件ID
+	DetectedAt  time.Time      `json:"detected_at"`
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
@@ -373,15 +373,15 @@ type RetentionPolicy struct {
 
 // AuditLogStatus 审计日志状态
 type AuditLogStatus struct {
-	Status           string                 `json:"status"`
-	Version          string                 `json:"version"`
-	Uptime           time.Duration          `json:"uptime"`
-	TotalEvents      int64                  `json:"total_events"`
-	EventsPerSecond  float64                `json:"events_per_second"`
-	StorageSize      int64                  `json:"storage_size"`
-	LastEventTime    time.Time              `json:"last_event_time"`
-	ErrorCount       int64                  `json:"error_count"`
-	LastError        string                 `json:"last_error,omitempty"`
+	Status           string         `json:"status"`
+	Version          string         `json:"version"`
+	Uptime           time.Duration  `json:"uptime"`
+	TotalEvents      int64          `json:"total_events"`
+	EventsPerSecond  float64        `json:"events_per_second"`
+	StorageSize      int64          `json:"storage_size"`
+	LastEventTime    time.Time      `json:"last_event_time"`
+	ErrorCount       int64          `json:"error_count"`
+	LastError        string         `json:"last_error,omitempty"`
 	WorkerPoolStatus map[string]any `json:"worker_pool_status"`
 	MemoryUsage      map[string]any `json:"memory_usage"`
 }

@@ -935,16 +935,16 @@ func (a *Agent) ExecuteToolsDirect(ctx context.Context, calls []ToolCall) []Tool
 
 // ToolCall 工具调用参数
 type ToolCall struct {
-	Name  string                 `json:"name"`
+	Name  string         `json:"name"`
 	Input map[string]any `json:"input"`
 }
 
 // ToolCallResult 工具调用结果
 type ToolCallResult struct {
-	Name    string      `json:"name"`
-	Success bool        `json:"success"`
-	Result  any `json:"result,omitempty"`
-	Error   string      `json:"error,omitempty"`
+	Name    string `json:"name"`
+	Success bool   `json:"success"`
+	Result  any    `json:"result,omitempty"`
+	Error   string `json:"error,omitempty"`
 }
 
 // Close 关闭Agent

@@ -19,9 +19,9 @@ type EventType interface {
 
 // AgentEventEnvelope 事件封装(带Bookmark)
 type AgentEventEnvelope struct {
-	Cursor   int64       `json:"cursor"`
-	Bookmark Bookmark    `json:"bookmark"`
-	Event    any `json:"event"`
+	Cursor   int64    `json:"cursor"`
+	Bookmark Bookmark `json:"bookmark"`
+	Event    any      `json:"event"`
 }
 
 // ===================
@@ -97,13 +97,13 @@ func (e *ProgressToolEndEvent) EventType() string     { return "tool:end" }
 
 // ProgressToolProgressEvent 工具执行进度事件
 type ProgressToolProgressEvent struct {
-	Call     ToolCallSnapshot       `json:"call"`
-	Progress float64                `json:"progress"`           // 0.0 - 1.0
-	Message  string                 `json:"message,omitempty"`  // 进度描述
-	Step     int                    `json:"step,omitempty"`     // 当前步骤
-	Total    int                    `json:"total,omitempty"`    // 总步骤
-	Metadata map[string]any `json:"metadata,omitempty"` // 额外元数据
-	ETA      int64                  `json:"eta_ms,omitempty"`   // 预估剩余时间(ms)
+	Call     ToolCallSnapshot `json:"call"`
+	Progress float64          `json:"progress"`           // 0.0 - 1.0
+	Message  string           `json:"message,omitempty"`  // 进度描述
+	Step     int              `json:"step,omitempty"`     // 当前步骤
+	Total    int              `json:"total,omitempty"`    // 总步骤
+	Metadata map[string]any   `json:"metadata,omitempty"` // 额外元数据
+	ETA      int64            `json:"eta_ms,omitempty"`   // 预估剩余时间(ms)
 }
 
 func (e *ProgressToolProgressEvent) Channel() AgentChannel { return ChannelProgress }
@@ -113,7 +113,7 @@ func (e *ProgressToolProgressEvent) EventType() string     { return "tool:progre
 type ProgressToolIntermediateEvent struct {
 	Call  ToolCallSnapshot `json:"call"`
 	Label string           `json:"label,omitempty"`
-	Data  any      `json:"data,omitempty"`
+	Data  any              `json:"data,omitempty"`
 }
 
 func (e *ProgressToolIntermediateEvent) Channel() AgentChannel { return ChannelProgress }
@@ -217,9 +217,9 @@ func (e *MonitorStepCompleteEvent) EventType() string     { return "step_complet
 
 // MonitorErrorEvent 错误事件
 type MonitorErrorEvent struct {
-	Severity string                 `json:"severity"` // "info", "warn", "error"
-	Phase    string                 `json:"phase"`    // "model", "tool", "system", "lifecycle"
-	Message  string                 `json:"message"`
+	Severity string         `json:"severity"` // "info", "warn", "error"
+	Phase    string         `json:"phase"`    // "model", "tool", "system", "lifecycle"
+	Message  string         `json:"message"`
 	Detail   map[string]any `json:"detail,omitempty"`
 }
 
@@ -331,8 +331,8 @@ type Question struct {
 
 // ControlAskUserEvent 请求用户回答问题事件
 type ControlAskUserEvent struct {
-	RequestID string                                     `json:"request_id"`
-	Questions []Question                                 `json:"questions"`
+	RequestID string                             `json:"request_id"`
+	Questions []Question                         `json:"questions"`
 	Respond   func(answers map[string]any) error `json:"-"` // 响应回调
 }
 
@@ -341,7 +341,7 @@ func (e *ControlAskUserEvent) EventType() string     { return "ask_user" }
 
 // ControlUserAnswerEvent 用户回答事件
 type ControlUserAnswerEvent struct {
-	RequestID string                 `json:"request_id"`
+	RequestID string         `json:"request_id"`
 	Answers   map[string]any `json:"answers"` // question_index -> answer(s)
 }
 

@@ -20,15 +20,15 @@ type ToolIndex struct {
 
 // ToolIndexEntry 工具索引条目
 type ToolIndexEntry struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	InputSchema map[string]any `json:"input_schema"`
-	Category    string                 `json:"category,omitempty"`
-	Keywords    []string               `json:"keywords,omitempty"`
-	Examples    []tools.ToolExample    `json:"examples,omitempty"`
-	Deferred    bool                   `json:"deferred"`
-	Source      string                 `json:"source"` // "builtin", "mcp", "custom"
-	Metadata    map[string]any `json:"metadata,omitempty"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	InputSchema map[string]any      `json:"input_schema"`
+	Category    string              `json:"category,omitempty"`
+	Keywords    []string            `json:"keywords,omitempty"`
+	Examples    []tools.ToolExample `json:"examples,omitempty"`
+	Deferred    bool                `json:"deferred"`
+	Source      string              `json:"source"` // "builtin", "mcp", "custom"
+	Metadata    map[string]any      `json:"metadata,omitempty"`
 }
 
 // ToolSearchResult 工具搜索结果

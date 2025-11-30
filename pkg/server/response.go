@@ -7,9 +7,9 @@ import (
 
 // APIResponse 统一的 API 响应格式
 type APIResponse struct {
-	Success bool        `json:"success"`
-	Data    any `json:"data,omitempty"`
-	Error   *APIError   `json:"error,omitempty"`
+	Success bool      `json:"success"`
+	Data    any       `json:"data,omitempty"`
+	Error   *APIError `json:"error,omitempty"`
 }
 
 // APIError 统一的错误格式
@@ -22,10 +22,10 @@ type APIError struct {
 // PaginatedResponse 分页响应
 type PaginatedResponse struct {
 	Items      any `json:"items"`
-	Total      int         `json:"total"`
-	Page       int         `json:"page"`
-	PageSize   int         `json:"page_size"`
-	TotalPages int         `json:"total_pages"`
+	Total      int `json:"total"`
+	Page       int `json:"page"`
+	PageSize   int `json:"page_size"`
+	TotalPages int `json:"total_pages"`
 }
 
 // JSON 辅助函数：发送 JSON 响应

@@ -179,7 +179,7 @@ type MCPRequest struct {
 
 // MCPCallParams 工具调用参数
 type MCPCallParams struct {
-	Name      string                 `json:"name"`
+	Name      string         `json:"name"`
 	Arguments map[string]any `json:"arguments,omitempty"`
 }
 
@@ -193,14 +193,14 @@ type MCPResponse struct {
 
 // MCPError MCP 错误
 type MCPError struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    any `json:"data,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // MCPTool MCP 工具定义
 type MCPTool struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
 	InputSchema map[string]any `json:"inputSchema"`
 }

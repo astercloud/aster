@@ -2,9 +2,9 @@ package core
 
 // IngestRequest 描述一次知识摄入请求（轻量模型）。
 type IngestRequest struct {
-	ID        string                 // 文档 ID，可为空则自动生成
-	Text      string                 // 原文文本
-	Namespace string                 // 命名空间，可为空使用默认
+	ID        string         // 文档 ID，可为空则自动生成
+	Text      string         // 原文文本
+	Namespace string         // 命名空间，可为空使用默认
 	Metadata  map[string]any // 自定义元数据
 }
 

@@ -33,7 +33,7 @@ func NewSessionHandler(st store.Store) *SessionHandler {
 // Create creates a new session
 func (h *SessionHandler) Create(c *gin.Context) {
 	var req struct {
-		AgentID  string                 `json:"agent_id" binding:"required"`
+		AgentID  string         `json:"agent_id" binding:"required"`
 		Context  map[string]any `json:"context"`
 		Metadata map[string]any `json:"metadata"`
 	}
@@ -164,7 +164,7 @@ func (h *SessionHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Status   *string                `json:"status"`
+		Status   *string        `json:"status"`
 		Context  map[string]any `json:"context"`
 		Metadata map[string]any `json:"metadata"`
 	}

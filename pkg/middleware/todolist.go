@@ -32,8 +32,8 @@ type TodoItem struct {
 type TodoListMiddleware struct {
 	*BaseMiddleware
 	todos       []TodoItem
-	storeGetter func() any // 获取当前任务列表
-	storeSetter func([]TodoItem)   // 设置任务列表
+	storeGetter func() any       // 获取当前任务列表
+	storeSetter func([]TodoItem) // 设置任务列表
 }
 
 // TodoListMiddlewareConfig 任务列表中间件配置

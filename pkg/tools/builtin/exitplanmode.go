@@ -16,20 +16,20 @@ type ExitPlanModeTool struct {
 
 // PlanRecord 计划记录
 type PlanRecord struct {
-	ID                   string                 `json:"id"`
-	Content              string                 `json:"content"`
-	FilePath             string                 `json:"file_path,omitempty"`
-	EstimatedDuration    string                 `json:"estimated_duration,omitempty"`
-	Dependencies         []string               `json:"dependencies,omitempty"`
-	Risks                []string               `json:"risks,omitempty"`
-	SuccessCriteria      []string               `json:"success_criteria,omitempty"`
-	ConfirmationRequired bool                   `json:"confirmation_required"`
-	Status               string                 `json:"status"` // "pending_approval", "approved", "rejected", "completed"
-	CreatedAt            time.Time              `json:"created_at"`
-	UpdatedAt            time.Time              `json:"updated_at"`
-	ApprovedAt           *time.Time             `json:"approved_at,omitempty"`
-	AgentID              string                 `json:"agent_id"`
-	SessionID            string                 `json:"session_id"`
+	ID                   string         `json:"id"`
+	Content              string         `json:"content"`
+	FilePath             string         `json:"file_path,omitempty"`
+	EstimatedDuration    string         `json:"estimated_duration,omitempty"`
+	Dependencies         []string       `json:"dependencies,omitempty"`
+	Risks                []string       `json:"risks,omitempty"`
+	SuccessCriteria      []string       `json:"success_criteria,omitempty"`
+	ConfirmationRequired bool           `json:"confirmation_required"`
+	Status               string         `json:"status"` // "pending_approval", "approved", "rejected", "completed"
+	CreatedAt            time.Time      `json:"created_at"`
+	UpdatedAt            time.Time      `json:"updated_at"`
+	ApprovedAt           *time.Time     `json:"approved_at,omitempty"`
+	AgentID              string         `json:"agent_id"`
+	SessionID            string         `json:"session_id"`
 	Metadata             map[string]any `json:"metadata,omitempty"`
 }
 

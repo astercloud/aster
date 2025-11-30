@@ -24,23 +24,23 @@ type HITLManager struct {
 
 // HITLRequest 审批请求
 type HITLRequest struct {
-	ID         string                 `json:"id"`
-	ToolCallID string                 `json:"tool_call_id"`
-	ToolName   string                 `json:"tool_name"`
+	ID         string         `json:"id"`
+	ToolCallID string         `json:"tool_call_id"`
+	ToolName   string         `json:"tool_name"`
 	ToolInput  map[string]any `json:"tool_input"`
-	Message    string                 `json:"message"`
-	CreatedAt  time.Time              `json:"created_at"`
-	AgentID    string                 `json:"agent_id"`
-	ConnID     string                 `json:"conn_id"` // WebSocket 连接 ID
+	Message    string         `json:"message"`
+	CreatedAt  time.Time      `json:"created_at"`
+	AgentID    string         `json:"agent_id"`
+	ConnID     string         `json:"conn_id"` // WebSocket 连接 ID
 }
 
 // HITLDecision 审批决策
 type HITLDecision struct {
-	RequestID   string                 `json:"request_id"`
-	Decision    string                 `json:"decision"` // approve, reject, edit
+	RequestID   string         `json:"request_id"`
+	Decision    string         `json:"decision"` // approve, reject, edit
 	EditedInput map[string]any `json:"edited_input,omitempty"`
-	Reason      string                 `json:"reason,omitempty"`
-	DecidedAt   time.Time              `json:"decided_at"`
+	Reason      string         `json:"reason,omitempty"`
+	DecidedAt   time.Time      `json:"decided_at"`
 }
 
 // NewHITLManager 创建 HITL 管理器

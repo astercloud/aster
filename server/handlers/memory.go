@@ -12,40 +12,40 @@ import (
 
 // WorkingMemoryRecord Working Memory 记录
 type WorkingMemoryRecord struct {
-	ID        string                 `json:"id"`
-	SessionID string                 `json:"session_id,omitempty"`
-	AgentID   string                 `json:"agent_id,omitempty"`
-	Key       string                 `json:"key"`
+	ID        string         `json:"id"`
+	SessionID string         `json:"session_id,omitempty"`
+	AgentID   string         `json:"agent_id,omitempty"`
+	Key       string         `json:"key"`
 	Value     any            `json:"value"`
-	Type      string                 `json:"type"`
-	TTL       int                    `json:"ttl,omitempty"`
-	ExpiresAt *time.Time             `json:"expires_at,omitempty"`
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
+	Type      string         `json:"type"`
+	TTL       int            `json:"ttl,omitempty"`
+	ExpiresAt *time.Time     `json:"expires_at,omitempty"`
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
 // SemanticMemoryRecord Semantic Memory 记录
 type SemanticMemoryRecord struct {
-	ID        string                 `json:"id"`
-	Content   string                 `json:"content"`
-	Embedding []float64              `json:"embedding,omitempty"`
-	Source    string                 `json:"source,omitempty"`
-	SessionID string                 `json:"session_id,omitempty"`
-	AgentID   string                 `json:"agent_id,omitempty"`
-	Tags      []string               `json:"tags,omitempty"`
-	CreatedAt time.Time              `json:"created_at"`
+	ID        string         `json:"id"`
+	Content   string         `json:"content"`
+	Embedding []float64      `json:"embedding,omitempty"`
+	Source    string         `json:"source,omitempty"`
+	SessionID string         `json:"session_id,omitempty"`
+	AgentID   string         `json:"agent_id,omitempty"`
+	Tags      []string       `json:"tags,omitempty"`
+	CreatedAt time.Time      `json:"created_at"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
 // ProvenanceRecord Provenance 溯源记录
 type ProvenanceRecord struct {
-	ID         string                 `json:"id"`
-	EntityType string                 `json:"entity_type"`
-	EntityID   string                 `json:"entity_id"`
-	Operation  string                 `json:"operation"`
-	Actor      string                 `json:"actor,omitempty"`
-	Timestamp  time.Time              `json:"timestamp"`
+	ID         string         `json:"id"`
+	EntityType string         `json:"entity_type"`
+	EntityID   string         `json:"entity_id"`
+	Operation  string         `json:"operation"`
+	Actor      string         `json:"actor,omitempty"`
+	Timestamp  time.Time      `json:"timestamp"`
 	Changes    map[string]any `json:"changes,omitempty"`
 	Metadata   map[string]any `json:"metadata,omitempty"`
 }
@@ -63,12 +63,12 @@ func NewMemoryHandler(st store.Store) *MemoryHandler {
 // CreateWorkingMemory creates working memory
 func (h *MemoryHandler) CreateWorkingMemory(c *gin.Context) {
 	var req struct {
-		SessionID string                 `json:"session_id"`
-		AgentID   string                 `json:"agent_id"`
-		Key       string                 `json:"key" binding:"required"`
+		SessionID string         `json:"session_id"`
+		AgentID   string         `json:"agent_id"`
+		Key       string         `json:"key" binding:"required"`
 		Value     any            `json:"value" binding:"required"`
-		Type      string                 `json:"type"`
-		TTL       int                    `json:"ttl"`
+		Type      string         `json:"type"`
+		TTL       int            `json:"ttl"`
 		Metadata  map[string]any `json:"metadata"`
 	}
 
@@ -227,7 +227,7 @@ func (h *MemoryHandler) UpdateWorkingMemory(c *gin.Context) {
 
 	var req struct {
 		Value    any            `json:"value"`
-		TTL      *int                   `json:"ttl"`
+		TTL      *int           `json:"ttl"`
 		Metadata map[string]any `json:"metadata"`
 	}
 
@@ -389,12 +389,12 @@ func (h *MemoryHandler) ClearWorkingMemory(c *gin.Context) {
 // CreateSemanticMemory creates semantic memory
 func (h *MemoryHandler) CreateSemanticMemory(c *gin.Context) {
 	var req struct {
-		Content   string                 `json:"content" binding:"required"`
-		Embedding []float64              `json:"embedding"`
-		Source    string                 `json:"source"`
-		SessionID string                 `json:"session_id"`
-		AgentID   string                 `json:"agent_id"`
-		Tags      []string               `json:"tags"`
+		Content   string         `json:"content" binding:"required"`
+		Embedding []float64      `json:"embedding"`
+		Source    string         `json:"source"`
+		SessionID string         `json:"session_id"`
+		AgentID   string         `json:"agent_id"`
+		Tags      []string       `json:"tags"`
 		Metadata  map[string]any `json:"metadata"`
 	}
 

@@ -41,9 +41,9 @@ type SimplicityCheckerConfig struct {
 
 // SimplicityWarning 简洁性警告
 type SimplicityWarning struct {
-	Type    string                 `json:"type"`    // 警告类型
-	Message string                 `json:"message"` // 警告消息
-	File    string                 `json:"file"`    // 相关文件
+	Type    string         `json:"type"`    // 警告类型
+	Message string         `json:"message"` // 警告消息
+	File    string         `json:"file"`    // 相关文件
 	Details map[string]any `json:"details"` // 详细信息
 }
 

@@ -38,17 +38,17 @@ type SubagentManager interface {
 
 // SubagentConfig 子代理配置
 type SubagentConfig struct {
-	ID            string                 `json:"id"`
-	Type          string                 `json:"type"` // "general-purpose", "Explore", "Plan", "statusline-setup"
-	Prompt        string                 `json:"prompt"`
-	ParentContext map[string]any `json:"parent_context,omitempty"`
-	Model         string                 `json:"model,omitempty"`
-	WorkDir       string                 `json:"work_dir,omitempty"`
-	Env           map[string]string      `json:"env,omitempty"`
-	Timeout       time.Duration          `json:"timeout,omitempty"`
-	MaxTokens     int                    `json:"max_tokens,omitempty"`
-	Temperature   float64                `json:"temperature,omitempty"`
-	Metadata      map[string]string      `json:"metadata,omitempty"`
+	ID            string            `json:"id"`
+	Type          string            `json:"type"` // "general-purpose", "Explore", "Plan", "statusline-setup"
+	Prompt        string            `json:"prompt"`
+	ParentContext map[string]any    `json:"parent_context,omitempty"`
+	Model         string            `json:"model,omitempty"`
+	WorkDir       string            `json:"work_dir,omitempty"`
+	Env           map[string]string `json:"env,omitempty"`
+	Timeout       time.Duration     `json:"timeout,omitempty"`
+	MaxTokens     int               `json:"max_tokens,omitempty"`
+	Temperature   float64           `json:"temperature,omitempty"`
+	Metadata      map[string]string `json:"metadata,omitempty"`
 }
 
 // SubagentInstance 子代理实例

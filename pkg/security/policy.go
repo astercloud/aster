@@ -43,7 +43,7 @@ type SecurityPolicy struct {
 	Response PolicyResponse `json:"response"`
 
 	// 元数据
-	Tags     []string               `json:"tags"`
+	Tags     []string       `json:"tags"`
 	Metadata map[string]any `json:"metadata"`
 
 	// 审计
@@ -84,14 +84,14 @@ const (
 
 // PolicyRule 策略规则
 type PolicyRule struct {
-	ID          string                 `json:"id"`
-	Type        RuleType               `json:"type"`
-	Field       string                 `json:"field"`
-	Operator    RuleOperator           `json:"operator"`
+	ID          string         `json:"id"`
+	Type        RuleType       `json:"type"`
+	Field       string         `json:"field"`
+	Operator    RuleOperator   `json:"operator"`
 	Value       any            `json:"value"`
-	Description string                 `json:"description"`
-	Enabled     bool                   `json:"enabled"`
-	Priority    int                    `json:"priority"`
+	Description string         `json:"description"`
+	Enabled     bool           `json:"enabled"`
+	Priority    int            `json:"priority"`
 	Metadata    map[string]any `json:"metadata"`
 }
 
@@ -128,15 +128,15 @@ const (
 
 // PolicyCondition 策略条件
 type PolicyCondition struct {
-	ID          string                 `json:"id"`
-	Type        ConditionType          `json:"type"`
-	Field       string                 `json:"field"`
-	Operator    ConditionOperator      `json:"operator"`
-	Value       any            `json:"value"`
-	Logic       ConditionLogic         `json:"logic"` // AND, OR, NOT
-	Description string                 `json:"description"`
-	Enabled     bool                   `json:"enabled"`
-	Metadata    map[string]any `json:"metadata"`
+	ID          string            `json:"id"`
+	Type        ConditionType     `json:"type"`
+	Field       string            `json:"field"`
+	Operator    ConditionOperator `json:"operator"`
+	Value       any               `json:"value"`
+	Logic       ConditionLogic    `json:"logic"` // AND, OR, NOT
+	Description string            `json:"description"`
+	Enabled     bool              `json:"enabled"`
+	Metadata    map[string]any    `json:"metadata"`
 }
 
 // ConditionType 条件类型
@@ -216,26 +216,26 @@ const (
 
 // PolicyResponse 策略响应
 type PolicyResponse struct {
-	Message     string                 `json:"message"`
-	Code        int                    `json:"code"`
-	Headers     map[string]string      `json:"headers,omitempty"`
-	RedirectURL string                 `json:"redirect_url,omitempty"`
-	Challenge   *ChallengeInfo         `json:"challenge,omitempty"`
-	Transform   *TransformInfo         `json:"transform,omitempty"`
-	Metadata    map[string]any `json:"metadata"`
+	Message     string            `json:"message"`
+	Code        int               `json:"code"`
+	Headers     map[string]string `json:"headers,omitempty"`
+	RedirectURL string            `json:"redirect_url,omitempty"`
+	Challenge   *ChallengeInfo    `json:"challenge,omitempty"`
+	Transform   *TransformInfo    `json:"transform,omitempty"`
+	Metadata    map[string]any    `json:"metadata"`
 }
 
 // ChallengeInfo 挑战信息
 type ChallengeInfo struct {
-	Type        string                 `json:"type"` // CAPTCHA, MFA, 知识问答等
-	Duration    time.Duration          `json:"duration"`
-	MaxAttempts int                    `json:"max_attempts"`
+	Type        string         `json:"type"` // CAPTCHA, MFA, 知识问答等
+	Duration    time.Duration  `json:"duration"`
+	MaxAttempts int            `json:"max_attempts"`
 	Parameters  map[string]any `json:"parameters"`
 }
 
 // TransformInfo 转换信息
 type TransformInfo struct {
-	Type       string                 `json:"type"` // 数据脱敏、格式转换等
+	Type       string         `json:"type"` // 数据脱敏、格式转换等
 	Parameters map[string]any `json:"parameters"`
 }
 
@@ -251,19 +251,19 @@ const (
 
 // PolicyEvaluation 策略评估结果
 type PolicyEvaluation struct {
-	PolicyID            string                 `json:"policy_id"`
-	PolicyName          string                 `json:"policy_name"`
-	Allowed             bool                   `json:"allowed"`
-	Action              PolicyAction           `json:"action"`
-	Reason              string                 `json:"reason"`
-	Score               float64                `json:"score"` // 风险评分 0-100
-	RiskLevel           RiskLevel              `json:"risk_level"`
-	Duration            time.Duration          `json:"duration"`
-	MatchedRules        []string               `json:"matched_rules"`
-	TriggeredConditions []string               `json:"triggered_conditions"`
-	Response            *PolicyResponse        `json:"response,omitempty"`
-	Metadata            map[string]any `json:"metadata"`
-	EvaluatedAt         time.Time              `json:"evaluated_at"`
+	PolicyID            string          `json:"policy_id"`
+	PolicyName          string          `json:"policy_name"`
+	Allowed             bool            `json:"allowed"`
+	Action              PolicyAction    `json:"action"`
+	Reason              string          `json:"reason"`
+	Score               float64         `json:"score"` // 风险评分 0-100
+	RiskLevel           RiskLevel       `json:"risk_level"`
+	Duration            time.Duration   `json:"duration"`
+	MatchedRules        []string        `json:"matched_rules"`
+	TriggeredConditions []string        `json:"triggered_conditions"`
+	Response            *PolicyResponse `json:"response,omitempty"`
+	Metadata            map[string]any  `json:"metadata"`
+	EvaluatedAt         time.Time       `json:"evaluated_at"`
 }
 
 // RiskLevel 风险级别
@@ -278,17 +278,17 @@ const (
 
 // PolicyRequest 策略请求
 type PolicyRequest struct {
-	RequestID   string                 `json:"request_id"`
-	UserID      string                 `json:"user_id,omitempty"`
-	AgentID     string                 `json:"agent_id,omitempty"`
-	Action      string                 `json:"action"`
-	Resource    string                 `json:"resource"`
+	RequestID   string         `json:"request_id"`
+	UserID      string         `json:"user_id,omitempty"`
+	AgentID     string         `json:"agent_id,omitempty"`
+	Action      string         `json:"action"`
+	Resource    string         `json:"resource"`
 	Context     map[string]any `json:"context"`
-	IPAddress   string                 `json:"ip_address,omitempty"`
-	UserAgent   string                 `json:"user_agent,omitempty"`
-	Timestamp   time.Time              `json:"timestamp"`
-	Environment string                 `json:"environment,omitempty"`
-	Location    string                 `json:"location,omitempty"`
+	IPAddress   string         `json:"ip_address,omitempty"`
+	UserAgent   string         `json:"user_agent,omitempty"`
+	Timestamp   time.Time      `json:"timestamp"`
+	Environment string         `json:"environment,omitempty"`
+	Location    string         `json:"location,omitempty"`
 	Metadata    map[string]any `json:"metadata"`
 }
 
@@ -362,14 +362,14 @@ const (
 
 // PolicyReport 策略报告
 type PolicyReport struct {
-	ID          string                 `json:"id"`
-	Type        ReportType             `json:"type"`
-	Title       string                 `json:"title"`
-	Period      TimeRange              `json:"period"`
-	GeneratedAt time.Time              `json:"generated_at"`
-	GeneratedBy string                 `json:"generated_by"`
+	ID          string         `json:"id"`
+	Type        ReportType     `json:"type"`
+	Title       string         `json:"title"`
+	Period      TimeRange      `json:"period"`
+	GeneratedAt time.Time      `json:"generated_at"`
+	GeneratedBy string         `json:"generated_by"`
 	Content     map[string]any `json:"content"`
-	Format      ReportFormat           `json:"format"`
+	Format      ReportFormat   `json:"format"`
 }
 
 // ReportFormat 报告格式
@@ -384,15 +384,15 @@ const (
 
 // EngineStatus 引擎状态
 type EngineStatus struct {
-	Status            string                 `json:"status"`
-	Version           string                 `json:"version"`
-	Uptime            time.Duration          `json:"uptime"`
-	PolicyCount       int                    `json:"policy_count"`
-	ActivePolicyCount int                    `json:"active_policy_count"`
-	TotalEvaluations  int64                  `json:"total_evaluations"`
-	AverageLatency    time.Duration          `json:"average_latency"`
-	ErrorRate         float64                `json:"error_rate"`
-	LastReload        time.Time              `json:"last_reload"`
+	Status            string         `json:"status"`
+	Version           string         `json:"version"`
+	Uptime            time.Duration  `json:"uptime"`
+	PolicyCount       int            `json:"policy_count"`
+	ActivePolicyCount int            `json:"active_policy_count"`
+	TotalEvaluations  int64          `json:"total_evaluations"`
+	AverageLatency    time.Duration  `json:"average_latency"`
+	ErrorRate         float64        `json:"error_rate"`
+	LastReload        time.Time      `json:"last_reload"`
 	MemoryUsage       map[string]any `json:"memory_usage"`
 	CPUUsage          map[string]any `json:"cpu_usage"`
 }
