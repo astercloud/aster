@@ -1,3 +1,5 @@
+// HumanInTheLoop 演示 HITL 中间件实现的工具审批工作流，包括基于风险的
+// 评估、交互式提示和可配置的审批策略。
 package main
 
 import (

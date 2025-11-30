@@ -1,3 +1,5 @@
+// Guardrails 演示安全防护栏系统，包括 PII 检测、PII 掩码、提示注入检测、
+// 防护栏链和 OpenAI 内容审核集成。
 package main
 
 import (

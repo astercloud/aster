@@ -1,3 +1,5 @@
+// AgentWorkingMemory 演示带 Working Memory 的 Agent，支持自动加载到
+// system prompt、LLM 主动更新和跨会话持久化。
 package main
 
 import (
@@ -18,11 +20,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 本示例演示一个带 Working Memory 的 Agent
-// Working Memory 特点:
-// - 自动加载: 每轮对话开始时自动注入到 system prompt
-// - LLM 控制: Agent 可以通过 update_working_memory 工具主动更新
-// - 持久化: 跨会话保持状态
 //
 // 使用场景:
 // - 记住用户偏好和设置

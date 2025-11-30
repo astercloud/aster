@@ -1,3 +1,5 @@
+// WorkflowSteps 演示 Aster Workflow 的所有步骤类型，包括 FunctionStep、
+// ConditionStep、ParallelStep、LoopStep、RouterStep 等。
 package main
 
 import (

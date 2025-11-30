@@ -1,3 +1,5 @@
+// Subagent 演示 SubAgentMiddleware 实现的任务委派功能，支持将任务分派给
+// 专业化的子代理如研究员、编码员和审查员等角色。
 package main
 
 import (

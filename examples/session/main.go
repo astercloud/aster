@@ -1,3 +1,4 @@
+// Session 演示会话管理系统，包括分层状态管理、事件溯源、事件过滤和会话列表。
 package main
 
 import (

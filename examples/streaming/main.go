@@ -1,3 +1,5 @@
+// Streaming 演示基于 Go 1.23 iter.Seq2 迭代器的 Agent 流式 API，
+// 包括事件收集、过滤和内存高效的实时处理。
 package main
 
 import (
@@ -17,8 +19,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 演示 Agent 流式执行接口
-// 基于 Go 1.23 的 iter.Seq2 迭代器设计
 func main() {
 	ctx := context.Background()
 

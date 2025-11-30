@@ -1,3 +1,5 @@
+// MemorySemanticSession 演示如何将 Session 对话内容保存到 SemanticMemory，
+// 实现跨会话的长期语义记忆和检索能力。
 package main
 
 import (
@@ -12,8 +14,6 @@ import (
 	"github.com/astercloud/aster/pkg/vector"
 )
 
-// 本示例演示如何将 Session 中的对话内容保存到 SemanticMemory 中，
-// 作为长期语义记忆，供后续会话进行语义检索。
 func main() {
 	ctx := context.Background()
 

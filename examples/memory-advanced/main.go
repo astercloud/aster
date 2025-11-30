@@ -1,3 +1,5 @@
+// MemoryAdvanced 演示基于 memory.Scope 的高级记忆封装策略，支持多用户、
+// 多项目、多资源的分层记忆管理，无需 LLM 直接操作文件路径。
 package main
 
 import (
@@ -10,15 +12,6 @@ import (
 	"github.com/astercloud/aster/pkg/middleware"
 	"github.com/astercloud/aster/pkg/tools"
 )
-
-// 本示例演示如何在不依赖完整 Agent 的情况下:
-// - 使用 AgentMemoryMiddleware 提供的 memory_write 工具
-// - 基于 memory.Scope 封装更高层的业务工具:
-//     - user_preference_write
-//     - project_fact_write
-//     - resource_note_write
-//
-// 这有助于你在应用层设计清晰的“多用户 + 多项目 + 多资源”记忆策略,而不是让 LLM 直接操作 namespace 和文件路径。
 
 // userPreferenceTool 封装: 写用户偏好 -> users/<user-id>/profile/prefs.md
 type userPreferenceTool struct {

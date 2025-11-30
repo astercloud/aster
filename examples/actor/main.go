@@ -1,4 +1,5 @@
-// Package main 演示如何使用 Actor 模型实现多 Agent 协作
+// Actor 演示如何使用 Actor 模型实现多 Agent 协作，包括 Ping-Pong、
+// 并发计数器、监督者策略、流水线处理和广播消息等模式。
 package main
 
 import (

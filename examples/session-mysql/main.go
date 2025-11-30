@@ -1,3 +1,5 @@
+// SessionMySQL 演示 MySQL 8.0+ Session 持久化功能，利用 MySQL 的 JSON
+// 列类型实现会话状态和事件的持久化存储。
 package main
 
 import (
@@ -12,8 +14,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// 演示 MySQL 8.0+ Session 持久化
-// 利用 MySQL 8.0+ 的 JSON 列类型
 func main() {
 	ctx := context.Background()
 

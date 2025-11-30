@@ -1,3 +1,5 @@
+// SessionPostgres 演示 PostgreSQL Session 持久化功能，使用 JSONB 列类型
+// 实现高效的会话状态和事件存储。
 package main
 
 import (
@@ -12,8 +14,6 @@ import (
 	"gorm.io/gorm/logger"
 )
 
-// 演示 PostgreSQL Session 持久化
-// 基于 Google ADK-Go 的 session/database/ 实现
 func main() {
 	ctx := context.Background()
 

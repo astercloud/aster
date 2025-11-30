@@ -1,3 +1,5 @@
+// Router 演示 StaticRouter 的模型路由功能，根据不同的 routing_profile
+// 为 Agent 选择不同的模型配置，如 "quality-first" 或 "cost-first"。
 package main
 
 import (
@@ -16,8 +18,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 这个示例展示了如何使用 StaticRouter 根据不同的 routing_profile
-// 为 Agent 选择不同的模型配置，比如 “quality-first” 和 “cost-first”。
 func main() {
 	ctx := context.Background()
 

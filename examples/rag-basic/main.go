@@ -1,3 +1,5 @@
+// RAGBasic 演示最小化的 RAG 检索增强生成示例，使用核心管线、
+// 内存向量库和 MockEmbedder 实现文档入库和语义检索。
 package main
 
 import (
@@ -10,7 +12,6 @@ import (
 	"github.com/astercloud/aster/pkg/vector"
 )
 
-// 一个最小的 RAG 示例：使用核心管线 + 内存向量库 + MockEmbedder。
 func main() {
 	pipe, err := core.NewPipeline(core.PipelineConfig{
 		Store:       vector.NewMemoryStore(),

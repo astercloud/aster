@@ -1,4 +1,5 @@
-// Package main 演示如何使用 OpenRouter 作为 LLM Provider
+// OpenRouter 演示如何使用 OpenRouter 作为 LLM Provider，支持多模型切换
+// 和统一的 API 访问方式。
 package main
 
 import (

@@ -1,3 +1,5 @@
+// WorkflowSemantic 演示如何在 Workflow Agent 中集成 SemanticMemory，
+// 实现跨步骤的语义记忆共享和上下文感知的工作流执行。
 package main
 
 import (
@@ -22,7 +24,6 @@ import (
 	"github.com/astercloud/aster/pkg/vector"
 )
 
-// 本示例演示如何在 Workflow Agent 中集成 SemanticMemory:
 // - 使用 SemanticMemory 索引一组知识片段
 // - Workflow Agent 在执行时先进行语义检索, 再将检索结果作为上下文交给 LLM Agent 生成回答
 //

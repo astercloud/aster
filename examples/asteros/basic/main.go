@@ -1,3 +1,5 @@
+// Basic 演示 AsterOS 统一运行时系统的基本用法，包括 Agent 注册、
+// 启动和优雅关闭等核心功能。
 package main
 
 import (

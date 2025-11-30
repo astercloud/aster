@@ -1,3 +1,4 @@
+// ToolCache 演示工具执行结果缓存功能，通过缓存耗时工具的输出来提升性能。
 package main
 
 import (

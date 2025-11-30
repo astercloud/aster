@@ -1,3 +1,5 @@
+// Evals 演示无外部依赖的模型输出评估功能，包括关键词覆盖率评估和
+// 词汇级相似度 (Jaccard) 评估。
 package main
 
 import (
@@ -7,11 +9,6 @@ import (
 	"github.com/astercloud/aster/pkg/evals"
 )
 
-// 本示例演示如何在不依赖任何外部服务的情况下,使用 pkg/evals 对模型输出做简单评估。
-//
-// 包含两个评估维度:
-// - KeywordCoverageScorer: 关键词覆盖率
-// - LexicalSimilarityScorer: 词汇级相似度(Jaccard)
 func main() {
 	ctx := context.Background()
 

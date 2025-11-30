@@ -1,3 +1,5 @@
+// StructuredOutput 演示结构化输出功能，包括 JSON Schema 生成、
+// 类型化解析、字段验证和自定义验证逻辑。
 package main
 
 import (
@@ -82,7 +84,7 @@ func main() {
 
 	// 示例 1: 生成任务列表
 	fmt.Println("=== Example 1: Generate Task List ===")
-	prompt := `Create a task list for building a web application. 
+	prompt := `Create a task list for building a web application.
 Return the result in JSON format with the following structure:
 {
   "tasks": [

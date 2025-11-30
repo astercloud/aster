@@ -1,3 +1,5 @@
+// SessionEnhanced 演示增强版会话管理功能，包括与 Agent 的深度集成、
+// 会话状态持久化和多轮对话上下文管理。
 package main
 
 import (

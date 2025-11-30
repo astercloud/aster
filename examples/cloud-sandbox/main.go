@@ -1,3 +1,5 @@
+// CloudSandbox 演示云端沙箱环境的使用，支持阿里云 AgentBay 和火山引擎
+// 两种云平台的代码执行隔离环境。
 package main
 
 import (

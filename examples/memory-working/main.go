@@ -1,3 +1,10 @@
+// MemoryWorking 演示 Working Memory 的跨会话状态管理功能。
+//
+// Working Memory 特点：
+//   - 自动注入到每轮对话的 system prompt
+//   - 支持 thread/resource 两种作用域
+//   - 可选的 JSON Schema 验证
+//   - 通过 update_working_memory 工具更新
 package main
 
 import (
@@ -8,14 +15,6 @@ import (
 	"github.com/astercloud/aster/pkg/backends"
 	"github.com/astercloud/aster/pkg/memory"
 )
-
-// 本示例演示如何使用 Working Memory 管理跨会话状态
-//
-// Working Memory 特点：
-// - 自动注入到每轮对话的 system prompt
-// - 支持 thread/resource 两种作用域
-// - 可选的 JSON Schema 验证
-// - 通过 update_working_memory 工具更新
 
 func main() {
 	ctx := context.Background()

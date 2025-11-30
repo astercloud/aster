@@ -1,3 +1,5 @@
+// Server 演示如何使用 pkg/mcpserver 暴露 MCP HTTP Server，
+// 支持 tools/list 和 tools/call，提供一个 echo 工具供客户端调用。
 package main
 
 import (
@@ -10,13 +12,6 @@ import (
 	"github.com/astercloud/aster/pkg/mcpserver"
 	"github.com/astercloud/aster/pkg/tools"
 )
-
-// 本示例演示如何使用 pkg/mcpserver 暴露一个简单的 MCP HTTP Server:
-// - 支持 tools/list 和 tools/call
-// - 注册一个本地 "echo" 工具供 MCP 客户端调用
-//
-// 示例客户端: examples/mcp/main.go
-// 默认会连接 MCP_ENDPOINT=http://localhost:8090/mcp
 
 // EchoTool 简单回显工具, 用于演示 MCP 工具调用
 type EchoTool struct{}

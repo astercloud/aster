@@ -1,3 +1,5 @@
+// Comprehensive 演示多个 Aster 功能的综合应用，包括防护栏集成、
+// 带条件分支和并行步骤的复杂工作流编排，以及 WorkflowAgent 智能调度。
 package main
 
 import (

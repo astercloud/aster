@@ -1,3 +1,5 @@
+// Skills 演示 Agent 技能系统的使用，支持通过命令行参数配置工作目录和
+// 调试模式。
 package main
 
 import (

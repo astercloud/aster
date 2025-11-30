@@ -1,3 +1,5 @@
+// PromptBuilder 演示 Agent 提示词构建功能，包括代码引用规范注入和
+// 上下文感知的提示词组装。
 package main
 
 import (

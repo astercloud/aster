@@ -1,3 +1,5 @@
+// Workflow 演示 Aster 工作流引擎，包括顺序步骤执行、步骤间数据传递和
+// 基于流的事件处理。
 package main
 
 import (

@@ -1,3 +1,5 @@
+// A2A 演示 Agent-to-Agent 协议实现，包括基于 JSON-RPC 的消息发送、
+// 任务管理和对话历史追踪。
 package main
 
 import (

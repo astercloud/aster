@@ -1,3 +1,5 @@
+// PlanExploreUI 演示一个简单的 Plan/Explore 命令行 UI，使用 TodoWrite、
+// Task、Read、Grep 等工具分析代码，并通过事件订阅渲染工具调用过程。
 package main
 
 import (
@@ -19,17 +21,15 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 这个示例演示一个简单的「Plan / Explore」命令行 UI:
-// - 使用 TodoWrite / ExitPlanMode / Task / Read / Grep 等工具分析本仓库代码
-// - 通过订阅 Agent 事件，把工具调用分组渲染为类似：
+// Plan(分析 builtin 工具测试需求)
 //
-//	Plan(分析 builtin 工具测试需求)
-//	  └─ Read(pkg/tools/builtin/edit.go)
-//	  └─ Read(pkg/tools/builtin/utils.go)
+//	└─ Read(pkg/tools/builtin/edit.go)
+//	└─ Read(pkg/tools/builtin/utils.go)
 //
-//	Explore(分析当前工具实现状态)
-//	  └─ Read(pkg/tools/builtin/task.go)
-//	  └─ Read(pkg/tools/builtin/subagent_manager.go)
+// Explore(分析当前工具实现状态)
+//
+//	└─ Read(pkg/tools/builtin/task.go)
+//	└─ Read(pkg/tools/builtin/subagent_manager.go)
 func main() {
 	mode := flag.String("mode", "web", "UI mode: web 或 cli")
 	addr := flag.String("addr", ":8080", "Web UI HTTP 监听地址")
@@ -534,9 +534,9 @@ func formatToolCallLabel(call *types.ToolCallSnapshot) string {
 
 // uiEvent 是前端消费的简化事件结构。
 type uiEvent struct {
-	Cursor  int64                  `json:"cursor"`
-	Channel string                 `json:"channel"`
-	Type    string                 `json:"type"`
+	Cursor  int64          `json:"cursor"`
+	Channel string         `json:"channel"`
+	Type    string         `json:"type"`
 	Payload map[string]any `json:"payload,omitempty"`
 }
 

@@ -1,3 +1,5 @@
+// MemoryAgent 演示带长期记忆的 Agent，使用 FilesystemMiddleware 和
+// AgentMemoryMiddleware 实现跨会话的用户信息记忆和检索。
 package main
 
 import (
@@ -16,10 +18,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 本示例演示一个“带长期记忆”的 Agent:
-// - 使用 FilesystemMiddleware 暴露 fs_* 工具
-// - 使用 AgentMemoryMiddleware 暴露 memory_search / memory_write 工具，并注入 /agent.md
-// - 展示在多轮对话中如何让 Agent 记住用户信息并重新检索
 func main() {
 	// 检查 API Key
 	apiKey := os.Getenv("ANTHROPIC_API_KEY")

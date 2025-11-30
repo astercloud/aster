@@ -1,3 +1,11 @@
+// Memory 演示 AgentMemoryMiddleware 提供的长期记忆能力，使用基于文件的
+// 存储和 grep 风格的搜索。
+//
+// 演示功能:
+//   - memory_write: 向记忆文件追加或覆盖 Markdown 笔记
+//   - memory_search: 在记忆目录中进行全文搜索
+//
+// 在生产环境中，这些工具通过 AgentConfig.Middlewares 自动注入并由 LLM 调用。
 package main
 
 import (
@@ -10,13 +18,6 @@ import (
 	"github.com/astercloud/aster/pkg/tools"
 )
 
-// 本示例演示如何使用 AgentMemoryMiddleware 提供的高级记忆能力:
-// - 基于文件 + grep 的长期记忆 (/memories/*.md)
-// - memory_write: 向记忆文件追加/覆盖 Markdown 笔记
-// - memory_search: 在记忆目录中进行全文搜索
-//
-// 注意: 这里直接通过 Tool 接口调用 memory_* 工具, 真实 Agent 中这些工具会通过
-// AgentConfig.Middlewares 自动注入并由 LLM 调用。
 func main() {
 	ctx := context.Background()
 

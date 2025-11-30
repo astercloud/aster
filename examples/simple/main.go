@@ -1,3 +1,5 @@
+// Simple 演示 Aster Agent SDK 的基础组件，包括 EventBus 事件总线、
+// Sandbox 沙箱执行环境和 JSON Store 持久化存储。
 package main
 
 import (

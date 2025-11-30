@@ -1,3 +1,4 @@
+// Agent 演示核心 Agent API，包括工具注册、事件订阅和多轮对话能力。
 package main
 
 import (

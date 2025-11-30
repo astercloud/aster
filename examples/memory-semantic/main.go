@@ -1,3 +1,7 @@
+// MemorySemantic 演示 SemanticMemory 的语义检索能力，使用内存 VectorStore
+// 和 MockEmbedder 实现基础的向量相似度搜索。
+//
+// 注意: 该示例仅用于演示接口用法，不适合作为生产环境的 RAG 实现。
 package main
 
 import (
@@ -8,10 +12,6 @@ import (
 	"github.com/astercloud/aster/pkg/vector"
 )
 
-// 本示例演示如何使用 SemanticMemory + 内存 VectorStore + MockEmbedder
-// 实现一个最简版本的语义检索能力。
-//
-// 注意: 该示例仅用于演示接口用法, 不适合作为生产环境的 RAG 实现。
 func main() {
 	ctx := context.Background()
 

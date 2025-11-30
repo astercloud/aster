@@ -1,3 +1,5 @@
+// Telemetry 演示 OpenTelemetry 集成，包括基础追踪、Agent 执行追踪、
+// LLM 调用追踪、工具执行追踪和分布式追踪上下文传播。
 package main
 
 import (
@@ -13,8 +15,6 @@ import (
 	sdktrace "go.opentelemetry.io/otel/sdk/trace"
 )
 
-// 演示 OpenTelemetry 集成
-// 参考 Google ADK-Go 的 telemetry 实现
 func main() {
 	// ====== 示例 1: 基础 OTel 集成 ======
 	fmt.Println("=== Example 1: Basic OpenTelemetry Integration ===")
@@ -265,7 +265,7 @@ func distributedTracingExample() {
 
 // 辅助函数
 
-func processMiddleware(ctx context.Context, parentSpan telemetry.Span) {
+func processMiddleware(ctx context.Context, _ telemetry.Span) {
 	tracer := telemetry.GetGlobalTracer()
 
 	middlewares := []string{"auth", "rate-limit", "logging"}
@@ -282,7 +282,7 @@ func processMiddleware(ctx context.Context, parentSpan telemetry.Span) {
 	}
 }
 
-func processLLM(ctx context.Context, parentSpan telemetry.Span) {
+func processLLM(ctx context.Context, _ telemetry.Span) {
 	tracer := telemetry.GetGlobalTracer()
 
 	_, span := tracer.StartSpan(

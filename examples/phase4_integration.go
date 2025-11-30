@@ -1,3 +1,4 @@
+// Package examples 包含 Aster 框架的示例代码和集成演示。
 package examples
 
 import (
@@ -65,7 +66,7 @@ func Phase4IntegrationExample() error {
 }
 
 // generateSummaryWithLLM 使用 LLM 生成对话总结
-func generateSummaryWithLLM(ctx context.Context, messages []types.Message) (string, error) {
+func generateSummaryWithLLM(_ context.Context, messages []types.Message) (string, error) {
 	// 这是一个示例实现
 	// 实际应用中应该:
 	// 1. 使用 Provider 接口调用 LLM

@@ -1,3 +1,6 @@
+// EvalsSession 演示将 Session 事件与评估系统结合，通过
+// BuildTextEvalInputFromEvents 转换会话事件并进行关键词覆盖率和
+// 词汇相似度评估。
 package main
 
 import (
@@ -10,10 +13,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 本示例演示如何将 session 事件与 evals 结合:
-// - 构造一个简单的会话(包含 user 问题和 assistant 回答)
-// - 使用 BuildTextEvalInputFromEvents 将事件转换为 TextEvalInput
-// - 使用关键词覆盖率和词汇相似度进行评估
 func main() {
 	ctx := context.Background()
 

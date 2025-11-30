@@ -1,3 +1,5 @@
+// LongRunningTools 演示长时运行工具的使用，包括异步执行、进度跟踪、
+// 任务取消和并发多任务处理。
 package main
 
 import (
@@ -9,8 +11,6 @@ import (
 	"github.com/astercloud/aster/pkg/tools"
 )
 
-// 演示长时运行工具的使用
-// 参考 Google ADK-Go 的长时运行工具设计
 func main() {
 	ctx := context.Background()
 

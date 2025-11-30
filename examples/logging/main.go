@@ -1,3 +1,5 @@
+// Logging 演示日志系统的使用，包括 StdoutTransport 和 FileTransport
+// 两种输出方式，支持 JSON 行格式日志输出。
 package main
 
 import (
@@ -8,9 +10,6 @@ import (
 	"github.com/astercloud/aster/pkg/logging"
 )
 
-// 本示例演示如何使用 pkg/logging 提供的 Logger 和 transports:
-// - StdoutTransport: 将日志以 JSON 行写到 stdout
-// - FileTransport: 将日志以 JSON 行写到指定文件
 func main() {
 	ctx := context.Background()
 

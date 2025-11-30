@@ -1,3 +1,5 @@
+// WorkflowRouter 演示 Router 步骤的流式执行，支持基于输入内容动态选择
+// 执行路径。
 package main
 
 import (

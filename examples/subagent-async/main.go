@@ -1,3 +1,5 @@
+// SubagentAsync 演示 SubAgent 的异步执行模式，支持并行委派任务给多个
+// 专业化子代理并收集结果。
 package main
 
 import (

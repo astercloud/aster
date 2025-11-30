@@ -1,3 +1,5 @@
+// Reasoning 演示推理中间件的高级推理能力，支持分步骤的问题分解、
+// 系统化分析和结构化推理输出。
 package main
 
 import (

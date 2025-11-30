@@ -1,3 +1,4 @@
+// ModelFallback 演示模型降级策略，当主模型不可用时自动切换到备选模型。
 package main
 
 import (

@@ -1,3 +1,5 @@
+// WithInterfaces 演示 AsterOS 与多种接口的集成，展示如何配置和使用
+// 不同的输入输出接口。
 package main
 
 import (

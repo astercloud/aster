@@ -1,3 +1,5 @@
+// WorkflowAgents 演示工作流 Agent 的使用，包括 SequentialAgent 顺序工作流、
+// ParallelAgent 并行工作流和 LoopAgent 循环工作流等模式。
 package main
 
 import (
@@ -14,8 +16,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 演示工作流 Agent 的使用
-// 参考 Google ADK-Go 的工作流设计
 func main() {
 	ctx := context.Background()
 

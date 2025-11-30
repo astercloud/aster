@@ -1,3 +1,5 @@
+// MCP 演示与 Model Context Protocol 服务器的集成，展示如何连接外部工具
+// 服务器并将 MCP 工具与内置工具配合使用。
 package main
 
 import (

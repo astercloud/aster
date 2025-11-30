@@ -1,3 +1,5 @@
+// ServerHTTP 演示如何使用 pkg/server 暴露 HTTP Chat 接口，提供
+// POST /v1/agents/chat 端点用于与 Agent 进行对话交互。
 package main
 
 import (
@@ -18,11 +20,6 @@ import (
 	"github.com/astercloud/aster/pkg/types"
 )
 
-// 本示例演示如何使用 pkg/server 暴露一个最小的 HTTP Chat 接口:
-//   POST /v1/agents/chat
-//
-// 示例请求:
-//   curl -X POST http://localhost:8080/v1/agents/chat \
 //     -H "Content-Type: application/json" \
 //     -d '{
 //       "template_id": "assistant",

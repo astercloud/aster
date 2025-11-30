@@ -1,3 +1,5 @@
+// WorkflowComplete 演示 Aster Workflow 的完整功能测试，包括基础工作流、
+// 所有步骤类型、嵌套工作流和错误处理等场景。
 package main
 
 import (
