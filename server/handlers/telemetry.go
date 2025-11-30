@@ -12,35 +12,35 @@ import (
 
 // MetricRecord 指标记录
 type MetricRecord struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Type      string                 `json:"type"` // counter, gauge, histogram
-	Value     float64                `json:"value"`
-	Tags      map[string]string      `json:"tags,omitempty"`
-	Timestamp time.Time              `json:"timestamp"`
-	Metadata  map[string]any `json:"metadata,omitempty"`
+	ID        string            `json:"id"`
+	Name      string            `json:"name"`
+	Type      string            `json:"type"` // counter, gauge, histogram
+	Value     float64           `json:"value"`
+	Tags      map[string]string `json:"tags,omitempty"`
+	Timestamp time.Time         `json:"timestamp"`
+	Metadata  map[string]any    `json:"metadata,omitempty"`
 }
 
 // TraceRecord 追踪记录
 type TraceRecord struct {
-	ID         string                 `json:"id"`
-	Name       string                 `json:"name"`
-	SpanID     string                 `json:"span_id"`
-	ParentID   string                 `json:"parent_id,omitempty"`
-	StartTime  time.Time              `json:"start_time"`
-	EndTime    *time.Time             `json:"end_time,omitempty"`
-	Duration   int64                  `json:"duration,omitempty"` // microseconds
-	Status     string                 `json:"status"`             // ok, error
+	ID         string         `json:"id"`
+	Name       string         `json:"name"`
+	SpanID     string         `json:"span_id"`
+	ParentID   string         `json:"parent_id,omitempty"`
+	StartTime  time.Time      `json:"start_time"`
+	EndTime    *time.Time     `json:"end_time,omitempty"`
+	Duration   int64          `json:"duration,omitempty"` // microseconds
+	Status     string         `json:"status"`             // ok, error
 	Attributes map[string]any `json:"attributes,omitempty"`
 }
 
 // LogRecord 日志记录
 type LogRecord struct {
-	ID        string                 `json:"id"`
-	Level     string                 `json:"level"` // debug, info, warn, error
-	Message   string                 `json:"message"`
-	Source    string                 `json:"source,omitempty"`
-	Timestamp time.Time              `json:"timestamp"`
+	ID        string         `json:"id"`
+	Level     string         `json:"level"` // debug, info, warn, error
+	Message   string         `json:"message"`
+	Source    string         `json:"source,omitempty"`
+	Timestamp time.Time      `json:"timestamp"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
@@ -57,11 +57,11 @@ func NewTelemetryHandler(st store.Store) *TelemetryHandler {
 // RecordMetric records a metric
 func (h *TelemetryHandler) RecordMetric(c *gin.Context) {
 	var req struct {
-		Name     string                 `json:"name" binding:"required"`
-		Type     string                 `json:"type" binding:"required"`
-		Value    float64                `json:"value" binding:"required"`
-		Tags     map[string]string      `json:"tags"`
-		Metadata map[string]any `json:"metadata"`
+		Name     string            `json:"name" binding:"required"`
+		Type     string            `json:"type" binding:"required"`
+		Value    float64           `json:"value" binding:"required"`
+		Tags     map[string]string `json:"tags"`
+		Metadata map[string]any    `json:"metadata"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -142,13 +142,13 @@ func (h *TelemetryHandler) ListMetrics(c *gin.Context) {
 // RecordTrace records a trace
 func (h *TelemetryHandler) RecordTrace(c *gin.Context) {
 	var req struct {
-		Name       string                 `json:"name" binding:"required"`
-		SpanID     string                 `json:"span_id" binding:"required"`
-		ParentID   string                 `json:"parent_id"`
-		StartTime  time.Time              `json:"start_time"`
-		EndTime    *time.Time             `json:"end_time"`
-		Duration   int64                  `json:"duration"`
-		Status     string                 `json:"status"`
+		Name       string         `json:"name" binding:"required"`
+		SpanID     string         `json:"span_id" binding:"required"`
+		ParentID   string         `json:"parent_id"`
+		StartTime  time.Time      `json:"start_time"`
+		EndTime    *time.Time     `json:"end_time"`
+		Duration   int64          `json:"duration"`
+		Status     string         `json:"status"`
 		Attributes map[string]any `json:"attributes"`
 	}
 
@@ -262,9 +262,9 @@ func (h *TelemetryHandler) QueryTraces(c *gin.Context) {
 // RecordLog records a log
 func (h *TelemetryHandler) RecordLog(c *gin.Context) {
 	var req struct {
-		Level    string                 `json:"level" binding:"required"`
-		Message  string                 `json:"message" binding:"required"`
-		Source   string                 `json:"source"`
+		Level    string         `json:"level" binding:"required"`
+		Message  string         `json:"message" binding:"required"`
+		Source   string         `json:"source"`
 		Metadata map[string]any `json:"metadata"`
 	}
 

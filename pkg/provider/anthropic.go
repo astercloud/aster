@@ -247,6 +247,10 @@ func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *Stream
 					}
 					toolMap["input_examples"] = examples
 				}
+				// PTC 支持: 添加 AllowedCallers 字段
+				if len(tool.AllowedCallers) > 0 {
+					toolMap["allowed_callers"] = tool.AllowedCallers
+				}
 				tools = append(tools, toolMap)
 			}
 			req["tools"] = tools
@@ -316,12 +320,22 @@ func (ap *AnthropicProvider) convertMessages(messages []types.Message) []map[str
 						"text": b.Text,
 					})
 				case *types.ToolUseBlock:
-					blocks = append(blocks, map[string]any{
+					toolUse := map[string]any{
 						"type":  "tool_use",
 						"id":    b.ID,
 						"name":  b.Name,
 						"input": b.Input,
-					})
+					}
+					// PTC 支持: 添加 Caller 字段
+					if b.Caller != nil {
+						toolUse["caller"] = map[string]any{
+							"type": b.Caller.Type,
+						}
+						if b.Caller.ToolID != "" {
+							toolUse["caller"].(map[string]any)["tool_id"] = b.Caller.ToolID
+						}
+					}
+					blocks = append(blocks, toolUse)
 				case *types.ToolResultBlock:
 					blocks = append(blocks, map[string]any{
 						"type":        "tool_result",
@@ -512,10 +526,22 @@ func (ap *AnthropicProvider) parseCompleteResponse(apiResp map[string]any) (type
 				input = make(map[string]any)
 			}
 
+			// PTC 支持: 解析 Caller 字段
+			var caller *types.ToolCaller
+			if callerData, ok := block["caller"].(map[string]any); ok {
+				callerType, _ := callerData["type"].(string)
+				toolID, _ := callerData["tool_id"].(string)
+				caller = &types.ToolCaller{
+					Type:   callerType,
+					ToolID: toolID,
+				}
+			}
+
 			assistantContent = append(assistantContent, &types.ToolUseBlock{
-				ID:    toolID,
-				Name:  toolName,
-				Input: input,
+				ID:     toolID,
+				Name:   toolName,
+				Input:  input,
+				Caller: caller,
 			})
 		}
 	}

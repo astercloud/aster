@@ -11,15 +11,15 @@ import (
 
 // MiddlewareRecord 中间件记录
 type MiddlewareRecord struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Type        string                 `json:"type"` // builtin, custom
-	Description string                 `json:"description,omitempty"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Type        string         `json:"type"` // builtin, custom
+	Description string         `json:"description,omitempty"`
 	Config      map[string]any `json:"config,omitempty"`
-	Enabled     bool                   `json:"enabled"`
-	Priority    int                    `json:"priority"` // 执行顺序
-	CreatedAt   time.Time              `json:"created_at"`
-	UpdatedAt   time.Time              `json:"updated_at"`
+	Enabled     bool           `json:"enabled"`
+	Priority    int            `json:"priority"` // 执行顺序
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
@@ -36,11 +36,11 @@ func NewMiddlewareHandler(st store.Store) *MiddlewareHandler {
 // Create 创建中间件
 func (h *MiddlewareHandler) Create(c *gin.Context) {
 	var req struct {
-		Name        string                 `json:"name" binding:"required"`
-		Type        string                 `json:"type"`
-		Description string                 `json:"description"`
+		Name        string         `json:"name" binding:"required"`
+		Type        string         `json:"type"`
+		Description string         `json:"description"`
 		Config      map[string]any `json:"config"`
-		Priority    int                    `json:"priority"`
+		Priority    int            `json:"priority"`
 		Metadata    map[string]any `json:"metadata"`
 	}
 
@@ -117,10 +117,10 @@ func (h *MiddlewareHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Name        *string                `json:"name"`
-		Description *string                `json:"description"`
+		Name        *string        `json:"name"`
+		Description *string        `json:"description"`
 		Config      map[string]any `json:"config"`
-		Priority    *int                   `json:"priority"`
+		Priority    *int           `json:"priority"`
 		Metadata    map[string]any `json:"metadata"`
 	}
 

@@ -44,7 +44,7 @@ type Culture struct {
 
 	// 元数据
 	Metadata map[string]any `json:"metadata"`
-	Tags     []string               `json:"tags"`
+	Tags     []string       `json:"tags"`
 
 	// 状态信息
 	CreatedAt time.Time `json:"created_at"`
@@ -61,16 +61,16 @@ type Culture struct {
 
 // CultureDimension 文化维度
 type CultureDimension struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Type        DimensionType          `json:"type"`
-	Description string                 `json:"description"`
-	Value       float64                `json:"value"` // 0.0 - 1.0
-	MinValue    float64                `json:"min_value"`
-	MaxValue    float64                `json:"max_value"`
-	Category    string                 `json:"category"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Type        DimensionType  `json:"type"`
+	Description string         `json:"description"`
+	Value       float64        `json:"value"` // 0.0 - 1.0
+	MinValue    float64        `json:"min_value"`
+	MaxValue    float64        `json:"max_value"`
+	Category    string         `json:"category"`
 	Attributes  map[string]any `json:"attributes"`
-	Indicators  []Indicator            `json:"indicators"` // 指标
+	Indicators  []Indicator    `json:"indicators"` // 指标
 }
 
 // DimensionType 维度类型
@@ -103,15 +103,15 @@ type Indicator struct {
 
 // Norm 规范
 type Norm struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        NormType               `json:"type"`
-	Strength    float64                `json:"strength"` // 0.0 - 1.0
-	Scope       NormScope              `json:"scope"`
-	Conditions  []NormCondition        `json:"conditions"`
-	Exceptions  []NormException        `json:"exceptions"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Type        NormType        `json:"type"`
+	Strength    float64         `json:"strength"` // 0.0 - 1.0
+	Scope       NormScope       `json:"scope"`
+	Conditions  []NormCondition `json:"conditions"`
+	Exceptions  []NormException `json:"exceptions"`
+	Attributes  map[string]any  `json:"attributes"`
 }
 
 // NormType 规范类型
@@ -137,31 +137,31 @@ const (
 
 // NormCondition 规范条件
 type NormCondition struct {
-	Type        string      `json:"type"`
-	Field       string      `json:"field"`
-	Operator    string      `json:"operator"`
-	Value       any `json:"value"`
-	Description string      `json:"description"`
+	Type        string `json:"type"`
+	Field       string `json:"field"`
+	Operator    string `json:"operator"`
+	Value       any    `json:"value"`
+	Description string `json:"description"`
 }
 
 // NormException 规范例外
 type NormException struct {
-	ID          string                 `json:"id"`
-	Description string                 `json:"description"`
-	Conditions  []NormCondition        `json:"conditions"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string          `json:"id"`
+	Description string          `json:"description"`
+	Conditions  []NormCondition `json:"conditions"`
+	Attributes  map[string]any  `json:"attributes"`
 }
 
 // Value 价值观
 type Value struct {
-	ID             string                 `json:"id"`
-	Name           string                 `json:"name"`
-	Description    string                 `json:"description"`
-	Category       ValueCategory          `json:"category"`
-	Priority       int                    `json:"priority"`   // 1-10
-	Importance     float64                `json:"importance"` // 0.0 - 1.0
-	Manifestations []ValueManifestation   `json:"manifestations"`
-	Attributes     map[string]any `json:"attributes"`
+	ID             string               `json:"id"`
+	Name           string               `json:"name"`
+	Description    string               `json:"description"`
+	Category       ValueCategory        `json:"category"`
+	Priority       int                  `json:"priority"`   // 1-10
+	Importance     float64              `json:"importance"` // 0.0 - 1.0
+	Manifestations []ValueManifestation `json:"manifestations"`
+	Attributes     map[string]any       `json:"attributes"`
 }
 
 // ValueCategory 价值观类别
@@ -188,15 +188,15 @@ type ValueManifestation struct {
 
 // Belief 信念
 type Belief struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        BeliefType             `json:"type"`
-	Category    BeliefCategory         `json:"category"`
-	Strength    float64                `json:"strength"`
-	Evidence    []BeliefEvidence       `json:"evidence"`
-	Source      string                 `json:"source"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Type        BeliefType       `json:"type"`
+	Category    BeliefCategory   `json:"category"`
+	Strength    float64          `json:"strength"`
+	Evidence    []BeliefEvidence `json:"evidence"`
+	Source      string           `json:"source"`
+	Attributes  map[string]any   `json:"attributes"`
 }
 
 // BeliefType 信念类型
@@ -223,23 +223,23 @@ const (
 
 // BeliefEvidence 信念证据
 type BeliefEvidence struct {
-	Type        string      `json:"type"`
-	Description string      `json:"description"`
-	Source      string      `json:"source"`
-	Strength    float64     `json:"strength"`
-	Attributes  any `json:"attributes"`
+	Type        string  `json:"type"`
+	Description string  `json:"description"`
+	Source      string  `json:"source"`
+	Strength    float64 `json:"strength"`
+	Attributes  any     `json:"attributes"`
 }
 
 // BehaviorPattern 行为模式
 type BehaviorPattern struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        BehaviorType           `json:"type"`
-	Frequency   FrequencyLevel         `json:"frequency"`
-	Triggers    []BehaviorTrigger      `json:"triggers"`
-	Outcomes    []BehaviorOutcome      `json:"outcomes"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string            `json:"id"`
+	Name        string            `json:"name"`
+	Description string            `json:"description"`
+	Type        BehaviorType      `json:"type"`
+	Frequency   FrequencyLevel    `json:"frequency"`
+	Triggers    []BehaviorTrigger `json:"triggers"`
+	Outcomes    []BehaviorOutcome `json:"outcomes"`
+	Attributes  map[string]any    `json:"attributes"`
 }
 
 // BehaviorType 行为类型
@@ -269,10 +269,10 @@ const (
 
 // BehaviorTrigger 行为触发器
 type BehaviorTrigger struct {
-	Type        string      `json:"type"`
-	Condition   string      `json:"condition"`
-	Description string      `json:"description"`
-	Attributes  any `json:"attributes"`
+	Type        string `json:"type"`
+	Condition   string `json:"condition"`
+	Description string `json:"description"`
+	Attributes  any    `json:"attributes"`
 }
 
 // BehaviorOutcome 行为结果
@@ -285,14 +285,14 @@ type BehaviorOutcome struct {
 
 // Ritual 仪式
 type Ritual struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        RitualType             `json:"type"`
-	Purpose     RitualPurpose          `json:"purpose"`
-	Frequency   FrequencyLevel         `json:"frequency"`
-	Steps       []RitualStep           `json:"steps"`
-	Symbols     []RitualSymbol         `json:"symbols"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Type        RitualType     `json:"type"`
+	Purpose     RitualPurpose  `json:"purpose"`
+	Frequency   FrequencyLevel `json:"frequency"`
+	Steps       []RitualStep   `json:"steps"`
+	Symbols     []RitualSymbol `json:"symbols"`
 	Attributes  map[string]any `json:"attributes"`
 }
 
@@ -340,15 +340,15 @@ type RitualSymbol struct {
 
 // CommunicationStyle 沟通风格
 type CommunicationStyle struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        CommStyleType          `json:"type"`
-	Directness  DirectnessLevel        `json:"directness"`
-	Context     ContextLevel           `json:"context"`
-	Formality   FormalityLevel         `json:"formality"`
-	Emotional   EmotionalLevel         `json:"emotional"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string          `json:"id"`
+	Name        string          `json:"name"`
+	Description string          `json:"description"`
+	Type        CommStyleType   `json:"type"`
+	Directness  DirectnessLevel `json:"directness"`
+	Context     ContextLevel    `json:"context"`
+	Formality   FormalityLevel  `json:"formality"`
+	Emotional   EmotionalLevel  `json:"emotional"`
+	Attributes  map[string]any  `json:"attributes"`
 }
 
 // CommStyleType 沟通风格类型
@@ -408,16 +408,16 @@ const (
 
 // DecisionStyle 决策风格
 type DecisionStyle struct {
-	ID             string                 `json:"id"`
-	Name           string                 `json:"name"`
-	Description    string                 `json:"description"`
-	Type           DecisionType           `json:"type"`
-	Approach       DecisionApproach       `json:"approach"`
-	Speed          DecisionSpeed          `json:"speed"`
-	ConsensusLevel ConsensusLevel         `json:"consensus_level"`
-	RiskTolerance  RiskToleranceLevel     `json:"risk_tolerance"`
-	DataPreference DataPreference         `json:"data_preference"`
-	Attributes     map[string]any `json:"attributes"`
+	ID             string             `json:"id"`
+	Name           string             `json:"name"`
+	Description    string             `json:"description"`
+	Type           DecisionType       `json:"type"`
+	Approach       DecisionApproach   `json:"approach"`
+	Speed          DecisionSpeed      `json:"speed"`
+	ConsensusLevel ConsensusLevel     `json:"consensus_level"`
+	RiskTolerance  RiskToleranceLevel `json:"risk_tolerance"`
+	DataPreference DataPreference     `json:"data_preference"`
+	Attributes     map[string]any     `json:"attributes"`
 }
 
 // DecisionType 决策类型
@@ -491,17 +491,17 @@ const (
 
 // ConflictResolutionStrategy 冲突解决策略
 type ConflictResolutionStrategy struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        ConflictType           `json:"type"`
-	Style       ConflictStyle          `json:"style"`
-	Approach    ConflictApproach       `json:"approach"`
-	Timing      ConflictTiming         `json:"timing"`
-	Involvement InvolvementLevel       `json:"involvement"`
-	Outcome     ConflictOutcome        `json:"outcome"`
-	Techniques  []ConflictTechnique    `json:"techniques"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string              `json:"id"`
+	Name        string              `json:"name"`
+	Description string              `json:"description"`
+	Type        ConflictType        `json:"type"`
+	Style       ConflictStyle       `json:"style"`
+	Approach    ConflictApproach    `json:"approach"`
+	Timing      ConflictTiming      `json:"timing"`
+	Involvement InvolvementLevel    `json:"involvement"`
+	Outcome     ConflictOutcome     `json:"outcome"`
+	Techniques  []ConflictTechnique `json:"techniques"`
+	Attributes  map[string]any      `json:"attributes"`
 }
 
 // ConflictType 冲突类型
@@ -578,15 +578,15 @@ type ConflictTechnique struct {
 
 // LearningStyle 学习风格
 type LearningStyle struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        LearningType           `json:"type"`
-	Modality    LearningModality       `json:"modality"`
-	Pace        LearningPace           `json:"pace"`
-	Depth       LearningDepth          `json:"depth"`
-	Social      LearningSocial         `json:"social"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string           `json:"id"`
+	Name        string           `json:"name"`
+	Description string           `json:"description"`
+	Type        LearningType     `json:"type"`
+	Modality    LearningModality `json:"modality"`
+	Pace        LearningPace     `json:"pace"`
+	Depth       LearningDepth    `json:"depth"`
+	Social      LearningSocial   `json:"social"`
+	Attributes  map[string]any   `json:"attributes"`
 }
 
 // LearningType 学习类型
@@ -641,15 +641,15 @@ const (
 
 // AdaptationStrategy 适应策略
 type AdaptationStrategy struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        AdaptationType         `json:"type"`
-	Scope       AdaptationScope        `json:"scope"`
-	Trigger     AdaptationTrigger      `json:"trigger"`
-	Response    AdaptationResponse     `json:"response"`
-	Flexibility FlexibilityLevel       `json:"flexibility"`
-	Attributes  map[string]any `json:"attributes"`
+	ID          string             `json:"id"`
+	Name        string             `json:"name"`
+	Description string             `json:"description"`
+	Type        AdaptationType     `json:"type"`
+	Scope       AdaptationScope    `json:"scope"`
+	Trigger     AdaptationTrigger  `json:"trigger"`
+	Response    AdaptationResponse `json:"response"`
+	Flexibility FlexibilityLevel   `json:"flexibility"`
+	Attributes  map[string]any     `json:"attributes"`
 }
 
 // AdaptationType 适应类型
@@ -675,18 +675,18 @@ const (
 
 // AdaptationTrigger 适应触发器
 type AdaptationTrigger struct {
-	Type        string      `json:"type"`
-	Condition   string      `json:"condition"`
-	Description string      `json:"description"`
-	Attributes  any `json:"attributes"`
+	Type        string `json:"type"`
+	Condition   string `json:"condition"`
+	Description string `json:"description"`
+	Attributes  any    `json:"attributes"`
 }
 
 // AdaptationResponse 适应响应
 type AdaptationResponse struct {
-	Type        string      `json:"type"`
-	Description string      `json:"description"`
-	Strategy    string      `json:"strategy"`
-	Attributes  any `json:"attributes"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Strategy    string `json:"strategy"`
+	Attributes  any    `json:"attributes"`
 }
 
 // FlexibilityLevel 灵活性级别
@@ -702,13 +702,13 @@ const (
 
 // CultureContext 文化上下文
 type CultureContext struct {
-	Environment  string                 `json:"environment"`
-	Domain       string                 `json:"domain"`
-	Purpose      string                 `json:"purpose"`
-	Constraints  []ContextConstraint    `json:"constraints"`
-	Resources    []ContextResource      `json:"resources"`
-	Stakeholders []ContextStakeholder   `json:"stakeholders"`
-	Attributes   map[string]any `json:"attributes"`
+	Environment  string               `json:"environment"`
+	Domain       string               `json:"domain"`
+	Purpose      string               `json:"purpose"`
+	Constraints  []ContextConstraint  `json:"constraints"`
+	Resources    []ContextResource    `json:"resources"`
+	Stakeholders []ContextStakeholder `json:"stakeholders"`
+	Attributes   map[string]any       `json:"attributes"`
 }
 
 // Clone 克隆 CultureContext
@@ -740,28 +740,28 @@ func (cc *CultureContext) Clone() *CultureContext {
 
 // ContextConstraint 上下文约束
 type ContextConstraint struct {
-	Type        string      `json:"type"`
-	Description string      `json:"description"`
-	Impact      string      `json:"impact"`
-	Attributes  any `json:"attributes"`
+	Type        string `json:"type"`
+	Description string `json:"description"`
+	Impact      string `json:"impact"`
+	Attributes  any    `json:"attributes"`
 }
 
 // ContextResource 上下文资源
 type ContextResource struct {
-	Type         string      `json:"type"`
-	Description  string      `json:"description"`
-	Availability string      `json:"availability"`
-	Attributes   any `json:"attributes"`
+	Type         string `json:"type"`
+	Description  string `json:"description"`
+	Availability string `json:"availability"`
+	Attributes   any    `json:"attributes"`
 }
 
 // ContextStakeholder 上下文利益相关者
 type ContextStakeholder struct {
-	Type       string      `json:"type"`
-	Name       string      `json:"name"`
-	Role       string      `json:"role"`
-	Influence  string      `json:"influence"`
-	Interest   string      `json:"interest"`
-	Attributes any `json:"attributes"`
+	Type       string `json:"type"`
+	Name       string `json:"name"`
+	Role       string `json:"role"`
+	Influence  string `json:"influence"`
+	Interest   string `json:"interest"`
+	Attributes any    `json:"attributes"`
 }
 
 // CultureEngine 文化引擎接口
@@ -797,16 +797,16 @@ type CultureEngine interface {
 
 // CultureAnalysis 文化分析结果
 type CultureAnalysis struct {
-	CultureID       string                 `json:"culture_id"`
-	AnalysisDate    time.Time              `json:"analysis_date"`
-	OverallScore    float64                `json:"overall_score"`
-	DimensionScores map[string]float64     `json:"dimension_scores"`
-	Strengths       []string               `json:"strengths"`
-	Weaknesses      []string               `json:"weaknesses"`
-	Characteristics []string               `json:"characteristics"`
-	Compatibility   []CompatibilityScore   `json:"compatibility"`
-	Recommendations []string               `json:"recommendations"`
-	Metadata        map[string]any `json:"metadata"`
+	CultureID       string               `json:"culture_id"`
+	AnalysisDate    time.Time            `json:"analysis_date"`
+	OverallScore    float64              `json:"overall_score"`
+	DimensionScores map[string]float64   `json:"dimension_scores"`
+	Strengths       []string             `json:"strengths"`
+	Weaknesses      []string             `json:"weaknesses"`
+	Characteristics []string             `json:"characteristics"`
+	Compatibility   []CompatibilityScore `json:"compatibility"`
+	Recommendations []string             `json:"recommendations"`
+	Metadata        map[string]any       `json:"metadata"`
 }
 
 // CompatibilityScore 兼容性评分
@@ -819,15 +819,15 @@ type CompatibilityScore struct {
 
 // CultureComparison 文化比较
 type CultureComparison struct {
-	Culture1ID           string                 `json:"culture1_id"`
-	Culture2ID           string                 `json:"culture2_id"`
-	ComparisonDate       time.Time              `json:"comparison_date"`
-	Similarity           float64                `json:"similarity"`
-	Differences          []CultureDifference    `json:"differences"`
-	Commonalities        []string               `json:"commonalities"`
-	PotentialConflicts   []ConflictArea         `json:"potential_conflicts"`
-	SynergyOpportunities []SynergyOpportunity   `json:"synergy_opportunities"`
-	Metadata             map[string]any `json:"metadata"`
+	Culture1ID           string               `json:"culture1_id"`
+	Culture2ID           string               `json:"culture2_id"`
+	ComparisonDate       time.Time            `json:"comparison_date"`
+	Similarity           float64              `json:"similarity"`
+	Differences          []CultureDifference  `json:"differences"`
+	Commonalities        []string             `json:"commonalities"`
+	PotentialConflicts   []ConflictArea       `json:"potential_conflicts"`
+	SynergyOpportunities []SynergyOpportunity `json:"synergy_opportunities"`
+	Metadata             map[string]any       `json:"metadata"`
 }
 
 // CultureDifference 文化差异
@@ -860,12 +860,12 @@ type SynergyOpportunity struct {
 
 // CultureMatchRequest 文化匹配请求
 type CultureMatchRequest struct {
-	TargetCulture string                 `json:"target_culture"`
-	Preferences   map[string]any `json:"preferences"`
-	Constraints   []string               `json:"constraints"`
-	Context       *CultureContext        `json:"context"`
-	Priority      []string               `json:"priority"`
-	Requirements  []MatchRequirement     `json:"requirements"`
+	TargetCulture string             `json:"target_culture"`
+	Preferences   map[string]any     `json:"preferences"`
+	Constraints   []string           `json:"constraints"`
+	Context       *CultureContext    `json:"context"`
+	Priority      []string           `json:"priority"`
+	Requirements  []MatchRequirement `json:"requirements"`
 }
 
 // MatchRequirement 匹配需求
@@ -891,25 +891,25 @@ type CultureMatch struct {
 
 // CultureMatchResult 文化匹配结果
 type CultureMatchResult struct {
-	CultureID   string                 `json:"culture_id"`
-	CultureName string                 `json:"culture_name"`
-	Score       float64                `json:"score"`
-	Fit         string                 `json:"fit"`
-	Strengths   []string               `json:"strengths"`
-	Weaknesses  []string               `json:"weaknesses"`
+	CultureID   string         `json:"culture_id"`
+	CultureName string         `json:"culture_name"`
+	Score       float64        `json:"score"`
+	Fit         string         `json:"fit"`
+	Strengths   []string       `json:"strengths"`
+	Weaknesses  []string       `json:"weaknesses"`
 	Analysis    map[string]any `json:"analysis"`
 }
 
 // AdaptationResult 适应结果
 type AdaptationResult struct {
-	CultureID       string                 `json:"culture_id"`
-	AdaptationDate  time.Time              `json:"adaptation_date"`
-	Success         bool                   `json:"success"`
-	Adaptations     []AppliedAdaptation    `json:"adaptations"`
-	Changes         []CultureChange        `json:"changes"`
-	Impact          AdaptationImpact       `json:"impact"`
-	Recommendations []string               `json:"recommendations"`
-	Metadata        map[string]any `json:"metadata"`
+	CultureID       string              `json:"culture_id"`
+	AdaptationDate  time.Time           `json:"adaptation_date"`
+	Success         bool                `json:"success"`
+	Adaptations     []AppliedAdaptation `json:"adaptations"`
+	Changes         []CultureChange     `json:"changes"`
+	Impact          AdaptationImpact    `json:"impact"`
+	Recommendations []string            `json:"recommendations"`
+	Metadata        map[string]any      `json:"metadata"`
 }
 
 // AppliedAdaptation 应用的适应
@@ -924,11 +924,11 @@ type AppliedAdaptation struct {
 
 // CultureChange 文化变更
 type CultureChange struct {
-	Type        string                 `json:"type"`
-	Description string                 `json:"description"`
-	Impact      string                 `json:"impact"`
-	Magnitude   float64                `json:"magnitude"`
-	Status      string                 `json:"status"`
+	Type        string         `json:"type"`
+	Description string         `json:"description"`
+	Impact      string         `json:"impact"`
+	Magnitude   float64        `json:"magnitude"`
+	Status      string         `json:"status"`
 	Attributes  map[string]any `json:"attributes"`
 }
 
@@ -955,16 +955,16 @@ type AdaptationPlan struct {
 	Resources    []PlanResource          `json:"resources"`
 	Risks        []PlanRisk              `json:"risks"`
 	Metrics      []PlanMetric            `json:"metrics"`
-	Metadata     map[string]any  `json:"metadata"`
+	Metadata     map[string]any          `json:"metadata"`
 }
 
 // AdaptationRequirement 适应需求
 type AdaptationRequirement struct {
-	ID          string                 `json:"id"`
-	Type        string                 `json:"type"`
-	Description string                 `json:"description"`
-	Priority    int                    `json:"priority"`
-	Source      string                 `json:"source"`
+	ID          string         `json:"id"`
+	Type        string         `json:"type"`
+	Description string         `json:"description"`
+	Priority    int            `json:"priority"`
+	Source      string         `json:"source"`
 	Attributes  map[string]any `json:"attributes"`
 }
 
@@ -992,22 +992,22 @@ type PlanTimeline struct {
 
 // PlanResource 计划资源
 type PlanResource struct {
-	Type         string                 `json:"type"`
-	Name         string                 `json:"name"`
-	Description  string                 `json:"description"`
-	Quantity     int                    `json:"quantity"`
-	Availability string                 `json:"availability"`
+	Type         string         `json:"type"`
+	Name         string         `json:"name"`
+	Description  string         `json:"description"`
+	Quantity     int            `json:"quantity"`
+	Availability string         `json:"availability"`
 	Attributes   map[string]any `json:"attributes"`
 }
 
 // PlanRisk 计划风险
 type PlanRisk struct {
-	ID          string                 `json:"id"`
-	Type        string                 `json:"type"`
-	Description string                 `json:"description"`
-	Probability float64                `json:"probability"`
-	Impact      string                 `json:"impact"`
-	Mitigation  []string               `json:"mitigation"`
+	ID          string         `json:"id"`
+	Type        string         `json:"type"`
+	Description string         `json:"description"`
+	Probability float64        `json:"probability"`
+	Impact      string         `json:"impact"`
+	Mitigation  []string       `json:"mitigation"`
 	Attributes  map[string]any `json:"attributes"`
 }
 
@@ -1023,16 +1023,16 @@ type PlanMetric struct {
 
 // FitAssessment 适配评估
 type FitAssessment struct {
-	CultureID       string                 `json:"culture_id"`
-	AssessmentDate  time.Time              `json:"assessment_date"`
-	OverallFit      float64                `json:"overall_fit"`
-	DimensionFits   map[string]float64     `json:"dimension_fits"`
-	Strengths       []string               `json:"strengths"`
-	Concerns        []string               `json:"concerns"`
-	Gaps            []FitGap               `json:"gaps"`
-	Recommendations []string               `json:"recommendations"`
-	Confidence      float64                `json:"confidence"`
-	Metadata        map[string]any `json:"metadata"`
+	CultureID       string             `json:"culture_id"`
+	AssessmentDate  time.Time          `json:"assessment_date"`
+	OverallFit      float64            `json:"overall_fit"`
+	DimensionFits   map[string]float64 `json:"dimension_fits"`
+	Strengths       []string           `json:"strengths"`
+	Concerns        []string           `json:"concerns"`
+	Gaps            []FitGap           `json:"gaps"`
+	Recommendations []string           `json:"recommendations"`
+	Confidence      float64            `json:"confidence"`
+	Metadata        map[string]any     `json:"metadata"`
 }
 
 // FitGap 适配差距
@@ -1047,14 +1047,14 @@ type FitGap struct {
 
 // ChallengePrediction 挑战预测
 type ChallengePrediction struct {
-	CultureID       string                 `json:"culture_id"`
-	Scenario        string                 `json:"scenario"`
-	PredictionDate  time.Time              `json:"prediction_date"`
-	Challenges      []PredictedChallenge   `json:"challenges"`
-	OverallRisk     security.RiskLevel     `json:"overall_risk"`
-	Recommendations []string               `json:"recommendations"`
-	Confidence      float64                `json:"confidence"`
-	Metadata        map[string]any `json:"metadata"`
+	CultureID       string               `json:"culture_id"`
+	Scenario        string               `json:"scenario"`
+	PredictionDate  time.Time            `json:"prediction_date"`
+	Challenges      []PredictedChallenge `json:"challenges"`
+	OverallRisk     security.RiskLevel   `json:"overall_risk"`
+	Recommendations []string             `json:"recommendations"`
+	Confidence      float64              `json:"confidence"`
+	Metadata        map[string]any       `json:"metadata"`
 }
 
 // PredictedChallenge 预测的挑战
@@ -1078,7 +1078,7 @@ type CulturalInteraction struct {
 	Content         string                   `json:"content"`
 	Outcome         string                   `json:"outcome"`
 	Timestamp       time.Time                `json:"timestamp"`
-	Metadata        map[string]any   `json:"metadata"`
+	Metadata        map[string]any           `json:"metadata"`
 }
 
 // InteractionParticipant 互动参与者
@@ -1092,14 +1092,14 @@ type InteractionParticipant struct {
 
 // LearningResult 学习结果
 type LearningResult struct {
-	CultureID    string                 `json:"culture_id"`
-	LearningDate time.Time              `json:"learning_date"`
-	Interactions int                    `json:"interactions"`
-	Patterns     []LearnedPattern       `json:"patterns"`
-	Adjustments  []CultureAdjustment    `json:"adjustments"`
-	Improvements []CultureImprovement   `json:"improvements"`
-	Confidence   float64                `json:"confidence"`
-	Metadata     map[string]any `json:"metadata"`
+	CultureID    string               `json:"culture_id"`
+	LearningDate time.Time            `json:"learning_date"`
+	Interactions int                  `json:"interactions"`
+	Patterns     []LearnedPattern     `json:"patterns"`
+	Adjustments  []CultureAdjustment  `json:"adjustments"`
+	Improvements []CultureImprovement `json:"improvements"`
+	Confidence   float64              `json:"confidence"`
+	Metadata     map[string]any       `json:"metadata"`
 }
 
 // LearnedPattern 学习的模式
@@ -1130,15 +1130,15 @@ type CultureImprovement struct {
 
 // CultureFeedback 文化反馈
 type CultureFeedback struct {
-	ID          string                 `json:"id"`
-	CultureID   string                 `json:"culture_id"`
-	Source      string                 `json:"source"`
-	Type        FeedbackType           `json:"type"`
-	Content     string                 `json:"content"`
-	Rating      int                    `json:"rating"`
-	Categories  []string               `json:"categories"`
-	Suggestions []string               `json:"suggestions"`
-	Timestamp   time.Time              `json:"timestamp"`
+	ID          string         `json:"id"`
+	CultureID   string         `json:"culture_id"`
+	Source      string         `json:"source"`
+	Type        FeedbackType   `json:"type"`
+	Content     string         `json:"content"`
+	Rating      int            `json:"rating"`
+	Categories  []string       `json:"categories"`
+	Suggestions []string       `json:"suggestions"`
+	Timestamp   time.Time      `json:"timestamp"`
 	Metadata    map[string]any `json:"metadata"`
 }
 
@@ -1155,14 +1155,14 @@ const (
 
 // Situation 情境
 type Situation struct {
-	ID           string                 `json:"id"`
-	Type         SituationType          `json:"type"`
-	Description  string                 `json:"description"`
+	ID           string         `json:"id"`
+	Type         SituationType  `json:"type"`
+	Description  string         `json:"description"`
 	Context      map[string]any `json:"context"`
-	Participants []string               `json:"participants"`
-	Objectives   []string               `json:"objectives"`
-	Constraints  []string               `json:"constraints"`
-	Timestamp    time.Time              `json:"timestamp"`
+	Participants []string       `json:"participants"`
+	Objectives   []string       `json:"objectives"`
+	Constraints  []string       `json:"constraints"`
+	Timestamp    time.Time      `json:"timestamp"`
 	Metadata     map[string]any `json:"metadata"`
 }
 
@@ -1182,18 +1182,18 @@ const (
 
 // Guidance 指导
 type Guidance struct {
-	ID           string                 `json:"id"`
-	CultureID    string                 `json:"culture_id"`
-	SituationID  string                 `json:"situation_id"`
-	Type         GuidanceType           `json:"type"`
-	Priority     int                    `json:"priority"`
-	Advice       []GuidanceAdvice       `json:"advice"`
-	Principles   []string               `json:"principles"`
-	Alternatives []GuidanceAlternative  `json:"alternatives"`
-	Timing       GuidanceTiming         `json:"timing"`
-	Impact       GuidanceImpact         `json:"impact"`
-	Confidence   float64                `json:"confidence"`
-	Metadata     map[string]any `json:"metadata"`
+	ID           string                `json:"id"`
+	CultureID    string                `json:"culture_id"`
+	SituationID  string                `json:"situation_id"`
+	Type         GuidanceType          `json:"type"`
+	Priority     int                   `json:"priority"`
+	Advice       []GuidanceAdvice      `json:"advice"`
+	Principles   []string              `json:"principles"`
+	Alternatives []GuidanceAlternative `json:"alternatives"`
+	Timing       GuidanceTiming        `json:"timing"`
+	Impact       GuidanceImpact        `json:"impact"`
+	Confidence   float64               `json:"confidence"`
+	Metadata     map[string]any        `json:"metadata"`
 }
 
 // GuidanceType 指导类型
@@ -1246,13 +1246,13 @@ type GuidanceImpact struct {
 
 // Recommendations 推荐
 type Recommendations struct {
-	ID              string                 `json:"id"`
-	CultureID       string                 `json:"culture_id"`
-	Context         *CultureContext        `json:"context"`
-	Recommendations []Recommendation       `json:"recommendations"`
-	GeneratedAt     time.Time              `json:"generated_at"`
-	Confidence      float64                `json:"confidence"`
-	Metadata        map[string]any `json:"metadata"`
+	ID              string           `json:"id"`
+	CultureID       string           `json:"culture_id"`
+	Context         *CultureContext  `json:"context"`
+	Recommendations []Recommendation `json:"recommendations"`
+	GeneratedAt     time.Time        `json:"generated_at"`
+	Confidence      float64          `json:"confidence"`
+	Metadata        map[string]any   `json:"metadata"`
 }
 
 // Recommendation 推荐

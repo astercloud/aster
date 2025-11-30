@@ -149,7 +149,7 @@ type AgentTemplateRuntime struct {
 	ExposeThinking          bool                           `json:"expose_thinking,omitempty"`
 	Todo                    *TodoConfig                    `json:"todo,omitempty"`
 	SubAgents               *SubAgentConfig                `json:"subagents,omitempty"`
-	Metadata                map[string]any         `json:"metadata,omitempty"`
+	Metadata                map[string]any                 `json:"metadata,omitempty"`
 	ToolTimeoutMs           int                            `json:"tool_timeout_ms,omitempty"`
 	MaxToolConcurrency      int                            `json:"max_tool_concurrency,omitempty"`
 	ToolsManual             *ToolsManualConfig             `json:"tools_manual,omitempty"`
@@ -163,7 +163,7 @@ type AgentTemplateDefinition struct {
 	Version      string                `json:"version,omitempty"`
 	SystemPrompt string                `json:"system_prompt"`
 	Model        string                `json:"model,omitempty"`
-	Tools        any           `json:"tools"` // []string or "*"
+	Tools        any                   `json:"tools"` // []string or "*"
 	Permission   *PermissionConfig     `json:"permission,omitempty"`
 	Runtime      *AgentTemplateRuntime `json:"runtime,omitempty"`
 }
@@ -192,11 +192,11 @@ const (
 
 // SandboxConfig 沙箱配置
 type SandboxConfig struct {
-	Kind            SandboxKind            `json:"kind"`
-	WorkDir         string                 `json:"work_dir,omitempty"`
-	EnforceBoundary bool                   `json:"enforce_boundary,omitempty"`
-	AllowPaths      []string               `json:"allow_paths,omitempty"`
-	WatchFiles      bool                   `json:"watch_files,omitempty"`
+	Kind            SandboxKind    `json:"kind"`
+	WorkDir         string         `json:"work_dir,omitempty"`
+	EnforceBoundary bool           `json:"enforce_boundary,omitempty"`
+	AllowPaths      []string       `json:"allow_paths,omitempty"`
+	WatchFiles      bool           `json:"watch_files,omitempty"`
 	Extra           map[string]any `json:"extra,omitempty"` // 云平台特定配置
 }
 
@@ -242,22 +242,22 @@ type SkillsPackageConfig struct {
 
 // AgentConfig Agent创建配置
 type AgentConfig struct {
-	AgentID          string                            `json:"agent_id,omitempty"`
-	TemplateID       string                            `json:"template_id"`
-	TemplateVersion  string                            `json:"template_version,omitempty"`
-	ModelConfig      *ModelConfig                      `json:"model_config,omitempty"`
-	Sandbox          *SandboxConfig                    `json:"sandbox,omitempty"`
-	Tools            []string                          `json:"tools,omitempty"`
-	Middlewares      []string                          `json:"middlewares,omitempty"`       // Middleware 列表 (Phase 6C)
+	AgentID          string                    `json:"agent_id,omitempty"`
+	TemplateID       string                    `json:"template_id"`
+	TemplateVersion  string                    `json:"template_version,omitempty"`
+	ModelConfig      *ModelConfig              `json:"model_config,omitempty"`
+	Sandbox          *SandboxConfig            `json:"sandbox,omitempty"`
+	Tools            []string                  `json:"tools,omitempty"`
+	Middlewares      []string                  `json:"middlewares,omitempty"`       // Middleware 列表 (Phase 6C)
 	MiddlewareConfig map[string]map[string]any `json:"middleware_config,omitempty"` // 各中间件的自定义配置
-	ExposeThinking   bool                              `json:"expose_thinking,omitempty"`
+	ExposeThinking   bool                      `json:"expose_thinking,omitempty"`
 	// RoutingProfile 可选的路由配置标识，例如 "quality-first"、"cost-first"。
 	// 当配置了 Router 时，可以根据该字段选择不同的模型路由策略。
 	RoutingProfile string                 `json:"routing_profile,omitempty"`
 	Overrides      *AgentConfigOverrides  `json:"overrides,omitempty"`
 	Context        *ContextManagerOptions `json:"context,omitempty"`
 	SkillsPackage  *SkillsPackageConfig   `json:"skills_package,omitempty"` // Skills 包配置
-	Metadata       map[string]any `json:"metadata,omitempty"`
+	Metadata       map[string]any         `json:"metadata,omitempty"`
 }
 
 // ResumeStrategy 恢复策略

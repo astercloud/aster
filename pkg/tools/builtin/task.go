@@ -14,30 +14,30 @@ type TaskTool struct{}
 
 // TaskDefinition 任务定义
 type TaskDefinition struct {
-	ID          string                 `json:"id"`
-	Description string                 `json:"description"`
-	Subagent    string                 `json:"subagent"`
-	Prompt      string                 `json:"prompt"`
-	Model       string                 `json:"model,omitempty"`
-	Resume      string                 `json:"resume,omitempty"`
-	CreatedAt   time.Time              `json:"createdAt"`
-	StartedAt   *time.Time             `json:"startedAt,omitempty"`
-	CompletedAt *time.Time             `json:"completedAt,omitempty"`
-	Status      string                 `json:"status"` // "created", "running", "completed", "failed"
+	ID          string         `json:"id"`
+	Description string         `json:"description"`
+	Subagent    string         `json:"subagent"`
+	Prompt      string         `json:"prompt"`
+	Model       string         `json:"model,omitempty"`
+	Resume      string         `json:"resume,omitempty"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	StartedAt   *time.Time     `json:"startedAt,omitempty"`
+	CompletedAt *time.Time     `json:"completedAt,omitempty"`
+	Status      string         `json:"status"` // "created", "running", "completed", "failed"
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
 // TaskExecution 任务执行结果
 type TaskExecution struct {
-	TaskID    string                 `json:"task_id"`
-	Subagent  string                 `json:"subagent"`
-	Model     string                 `json:"model"`
-	Status    string                 `json:"status"`
+	TaskID    string         `json:"task_id"`
+	Subagent  string         `json:"subagent"`
+	Model     string         `json:"model"`
+	Status    string         `json:"status"`
 	Result    any            `json:"result,omitempty"`
-	Error     string                 `json:"error,omitempty"`
-	StartTime time.Time              `json:"start_time"`
-	EndTime   *time.Time             `json:"end_time,omitempty"`
-	Duration  time.Duration          `json:"duration"`
+	Error     string         `json:"error,omitempty"`
+	StartTime time.Time      `json:"start_time"`
+	EndTime   *time.Time     `json:"end_time,omitempty"`
+	Duration  time.Duration  `json:"duration"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 

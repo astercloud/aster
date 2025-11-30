@@ -129,20 +129,25 @@ type CompleteResponse struct {
 
 // ToolExample 工具使用示例（与 tools.ToolExample 保持一致）
 type ToolExample struct {
-	Description string                 `json:"description"`
+	Description string         `json:"description"`
 	Input       map[string]any `json:"input"`
 	Output      any            `json:"output,omitempty"`
 }
 
 // ToolSchema 工具Schema
 type ToolSchema struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
 	InputSchema map[string]any `json:"input_schema"`
 
 	// InputExamples 工具使用示例，帮助 LLM 更准确地调用工具
 	// 参考 Anthropic 的 Tool Use Examples 功能
 	InputExamples []ToolExample `json:"input_examples,omitempty"`
+
+	// AllowedCallers 指定哪些上下文可以调用此工具 (PTC 支持)
+	// 可选值: ["direct"], ["code_execution_20250825"], 或两者组合
+	// 默认: nil 或 ["direct"] - 仅 LLM 直接调用
+	AllowedCallers []string `json:"allowed_callers,omitempty"`
 }
 
 // ProviderCapabilities 模型能力（扩展版本）

@@ -22,7 +22,7 @@ type Resource struct {
 	ID   string       // 资源 ID
 	Name string       // 资源名称
 	Type ResourceType // 资源类型
-	Data any  // 资源数据（Agent、Room 或 Workflow）
+	Data any          // 资源数据（Agent、Room 或 Workflow）
 }
 
 // Registry 资源注册表

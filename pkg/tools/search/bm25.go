@@ -25,8 +25,8 @@ type BM25 struct {
 
 // Document 可搜索的文档
 type Document struct {
-	ID       string                 // 文档唯一标识
-	Content  string                 // 文档内容
+	ID       string         // 文档唯一标识
+	Content  string         // 文档内容
 	Metadata map[string]any // 附加元数据
 }
 

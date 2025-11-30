@@ -95,8 +95,8 @@ type DeferrableTool interface {
 
 // ToolConfig 工具配置(用于持久化)
 type ToolConfig struct {
-	Name       string                 `json:"name"`
-	RegistryID string                 `json:"registry_id,omitempty"`
+	Name       string         `json:"name"`
+	RegistryID string         `json:"registry_id,omitempty"`
 	Config     map[string]any `json:"config,omitempty"`
 }
 

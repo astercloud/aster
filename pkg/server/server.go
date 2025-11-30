@@ -893,10 +893,10 @@ type BatchEvalRequest struct {
 
 // BatchTestCaseRequest 单个测试用例请求
 type BatchTestCaseRequest struct {
-	ID        string                 `json:"id"`
-	Answer    string                 `json:"answer"`
-	Context   []string               `json:"context,omitempty"`
-	Reference string                 `json:"reference,omitempty"`
+	ID        string         `json:"id"`
+	Answer    string         `json:"answer"`
+	Context   []string       `json:"context,omitempty"`
+	Reference string         `json:"reference,omitempty"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
@@ -909,11 +909,11 @@ type BatchEvalResponse struct {
 
 // BatchResultResponse 单个测试用例的结果
 type BatchResultResponse struct {
-	TestCaseID string                 `json:"test_case_id"`
-	Scores     []evals.ScoreResult    `json:"scores"`
-	Duration   int64                  `json:"duration_ms"`
-	Error      string                 `json:"error,omitempty"`
-	Metadata   map[string]any `json:"metadata,omitempty"`
+	TestCaseID string              `json:"test_case_id"`
+	Scores     []evals.ScoreResult `json:"scores"`
+	Duration   int64               `json:"duration_ms"`
+	Error      string              `json:"error,omitempty"`
+	Metadata   map[string]any      `json:"metadata,omitempty"`
 }
 
 // BatchSummaryResponse 批量评估汇总

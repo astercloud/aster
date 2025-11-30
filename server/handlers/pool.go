@@ -36,11 +36,11 @@ func NewPoolHandler(st store.Store, deps *agent.Dependencies) *PoolHandler {
 // CreateAgent creates a new agent in the pool
 func (h *PoolHandler) CreateAgent(c *gin.Context) {
 	var req struct {
-		AgentID       string                            `json:"agent_id"`
-		TemplateID    string                            `json:"template_id" binding:"required"`
-		ModelConfig   *types.ModelConfig                `json:"model_config"`
-		Sandbox       *types.SandboxConfig              `json:"sandbox"`
-		Middlewares   []string                          `json:"middlewares"`
+		AgentID       string                    `json:"agent_id"`
+		TemplateID    string                    `json:"template_id" binding:"required"`
+		ModelConfig   *types.ModelConfig        `json:"model_config"`
+		Sandbox       *types.SandboxConfig      `json:"sandbox"`
+		Middlewares   []string                  `json:"middlewares"`
 		MiddlewareCfg map[string]map[string]any `json:"middleware_config"`
 		Metadata      map[string]any            `json:"metadata"`
 	}
@@ -152,10 +152,10 @@ func (h *PoolHandler) ResumeAgent(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		TemplateID    string                            `json:"template_id" binding:"required"`
-		ModelConfig   *types.ModelConfig                `json:"model_config"`
-		Sandbox       *types.SandboxConfig              `json:"sandbox"`
-		Middlewares   []string                          `json:"middlewares"`
+		TemplateID    string                    `json:"template_id" binding:"required"`
+		ModelConfig   *types.ModelConfig        `json:"model_config"`
+		Sandbox       *types.SandboxConfig      `json:"sandbox"`
+		Middlewares   []string                  `json:"middlewares"`
 		MiddlewareCfg map[string]map[string]any `json:"middleware_config"`
 	}
 

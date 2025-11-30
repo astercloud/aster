@@ -37,27 +37,27 @@ type WorkflowDefinition struct {
 
 // VariableDef 变量定义
 type VariableDef struct {
-	Name        string      `json:"name"`
-	Type        string      `json:"type"` // string, number, boolean, object, array
-	Description string      `json:"description"`
-	Required    bool        `json:"required"`
-	Default     any `json:"default,omitempty"`
-	Validation  string      `json:"validation,omitempty"` // JSON Schema or validation rules
+	Name        string `json:"name"`
+	Type        string `json:"type"` // string, number, boolean, object, array
+	Description string `json:"description"`
+	Required    bool   `json:"required"`
+	Default     any    `json:"default,omitempty"`
+	Validation  string `json:"validation,omitempty"` // JSON Schema or validation rules
 }
 
 // NodeDef 节点定义
 type NodeDef struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Type      NodeType               `json:"type"`
-	Position  Position               `json:"position"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Type      NodeType       `json:"type"`
+	Position  Position       `json:"position"`
 	Config    map[string]any `json:"config,omitempty"`
-	Agent     *AgentRef              `json:"agent,omitempty"`     // Agent节点
-	Condition *ConditionDef          `json:"condition,omitempty"` // 条件节点
-	Loop      *LoopDef               `json:"loop,omitempty"`      // 循环节点
-	Parallel  *ParallelDef           `json:"parallel,omitempty"`  // 并行节点
-	Timeout   time.Duration          `json:"timeout,omitempty"`   // 超时时间
-	Retry     *RetryDef              `json:"retry,omitempty"`     // 重试配置
+	Agent     *AgentRef      `json:"agent,omitempty"`     // Agent节点
+	Condition *ConditionDef  `json:"condition,omitempty"` // 条件节点
+	Loop      *LoopDef       `json:"loop,omitempty"`      // 循环节点
+	Parallel  *ParallelDef   `json:"parallel,omitempty"`  // 并行节点
+	Timeout   time.Duration  `json:"timeout,omitempty"`   // 超时时间
+	Retry     *RetryDef      `json:"retry,omitempty"`     // 重试配置
 }
 
 // Position 位置信息
@@ -94,11 +94,11 @@ type EdgeDef struct {
 
 // AgentRef Agent引用
 type AgentRef struct {
-	ID       string                 `json:"id"`
-	Template string                 `json:"template"`
-	Config   map[string]any `json:"config,omitempty"`
-	Inputs   map[string]string      `json:"inputs,omitempty"`  // 输入映射
-	Outputs  map[string]string      `json:"outputs,omitempty"` // 输出映射
+	ID       string            `json:"id"`
+	Template string            `json:"template"`
+	Config   map[string]any    `json:"config,omitempty"`
+	Inputs   map[string]string `json:"inputs,omitempty"`  // 输入映射
+	Outputs  map[string]string `json:"outputs,omitempty"` // 输出映射
 }
 
 // ConditionDef 条件定义
@@ -120,9 +120,9 @@ const (
 
 // ConditionRule 条件规则
 type ConditionRule struct {
-	Variable string      `json:"variable"` // 变量路径，如 "input.score"
-	Operator string      `json:"operator"` // eq, ne, gt, gte, lt, lte, in, nin, contains, regex
-	Value    any `json:"value"`    // 比较值
+	Variable string `json:"variable"` // 变量路径，如 "input.score"
+	Operator string `json:"operator"` // eq, ne, gt, gte, lt, lte, in, nin, contains, regex
+	Value    any    `json:"value"`    // 比较值
 }
 
 // LoopDef 循环定义
@@ -275,16 +275,16 @@ const (
 
 // WorkflowResult 工作流执行结果
 type WorkflowResult struct {
-	ExecutionID string                 `json:"execution_id"`
-	WorkflowID  string                 `json:"workflow_id"`
-	Status      WorkflowStatus         `json:"status"`
-	StartTime   time.Time              `json:"start_time"`
-	EndTime     time.Time              `json:"end_time"`
-	Duration    time.Duration          `json:"duration"`
-	Outputs     map[string]any `json:"outputs"`
-	Errors      []WorkflowError        `json:"errors,omitempty"`
-	Metrics     *WorkflowMetrics       `json:"metrics,omitempty"`
-	Trace       []WorkflowStep         `json:"trace,omitempty"`
+	ExecutionID string           `json:"execution_id"`
+	WorkflowID  string           `json:"workflow_id"`
+	Status      WorkflowStatus   `json:"status"`
+	StartTime   time.Time        `json:"start_time"`
+	EndTime     time.Time        `json:"end_time"`
+	Duration    time.Duration    `json:"duration"`
+	Outputs     map[string]any   `json:"outputs"`
+	Errors      []WorkflowError  `json:"errors,omitempty"`
+	Metrics     *WorkflowMetrics `json:"metrics,omitempty"`
+	Trace       []WorkflowStep   `json:"trace,omitempty"`
 }
 
 // WorkflowError 工作流错误
@@ -310,17 +310,17 @@ type WorkflowMetrics struct {
 
 // WorkflowStep 工作流步骤
 type WorkflowStep struct {
-	NodeID     string                 `json:"node_id"`
-	NodeName   string                 `json:"node_name"`
-	NodeType   NodeType               `json:"node_type"`
-	Status     WorkflowStatus         `json:"status"`
-	StartTime  time.Time              `json:"start_time"`
-	EndTime    time.Time              `json:"end_time"`
-	Duration   time.Duration          `json:"duration"`
+	NodeID     string         `json:"node_id"`
+	NodeName   string         `json:"node_name"`
+	NodeType   NodeType       `json:"node_type"`
+	Status     WorkflowStatus `json:"status"`
+	StartTime  time.Time      `json:"start_time"`
+	EndTime    time.Time      `json:"end_time"`
+	Duration   time.Duration  `json:"duration"`
 	Inputs     map[string]any `json:"inputs"`
 	Outputs    map[string]any `json:"outputs"`
-	Error      string                 `json:"error,omitempty"`
-	RetryCount int                    `json:"retry_count"`
+	Error      string         `json:"error,omitempty"`
+	RetryCount int            `json:"retry_count"`
 	Metadata   map[string]any `json:"metadata"`
 }
 

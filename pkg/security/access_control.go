@@ -101,41 +101,41 @@ type IPLockdownPolicy struct {
 
 // Role 角色
 type Role struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Permissions []string               `json:"permissions"`
-	Parents     []string               `json:"parents"` // 父角色，继承权限
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Permissions []string       `json:"permissions"`
+	Parents     []string       `json:"parents"` // 父角色，继承权限
 	Attributes  map[string]any `json:"attributes"`
-	Enabled     bool                   `json:"enabled"`
-	Priority    int                    `json:"priority"`
-	CreatedAt   time.Time              `json:"created_at"`
-	UpdatedAt   time.Time              `json:"updated_at"`
-	CreatedBy   string                 `json:"created_by"`
-	UpdatedBy   string                 `json:"updated_by"`
+	Enabled     bool           `json:"enabled"`
+	Priority    int            `json:"priority"`
+	CreatedAt   time.Time      `json:"created_at"`
+	UpdatedAt   time.Time      `json:"updated_at"`
+	CreatedBy   string         `json:"created_by"`
+	UpdatedBy   string         `json:"updated_by"`
 }
 
 // Permission 权限
 type Permission struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Resource    string                 `json:"resource"`   // 资源类型
-	Action      string                 `json:"action"`     // 操作类型
-	Conditions  []PermissionCondition  `json:"conditions"` // 权限条件
-	Attributes  map[string]any `json:"attributes"`
-	Enabled     bool                   `json:"enabled"`
-	CreatedAt   time.Time              `json:"created_at"`
-	UpdatedAt   time.Time              `json:"updated_at"`
+	ID          string                `json:"id"`
+	Name        string                `json:"name"`
+	Description string                `json:"description"`
+	Resource    string                `json:"resource"`   // 资源类型
+	Action      string                `json:"action"`     // 操作类型
+	Conditions  []PermissionCondition `json:"conditions"` // 权限条件
+	Attributes  map[string]any        `json:"attributes"`
+	Enabled     bool                  `json:"enabled"`
+	CreatedAt   time.Time             `json:"created_at"`
+	UpdatedAt   time.Time             `json:"updated_at"`
 }
 
 // PermissionCondition 权限条件
 type PermissionCondition struct {
-	Type        string      `json:"type"`     // 条件类型
-	Field       string      `json:"field"`    // 字段名
-	Operator    string      `json:"operator"` // 操作符
-	Value       any `json:"value"`    // 条件值
-	Description string      `json:"description"`
+	Type        string `json:"type"`     // 条件类型
+	Field       string `json:"field"`    // 字段名
+	Operator    string `json:"operator"` // 操作符
+	Value       any    `json:"value"`    // 条件值
+	Description string `json:"description"`
 }
 
 // AccessPolicy 访问策略
@@ -173,17 +173,17 @@ const (
 
 // User 用户
 type User struct {
-	ID         string                 `json:"id"`
-	Username   string                 `json:"username"`
-	Email      string                 `json:"email"`
-	FullName   string                 `json:"full_name"`
-	Roles      []string               `json:"roles"`
+	ID         string         `json:"id"`
+	Username   string         `json:"username"`
+	Email      string         `json:"email"`
+	FullName   string         `json:"full_name"`
+	Roles      []string       `json:"roles"`
 	Attributes map[string]any `json:"attributes"`
-	Status     UserStatus             `json:"status"`
-	Enabled    bool                   `json:"enabled"`
-	LastLogin  *time.Time             `json:"last_login"`
-	CreatedAt  time.Time              `json:"created_at"`
-	UpdatedAt  time.Time              `json:"updated_at"`
+	Status     UserStatus     `json:"status"`
+	Enabled    bool           `json:"enabled"`
+	LastLogin  *time.Time     `json:"last_login"`
+	CreatedAt  time.Time      `json:"created_at"`
+	UpdatedAt  time.Time      `json:"updated_at"`
 }
 
 // UserStatus 用户状态
@@ -198,18 +198,18 @@ const (
 
 // Session 会话
 type Session struct {
-	ID           string                 `json:"id"`
-	UserID       string                 `json:"user_id"`
-	Username     string                 `json:"username"`
-	Roles        []string               `json:"roles"`
-	Permissions  []string               `json:"permissions"`
-	IPAddress    string                 `json:"ip_address"`
-	UserAgent    string                 `json:"user_agent"`
+	ID           string         `json:"id"`
+	UserID       string         `json:"user_id"`
+	Username     string         `json:"username"`
+	Roles        []string       `json:"roles"`
+	Permissions  []string       `json:"permissions"`
+	IPAddress    string         `json:"ip_address"`
+	UserAgent    string         `json:"user_agent"`
 	Attributes   map[string]any `json:"attributes"`
-	Status       SessionStatus          `json:"status"`
-	CreatedAt    time.Time              `json:"created_at"`
-	LastActivity time.Time              `json:"last_activity"`
-	ExpiresAt    time.Time              `json:"expires_at"`
+	Status       SessionStatus  `json:"status"`
+	CreatedAt    time.Time      `json:"created_at"`
+	LastActivity time.Time      `json:"last_activity"`
+	ExpiresAt    time.Time      `json:"expires_at"`
 }
 
 // SessionStatus 会话状态
@@ -224,29 +224,29 @@ const (
 
 // AccessDecision 访问决策
 type AccessDecision struct {
-	Allowed      bool                   `json:"allowed"`
-	Effect       PolicyEffect           `json:"effect"`
-	Reason       string                 `json:"reason"`
-	Policies     []string               `json:"policies"`    // 影响决策的策略ID
-	Roles        []string               `json:"roles"`       // 相关角色
-	Permissions  []string               `json:"permissions"` // 相关权限
-	CacheHit     bool                   `json:"cache_hit"`
-	DecisionTime time.Duration          `json:"decision_time"`
-	EvaluatedAt  time.Time              `json:"evaluated_at"`
+	Allowed      bool           `json:"allowed"`
+	Effect       PolicyEffect   `json:"effect"`
+	Reason       string         `json:"reason"`
+	Policies     []string       `json:"policies"`    // 影响决策的策略ID
+	Roles        []string       `json:"roles"`       // 相关角色
+	Permissions  []string       `json:"permissions"` // 相关权限
+	CacheHit     bool           `json:"cache_hit"`
+	DecisionTime time.Duration  `json:"decision_time"`
+	EvaluatedAt  time.Time      `json:"evaluated_at"`
 	Context      map[string]any `json:"context"`
 }
 
 // AccessRequest 访问请求
 type AccessRequest struct {
-	UserID      string                 `json:"user_id"`
-	Username    string                 `json:"username"`
-	Resource    string                 `json:"resource"`
-	Action      string                 `json:"action"`
+	UserID      string         `json:"user_id"`
+	Username    string         `json:"username"`
+	Resource    string         `json:"resource"`
+	Action      string         `json:"action"`
 	Context     map[string]any `json:"context"`
-	IPAddress   string                 `json:"ip_address"`
-	UserAgent   string                 `json:"user_agent"`
-	SessionID   string                 `json:"session_id"`
-	RequestTime time.Time              `json:"request_time"`
+	IPAddress   string         `json:"ip_address"`
+	UserAgent   string         `json:"user_agent"`
+	SessionID   string         `json:"session_id"`
+	RequestTime time.Time      `json:"request_time"`
 }
 
 // AccessCache 访问缓存

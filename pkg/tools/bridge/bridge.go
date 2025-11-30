@@ -47,16 +47,16 @@ func (b *ToolBridge) GetTool(name string) (tools.Tool, error) {
 
 // CallToolInput 工具调用输入
 type CallToolInput struct {
-	Name  string                 `json:"name"`
+	Name  string         `json:"name"`
 	Input map[string]any `json:"input"`
 }
 
 // CallToolResult 工具调用结果
 type CallToolResult struct {
-	Name    string      `json:"name"`
-	Success bool        `json:"success"`
-	Result  any `json:"result,omitempty"`
-	Error   string      `json:"error,omitempty"`
+	Name    string `json:"name"`
+	Success bool   `json:"success"`
+	Result  any    `json:"result,omitempty"`
+	Error   string `json:"error,omitempty"`
 }
 
 // CallTool 调用单个工具
@@ -191,7 +191,7 @@ type ToolChain struct {
 
 // ChainStep 链中的一步
 type ChainStep struct {
-	Name  string                 `json:"name"`
+	Name  string         `json:"name"`
 	Input map[string]any `json:"input"`
 	// InputMapper 可选：将前一步结果映射到当前输入
 	InputMapper func(prevResult any) map[string]any `json:"-"`
@@ -214,7 +214,7 @@ func (c *ToolChain) AddStep(step ChainStep) *ToolChain {
 // ChainResult 链执行结果
 type ChainResult struct {
 	Steps       []*CallToolResult `json:"steps"`
-	FinalResult any       `json:"final_result"`
+	FinalResult any               `json:"final_result"`
 	Success     bool              `json:"success"`
 	Error       string            `json:"error,omitempty"`
 }

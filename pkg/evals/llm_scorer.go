@@ -121,8 +121,8 @@ func parseScoreResponse(output string) (score float64, reason string, details ma
 	// 尝试1: 解析JSON
 	if strings.HasPrefix(output, "{") {
 		var jsonResp struct {
-			Score   float64                `json:"score"`
-			Reason  string                 `json:"reason"`
+			Score   float64        `json:"score"`
+			Reason  string         `json:"reason"`
 			Details map[string]any `json:"details"`
 		}
 		if err := json.Unmarshal([]byte(output), &jsonResp); err == nil {

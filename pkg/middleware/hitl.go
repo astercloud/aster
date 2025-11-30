@@ -24,17 +24,17 @@ type InterruptConfig struct {
 
 // ActionRequest 待审核的操作请求
 type ActionRequest struct {
-	ToolCallID string                 // 工具调用ID
-	ToolName   string                 // 工具名称
+	ToolCallID string         // 工具调用ID
+	ToolName   string         // 工具名称
 	Input      map[string]any // 工具输入参数
-	Message    string                 // 审核提示信息
+	Message    string         // 审核提示信息
 }
 
 // Decision 人工决策
 type Decision struct {
-	Type        DecisionType           // 决策类型
+	Type        DecisionType   // 决策类型
 	EditedInput map[string]any // 编辑后的参数(仅 type=edit 时有效)
-	Reason      string                 // 决策理由(可选)
+	Reason      string         // 决策理由(可选)
 }
 
 // ReviewRequest 审核请求

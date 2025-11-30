@@ -12,15 +12,15 @@ import (
 
 // MCPServerRecord MCP 服务器记录
 type MCPServerRecord struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Type      string                 `json:"type"` // stdio, sse, http
-	Command   string                 `json:"command,omitempty"`
-	Args      []string               `json:"args,omitempty"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Type      string         `json:"type"` // stdio, sse, http
+	Command   string         `json:"command,omitempty"`
+	Args      []string       `json:"args,omitempty"`
 	Config    map[string]any `json:"config,omitempty"`
-	Status    string                 `json:"status"` // stopped, running, error
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
+	Status    string         `json:"status"` // stopped, running, error
+	CreatedAt time.Time      `json:"created_at"`
+	UpdatedAt time.Time      `json:"updated_at"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 
@@ -37,10 +37,10 @@ func NewMCPHandler(st store.Store) *MCPHandler {
 // Create creates a new MCP server
 func (h *MCPHandler) Create(c *gin.Context) {
 	var req struct {
-		Name     string                 `json:"name" binding:"required"`
-		Type     string                 `json:"type" binding:"required"`
-		Command  string                 `json:"command"`
-		Args     []string               `json:"args"`
+		Name     string         `json:"name" binding:"required"`
+		Type     string         `json:"type" binding:"required"`
+		Command  string         `json:"command"`
+		Args     []string       `json:"args"`
 		Config   map[string]any `json:"config"`
 		Metadata map[string]any `json:"metadata"`
 	}
@@ -173,9 +173,9 @@ func (h *MCPHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Name     *string                `json:"name"`
-		Command  *string                `json:"command"`
-		Args     []string               `json:"args"`
+		Name     *string        `json:"name"`
+		Command  *string        `json:"command"`
+		Args     []string       `json:"args"`
 		Config   map[string]any `json:"config"`
 		Metadata map[string]any `json:"metadata"`
 	}

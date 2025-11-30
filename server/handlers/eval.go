@@ -12,29 +12,29 @@ import (
 
 // EvalRecord 评估记录
 type EvalRecord struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Type        string                 `json:"type"`   // text, session, batch, benchmark
-	Status      string                 `json:"status"` // pending, running, completed, failed
-	Input       map[string]any `json:"input,omitempty"`
-	Output      map[string]any `json:"output,omitempty"`
-	Metrics     map[string]float64     `json:"metrics,omitempty"`
-	Score       float64                `json:"score,omitempty"`
-	StartedAt   time.Time              `json:"started_at"`
-	CompletedAt *time.Time             `json:"completed_at,omitempty"`
-	Duration    int64                  `json:"duration,omitempty"` // milliseconds
-	Error       string                 `json:"error,omitempty"`
-	Metadata    map[string]any `json:"metadata,omitempty"`
+	ID          string             `json:"id"`
+	Name        string             `json:"name"`
+	Type        string             `json:"type"`   // text, session, batch, benchmark
+	Status      string             `json:"status"` // pending, running, completed, failed
+	Input       map[string]any     `json:"input,omitempty"`
+	Output      map[string]any     `json:"output,omitempty"`
+	Metrics     map[string]float64 `json:"metrics,omitempty"`
+	Score       float64            `json:"score,omitempty"`
+	StartedAt   time.Time          `json:"started_at"`
+	CompletedAt *time.Time         `json:"completed_at,omitempty"`
+	Duration    int64              `json:"duration,omitempty"` // milliseconds
+	Error       string             `json:"error,omitempty"`
+	Metadata    map[string]any     `json:"metadata,omitempty"`
 }
 
 // BenchmarkRecord 基准测试记录
 type BenchmarkRecord struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Runs      int                    `json:"runs"`
-	Results   []map[string]float64   `json:"results,omitempty"`
-	Summary   map[string]any `json:"summary,omitempty"`
-	CreatedAt time.Time              `json:"created_at"`
+	ID        string               `json:"id"`
+	Name      string               `json:"name"`
+	Runs      int                  `json:"runs"`
+	Results   []map[string]float64 `json:"results,omitempty"`
+	Summary   map[string]any       `json:"summary,omitempty"`
+	CreatedAt time.Time            `json:"created_at"`
 }
 
 // EvalHandler handles evaluation-related requests
@@ -50,8 +50,8 @@ func NewEvalHandler(st store.Store) *EvalHandler {
 // RunTextEval runs text evaluation
 func (h *EvalHandler) RunTextEval(c *gin.Context) {
 	var req struct {
-		Prompt   string                 `json:"prompt" binding:"required"`
-		Expected string                 `json:"expected"`
+		Prompt   string         `json:"prompt" binding:"required"`
+		Expected string         `json:"expected"`
 		Criteria map[string]any `json:"criteria"`
 		Metadata map[string]any `json:"metadata"`
 	}
@@ -113,7 +113,7 @@ func (h *EvalHandler) RunTextEval(c *gin.Context) {
 // RunSessionEval runs session evaluation
 func (h *EvalHandler) RunSessionEval(c *gin.Context) {
 	var req struct {
-		SessionID string                 `json:"session_id" binding:"required"`
+		SessionID string         `json:"session_id" binding:"required"`
 		Criteria  map[string]any `json:"criteria"`
 		Metadata  map[string]any `json:"metadata"`
 	}
@@ -232,7 +232,7 @@ func (h *EvalHandler) RunBatchEval(c *gin.Context) {
 // RunCustomEval runs custom evaluation
 func (h *EvalHandler) RunCustomEval(c *gin.Context) {
 	var req struct {
-		Name     string                 `json:"name" binding:"required"`
+		Name     string         `json:"name" binding:"required"`
 		Input    map[string]any `json:"input" binding:"required"`
 		Criteria map[string]any `json:"criteria"`
 		Metadata map[string]any `json:"metadata"`

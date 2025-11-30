@@ -12,14 +12,14 @@ import (
 
 // ToolExecution Tool 执行记录
 type ToolExecution struct {
-	ID          string                 `json:"id"`
-	ToolID      string                 `json:"tool_id"`
+	ID          string         `json:"id"`
+	ToolID      string         `json:"tool_id"`
 	Input       map[string]any `json:"input"`
 	Output      map[string]any `json:"output,omitempty"`
-	Status      string                 `json:"status"` // pending, running, completed, failed
-	StartedAt   time.Time              `json:"started_at"`
-	CompletedAt *time.Time             `json:"completed_at,omitempty"`
-	Error       string                 `json:"error,omitempty"`
+	Status      string         `json:"status"` // pending, running, completed, failed
+	StartedAt   time.Time      `json:"started_at"`
+	CompletedAt *time.Time     `json:"completed_at,omitempty"`
+	Error       string         `json:"error,omitempty"`
 }
 
 // ToolHandler handles tool-related requests
@@ -35,9 +35,9 @@ func NewToolHandler(st store.Store) *ToolHandler {
 // Create creates a new tool
 func (h *ToolHandler) Create(c *gin.Context) {
 	var req struct {
-		Name        string                 `json:"name" binding:"required"`
-		Description string                 `json:"description"`
-		Type        string                 `json:"type"`
+		Name        string         `json:"name" binding:"required"`
+		Description string         `json:"description"`
+		Type        string         `json:"type"`
 		Schema      map[string]any `json:"schema" binding:"required"`
 		Config      map[string]any `json:"config"`
 		Metadata    map[string]any `json:"metadata"`
@@ -171,12 +171,12 @@ func (h *ToolHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Name        *string                `json:"name"`
-		Description *string                `json:"description"`
-		Type        *string                `json:"type"`
+		Name        *string        `json:"name"`
+		Description *string        `json:"description"`
+		Type        *string        `json:"type"`
 		Schema      map[string]any `json:"schema"`
 		Config      map[string]any `json:"config"`
-		Status      *string                `json:"status"`
+		Status      *string        `json:"status"`
 		Metadata    map[string]any `json:"metadata"`
 	}
 

@@ -36,12 +36,12 @@ type WorkflowRunRequest struct {
 
 // WorkflowEvent 表示通过 HTTP 返回的精简事件结构。
 type WorkflowEvent struct {
-	ID        string                 `json:"id"`
-	Timestamp time.Time              `json:"timestamp"`
-	AgentID   string                 `json:"agent_id"`
-	Branch    string                 `json:"branch,omitempty"`
-	Author    string                 `json:"author"`
-	Text      string                 `json:"text"`
+	ID        string         `json:"id"`
+	Timestamp time.Time      `json:"timestamp"`
+	AgentID   string         `json:"agent_id"`
+	Branch    string         `json:"branch,omitempty"`
+	Author    string         `json:"author"`
+	Text      string         `json:"text"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 

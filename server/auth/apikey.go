@@ -26,13 +26,13 @@ type APIKeyStore interface {
 
 // APIKeyInfo API Key 信息
 type APIKeyInfo struct {
-	Key       string                 `json:"key"`
-	UserID    string                 `json:"user_id"`
-	Name      string                 `json:"name"`
-	Roles     []string               `json:"roles"`
-	ExpiresAt *time.Time             `json:"expires_at,omitempty"`
-	CreatedAt time.Time              `json:"created_at"`
-	LastUsed  *time.Time             `json:"last_used,omitempty"`
+	Key       string         `json:"key"`
+	UserID    string         `json:"user_id"`
+	Name      string         `json:"name"`
+	Roles     []string       `json:"roles"`
+	ExpiresAt *time.Time     `json:"expires_at,omitempty"`
+	CreatedAt time.Time      `json:"created_at"`
+	LastUsed  *time.Time     `json:"last_used,omitempty"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 

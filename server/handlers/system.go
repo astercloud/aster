@@ -11,9 +11,9 @@ import (
 
 // SystemConfigRecord 系统配置记录
 type SystemConfigRecord struct {
-	Key       string      `json:"key"`
-	Value     any `json:"value"`
-	UpdatedAt time.Time   `json:"updated_at"`
+	Key       string    `json:"key"`
+	Value     any       `json:"value"`
+	UpdatedAt time.Time `json:"updated_at"`
 }
 
 // SystemHandler 系统处理器

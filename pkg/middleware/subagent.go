@@ -14,13 +14,13 @@ import (
 
 // SubAgentSpec 子代理规格
 type SubAgentSpec struct {
-	Name                string                 // 子代理名称
-	Description         string                 // 子代理描述
-	Prompt              string                 // 子代理专用提示词
-	Tools               []string               // 工具名称列表(可选,默认继承父代理)
+	Name                string         // 子代理名称
+	Description         string         // 子代理描述
+	Prompt              string         // 子代理专用提示词
+	Tools               []string       // 工具名称列表(可选,默认继承父代理)
 	Config              map[string]any // 自定义配置
-	InheritMiddlewares  bool                   // 是否继承父代理的中间件栈(默认 false)
-	MiddlewareOverrides []Middleware           // 子代理专用中间件(覆盖或追加)
+	InheritMiddlewares  bool           // 是否继承父代理的中间件栈(默认 false)
+	MiddlewareOverrides []Middleware   // 子代理专用中间件(覆盖或追加)
 }
 
 // SubAgentFactory 子代理工厂函数
@@ -516,10 +516,10 @@ func (a *SimpleSubAgent) Close() error {
 
 // SubAgentResult 子代理执行结果
 type SubAgentResult struct {
-	Success      bool                   `json:"success"`
-	SubAgentType string                 `json:"subagent_type"`
-	Result       string                 `json:"result"`
-	Error        string                 `json:"error,omitempty"`
+	Success      bool           `json:"success"`
+	SubAgentType string         `json:"subagent_type"`
+	Result       string         `json:"result"`
+	Error        string         `json:"error,omitempty"`
 	Metadata     map[string]any `json:"metadata,omitempty"`
 }
 

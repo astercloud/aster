@@ -244,15 +244,15 @@ func NewBaseEnhancedTool(name, description string) *BaseEnhancedTool {
 	}
 }
 
-func (t *BaseEnhancedTool) Name() string                     { return t.name }
-func (t *BaseEnhancedTool) Description() string              { return t.description }
-func (t *BaseEnhancedTool) Schema() *types.ToolSchema        { return t.schema }
-func (t *BaseEnhancedTool) IsLongRunning() bool              { return t.isLongRunning }
-func (t *BaseEnhancedTool) Timeout() time.Duration           { return t.timeout }
-func (t *BaseEnhancedTool) RequiresApproval() bool           { return t.requireApproval }
-func (t *BaseEnhancedTool) Priority() int                    { return t.priority }
-func (t *BaseEnhancedTool) RetryPolicy() *RetryPolicy        { return t.retryPolicy }
-func (t *BaseEnhancedTool) Metadata() map[string]any { return t.metadata }
+func (t *BaseEnhancedTool) Name() string              { return t.name }
+func (t *BaseEnhancedTool) Description() string       { return t.description }
+func (t *BaseEnhancedTool) Schema() *types.ToolSchema { return t.schema }
+func (t *BaseEnhancedTool) IsLongRunning() bool       { return t.isLongRunning }
+func (t *BaseEnhancedTool) Timeout() time.Duration    { return t.timeout }
+func (t *BaseEnhancedTool) RequiresApproval() bool    { return t.requireApproval }
+func (t *BaseEnhancedTool) Priority() int             { return t.priority }
+func (t *BaseEnhancedTool) RetryPolicy() *RetryPolicy { return t.retryPolicy }
+func (t *BaseEnhancedTool) Metadata() map[string]any  { return t.metadata }
 
 // Setter 方法
 func (t *BaseEnhancedTool) SetSchema(schema *types.ToolSchema) { t.schema = schema }
