@@ -58,7 +58,7 @@ type WebSocketConnection struct {
 
 // WebSocketMessage represents a message sent over WebSocket
 type WebSocketMessage struct {
-	Type    string                 `json:"type"`
+	Type    string         `json:"type"`
 	Payload map[string]any `json:"payload"`
 }
 

@@ -99,9 +99,9 @@ type Message struct {
 // Part 消息部分
 // 支持 text、file、data 三种类型
 type Part struct {
-	Kind string      `json:"kind"` // "text", "file", "data"
-	Text string      `json:"text,omitempty"`
-	Data any `json:"data,omitempty"`
+	Kind string `json:"kind"` // "text", "file", "data"
+	Text string `json:"text,omitempty"`
+	Data any    `json:"data,omitempty"`
 	// File 相关字段
 	Name     string `json:"name,omitempty"`
 	MimeType string `json:"mimeType,omitempty"`
@@ -112,25 +112,25 @@ type Part struct {
 
 // JSONRPCRequest JSON-RPC 2.0 请求
 type JSONRPCRequest struct {
-	JSONRPC string      `json:"jsonrpc"` // 固定为 "2.0"
-	ID      any `json:"id"`      // 字符串或数字
-	Method  string      `json:"method"`
-	Params  any `json:"params,omitempty"`
+	JSONRPC string `json:"jsonrpc"` // 固定为 "2.0"
+	ID      any    `json:"id"`      // 字符串或数字
+	Method  string `json:"method"`
+	Params  any    `json:"params,omitempty"`
 }
 
 // JSONRPCResponse JSON-RPC 2.0 响应
 type JSONRPCResponse struct {
-	JSONRPC string      `json:"jsonrpc"` // 固定为 "2.0"
-	ID      any `json:"id"`
-	Result  any `json:"result,omitempty"`
-	Error   *RPCError   `json:"error,omitempty"`
+	JSONRPC string    `json:"jsonrpc"` // 固定为 "2.0"
+	ID      any       `json:"id"`
+	Result  any       `json:"result,omitempty"`
+	Error   *RPCError `json:"error,omitempty"`
 }
 
 // RPCError JSON-RPC 错误对象
 type RPCError struct {
-	Code    int         `json:"code"`
-	Message string      `json:"message"`
-	Data    any `json:"data,omitempty"`
+	Code    int    `json:"code"`
+	Message string `json:"message"`
+	Data    any    `json:"data,omitempty"`
 }
 
 // 标准 JSON-RPC 错误码

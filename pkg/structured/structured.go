@@ -11,18 +11,18 @@ import (
 // OutputSpec 描述期望的结构化输出。
 // Schema 字段目前仅用于文档/日志，不进行严格校验；RequiredFields 用于轻量必填校验。
 type OutputSpec struct {
-	Enabled         bool                   // 是否启用结构化解析
+	Enabled         bool           // 是否启用结构化解析
 	Schema          map[string]any // 可选的 JSON Schema 信息（当前仅透传）
-	RequiredFields  []string               // 期望在顶层出现的字段
-	AllowTextBackup bool                   // 解析失败时是否允许保留原始文本
+	RequiredFields  []string       // 期望在顶层出现的字段
+	AllowTextBackup bool           // 解析失败时是否允许保留原始文本
 }
 
 // ParseResult 结构化解析结果。
 type ParseResult struct {
-	RawText       string      // 模型原始输出
-	RawJSON       string      // 提取出的 JSON 文本
-	Data          any // JSON 解析结果
-	MissingFields []string    // 缺失的必填字段
+	RawText       string   // 模型原始输出
+	RawJSON       string   // 提取出的 JSON 文本
+	Data          any      // JSON 解析结果
+	MissingFields []string // 缺失的必填字段
 }
 
 // Parser 结构化输出解析器接口。

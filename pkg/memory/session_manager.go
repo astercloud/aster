@@ -30,7 +30,7 @@ const (
 type SharedMemory struct {
 	ID         string                 // 记忆 ID
 	Content    string                 // 内容
-	Metadata   map[string]any // 元数据
+	Metadata   map[string]any         // 元数据
 	Scope      MemoryScope            // 作用域
 	OwnerID    string                 // 所有者会话 ID
 	SharedWith map[string]AccessLevel // 共享给哪些会话（会话ID -> 访问级别）

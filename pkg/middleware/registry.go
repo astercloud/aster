@@ -23,8 +23,8 @@ type MiddlewareFactoryConfig struct {
 	Provider     provider.Provider
 	AgentID      string
 	Metadata     map[string]any
-	CustomConfig map[string]any // 自定义配置
-	Sandbox      sandbox.Sandbox        // 可选: 需要访问沙箱文件系统的中间件
+	CustomConfig map[string]any  // 自定义配置
+	Sandbox      sandbox.Sandbox // 可选: 需要访问沙箱文件系统的中间件
 }
 
 // Registry 中间件注册表

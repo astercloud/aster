@@ -98,12 +98,12 @@ type MemoryWithScore struct {
 
 // ConsolidatedMemory 合并后的记忆。
 type ConsolidatedMemory struct {
-	Text           string                 // 合并后的文本
-	Metadata       map[string]any // 合并后的元数据
-	Provenance     *MemoryProvenance      // 合并后的溯源
-	SourceMemories []string               // 源记忆 ID 列表
-	Reason         ConsolidationReason    // 合并原因
-	ConsolidatedAt time.Time              // 合并时间
+	Text           string              // 合并后的文本
+	Metadata       map[string]any      // 合并后的元数据
+	Provenance     *MemoryProvenance   // 合并后的溯源
+	SourceMemories []string            // 源记忆 ID 列表
+	Reason         ConsolidationReason // 合并原因
+	ConsolidatedAt time.Time           // 合并时间
 }
 
 // NewConsolidationEngine 创建合并引擎。

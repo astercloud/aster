@@ -58,13 +58,13 @@ type GeminiBlob struct {
 
 // GeminiFunctionCall 函数调用
 type GeminiFunctionCall struct {
-	Name string                 `json:"name"`
+	Name string         `json:"name"`
 	Args map[string]any `json:"args"`
 }
 
 // GeminiFunctionResponse 函数响应
 type GeminiFunctionResponse struct {
-	Name     string                 `json:"name"`
+	Name     string         `json:"name"`
 	Response map[string]any `json:"response"`
 }
 
@@ -75,8 +75,8 @@ type GeminiTool struct {
 
 // GeminiFunctionDeclaration 函数声明
 type GeminiFunctionDeclaration struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
 	Parameters  map[string]any `json:"parameters"`
 }
 

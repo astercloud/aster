@@ -106,8 +106,8 @@ type SearchQuery struct {
 	MinQuality    float64 `json:"min_quality"`    // 最小质量
 
 	// 检索配置
-	MaxResults int                    `json:"max_results"` // 最大结果数
-	Namespace  string                 `json:"namespace"`   // 命名空间
+	MaxResults int            `json:"max_results"` // 最大结果数
+	Namespace  string         `json:"namespace"`   // 命名空间
 	Filters    map[string]any `json:"filters"`     // 自定义过滤
 
 	// 搜索策略

@@ -93,17 +93,17 @@ type WorkflowExecution struct {
 
 // NodeResult 节点执行结果
 type NodeResult struct {
-	NodeID     string                 `json:"node_id"`
-	NodeName   string                 `json:"node_name"`
-	NodeType   NodeType               `json:"node_type"`
-	Status     WorkflowStatus         `json:"status"`
-	StartTime  time.Time              `json:"start_time"`
-	EndTime    time.Time              `json:"end_time"`
-	Duration   time.Duration          `json:"duration"`
+	NodeID     string         `json:"node_id"`
+	NodeName   string         `json:"node_name"`
+	NodeType   NodeType       `json:"node_type"`
+	Status     WorkflowStatus `json:"status"`
+	StartTime  time.Time      `json:"start_time"`
+	EndTime    time.Time      `json:"end_time"`
+	Duration   time.Duration  `json:"duration"`
 	Inputs     map[string]any `json:"inputs"`
 	Outputs    map[string]any `json:"outputs"`
-	Error      string                 `json:"error,omitempty"`
-	RetryCount int                    `json:"retry_count"`
+	Error      string         `json:"error,omitempty"`
+	RetryCount int            `json:"retry_count"`
 	Metadata   map[string]any `json:"metadata"`
 }
 
@@ -128,10 +128,10 @@ type EventBus interface {
 
 // WorkflowEvent 工作流事件
 type WorkflowEvent struct {
-	Type        string                 `json:"type"`
-	ExecutionID string                 `json:"execution_id"`
-	NodeID      string                 `json:"node_id"`
-	Timestamp   time.Time              `json:"timestamp"`
+	Type        string         `json:"type"`
+	ExecutionID string         `json:"execution_id"`
+	NodeID      string         `json:"node_id"`
+	Timestamp   time.Time      `json:"timestamp"`
 	Data        map[string]any `json:"data"`
 }
 

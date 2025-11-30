@@ -12,7 +12,7 @@ type JSONSchema struct {
 	Properties map[string]*JSONSchema `json:"properties,omitempty"` // 对象属性（仅 type=object 时有效）
 	Items      *JSONSchema            `json:"items,omitempty"`      // 数组元素（仅 type=array 时有效）
 	Required   []string               `json:"required,omitempty"`   // 必需字段（仅 type=object 时有效）
-	Enum       []any          `json:"enum,omitempty"`       // 枚举值
+	Enum       []any                  `json:"enum,omitempty"`       // 枚举值
 	MinLength  *int                   `json:"minLength,omitempty"`  // 最小长度（仅 type=string 时有效）
 	MaxLength  *int                   `json:"maxLength,omitempty"`  // 最大长度（仅 type=string 时有效）
 	Pattern    string                 `json:"pattern,omitempty"`    // 正则模式（仅 type=string 时有效）

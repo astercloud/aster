@@ -32,14 +32,14 @@ func NewAgentHandler(st store.Store, deps *agent.Dependencies) *AgentHandler {
 // Create creates a new agent
 func (h *AgentHandler) Create(c *gin.Context) {
 	var req struct {
-		TemplateID    string                            `json:"template_id" binding:"required"`
-		Name          string                            `json:"name"`
-		ModelConfig   *types.ModelConfig                `json:"model_config"`
-		Sandbox       *types.SandboxConfig              `json:"sandbox"`
-		Middlewares   []string                          `json:"middlewares"`
-		MiddlewareCfg map[string]map[string]any `json:"middleware_config"`
-		Metadata      map[string]any            `json:"metadata"`
-		SkillsPackage *types.SkillsPackageConfig        `json:"skills_package"`
+		TemplateID    string                     `json:"template_id" binding:"required"`
+		Name          string                     `json:"name"`
+		ModelConfig   *types.ModelConfig         `json:"model_config"`
+		Sandbox       *types.SandboxConfig       `json:"sandbox"`
+		Middlewares   []string                   `json:"middlewares"`
+		MiddlewareCfg map[string]map[string]any  `json:"middleware_config"`
+		Metadata      map[string]any             `json:"metadata"`
+		SkillsPackage *types.SkillsPackageConfig `json:"skills_package"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -221,7 +221,7 @@ func (h *AgentHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Name     *string                `json:"name"`
+		Name     *string        `json:"name"`
 		Metadata map[string]any `json:"metadata"`
 	}
 
@@ -322,7 +322,7 @@ func (h *AgentHandler) Run(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Message string                 `json:"message" binding:"required"`
+		Message string         `json:"message" binding:"required"`
 		Context map[string]any `json:"context"`
 	}
 
@@ -577,12 +577,12 @@ func (h *AgentHandler) Chat(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var req struct {
-		TemplateID  string                 `json:"template_id" binding:"required"`
-		Input       string                 `json:"input" binding:"required"`
-		ModelConfig *types.ModelConfig     `json:"model_config"`
-		Sandbox     *types.SandboxConfig   `json:"sandbox"`
-		Middlewares []string               `json:"middlewares"`
-		Metadata    map[string]any `json:"metadata"`
+		TemplateID  string               `json:"template_id" binding:"required"`
+		Input       string               `json:"input" binding:"required"`
+		ModelConfig *types.ModelConfig   `json:"model_config"`
+		Sandbox     *types.SandboxConfig `json:"sandbox"`
+		Middlewares []string             `json:"middlewares"`
+		Metadata    map[string]any       `json:"metadata"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -675,12 +675,12 @@ func (h *AgentHandler) StreamChat(c *gin.Context) {
 	ctx := c.Request.Context()
 
 	var req struct {
-		TemplateID  string                 `json:"template_id" binding:"required"`
-		Input       string                 `json:"input" binding:"required"`
-		ModelConfig *types.ModelConfig     `json:"model_config"`
-		Sandbox     *types.SandboxConfig   `json:"sandbox"`
-		Middlewares []string               `json:"middlewares"`
-		Metadata    map[string]any `json:"metadata"`
+		TemplateID  string               `json:"template_id" binding:"required"`
+		Input       string               `json:"input" binding:"required"`
+		ModelConfig *types.ModelConfig   `json:"model_config"`
+		Sandbox     *types.SandboxConfig `json:"sandbox"`
+		Middlewares []string             `json:"middlewares"`
+		Metadata    map[string]any       `json:"metadata"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {

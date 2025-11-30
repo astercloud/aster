@@ -12,40 +12,40 @@ import (
 
 // WorkflowStep Workflow 步骤
 type WorkflowStep struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Type      string                 `json:"type"` // agent, tool, condition, loop
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Type      string         `json:"type"` // agent, tool, condition, loop
 	Config    map[string]any `json:"config,omitempty"`
-	DependsOn []string               `json:"depends_on,omitempty"`
-	Timeout   int                    `json:"timeout,omitempty"` // seconds
+	DependsOn []string       `json:"depends_on,omitempty"`
+	Timeout   int            `json:"timeout,omitempty"` // seconds
 }
 
 // WorkflowTrigger Workflow 触发器
 type WorkflowTrigger struct {
-	Type   string                 `json:"type"` // manual, scheduled, event
+	Type   string         `json:"type"` // manual, scheduled, event
 	Config map[string]any `json:"config,omitempty"`
 }
 
 // WorkflowExecution Workflow 执行记录
 type WorkflowExecution struct {
-	ID          string                 `json:"id"`
-	WorkflowID  string                 `json:"workflow_id"`
-	Status      string                 `json:"status"` // pending, running, completed, failed, cancelled
-	StartedAt   time.Time              `json:"started_at"`
-	CompletedAt *time.Time             `json:"completed_at,omitempty"`
+	ID          string         `json:"id"`
+	WorkflowID  string         `json:"workflow_id"`
+	Status      string         `json:"status"` // pending, running, completed, failed, cancelled
+	StartedAt   time.Time      `json:"started_at"`
+	CompletedAt *time.Time     `json:"completed_at,omitempty"`
 	Result      map[string]any `json:"result,omitempty"`
-	Error       string                 `json:"error,omitempty"`
-	Logs        []ExecutionLog         `json:"logs,omitempty"`
+	Error       string         `json:"error,omitempty"`
+	Logs        []ExecutionLog `json:"logs,omitempty"`
 	Context     map[string]any `json:"context,omitempty"`
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
 // ExecutionLog 执行日志
 type ExecutionLog struct {
-	Timestamp time.Time              `json:"timestamp"`
-	Level     string                 `json:"level"` // info, warn, error
-	StepID    string                 `json:"step_id,omitempty"`
-	Message   string                 `json:"message"`
+	Timestamp time.Time      `json:"timestamp"`
+	Level     string         `json:"level"` // info, warn, error
+	StepID    string         `json:"step_id,omitempty"`
+	Message   string         `json:"message"`
 	Data      map[string]any `json:"data,omitempty"`
 }
 
@@ -62,12 +62,12 @@ func NewWorkflowHandler(st store.Store) *WorkflowHandler {
 // Create creates a new workflow
 func (h *WorkflowHandler) Create(c *gin.Context) {
 	var req struct {
-		Name        string                 `json:"name" binding:"required"`
-		Description string                 `json:"description"`
-		Version     string                 `json:"version"`
-		Steps       []WorkflowStep         `json:"steps" binding:"required"`
-		Triggers    []WorkflowTrigger      `json:"triggers"`
-		Metadata    map[string]any `json:"metadata"`
+		Name        string            `json:"name" binding:"required"`
+		Description string            `json:"description"`
+		Version     string            `json:"version"`
+		Steps       []WorkflowStep    `json:"steps" binding:"required"`
+		Triggers    []WorkflowTrigger `json:"triggers"`
+		Metadata    map[string]any    `json:"metadata"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {
@@ -213,13 +213,13 @@ func (h *WorkflowHandler) Update(c *gin.Context) {
 	id := c.Param("id")
 
 	var req struct {
-		Name        *string                `json:"name"`
-		Description *string                `json:"description"`
-		Version     *string                `json:"version"`
-		Steps       []WorkflowStep         `json:"steps"`
-		Triggers    []WorkflowTrigger      `json:"triggers"`
-		Status      *string                `json:"status"`
-		Metadata    map[string]any `json:"metadata"`
+		Name        *string           `json:"name"`
+		Description *string           `json:"description"`
+		Version     *string           `json:"version"`
+		Steps       []WorkflowStep    `json:"steps"`
+		Triggers    []WorkflowTrigger `json:"triggers"`
+		Status      *string           `json:"status"`
+		Metadata    map[string]any    `json:"metadata"`
 	}
 
 	if err := c.ShouldBindJSON(&req); err != nil {

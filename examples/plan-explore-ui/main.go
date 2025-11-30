@@ -534,9 +534,9 @@ func formatToolCallLabel(call *types.ToolCallSnapshot) string {
 
 // uiEvent 是前端消费的简化事件结构。
 type uiEvent struct {
-	Cursor  int64                  `json:"cursor"`
-	Channel string                 `json:"channel"`
-	Type    string                 `json:"type"`
+	Cursor  int64          `json:"cursor"`
+	Channel string         `json:"channel"`
+	Type    string         `json:"type"`
 	Payload map[string]any `json:"payload,omitempty"`
 }
 

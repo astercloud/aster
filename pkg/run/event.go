@@ -56,10 +56,10 @@ const (
 
 // BaseEvent 基础事件
 type BaseEvent struct {
-	Type      EventType              `json:"type"`
-	ID        string                 `json:"run_id"`
-	Time      time.Time              `json:"timestamp"`
-	SessionID string                 `json:"session_id,omitempty"`
+	Type      EventType      `json:"type"`
+	ID        string         `json:"run_id"`
+	Time      time.Time      `json:"timestamp"`
+	SessionID string         `json:"session_id,omitempty"`
 	Data      map[string]any `json:"data,omitempty"`
 }
 
@@ -112,29 +112,29 @@ func NewBaseEvent(eventType EventType, runID string) *BaseEvent {
 // AgentEvent Agent 事件
 type AgentEvent struct {
 	BaseEvent
-	AgentID string                 `json:"agent_id,omitempty"`
-	Content string                 `json:"content,omitempty"`
-	Delta   string                 `json:"delta,omitempty"`
+	AgentID string         `json:"agent_id,omitempty"`
+	Content string         `json:"content,omitempty"`
+	Delta   string         `json:"delta,omitempty"`
 	Metrics map[string]any `json:"metrics,omitempty"`
 }
 
 // WorkflowEvent Workflow 事件
 type WorkflowEvent struct {
 	BaseEvent
-	WorkflowID string                 `json:"workflow_id,omitempty"`
-	StepID     string                 `json:"step_id,omitempty"`
-	StepName   string                 `json:"step_name,omitempty"`
-	StepType   string                 `json:"step_type,omitempty"`
-	Progress   float64                `json:"progress,omitempty"`
+	WorkflowID string         `json:"workflow_id,omitempty"`
+	StepID     string         `json:"step_id,omitempty"`
+	StepName   string         `json:"step_name,omitempty"`
+	StepType   string         `json:"step_type,omitempty"`
+	Progress   float64        `json:"progress,omitempty"`
 	Metrics    map[string]any `json:"metrics,omitempty"`
 }
 
 // TeamEvent Team 事件
 type TeamEvent struct {
 	BaseEvent
-	TeamID   string                 `json:"team_id,omitempty"`
-	MemberID string                 `json:"member_id,omitempty"`
-	Role     string                 `json:"role,omitempty"`
+	TeamID   string         `json:"team_id,omitempty"`
+	MemberID string         `json:"member_id,omitempty"`
+	Role     string         `json:"role,omitempty"`
 	Metrics  map[string]any `json:"metrics,omitempty"`
 }
 

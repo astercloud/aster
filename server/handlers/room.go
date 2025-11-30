@@ -13,12 +13,12 @@ import (
 
 // RoomRecord Room 持久化记录
 type RoomRecord struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Members   []core.RoomMember      `json:"members"`
-	CreatedAt time.Time              `json:"created_at"`
-	UpdatedAt time.Time              `json:"updated_at"`
-	Metadata  map[string]any `json:"metadata,omitempty"`
+	ID        string            `json:"id"`
+	Name      string            `json:"name"`
+	Members   []core.RoomMember `json:"members"`
+	CreatedAt time.Time         `json:"created_at"`
+	UpdatedAt time.Time         `json:"updated_at"`
+	Metadata  map[string]any    `json:"metadata,omitempty"`
 }
 
 // RoomHandler handles room-related requests
@@ -40,7 +40,7 @@ func NewRoomHandler(st store.Store, pool *core.Pool) *RoomHandler {
 // Create creates a new room
 func (h *RoomHandler) Create(c *gin.Context) {
 	var req struct {
-		Name     string                 `json:"name" binding:"required"`
+		Name     string         `json:"name" binding:"required"`
 		Metadata map[string]any `json:"metadata"`
 	}
 

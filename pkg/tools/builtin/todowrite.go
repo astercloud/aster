@@ -15,24 +15,24 @@ type TodoWriteTool struct{}
 
 // TodoItem 单个任务项
 type TodoItem struct {
-	ID          string                 `json:"id"`
-	Content     string                 `json:"content"`
-	Status      string                 `json:"status"` // "pending", "in_progress", "completed"
-	ActiveForm  string                 `json:"activeForm"`
-	Priority    int                    `json:"priority,omitempty"`
-	CreatedAt   time.Time              `json:"createdAt"`
-	UpdatedAt   time.Time              `json:"updatedAt"`
-	CompletedAt *time.Time             `json:"completedAt,omitempty"`
+	ID          string         `json:"id"`
+	Content     string         `json:"content"`
+	Status      string         `json:"status"` // "pending", "in_progress", "completed"
+	ActiveForm  string         `json:"activeForm"`
+	Priority    int            `json:"priority,omitempty"`
+	CreatedAt   time.Time      `json:"createdAt"`
+	UpdatedAt   time.Time      `json:"updatedAt"`
+	CompletedAt *time.Time     `json:"completedAt,omitempty"`
 	Metadata    map[string]any `json:"metadata,omitempty"`
 }
 
 // TodoList 任务列表
 type TodoList struct {
-	ID        string                 `json:"id"`
-	Name      string                 `json:"name"`
-	Todos     []TodoItem             `json:"todos"`
-	CreatedAt time.Time              `json:"createdAt"`
-	UpdatedAt time.Time              `json:"updatedAt"`
+	ID        string         `json:"id"`
+	Name      string         `json:"name"`
+	Todos     []TodoItem     `json:"todos"`
+	CreatedAt time.Time      `json:"createdAt"`
+	UpdatedAt time.Time      `json:"updatedAt"`
 	Metadata  map[string]any `json:"metadata,omitempty"`
 }
 

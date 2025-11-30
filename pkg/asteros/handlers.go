@@ -34,8 +34,8 @@ func (os *AsterOS) handleListAgents(c *gin.Context) {
 
 // AgentRunRequest Agent 运行请求
 type AgentRunRequest struct {
-	Message string                 `json:"message" binding:"required"`
-	Stream  bool                   `json:"stream,omitempty"`
+	Message string         `json:"message" binding:"required"`
+	Stream  bool           `json:"stream,omitempty"`
 	Context map[string]any `json:"context,omitempty"`
 }
 
@@ -238,7 +238,7 @@ func (os *AsterOS) handleListWorkflows(c *gin.Context) {
 
 // WorkflowExecuteRequest Workflow 执行请求
 type WorkflowExecuteRequest struct {
-	Message string                 `json:"message" binding:"required"`
+	Message string         `json:"message" binding:"required"`
 	Context map[string]any `json:"context,omitempty"`
 }
 
