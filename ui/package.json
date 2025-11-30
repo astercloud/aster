@@ -8,9 +8,9 @@
   "types": "dist/index.d.ts",
   "exports": {
     ".": {
+      "types": "./dist/index.d.ts",
       "import": "./dist/aster-ui.es.js",
-      "require": "./dist/aster-ui.umd.js",
-      "types": "./dist/index.d.ts"
+      "require": "./dist/aster-ui.umd.js"
     },
     "./style.css": "./dist/style.css"
   },
