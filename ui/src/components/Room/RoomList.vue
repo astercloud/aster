@@ -6,7 +6,7 @@
         <h2 class="list-title">Room 列表</h2>
         <span class="room-count">{{ rooms.length }} 个</span>
       </div>
-      
+
       <div class="header-right">
         <button @click="$emit('create')" class="btn-create">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Search -->
     <div class="list-search">
       <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -29,10 +29,10 @@
         class="search-input"
       />
     </div>
-    
+
     <!-- Loading -->
     <LoadingSpinner v-if="loading" class="my-8" />
-    
+
     <!-- Empty State -->
     <EmptyState
       v-else-if="filteredRooms.length === 0"
@@ -45,7 +45,7 @@
         </button>
       </template>
     </EmptyState>
-    
+
     <!-- Room List -->
     <div v-else class="room-grid">
       <div
@@ -60,17 +60,17 @@
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
             </svg>
           </div>
-          
+
           <div class="room-info">
             <h3 class="room-name">{{ room.name }}</h3>
             <p class="room-members">{{ room.members.length }} 个成员</p>
           </div>
         </div>
-        
+
         <div v-if="room.metadata?.description" class="room-description">
           {{ room.metadata.description }}
         </div>
-        
+
         <div class="room-footer">
           <span class="room-time">
             {{ formatTime(room.createdAt) }}
@@ -90,50 +90,65 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, type PropType } from 'vue';
 import LoadingSpinner from '../Common/LoadingSpinner.vue';
 import EmptyState from '../Common/EmptyState.vue';
 import type { Room } from '@/types';
 
-interface Props {
-  rooms: Room[];
-  loading?: boolean;
-}
+export default defineComponent({
+  name: 'RoomList',
+  components: {
+    LoadingSpinner,
+    EmptyState,
+  },
+  props: {
+    rooms: {
+      type: Array as PropType<Room[]>,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    create: () => true,
+    select: (room: Room) => true,
+    delete: (room: Room) => true,
+  },
+  setup(props) {
+    const searchQuery = ref('');
 
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
+    const filteredRooms = computed(() => {
+      if (!searchQuery.value) return props.rooms;
+
+      const query = searchQuery.value.toLowerCase();
+      return props.rooms.filter(room =>
+        room.name.toLowerCase().includes(query)
+      );
+    });
+
+    function formatTime(timestamp: number): string {
+      const date = new Date(timestamp);
+      const now = new Date();
+      const diff = now.getTime() - date.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+      if (days === 0) return '今天';
+      if (days === 1) return '昨天';
+      if (days < 7) return `${days} 天前`;
+
+      return date.toLocaleDateString('zh-CN');
+    }
+
+    return {
+      searchQuery,
+      filteredRooms,
+      formatTime,
+    };
+  },
 });
-
-defineEmits<{
-  create: [];
-  select: [room: Room];
-  delete: [room: Room];
-}>();
-
-const searchQuery = ref('');
-
-const filteredRooms = computed(() => {
-  if (!searchQuery.value) return props.rooms;
-  
-  const query = searchQuery.value.toLowerCase();
-  return props.rooms.filter(room =>
-    room.name.toLowerCase().includes(query)
-  );
-});
-
-function formatTime(timestamp: number): string {
-  const date = new Date(timestamp);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-  
-  if (days === 0) return '今天';
-  if (days === 1) return '昨天';
-  if (days < 7) return `${days} 天前`;
-  
-  return date.toLocaleDateString('zh-CN');
-}
 </script>
 
 <style scoped>

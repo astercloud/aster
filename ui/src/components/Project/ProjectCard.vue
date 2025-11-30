@@ -80,84 +80,98 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed, type PropType } from 'vue';
 import type { Project } from '@/types';
 
-interface Props {
-  project: Project;
-}
-
-const props = defineProps<Props>();
-
-const emit = defineEmits<{
-  open: [project: Project];
-  edit: [project: Project];
-  delete: [project: Project];
-}>();
-
-// 工作空间配置
-const workspaceConfig = {
-  wechat: {
-    icon: '💬',
-    label: '微信公众号',
-    class: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+export default defineComponent({
+  name: 'ProjectCard',
+  props: {
+    project: {
+      type: Object as PropType<Project>,
+      required: true,
+    },
   },
-  video: {
-    icon: '🎬',
-    label: '视频脚本',
-    class: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+  emits: {
+    open: (project: Project) => true,
+    edit: (project: Project) => true,
+    delete: (project: Project) => true,
   },
-  general: {
-    icon: '📄',
-    label: '通用文档',
-    class: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+  setup(props, { emit }) {
+    // 工作空间配置
+    const workspaceConfig = {
+      wechat: {
+        icon: '💬',
+        label: '微信公众号',
+        class: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+      },
+      video: {
+        icon: '🎬',
+        label: '视频脚本',
+        class: 'bg-purple-100 dark:bg-purple-900/30 text-purple-600 dark:text-purple-400',
+      },
+      general: {
+        icon: '📄',
+        label: '通用文档',
+        class: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+      },
+    };
+
+    const workspaceIcon = computed(() => workspaceConfig[props.project.workspace].icon);
+    const workspaceLabel = computed(() => workspaceConfig[props.project.workspace].label);
+    const workspaceIconClass = computed(() => workspaceConfig[props.project.workspace].class);
+
+    // 状态配置
+    const statusConfig = {
+      draft: {
+        label: '草稿',
+        class: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
+      },
+      in_progress: {
+        label: '进行中',
+        class: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
+      },
+      completed: {
+        label: '已完成',
+        class: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
+      },
+    };
+
+    const statusLabel = computed(() => statusConfig[props.project.status].label);
+    const statusClass = computed(() => statusConfig[props.project.status].class);
+
+    // 格式化日期
+    const formattedDate = computed(() => {
+      const date = new Date(props.project.lastModified);
+      const now = new Date();
+      const diff = now.getTime() - date.getTime();
+      const days = Math.floor(diff / (1000 * 60 * 60 * 24));
+
+      if (days === 0) return '今天';
+      if (days === 1) return '昨天';
+      if (days < 7) return `${days} 天前`;
+      if (days < 30) return `${Math.floor(days / 7)} 周前`;
+      if (days < 365) return `${Math.floor(days / 30)} 月前`;
+      return `${Math.floor(days / 365)} 年前`;
+    });
+
+    const handleDelete = () => {
+      if (confirm(`确定要删除项目 "${props.project.name}" 吗？`)) {
+        emit('delete', props.project);
+      }
+    };
+
+    return {
+      workspaceIcon,
+      workspaceLabel,
+      workspaceIconClass,
+      statusLabel,
+      statusClass,
+      formattedDate,
+      handleDelete,
+    };
   },
-};
-
-const workspaceIcon = computed(() => workspaceConfig[props.project.workspace].icon);
-const workspaceLabel = computed(() => workspaceConfig[props.project.workspace].label);
-const workspaceIconClass = computed(() => workspaceConfig[props.project.workspace].class);
-
-// 状态配置
-const statusConfig = {
-  draft: {
-    label: '草稿',
-    class: 'bg-gray-100 dark:bg-gray-700 text-gray-600 dark:text-gray-300',
-  },
-  in_progress: {
-    label: '进行中',
-    class: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400',
-  },
-  completed: {
-    label: '已完成',
-    class: 'bg-green-100 dark:bg-green-900/30 text-green-600 dark:text-green-400',
-  },
-};
-
-const statusLabel = computed(() => statusConfig[props.project.status].label);
-const statusClass = computed(() => statusConfig[props.project.status].class);
-
-// 格式化日期
-const formattedDate = computed(() => {
-  const date = new Date(props.project.lastModified);
-  const now = new Date();
-  const diff = now.getTime() - date.getTime();
-  const days = Math.floor(diff / (1000 * 60 * 60 * 24));
-
-  if (days === 0) return '今天';
-  if (days === 1) return '昨天';
-  if (days < 7) return `${days} 天前`;
-  if (days < 30) return `${Math.floor(days / 7)} 周前`;
-  if (days < 365) return `${Math.floor(days / 30)} 月前`;
-  return `${Math.floor(days / 365)} 年前`;
 });
-
-const handleDelete = () => {
-  if (confirm(`确定要删除项目 "${props.project.name}" 吗？`)) {
-    emit('delete', props.project);
-  }
-};
 </script>
 
 <style scoped>

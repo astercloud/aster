@@ -6,7 +6,7 @@
         <h2 class="list-title">Agent 列表</h2>
         <span class="agent-count">{{ agents.length }} 个</span>
       </div>
-      
+
       <div class="header-right">
         <button @click="$emit('create')" class="btn-create">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Filters -->
     <div class="list-filters">
       <div class="filter-search">
@@ -30,7 +30,7 @@
           class="search-input"
         />
       </div>
-      
+
       <select v-model="statusFilter" class="filter-select">
         <option value="">全部状态</option>
         <option value="idle">空闲</option>
@@ -39,10 +39,10 @@
         <option value="error">错误</option>
       </select>
     </div>
-    
+
     <!-- Loading -->
     <LoadingSpinner v-if="loading" class="my-8" />
-    
+
     <!-- Empty State -->
     <EmptyState
       v-else-if="filteredAgents.length === 0"
@@ -55,7 +55,7 @@
         </button>
       </template>
     </EmptyState>
-    
+
     <!-- Agent Grid -->
     <div v-else class="agent-grid">
       <AgentCard
@@ -70,50 +70,66 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, type PropType } from 'vue';
 import AgentCard from './AgentCard.vue';
 import LoadingSpinner from '../Common/LoadingSpinner.vue';
 import EmptyState from '../Common/EmptyState.vue';
 import type { Agent } from '@/types';
 
-interface Props {
-  agents: Agent[];
-  loading?: boolean;
-}
+export default defineComponent({
+  name: 'AgentList',
+  components: {
+    AgentCard,
+    LoadingSpinner,
+    EmptyState,
+  },
+  props: {
+    agents: {
+      type: Array as PropType<Agent[]>,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    create: () => true,
+    chat: (agent: Agent) => true,
+    edit: (agent: Agent) => true,
+    delete: (agent: Agent) => true,
+  },
+  setup(props) {
+    const searchQuery = ref('');
+    const statusFilter = ref('');
 
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-});
+    const filteredAgents = computed(() => {
+      let result = props.agents;
 
-defineEmits<{
-  create: [];
-  chat: [agent: Agent];
-  edit: [agent: Agent];
-  delete: [agent: Agent];
-}>();
+      // 搜索过滤
+      if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        result = result.filter(agent =>
+          agent.name.toLowerCase().includes(query) ||
+          agent.description?.toLowerCase().includes(query)
+        );
+      }
 
-const searchQuery = ref('');
-const statusFilter = ref('');
+      // 状态过滤
+      if (statusFilter.value) {
+        result = result.filter(agent => agent.status === statusFilter.value);
+      }
 
-const filteredAgents = computed(() => {
-  let result = props.agents;
-  
-  // 搜索过滤
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(agent =>
-      agent.name.toLowerCase().includes(query) ||
-      agent.description?.toLowerCase().includes(query)
-    );
-  }
-  
-  // 状态过滤
-  if (statusFilter.value) {
-    result = result.filter(agent => agent.status === statusFilter.value);
-  }
-  
-  return result;
+      return result;
+    });
+
+    return {
+      searchQuery,
+      statusFilter,
+      filteredAgents,
+    };
+  },
 });
 </script>
 
