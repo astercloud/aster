@@ -22,15 +22,24 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import ThinkingStep from './ThinkingStep.vue';
 import type { ThinkingStep as ThinkingStepType } from '@/types/thinking';
+import type { PropType } from 'vue';
 
-interface Props {
-  steps: ThinkingStepType[];
-}
-
-defineProps<Props>();
+export default defineComponent({
+  name: 'ThinkingTimeline',
+  components: {
+    ThinkingStep,
+  },
+  props: {
+    steps: {
+      type: Array as PropType<ThinkingStepType[]>,
+      required: true,
+    },
+  },
+});
 </script>
 
 <style scoped>

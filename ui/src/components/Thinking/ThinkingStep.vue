@@ -185,77 +185,93 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
 import type { ThinkingStep } from '@/types/thinking';
+import type { PropType } from 'vue';
 
-interface Props {
-  step: ThinkingStep;
-  isLast?: boolean;
-}
+export default defineComponent({
+  name: 'ThinkingStep',
+  props: {
+    step: {
+      type: Object as PropType<ThinkingStep>,
+      required: true,
+    },
+    isLast: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  setup(props) {
+    const stepDotClass = computed(() => {
+      const classes: Record<string, string> = {
+        reasoning: 'step-dot-reasoning',
+        tool_call: 'step-dot-tool-call',
+        tool_result: 'step-dot-tool-result',
+        decision: 'step-dot-decision',
+        approval: 'step-dot-approval',
+      };
+      return classes[props.step.type] || '';
+    });
 
-const props = withDefaults(defineProps<Props>(), {
-  isLast: false,
+    const stepTypeClass = computed(() => {
+      const classes: Record<string, string> = {
+        reasoning: 'step-type-reasoning',
+        tool_call: 'step-type-tool-call',
+        tool_result: 'step-type-tool-result',
+        decision: 'step-type-decision',
+        approval: 'step-type-approval',
+      };
+      return classes[props.step.type] || '';
+    });
+
+    const stepLabel = computed(() => {
+      const labels: Record<string, string> = {
+        reasoning: '推理',
+        tool_call: '工具调用',
+        tool_result: '执行结果',
+        decision: '决策',
+        approval: '审批请求',
+      };
+      return labels[props.step.type] || props.step.type;
+    });
+
+    const formatTime = (timestamp: number): string => {
+      const date = new Date(timestamp);
+      return date.toLocaleTimeString('zh-CN', {
+        hour: '2-digit',
+        minute: '2-digit',
+        second: '2-digit',
+      });
+    };
+
+    const formatToolArgs = (args: any): string => {
+      try {
+        return JSON.stringify(args, null, 2);
+      } catch (e) {
+        return String(args);
+      }
+    };
+
+    const formatResult = (result: any): string => {
+      try {
+        if (typeof result === 'string') return result;
+        return JSON.stringify(result, null, 2);
+      } catch (e) {
+        return String(result);
+      }
+    };
+
+    return {
+      stepDotClass,
+      stepTypeClass,
+      stepLabel,
+      formatTime,
+      formatToolArgs,
+      formatResult,
+    };
+  },
 });
-
-const stepDotClass = computed(() => {
-  const classes: Record<string, string> = {
-    reasoning: 'step-dot-reasoning',
-    tool_call: 'step-dot-tool-call',
-    tool_result: 'step-dot-tool-result',
-    decision: 'step-dot-decision',
-    approval: 'step-dot-approval',
-  };
-  return classes[props.step.type] || '';
-});
-
-const stepTypeClass = computed(() => {
-  const classes: Record<string, string> = {
-    reasoning: 'step-type-reasoning',
-    tool_call: 'step-type-tool-call',
-    tool_result: 'step-type-tool-result',
-    decision: 'step-type-decision',
-    approval: 'step-type-approval',
-  };
-  return classes[props.step.type] || '';
-});
-
-const stepLabel = computed(() => {
-  const labels: Record<string, string> = {
-    reasoning: '推理',
-    tool_call: '工具调用',
-    tool_result: '执行结果',
-    decision: '决策',
-    approval: '审批请求',
-  };
-  return labels[props.step.type] || props.step.type;
-});
-
-const formatTime = (timestamp: number): string => {
-  const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
-  });
-};
-
-const formatToolArgs = (args: any): string => {
-  try {
-    return JSON.stringify(args, null, 2);
-  } catch (e) {
-    return String(args);
-  }
-};
-
-const formatResult = (result: any): string => {
-  try {
-    if (typeof result === 'string') return result;
-    return JSON.stringify(result, null, 2);
-  } catch (e) {
-    return String(result);
-  }
-};
 </script>
 
 <style scoped>

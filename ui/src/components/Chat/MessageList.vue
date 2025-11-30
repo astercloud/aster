@@ -67,7 +67,7 @@
       <transition name="fade">
         <button
           v-if="showScrollButton"
-          @click="scrollToBottom"
+          @click="scrollToBottom(true)"
           class="scroll-to-bottom"
         >
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -79,143 +79,172 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, watch, nextTick, onMounted } from 'vue';
 import MessageBubble from './MessageBubble.vue';
 import type { Message, ChatConfig } from '@/types';
 
-interface Props {
-  messages: Message[];
-  isTyping?: boolean;
-  hasMore?: boolean;
-  isLoadingMore?: boolean;
-  config: ChatConfig;
-}
+export default defineComponent({
+  name: 'MessageList',
 
-const props = withDefaults(defineProps<Props>(), {
-  isTyping: false,
-  hasMore: false,
-  isLoadingMore: false,
-});
+  components: {
+    MessageBubble,
+  },
 
-const emit = defineEmits<{
-  'load-more': [];
-  copy: [message: Message];
-  retry: [message: Message];
-  delete: [message: Message];
-}>();
+  props: {
+    messages: {
+      type: Array as () => Message[],
+      required: true,
+    },
+    isTyping: {
+      type: Boolean,
+      default: false,
+    },
+    hasMore: {
+      type: Boolean,
+      default: false,
+    },
+    isLoadingMore: {
+      type: Boolean,
+      default: false,
+    },
+    config: {
+      type: Object as () => ChatConfig,
+      required: true,
+    },
+  },
 
-const containerRef = ref<HTMLElement>();
-const showScrollButton = ref(false);
-const isNearBottom = ref(true);
+  emits: {
+    'load-more': () => true,
+    copy: (message: Message) => true,
+    retry: (message: Message) => true,
+    delete: (message: Message) => true,
+  },
 
-// Group messages by date
-const groupedMessages = computed(() => {
-  const groups: Array<{ date: string; messages: Message[] }> = [];
-  let currentDate = '';
-  let currentGroup: Message[] = [];
+  setup(props, { emit, expose }) {
+    const containerRef = ref<HTMLElement>();
+    const showScrollButton = ref(false);
+    const isNearBottom = ref(true);
 
-  props.messages.forEach((message) => {
-    const messageDate = formatMessageDate(message.createdAt);
-    
-    if (messageDate !== currentDate) {
+    // Group messages by date
+    const groupedMessages = computed(() => {
+      const groups: Array<{ date: string; messages: Message[] }> = [];
+      let currentDate = '';
+      let currentGroup: Message[] = [];
+
+      props.messages.forEach((message) => {
+        const messageDate = formatMessageDate(message.createdAt);
+
+        if (messageDate !== currentDate) {
+          if (currentGroup.length > 0) {
+            groups.push({ date: currentDate, messages: currentGroup });
+          }
+          currentDate = messageDate;
+          currentGroup = [message];
+        } else {
+          currentGroup.push(message);
+        }
+      });
+
       if (currentGroup.length > 0) {
         groups.push({ date: currentDate, messages: currentGroup });
       }
-      currentDate = messageDate;
-      currentGroup = [message];
-    } else {
-      currentGroup.push(message);
-    }
-  });
 
-  if (currentGroup.length > 0) {
-    groups.push({ date: currentDate, messages: currentGroup });
-  }
-
-  return groups;
-});
-
-// Format date for divider
-function formatMessageDate(timestamp: number): string {
-  const date = new Date(timestamp);
-  const today = new Date();
-  const yesterday = new Date(today);
-  yesterday.setDate(yesterday.getDate() - 1);
-
-  if (date.toDateString() === today.toDateString()) {
-    return '今天';
-  } else if (date.toDateString() === yesterday.toDateString()) {
-    return '昨天';
-  } else {
-    return date.toLocaleDateString('zh-CN', {
-      month: 'long',
-      day: 'numeric',
+      return groups;
     });
-  }
-}
 
-// Handle scroll
-function handleScroll() {
-  if (!containerRef.value) return;
+    // Format date for divider
+    function formatMessageDate(timestamp: number): string {
+      const date = new Date(timestamp);
+      const today = new Date();
+      const yesterday = new Date(today);
+      yesterday.setDate(yesterday.getDate() - 1);
 
-  const { scrollTop, scrollHeight, clientHeight } = containerRef.value;
-  const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
+      if (date.toDateString() === today.toDateString()) {
+        return '今天';
+      } else if (date.toDateString() === yesterday.toDateString()) {
+        return '昨天';
+      } else {
+        return date.toLocaleDateString('zh-CN', {
+          month: 'long',
+          day: 'numeric',
+        });
+      }
+    }
 
-  isNearBottom.value = distanceFromBottom < 100;
-  showScrollButton.value = distanceFromBottom > 200;
-}
+    // Handle scroll
+    function handleScroll() {
+      if (!containerRef.value) return;
 
-// Scroll to bottom
-function scrollToBottom(smoothOrEvent: boolean | Event = true) {
-  const smooth = typeof smoothOrEvent === 'boolean' ? smoothOrEvent : true;
-  if (!containerRef.value) return;
+      const { scrollTop, scrollHeight, clientHeight } = containerRef.value;
+      const distanceFromBottom = scrollHeight - scrollTop - clientHeight;
 
-  containerRef.value.scrollTo({
-    top: containerRef.value.scrollHeight,
-    behavior: smooth ? 'smooth' : 'auto',
-  });
-}
+      isNearBottom.value = distanceFromBottom < 100;
+      showScrollButton.value = distanceFromBottom > 200;
+    }
 
-// Handle message actions
-function handleCopy(message: Message) {
-  if (message.type === 'text') {
-    navigator.clipboard.writeText(message.content.text);
-  }
-  emit('copy', message);
-}
+    // Scroll to bottom
+    function scrollToBottom(smooth = true) {
+      if (!containerRef.value) return;
 
-function handleRetry(message: Message) {
-  emit('retry', message);
-}
+      containerRef.value.scrollTo({
+        top: containerRef.value.scrollHeight,
+        behavior: smooth ? 'smooth' : 'auto',
+      });
+    }
 
-function handleDelete(message: Message) {
-  emit('delete', message);
-}
+    // Handle message actions
+    function handleCopy(message: Message) {
+      if (message.type === 'text') {
+        navigator.clipboard.writeText(message.content.text);
+      }
+      emit('copy', message);
+    }
 
-// Auto scroll when new messages arrive
-watch(() => props.messages.length, async () => {
-  if (isNearBottom.value || props.config.autoScroll !== false) {
-    await nextTick();
-    scrollToBottom();
-  }
-});
+    function handleRetry(message: Message) {
+      emit('retry', message);
+    }
 
-// Auto scroll when typing starts
-watch(() => props.isTyping, async (typing) => {
-  if (typing && isNearBottom.value) {
-    await nextTick();
-    scrollToBottom();
-  }
-});
+    function handleDelete(message: Message) {
+      emit('delete', message);
+    }
 
-// Expose scroll method
-defineExpose({
-  scrollToBottom,
-});
+    // Auto scroll when new messages arrive
+    watch(() => props.messages.length, async () => {
+      if (isNearBottom.value || props.config.autoScroll !== false) {
+        await nextTick();
+        scrollToBottom();
+      }
+    });
 
-onMounted(() => {
-  scrollToBottom(false);
+    // Auto scroll when typing starts
+    watch(() => props.isTyping, async (typing) => {
+      if (typing && isNearBottom.value) {
+        await nextTick();
+        scrollToBottom();
+      }
+    });
+
+    // Expose scroll method
+    expose({
+      scrollToBottom,
+    });
+
+    onMounted(() => {
+      scrollToBottom(false);
+    });
+
+    return {
+      containerRef,
+      showScrollButton,
+      groupedMessages,
+      handleScroll,
+      scrollToBottom,
+      handleCopy,
+      handleRetry,
+      handleDelete,
+    };
+  },
 });
 </script>
 

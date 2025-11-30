@@ -6,7 +6,7 @@
         <h2 class="list-title">Workflow 列表</h2>
         <span class="workflow-count">{{ workflows.length }} 个</span>
       </div>
-      
+
       <div class="header-right">
         <button @click="$emit('create')" class="btn-create">
           <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -16,7 +16,7 @@
         </button>
       </div>
     </div>
-    
+
     <!-- Filters -->
     <div class="list-filters">
       <div class="filter-search">
@@ -30,7 +30,7 @@
           class="search-input"
         />
       </div>
-      
+
       <select v-model="statusFilter" class="filter-select">
         <option value="">全部状态</option>
         <option value="idle">空闲</option>
@@ -40,10 +40,10 @@
         <option value="error">错误</option>
       </select>
     </div>
-    
+
     <!-- Loading -->
     <LoadingSpinner v-if="loading" class="my-8" />
-    
+
     <!-- Empty State -->
     <EmptyState
       v-else-if="filteredWorkflows.length === 0"
@@ -56,7 +56,7 @@
         </button>
       </template>
     </EmptyState>
-    
+
     <!-- Workflow Grid -->
     <div v-else class="workflow-grid">
       <WorkflowCard
@@ -71,50 +71,66 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, type PropType } from 'vue';
 import WorkflowCard from './WorkflowCard.vue';
 import LoadingSpinner from '../Common/LoadingSpinner.vue';
 import EmptyState from '../Common/EmptyState.vue';
 import type { Workflow } from '@/types';
 
-interface Props {
-  workflows: Workflow[];
-  loading?: boolean;
-}
+export default defineComponent({
+  name: 'WorkflowList',
+  components: {
+    WorkflowCard,
+    LoadingSpinner,
+    EmptyState,
+  },
+  props: {
+    workflows: {
+      type: Array as PropType<Workflow[]>,
+      required: true,
+    },
+    loading: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    create: () => true,
+    execute: (workflow: Workflow) => true,
+    edit: (workflow: Workflow) => true,
+    delete: (workflow: Workflow) => true,
+  },
+  setup(props) {
+    const searchQuery = ref('');
+    const statusFilter = ref('');
 
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-});
+    const filteredWorkflows = computed(() => {
+      let result = props.workflows;
 
-defineEmits<{
-  create: [];
-  execute: [workflow: Workflow];
-  edit: [workflow: Workflow];
-  delete: [workflow: Workflow];
-}>();
+      // 搜索过滤
+      if (searchQuery.value) {
+        const query = searchQuery.value.toLowerCase();
+        result = result.filter(workflow =>
+          workflow.name.toLowerCase().includes(query) ||
+          workflow.description?.toLowerCase().includes(query)
+        );
+      }
 
-const searchQuery = ref('');
-const statusFilter = ref('');
+      // 状态过滤
+      if (statusFilter.value) {
+        result = result.filter(workflow => workflow.status === statusFilter.value);
+      }
 
-const filteredWorkflows = computed(() => {
-  let result = props.workflows;
-  
-  // 搜索过滤
-  if (searchQuery.value) {
-    const query = searchQuery.value.toLowerCase();
-    result = result.filter(workflow =>
-      workflow.name.toLowerCase().includes(query) ||
-      workflow.description?.toLowerCase().includes(query)
-    );
-  }
-  
-  // 状态过滤
-  if (statusFilter.value) {
-    result = result.filter(workflow => workflow.status === statusFilter.value);
-  }
-  
-  return result;
+      return result;
+    });
+
+    return {
+      searchQuery,
+      statusFilter,
+      filteredWorkflows,
+    };
+  },
 });
 </script>
 

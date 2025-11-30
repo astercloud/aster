@@ -55,24 +55,39 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { defineComponent, computed } from 'vue';
 
-interface Props {
-  total: number;
-  completed: number;
-  current?: number;
-  showDots?: boolean;
-}
+export default defineComponent({
+  name: 'WorkflowProgress',
+  props: {
+    total: {
+      type: Number,
+      required: true,
+    },
+    completed: {
+      type: Number,
+      required: true,
+    },
+    current: {
+      type: Number,
+      default: -1,
+    },
+    showDots: {
+      type: Boolean,
+      default: true,
+    },
+  },
+  setup(props) {
+    const progressPercentage = computed(() => {
+      if (props.total === 0) return 0;
+      return Math.round((props.completed / props.total) * 100);
+    });
 
-const props = withDefaults(defineProps<Props>(), {
-  current: -1,
-  showDots: true,
-});
-
-const progressPercentage = computed(() => {
-  if (props.total === 0) return 0;
-  return Math.round((props.completed / props.total) * 100);
+    return {
+      progressPercentage,
+    };
+  },
 });
 </script>
 

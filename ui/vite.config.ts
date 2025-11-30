@@ -9,6 +9,11 @@ export default defineConfig({
     dts({
       insertTypesEntry: true,
       copyDtsFiles: true,
+      // 指定 tsconfig 路径
+      tsconfigPath: './tsconfig.json',
+      // 允许类型诊断错误（TS4023/TS4082 是 vue-tsc 的已知问题）
+      // 设置为 false 以确保生成所有声明文件，即使有警告
+      strictOutput: false,
     }),
   ],
   resolve: {

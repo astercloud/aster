@@ -10,12 +10,12 @@
           </svg>
         </div>
       </div>
-      
+
       <div class="agent-info">
         <h3 class="agent-name">{{ agent.name }}</h3>
         <p v-if="agent.description" class="agent-description">{{ agent.description }}</p>
       </div>
-      
+
       <div class="agent-status">
         <span :class="['status-badge', statusClass]">
           <span class="status-dot"></span>
@@ -23,7 +23,7 @@
         </span>
       </div>
     </div>
-    
+
     <!-- Metadata -->
     <div v-if="agent.metadata" class="agent-metadata">
       <div
@@ -35,7 +35,7 @@
         <span class="metadata-value">{{ value }}</span>
       </div>
     </div>
-    
+
     <!-- Actions -->
     <div class="agent-actions">
       <button
@@ -48,7 +48,7 @@
         </svg>
         对话
       </button>
-      
+
       <button
         @click="$emit('edit', agent)"
         class="action-btn btn-secondary"
@@ -58,7 +58,7 @@
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 5H6a2 2 0 00-2 2v11a2 2 0 002 2h11a2 2 0 002-2v-5m-1.414-9.414a2 2 0 112.828 2.828L11.828 15H9v-2.828l8.586-8.586z"></path>
         </svg>
       </button>
-      
+
       <button
         @click="$emit('delete', agent)"
         class="action-btn btn-danger"
@@ -72,52 +72,63 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { computed } from 'vue';
+<script lang="ts">
+import { computed, defineComponent } from 'vue';
 import type { Agent } from '@/types';
+import type { PropType } from 'vue';
 
-interface Props {
-  agent: Agent;
-}
+export default defineComponent({
+  name: 'AgentCard',
+  props: {
+    agent: {
+      type: Object as PropType<Agent>,
+      required: true
+    }
+  },
+  emits: {
+    chat: (agent: Agent) => true,
+    edit: (agent: Agent) => true,
+    delete: (agent: Agent) => true
+  },
+  setup(props) {
+    const statusClass = computed(() => {
+      const classes: Record<string, string> = {
+        idle: 'status-idle',
+        thinking: 'status-thinking',
+        busy: 'status-busy',
+        error: 'status-error',
+      };
+      return classes[props.agent.status] || 'status-idle';
+    });
 
-const props = defineProps<Props>();
+    const statusText = computed(() => {
+      const texts: Record<string, string> = {
+        idle: '空闲',
+        thinking: '思考中',
+        busy: '忙碌',
+        error: '错误',
+      };
+      return texts[props.agent.status] || '未知';
+    });
 
-defineEmits<{
-  chat: [agent: Agent];
-  edit: [agent: Agent];
-  delete: [agent: Agent];
-}>();
+    const displayMetadata = computed(() => {
+      if (!props.agent.metadata) return {};
 
-const statusClass = computed(() => {
-  const classes: Record<string, string> = {
-    idle: 'status-idle',
-    thinking: 'status-thinking',
-    busy: 'status-busy',
-    error: 'status-error',
-  };
-  return classes[props.agent.status] || 'status-idle';
-});
+      // 只显示部分元数据
+      const { model, provider, version } = props.agent.metadata;
+      return {
+        ...(model && { 模型: model }),
+        ...(provider && { 提供商: provider }),
+        ...(version && { 版本: version }),
+      };
+    });
 
-const statusText = computed(() => {
-  const texts: Record<string, string> = {
-    idle: '空闲',
-    thinking: '思考中',
-    busy: '忙碌',
-    error: '错误',
-  };
-  return texts[props.agent.status] || '未知';
-});
-
-const displayMetadata = computed(() => {
-  if (!props.agent.metadata) return {};
-  
-  // 只显示部分元数据
-  const { model, provider, version } = props.agent.metadata;
-  return {
-    ...(model && { 模型: model }),
-    ...(provider && { 提供商: provider }),
-    ...(version && { 版本: version }),
-  };
+    return {
+      statusClass,
+      statusText,
+      displayMetadata
+    };
+  }
 });
 </script>
 

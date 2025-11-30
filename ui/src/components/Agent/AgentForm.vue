@@ -46,7 +46,7 @@
       <!-- Model Config -->
       <div class="form-section">
         <h3 class="section-title">模型配置</h3>
-        
+
         <div class="form-row">
           <div class="form-group">
             <label for="provider" class="form-label">提供商</label>
@@ -120,58 +120,70 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, watch } from 'vue';
+<script lang="ts">
+import { ref, watch, defineComponent } from 'vue';
 import type { Agent } from '@/types';
+import type { PropType } from 'vue';
 
-interface Props {
-  agent?: Agent;
-  loading?: boolean;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  loading: false,
-});
-
-const emit = defineEmits<{
-  submit: [data: any];
-  cancel: [];
-}>();
-
-const formData = ref({
-  name: '',
-  description: '',
-  template_id: '',
-  model_config: {
-    provider: 'anthropic',
-    model: 'claude-3-5-sonnet-20241022',
-    temperature: 1.0,
-    max_tokens: 4096,
+export default defineComponent({
+  name: 'AgentForm',
+  props: {
+    agent: {
+      type: Object as PropType<Agent>,
+      required: false,
+      default: undefined
+    },
+    loading: {
+      type: Boolean,
+      default: false
+    }
   },
-  metadata: {},
-});
-
-// Load agent data if editing
-watch(() => props.agent, (agent) => {
-  if (agent) {
-    formData.value = {
-      name: agent.name,
-      description: agent.description || '',
-      template_id: agent.metadata?.template_id || '',
+  emits: {
+    submit: (data: any) => true,
+    cancel: () => true
+  },
+  setup(props, { emit }) {
+    const formData = ref({
+      name: '',
+      description: '',
+      template_id: '',
       model_config: {
-        provider: agent.metadata?.provider || 'anthropic',
-        model: agent.metadata?.model || 'claude-3-5-sonnet-20241022',
-        temperature: agent.metadata?.temperature || 1.0,
-        max_tokens: agent.metadata?.max_tokens || 4096,
+        provider: 'anthropic',
+        model: 'claude-3-5-sonnet-20241022',
+        temperature: 1.0,
+        max_tokens: 4096,
       },
-      metadata: agent.metadata || {},
+      metadata: {},
+    });
+
+    // Load agent data if editing
+    watch(() => props.agent, (agent) => {
+      if (agent) {
+        formData.value = {
+          name: agent.name,
+          description: agent.description || '',
+          template_id: agent.metadata?.template_id || '',
+          model_config: {
+            provider: agent.metadata?.provider || 'anthropic',
+            model: agent.metadata?.model || 'claude-3-5-sonnet-20241022',
+            temperature: agent.metadata?.temperature || 1.0,
+            max_tokens: agent.metadata?.max_tokens || 4096,
+          },
+          metadata: agent.metadata || {},
+        };
+      }
+    }, { immediate: true });
+
+    const handleSubmit = () => {
+      emit('submit', formData.value);
+    };
+
+    return {
+      formData,
+      handleSubmit
     };
   }
-}, { immediate: true });
-
-const handleSubmit = () => {
-  emit('submit', formData.value);
-};
+});
 </script>
 
 <style scoped>

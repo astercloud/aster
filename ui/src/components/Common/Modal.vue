@@ -18,14 +18,26 @@
   </Teleport>
 </template>
 
-<script setup lang="ts">
-const emit = defineEmits<{
-  close: [];
-}>();
+<script lang="ts">
+import { defineComponent } from 'vue';
 
-const handleOverlayClick = () => {
-  emit('close');
-};
+export default defineComponent({
+  name: 'Modal',
+
+  emits: {
+    close: () => true,
+  },
+
+  setup(props, { emit }) {
+    const handleOverlayClick = () => {
+      emit('close');
+    };
+
+    return {
+      handleOverlayClick,
+    };
+  },
+});
 </script>
 
 <style scoped>

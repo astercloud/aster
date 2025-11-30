@@ -77,55 +77,67 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref } from 'vue';
+<script lang="ts">
+import { defineComponent, ref } from 'vue';
 import type { ApprovalRequest } from '@/types/approval';
+import type { PropType } from 'vue';
 
-interface Props {
-  request: ApprovalRequest;
-}
+export default defineComponent({
+  name: 'ApprovalCard',
+  props: {
+    request: {
+      type: Object as PropType<ApprovalRequest>,
+      required: true,
+    },
+  },
+  emits: {
+    approve: () => true,
+    reject: () => true,
+  },
+  setup(props, { emit }) {
+    const isProcessing = ref(false);
 
-defineProps<Props>();
+    const formatArgs = (args: Record<string, any>): string => {
+      try {
+        return JSON.stringify(args, null, 2);
+      } catch (e) {
+        return String(args);
+      }
+    };
 
-const emit = defineEmits<{
-  approve: [];
-  reject: [];
-}>();
+    const handleApprove = async () => {
+      if (isProcessing.value) return;
+      isProcessing.value = true;
+      try {
+        emit('approve');
+      } finally {
+        // 延迟重置，避免按钮闪烁
+        setTimeout(() => {
+          isProcessing.value = false;
+        }, 500);
+      }
+    };
 
-const isProcessing = ref(false);
+    const handleReject = async () => {
+      if (isProcessing.value) return;
+      isProcessing.value = true;
+      try {
+        emit('reject');
+      } finally {
+        setTimeout(() => {
+          isProcessing.value = false;
+        }, 500);
+      }
+    };
 
-const formatArgs = (args: Record<string, any>): string => {
-  try {
-    return JSON.stringify(args, null, 2);
-  } catch (e) {
-    return String(args);
-  }
-};
-
-const handleApprove = async () => {
-  if (isProcessing.value) return;
-  isProcessing.value = true;
-  try {
-    emit('approve');
-  } finally {
-    // 延迟重置，避免按钮闪烁
-    setTimeout(() => {
-      isProcessing.value = false;
-    }, 500);
-  }
-};
-
-const handleReject = async () => {
-  if (isProcessing.value) return;
-  isProcessing.value = true;
-  try {
-    emit('reject');
-  } finally {
-    setTimeout(() => {
-      isProcessing.value = false;
-    }, 500);
-  }
-};
+    return {
+      isProcessing,
+      formatArgs,
+      handleApprove,
+      handleReject,
+    };
+  },
+});
 </script>
 
 <style scoped>

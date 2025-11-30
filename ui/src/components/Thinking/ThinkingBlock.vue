@@ -111,67 +111,94 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, watch } from 'vue';
 import { useApprovalStore } from '@/stores/approval';
 import ThinkingTimeline from './ThinkingTimeline.vue';
 import ApprovalCard from './ApprovalCard.vue';
 import type { ThinkingStep } from '@/types/thinking';
+import type { PropType } from 'vue';
 
-interface Props {
-  messageId: string;
-  steps: ThinkingStep[];
-  isActive?: boolean;
-  summary?: string;
-}
-
-const props = withDefaults(defineProps<Props>(), {
-  isActive: false,
-});
-
-const approvalStore = useApprovalStore();
-const isExpanded = ref(false);
-
-// 检查是否有待审批请求（关联此消息）
-const pendingApproval = computed(() => {
-  return approvalStore.getApprovalByMessage(props.messageId);
-});
-
-const hasPendingApproval = computed(() => !!pendingApproval.value);
-
-// 自动展开逻辑：运行中或有审批请求时自动展开，完成后自动折叠
-watch(
-  [() => props.isActive, hasPendingApproval],
-  ([active, pending], [wasActive]) => {
-    if (active || pending) {
-      isExpanded.value = true;
-    } else if (wasActive && !active && !pending) {
-      // 思考刚完成，自动折叠
-      isExpanded.value = false;
-    }
+export default defineComponent({
+  name: 'ThinkingBlock',
+  components: {
+    ThinkingTimeline,
+    ApprovalCard,
   },
-  { immediate: true }
-);
+  props: {
+    messageId: {
+      type: String,
+      required: true,
+    },
+    steps: {
+      type: Array as PropType<ThinkingStep[]>,
+      required: true,
+    },
+    isActive: {
+      type: Boolean,
+      default: false,
+    },
+    summary: {
+      type: String,
+      default: undefined,
+    },
+  },
+  setup(props) {
+    const approvalStore = useApprovalStore();
+    const isExpanded = ref(false);
 
-const expand = () => {
-  isExpanded.value = true;
-};
+    // 检查是否有待审批请求（关联此消息）
+    const pendingApproval = computed(() => {
+      return approvalStore.getApprovalByMessage(props.messageId);
+    });
 
-const collapse = () => {
-  isExpanded.value = false;
-};
+    const hasPendingApproval = computed(() => !!pendingApproval.value);
 
-const handleApprove = () => {
-  if (pendingApproval.value) {
-    approvalStore.approve(pendingApproval.value.id);
-  }
-};
+    // 自动展开逻辑：运行中或有审批请求时自动展开，完成后自动折叠
+    watch(
+      [() => props.isActive, hasPendingApproval],
+      ([active, pending], [wasActive]) => {
+        if (active || pending) {
+          isExpanded.value = true;
+        } else if (wasActive && !active && !pending) {
+          // 思考刚完成，自动折叠
+          isExpanded.value = false;
+        }
+      },
+      { immediate: true }
+    );
 
-const handleReject = () => {
-  if (pendingApproval.value) {
-    approvalStore.reject(pendingApproval.value.id);
-  }
-};
+    const expand = () => {
+      isExpanded.value = true;
+    };
+
+    const collapse = () => {
+      isExpanded.value = false;
+    };
+
+    const handleApprove = () => {
+      if (pendingApproval.value) {
+        approvalStore.approve(pendingApproval.value.id);
+      }
+    };
+
+    const handleReject = () => {
+      if (pendingApproval.value) {
+        approvalStore.reject(pendingApproval.value.id);
+      }
+    };
+
+    return {
+      isExpanded,
+      pendingApproval,
+      hasPendingApproval,
+      expand,
+      collapse,
+      handleApprove,
+      handleReject,
+    };
+  },
+});
 </script>
 
 <style scoped>

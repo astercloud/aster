@@ -69,127 +69,160 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, watch, nextTick } from 'vue';
 
-interface Props {
-  modelValue: string;
-  placeholder?: string;
-  disabled?: boolean;
-  enableVoice?: boolean;
-  enableImage?: boolean;
-  maxLength?: number;
-  showCharCount?: boolean;
-}
+export default defineComponent({
+  name: 'Composer',
 
-const props = withDefaults(defineProps<Props>(), {
-  placeholder: '输入消息...',
-  disabled: false,
-  enableVoice: false,
-  enableImage: false,
-  showCharCount: false,
-});
+  props: {
+    modelValue: {
+      type: String,
+      required: true,
+    },
+    placeholder: {
+      type: String,
+      default: '输入消息...',
+    },
+    disabled: {
+      type: Boolean,
+      default: false,
+    },
+    enableVoice: {
+      type: Boolean,
+      default: false,
+    },
+    enableImage: {
+      type: Boolean,
+      default: false,
+    },
+    maxLength: {
+      type: Number,
+      default: undefined,
+    },
+    showCharCount: {
+      type: Boolean,
+      default: false,
+    },
+  },
 
-const emit = defineEmits<{
-  'update:modelValue': [value: string];
-  send: [];
-  voice: [blob: Blob];
-  image: [file: File];
-}>();
+  emits: {
+    'update:modelValue': (value: string) => true,
+    send: () => true,
+    voice: (blob: Blob) => true,
+    image: (file: File) => true,
+  },
 
-const textareaRef = ref<HTMLTextAreaElement>();
-const fileInputRef = ref<HTMLInputElement>();
-const localValue = ref(props.modelValue);
-const isRecording = ref(false);
+  setup(props, { emit, expose }) {
+    const textareaRef = ref<HTMLTextAreaElement>();
+    const fileInputRef = ref<HTMLInputElement>();
+    const localValue = ref(props.modelValue);
+    const isRecording = ref(false);
 
-// Can send if has content and not disabled
-const canSend = computed(() => {
-  return localValue.value.trim().length > 0 && !props.disabled;
-});
+    // Can send if has content and not disabled
+    const canSend = computed(() => {
+      return localValue.value.trim().length > 0 && !props.disabled;
+    });
 
-// Handle input
-function handleInput() {
-  emit('update:modelValue', localValue.value);
-  adjustTextareaHeight();
-}
-
-// Handle key down
-function handleKeyDown(e: KeyboardEvent) {
-  // Enter to send (Shift+Enter for new line)
-  if (e.key === 'Enter' && !e.shiftKey) {
-    e.preventDefault();
-    if (canSend.value) {
-      handleSend();
+    // Handle input
+    function handleInput() {
+      emit('update:modelValue', localValue.value);
+      adjustTextareaHeight();
     }
-  }
-}
 
-// Handle send
-function handleSend() {
-  if (!canSend.value) return;
-  emit('send');
-}
+    // Handle key down
+    function handleKeyDown(e: KeyboardEvent) {
+      // Enter to send (Shift+Enter for new line)
+      if (e.key === 'Enter' && !e.shiftKey) {
+        e.preventDefault();
+        if (canSend.value) {
+          handleSend();
+        }
+      }
+    }
 
-// Adjust textarea height
-function adjustTextareaHeight() {
-  if (!textareaRef.value) return;
+    // Handle send
+    function handleSend() {
+      if (!canSend.value) return;
+      emit('send');
+    }
 
-  textareaRef.value.style.height = 'auto';
-  const newHeight = Math.min(textareaRef.value.scrollHeight, 120); // Max 120px
-  textareaRef.value.style.height = `${newHeight}px`;
-}
+    // Adjust textarea height
+    function adjustTextareaHeight() {
+      if (!textareaRef.value) return;
 
-// Handle image upload
-function handleImageClick() {
-  fileInputRef.value?.click();
-}
+      textareaRef.value.style.height = 'auto';
+      const newHeight = Math.min(textareaRef.value.scrollHeight, 120); // Max 120px
+      textareaRef.value.style.height = `${newHeight}px`;
+    }
 
-function handleFileChange(e: Event) {
-  const target = e.target as HTMLInputElement;
-  const file = target.files?.[0];
-  if (file) {
-    emit('image', file);
-    // Reset input
-    target.value = '';
-  }
-}
+    // Handle image upload
+    function handleImageClick() {
+      fileInputRef.value?.click();
+    }
 
-// Handle voice input
-function toggleVoice() {
-  if (isRecording.value) {
-    stopRecording();
-  } else {
-    startRecording();
-  }
-}
+    function handleFileChange(e: Event) {
+      const target = e.target as HTMLInputElement;
+      const file = target.files?.[0];
+      if (file) {
+        emit('image', file);
+        // Reset input
+        target.value = '';
+      }
+    }
 
-function startRecording() {
-  // TODO: Implement voice recording
-  isRecording.value = true;
-  console.log('Start recording...');
-}
+    // Handle voice input
+    function toggleVoice() {
+      if (isRecording.value) {
+        stopRecording();
+      } else {
+        startRecording();
+      }
+    }
 
-function stopRecording() {
-  // TODO: Implement voice recording
-  isRecording.value = false;
-  console.log('Stop recording...');
-}
+    function startRecording() {
+      // TODO: Implement voice recording
+      isRecording.value = true;
+      console.log('Start recording...');
+    }
 
-// Watch modelValue changes from parent
-watch(() => props.modelValue, (newValue) => {
-  localValue.value = newValue;
-  nextTick(() => {
-    adjustTextareaHeight();
-  });
-});
+    function stopRecording() {
+      // TODO: Implement voice recording
+      isRecording.value = false;
+      console.log('Stop recording...');
+    }
 
-// Focus input
-function focus() {
-  textareaRef.value?.focus();
-}
+    // Watch modelValue changes from parent
+    watch(() => props.modelValue, (newValue) => {
+      localValue.value = newValue;
+      nextTick(() => {
+        adjustTextareaHeight();
+      });
+    });
 
-defineExpose({
-  focus,
+    // Focus input
+    function focus() {
+      textareaRef.value?.focus();
+    }
+
+    expose({
+      focus,
+    });
+
+    return {
+      textareaRef,
+      fileInputRef,
+      localValue,
+      isRecording,
+      canSend,
+      handleInput,
+      handleKeyDown,
+      handleSend,
+      handleImageClick,
+      handleFileChange,
+      toggleVoice,
+    };
+  },
 });
 </script>
 

@@ -43,66 +43,91 @@
   <slot v-else></slot>
 </template>
 
-<script setup lang="ts">
-import { ref, onErrorCaptured, provide } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, onErrorCaptured, provide } from 'vue';
 
-interface Props {
-  errorTitle?: string;
-  errorMessage?: string;
-  showDetails?: boolean;
-  onRetry?: () => void;
-  onReset?: () => void;
-  onError?: (error: Error) => void;
-}
+export default defineComponent({
+  name: 'ErrorBoundary',
 
-const props = withDefaults(defineProps<Props>(), {
-  errorTitle: '出错了',
-  errorMessage: '渲染组件时发生错误',
-  showDetails: import.meta.env.DEV,
+  props: {
+    errorTitle: {
+      type: String,
+      default: '出错了',
+    },
+    errorMessage: {
+      type: String,
+      default: '渲染组件时发生错误',
+    },
+    showDetails: {
+      type: Boolean,
+      default: import.meta.env.DEV,
+    },
+    onRetry: {
+      type: Function as unknown as () => (() => void) | undefined,
+      default: undefined,
+    },
+    onReset: {
+      type: Function as unknown as () => (() => void) | undefined,
+      default: undefined,
+    },
+    onError: {
+      type: Function as unknown as () => ((error: Error) => void) | undefined,
+      default: undefined,
+    },
+  },
+
+  setup(props) {
+    const hasError = ref(false);
+    const error = ref<Error | null>(null);
+
+    // 捕获子组件错误
+    onErrorCaptured((err: Error) => {
+      console.error('ErrorBoundary caught error:', err);
+
+      hasError.value = true;
+      error.value = err;
+
+      // 调用外部错误处理函数
+      if (props.onError) {
+        props.onError(err);
+      }
+
+      // 阻止错误继续向上传播
+      return false;
+    });
+
+    // 提供重置错误状态的方法给子组件
+    provide('resetError', () => {
+      hasError.value = false;
+      error.value = null;
+    });
+
+    const handleRetry = () => {
+      hasError.value = false;
+      error.value = null;
+
+      if (props.onRetry) {
+        props.onRetry();
+      }
+    };
+
+    const handleReset = () => {
+      if (props.onReset) {
+        props.onReset();
+      }
+
+      hasError.value = false;
+      error.value = null;
+    };
+
+    return {
+      hasError,
+      error,
+      handleRetry,
+      handleReset,
+    };
+  },
 });
-
-const hasError = ref(false);
-const error = ref<Error | null>(null);
-
-// 捕获子组件错误
-onErrorCaptured((err: Error) => {
-  console.error('ErrorBoundary caught error:', err);
-
-  hasError.value = true;
-  error.value = err;
-
-  // 调用外部错误处理函数
-  if (props.onError) {
-    props.onError(err);
-  }
-
-  // 阻止错误继续向上传播
-  return false;
-});
-
-// 提供重置错误状态的方法给子组件
-provide('resetError', () => {
-  hasError.value = false;
-  error.value = null;
-});
-
-const handleRetry = () => {
-  hasError.value = false;
-  error.value = null;
-
-  if (props.onRetry) {
-    props.onRetry();
-  }
-};
-
-const handleReset = () => {
-  if (props.onReset) {
-    props.onReset();
-  }
-
-  hasError.value = false;
-  error.value = null;
-};
 </script>
 
 <style scoped>

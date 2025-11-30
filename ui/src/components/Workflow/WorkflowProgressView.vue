@@ -51,73 +51,106 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, type PropType } from 'vue';
 import WorkflowStep from './WorkflowStep.vue';
 import WorkflowProgress from './WorkflowProgress.vue';
 import type { WorkflowStep as WorkflowStepType, WorkflowAction } from '@/types/workflow';
 
-interface Props {
-  steps: WorkflowStepType[];
-  title?: string;
-  showProgress?: boolean;
-  showSteps?: boolean;
-  showDots?: boolean;
-  showMetadata?: boolean;
-  allowNavigation?: boolean;
-  maxVisibleSteps?: number;
-}
+export default defineComponent({
+  name: 'WorkflowProgressView',
+  components: {
+    WorkflowStep,
+    WorkflowProgress,
+  },
+  props: {
+    steps: {
+      type: Array as PropType<WorkflowStepType[]>,
+      required: true,
+    },
+    title: {
+      type: String,
+      default: undefined,
+    },
+    showProgress: {
+      type: Boolean,
+      default: true,
+    },
+    showSteps: {
+      type: Boolean,
+      default: true,
+    },
+    showDots: {
+      type: Boolean,
+      default: false,
+    },
+    showMetadata: {
+      type: Boolean,
+      default: false,
+    },
+    allowNavigation: {
+      type: Boolean,
+      default: false,
+    },
+    maxVisibleSteps: {
+      type: Number,
+      default: 5,
+    },
+  },
+  emits: {
+    stepClick: (step: WorkflowStepType) => true,
+    stepAction: (action: WorkflowAction, step: WorkflowStepType) => true,
+  },
+  setup(props, { emit }) {
+    const isExpanded = ref(false);
 
-const props = withDefaults(defineProps<Props>(), {
-  showProgress: true,
-  showSteps: true,
-  showDots: false,
-  showMetadata: false,
-  allowNavigation: false,
-  maxVisibleSteps: 5,
+    // 已完成步骤数
+    const completedCount = computed(() => {
+      return props.steps.filter(s => s.status === 'completed').length;
+    });
+
+    // 当前激活步骤索引
+    const currentIndex = computed(() => {
+      return props.steps.findIndex(s => s.status === 'active');
+    });
+
+    // 是否有更多步骤
+    const hasMoreSteps = computed(() => {
+      return props.steps.length > props.maxVisibleSteps;
+    });
+
+    // 可见步骤
+    const visibleSteps = computed(() => {
+      if (isExpanded.value || !hasMoreSteps.value) {
+        return props.steps;
+      }
+      return props.steps.slice(0, props.maxVisibleSteps);
+    });
+
+    const toggleExpanded = () => {
+      isExpanded.value = !isExpanded.value;
+    };
+
+    const handleStepClick = (step: WorkflowStepType) => {
+      emit('stepClick', step);
+    };
+
+    const handleStepAction = (action: WorkflowAction, step: WorkflowStepType) => {
+      emit('stepAction', action, step);
+    };
+
+    return {
+      isExpanded,
+      completedCount,
+      currentIndex,
+      hasMoreSteps,
+      visibleSteps,
+      toggleExpanded,
+      handleStepClick,
+      handleStepAction,
+    };
+  },
 });
-
-const emit = defineEmits<{
-  stepClick: [step: WorkflowStepType];
-  stepAction: [action: WorkflowAction, step: WorkflowStepType];
-}>();
-
-const isExpanded = ref(false);
-
-// 已完成步骤数
-const completedCount = computed(() => {
-  return props.steps.filter(s => s.status === 'completed').length;
-});
-
-// 当前激活步骤索引
-const currentIndex = computed(() => {
-  return props.steps.findIndex(s => s.status === 'active');
-});
-
-// 是否有更多步骤
-const hasMoreSteps = computed(() => {
-  return props.steps.length > props.maxVisibleSteps;
-});
-
-// 可见步骤
-const visibleSteps = computed(() => {
-  if (isExpanded.value || !hasMoreSteps.value) {
-    return props.steps;
-  }
-  return props.steps.slice(0, props.maxVisibleSteps);
-});
-
-const toggleExpanded = () => {
-  isExpanded.value = !isExpanded.value;
-};
-
-const handleStepClick = (step: WorkflowStepType) => {
-  emit('stepClick', step);
-};
-
-const handleStepAction = (action: WorkflowAction, step: WorkflowStepType) => {
-  emit('stepAction', action, step);
-};
 </script>
 
 <style scoped>

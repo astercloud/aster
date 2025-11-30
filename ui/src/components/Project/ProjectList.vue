@@ -75,43 +75,57 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, type PropType } from 'vue';
 import type { Project } from '@/types';
 import ProjectCard from './ProjectCard.vue';
 
-interface Props {
-  projects: Project[];
-}
+export default defineComponent({
+  name: 'ProjectList',
+  components: {
+    ProjectCard,
+  },
+  props: {
+    projects: {
+      type: Array as PropType<Project[]>,
+      required: true,
+    },
+  },
+  emits: {
+    create: () => true,
+    open: (project: Project) => true,
+    edit: (project: Project) => true,
+    delete: (project: Project) => true,
+  },
+  setup(props) {
+    const selectedWorkspace = ref<string>('all');
+    const selectedStatus = ref<string>('all');
 
-const props = defineProps<Props>();
+    // 筛选项目
+    const filteredProjects = computed(() => {
+      return props.projects.filter((project) => {
+        const workspaceMatch =
+          selectedWorkspace.value === 'all' || project.workspace === selectedWorkspace.value;
+        const statusMatch =
+          selectedStatus.value === 'all' || project.status === selectedStatus.value;
+        return workspaceMatch && statusMatch;
+      });
+    });
 
-const emit = defineEmits<{
-  create: [];
-  open: [project: Project];
-  edit: [project: Project];
-  delete: [project: Project];
-}>();
+    // 空状态消息
+    const emptyMessage = computed(() => {
+      if (selectedWorkspace.value !== 'all' || selectedStatus.value !== 'all') {
+        return '没有符合筛选条件的项目';
+      }
+      return '开始创建你的第一个 AI 写作项目';
+    });
 
-const selectedWorkspace = ref<string>('all');
-const selectedStatus = ref<string>('all');
-
-// 筛选项目
-const filteredProjects = computed(() => {
-  return props.projects.filter((project) => {
-    const workspaceMatch =
-      selectedWorkspace.value === 'all' || project.workspace === selectedWorkspace.value;
-    const statusMatch =
-      selectedStatus.value === 'all' || project.status === selectedStatus.value;
-    return workspaceMatch && statusMatch;
-  });
-});
-
-// 空状态消息
-const emptyMessage = computed(() => {
-  if (selectedWorkspace.value !== 'all' || selectedStatus.value !== 'all') {
-    return '没有符合筛选条件的项目';
-  }
-  return '开始创建你的第一个 AI 写作项目';
+    return {
+      selectedWorkspace,
+      selectedStatus,
+      filteredProjects,
+      emptyMessage,
+    };
+  },
 });
 </script>

@@ -9,7 +9,7 @@
         {{ message.content.subtitle }}
       </p>
     </div>
-    
+
     <!-- Card Image -->
     <div v-if="message.content.image" class="card-image">
       <img
@@ -18,12 +18,12 @@
         loading="lazy"
       />
     </div>
-    
+
     <!-- Card Body -->
     <div v-if="message.content.description" class="card-body">
       <p class="card-description">{{ message.content.description }}</p>
     </div>
-    
+
     <!-- Card Fields -->
     <div v-if="message.content.fields && message.content.fields.length > 0" class="card-fields">
       <div
@@ -35,7 +35,7 @@
         <span class="field-value">{{ field.value }}</span>
       </div>
     </div>
-    
+
     <!-- Card Actions -->
     <div v-if="message.content.actions && message.content.actions.length > 0" class="card-actions">
       <button
@@ -53,7 +53,7 @@
         {{ action.label }}
       </button>
     </div>
-    
+
     <!-- Card Footer -->
     <div v-if="message.content.footer" class="card-footer">
       <span class="footer-text">{{ message.content.footer }}</span>
@@ -61,31 +61,44 @@
   </div>
 </template>
 
-<script setup lang="ts">
+<script lang="ts">
+import { defineComponent } from 'vue';
 import type { CardMessage as CardMessageType } from '@/types';
 
-interface Props {
-  message: CardMessageType;
-}
+export default defineComponent({
+  name: 'CardMessage',
 
-defineProps<Props>();
+  props: {
+    message: {
+      type: Object as () => CardMessageType,
+      required: true,
+    },
+  },
 
-const emit = defineEmits<{
-  action: [action: any];
-}>();
+  emits: {
+    action: (action: unknown) => true,
+  },
 
-function handleAction(action: any) {
-  emit('action', action);
-}
+  setup(props, { emit }) {
+    function handleAction(action: unknown) {
+      emit('action', action);
+    }
 
-function getIconPath(icon: string): string {
-  const icons: Record<string, string> = {
-    link: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
-    download: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
-    share: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
-  };
-  return icons[icon] || '';
-}
+    function getIconPath(icon: string): string {
+      const icons: Record<string, string> = {
+        link: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
+        download: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
+        share: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
+      };
+      return icons[icon] || '';
+    }
+
+    return {
+      handleAction,
+      getIconPath,
+    };
+  },
+});
 </script>
 
 <style scoped>

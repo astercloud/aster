@@ -93,116 +93,144 @@
   </div>
 </template>
 
-<script setup lang="ts">
-import { ref, computed, watch } from 'vue';
+<script lang="ts">
+import { defineComponent, ref, computed, watch } from 'vue';
 import type { Question } from '@/types/message';
+import type { PropType } from 'vue';
 
-interface Props {
-  requestId: string;
-  questions: Question[];
-  answered?: boolean;
-}
+export default defineComponent({
+  name: 'AskUserQuestionCard',
+  props: {
+    requestId: {
+      type: String,
+      required: true,
+    },
+    questions: {
+      type: Array as PropType<Question[]>,
+      required: true,
+    },
+    answered: {
+      type: Boolean,
+      default: false,
+    },
+  },
+  emits: {
+    submit: (payload: { requestId: string; answers: Record<string, any> }) => {
+      return typeof payload.requestId === 'string' && typeof payload.answers === 'object';
+    },
+  },
+  setup(props, { emit }) {
+    // 单选答案
+    const answers = ref<Record<number, string>>({});
 
-const props = withDefaults(defineProps<Props>(), {
-  answered: false,
-});
+    // 多选答案
+    const multiAnswers = ref<Record<number, string[]>>({});
 
-const emit = defineEmits<{
-  submit: [{ requestId: string; answers: Record<string, any> }];
-}>();
+    // Other 选项开关
+    const otherEnabled = ref<Record<number, boolean>>({});
 
-// 单选答案
-const answers = ref<Record<number, string>>({});
+    // Other 选项答案
+    const otherAnswers = ref<Record<number, string>>({});
 
-// 多选答案
-const multiAnswers = ref<Record<number, string[]>>({});
-
-// Other 选项开关
-const otherEnabled = ref<Record<number, boolean>>({});
-
-// Other 选项答案
-const otherAnswers = ref<Record<number, string>>({});
-
-// 初始化多选答案数组
-props.questions.forEach((q, index) => {
-  if (q.multi_select && !multiAnswers.value[index]) {
-    multiAnswers.value[index] = [];
-  }
-  otherEnabled.value[index] = false;
-  otherAnswers.value[index] = '';
-});
-
-// 验证所有问题是否都有答案
-const isValid = computed(() => {
-  return props.questions.every((q, index) => {
-    // 如果启用了 Other 并且有内容，则有效
-    if (otherEnabled.value[index] && otherAnswers.value[index]?.trim()) {
-      return true;
-    }
-
-    // 多选模式：至少选择一个
-    if (q.multi_select) {
-      return (multiAnswers.value[index]?.length ?? 0) > 0;
-    }
-
-    // 单选模式：必须选择一个
-    return !!answers.value[index];
-  });
-});
-
-// 当启用 Other 时，清空其他选项
-watch(otherEnabled, (newVal) => {
-  Object.keys(newVal).forEach((indexStr) => {
-    const index = parseInt(indexStr);
-    if (newVal[index] && props.questions[index]) {
-      // 清空单选或多选
-      if (props.questions[index]!.multi_select) {
+    // 初始化多选答案数组
+    props.questions.forEach((q, index) => {
+      if (q.multi_select && !multiAnswers.value[index]) {
         multiAnswers.value[index] = [];
-      } else {
-        delete answers.value[index];
       }
-    }
-  });
-}, { deep: true });
+      otherEnabled.value[index] = false;
+      otherAnswers.value[index] = '';
+    });
 
-// 当选择其他选项时，禁用 Other
-watch([answers, multiAnswers], () => {
-  props.questions.forEach((q, index) => {
-    if (q.multi_select) {
-      if ((multiAnswers.value[index]?.length ?? 0) > 0) {
-        otherEnabled.value[index] = false;
-        otherAnswers.value[index] = '';
-      }
-    } else {
-      if (answers.value[index]) {
-        otherEnabled.value[index] = false;
-        otherAnswers.value[index] = '';
-      }
-    }
-  });
-}, { deep: true });
+    // 验证所有问题是否都有答案
+    const isValid = computed(() => {
+      return props.questions.every((q, index) => {
+        // 如果启用了 Other 并且有内容，则有效
+        if (otherEnabled.value[index] && otherAnswers.value[index]?.trim()) {
+          return true;
+        }
 
-const handleSubmit = () => {
-  if (!isValid.value || props.answered) return;
+        // 多选模式：至少选择一个
+        if (q.multi_select) {
+          return (multiAnswers.value[index]?.length ?? 0) > 0;
+        }
 
-  const finalAnswers: Record<string, any> = {};
+        // 单选模式：必须选择一个
+        return !!answers.value[index];
+      });
+    });
 
-  props.questions.forEach((q, index) => {
-    // 优先使用 Other 答案
-    if (otherEnabled.value[index] && otherAnswers.value[index]?.trim()) {
-      finalAnswers[index] = otherAnswers.value[index];
-    } else if (q.multi_select) {
-      finalAnswers[index] = multiAnswers.value[index] || [];
-    } else {
-      finalAnswers[index] = answers.value[index];
-    }
-  });
+    // 当启用 Other 时，清空其他选项
+    watch(
+      otherEnabled,
+      (newVal) => {
+        Object.keys(newVal).forEach((indexStr) => {
+          const index = parseInt(indexStr);
+          if (newVal[index] && props.questions[index]) {
+            // 清空单选或多选
+            if (props.questions[index]!.multi_select) {
+              multiAnswers.value[index] = [];
+            } else {
+              delete answers.value[index];
+            }
+          }
+        });
+      },
+      { deep: true }
+    );
 
-  emit('submit', {
-    requestId: props.requestId,
-    answers: finalAnswers,
-  });
-};
+    // 当选择其他选项时，禁用 Other
+    watch(
+      [answers, multiAnswers],
+      () => {
+        props.questions.forEach((q, index) => {
+          if (q.multi_select) {
+            if ((multiAnswers.value[index]?.length ?? 0) > 0) {
+              otherEnabled.value[index] = false;
+              otherAnswers.value[index] = '';
+            }
+          } else {
+            if (answers.value[index]) {
+              otherEnabled.value[index] = false;
+              otherAnswers.value[index] = '';
+            }
+          }
+        });
+      },
+      { deep: true }
+    );
+
+    const handleSubmit = () => {
+      if (!isValid.value || props.answered) return;
+
+      const finalAnswers: Record<string, any> = {};
+
+      props.questions.forEach((q, index) => {
+        // 优先使用 Other 答案
+        if (otherEnabled.value[index] && otherAnswers.value[index]?.trim()) {
+          finalAnswers[index] = otherAnswers.value[index];
+        } else if (q.multi_select) {
+          finalAnswers[index] = multiAnswers.value[index] || [];
+        } else {
+          finalAnswers[index] = answers.value[index];
+        }
+      });
+
+      emit('submit', {
+        requestId: props.requestId,
+        answers: finalAnswers,
+      });
+    };
+
+    return {
+      answers,
+      multiAnswers,
+      otherEnabled,
+      otherAnswers,
+      isValid,
+      handleSubmit,
+    };
+  },
+});
 </script>
 
 <style scoped>
