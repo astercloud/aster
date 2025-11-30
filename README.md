@@ -30,16 +30,16 @@ Aster 是一个**生产级 AI Agent 框架**，用 Go 语言构建，专为企�
 
 ## ✨ 核心特性
 
-| 特性 | 描述 |
-|------|------|
-| 🔄 **事件驱动架构** | Progress/Control/Monitor 三通道设计 |
-| 🧠 **三层记忆系统** | Text/Working/Semantic Memory + 溯源 + 合并 |
-| 🔀 **Workflow 编排** | 8种步骤类型 + 动态路由 + 并行/顺序/循环 |
-| 🛡️ **安全防护栏** | PII 检测、提示注入防护、内容审核 |
-| ☁️ **云沙箱集成** | 阿里云 AgentBay、火山引擎原生支持 |
-| 📊 **可观测性** | OpenTelemetry 完整集成 |
-| 💾 **数据持久化** | PostgreSQL + MySQL 双数据库支持 |
-| 🔌 **MCP 协议** | Model Context Protocol 工具扩展 |
+| 特性                 | 描述                                       |
+| -------------------- | ------------------------------------------ |
+| 🔄 **事件驱动架构**  | Progress/Control/Monitor 三通道设计        |
+| 🧠 **三层记忆系统**  | Text/Working/Semantic Memory + 溯源 + 合并 |
+| 🔀 **Workflow 编排** | 8 种步骤类型 + 动态路由 + 并行/顺序/循环   |
+| 🛡️ **安全防护栏**    | PII 检测、提示注入防护、内容审核           |
+| ☁️ **云沙箱集成**    | 阿里云 AgentBay、火山引擎原生支持          |
+| 📊 **可观测性**      | OpenTelemetry 完整集成                     |
+| 💾 **数据持久化**    | PostgreSQL + MySQL 双数据库支持            |
+| 🔌 **MCP 协议**      | Model Context Protocol 工具扩展            |
 
 ## 🚀 快速开始
 
@@ -97,14 +97,14 @@ func main() {
 
 ## 📚 文档
 
-| 文档 | 描述 |
-|------|------|
-| [快速开始](https://astercloud.github.io/aster/introduction/quickstart) | 5分钟上手 Aster |
-| [核心概念](https://astercloud.github.io/aster/core-concepts) | Agent、Memory、Workflow 等核心概念 |
-| [Workflow 编排](https://astercloud.github.io/aster/workflows) | 工作流配置与执行 |
-| [API 参考](https://astercloud.github.io/aster/api-reference) | 完整 API 文档 |
-| [示例代码](https://astercloud.github.io/aster/examples) | 丰富的使用示例 |
-| [架构设计](https://astercloud.github.io/aster/architecture) | 系统架构与设计理念 |
+| 文档                                                                   | 描述                               |
+| ---------------------------------------------------------------------- | ---------------------------------- |
+| [快速开始](https://astercloud.github.io/aster/introduction/quickstart) | 5 分钟上手 Aster                   |
+| [核心概念](https://astercloud.github.io/aster/core-concepts)           | Agent、Memory、Workflow 等核心概念 |
+| [Workflow 编排](https://astercloud.github.io/aster/workflows)          | 工作流配置与执行                   |
+| [API 参考](https://astercloud.github.io/aster/api-reference)           | 完整 API 文档                      |
+| [示例代码](https://astercloud.github.io/aster/examples)                | 丰富的使用示例                     |
+| [架构设计](https://astercloud.github.io/aster/architecture)            | 系统架构与设计理念                 |
 
 ## 🏆 Google Context Engineering 实现度
 
@@ -121,12 +121,12 @@ Aster 是**首个完整实现** Google Context Engineering 标准的 Go 语言�
 
 ## 📊 项目状态
 
-| 指标 | 数值 |
-|------|------|
-| 代码量 | 18,000+ LOC |
-| 测试覆盖 | 80%+ |
-| 版本 | v0.17.0 |
-| 状态 | ✅ 生产就绪 |
+| 指标     | 数值        |
+| -------- | ----------- |
+| 代码量   | 18,000+ LOC |
+| 测试覆盖 | 80%+        |
+| 版本     | v0.17.0     |
+| 状态     | ✅ 生产就绪 |
 
 ## 🤝 贡献
 

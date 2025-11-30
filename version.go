@@ -1,5 +1,7 @@
 package aster
 
+import "runtime"
+
 // Version represents the current version of aster
 const Version = "v0.19.0"
 
@@ -20,7 +22,7 @@ func GetVersion() string {
 func GetVersionInfo() VersionInfo {
 	return VersionInfo{
 		Version:   Version,
-		GoVersion: "go1.21+",
+		GoVersion: runtime.Version(),
 		GitCommit: "", // Will be set during build
 		BuildTime: "", // Will be set during build
 	}

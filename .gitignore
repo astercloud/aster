@@ -205,5 +205,5 @@ examples/*/*-demo
 article-writer-web-service/
 
 # claude
-.claude/settings.local.json
+.claude/
 *_PLAN.md
