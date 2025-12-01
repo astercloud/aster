@@ -22,12 +22,20 @@ func (a *Agent) processMessages(ctx context.Context) {
 		return // 已经在处理中
 	}
 	a.state = types.AgentStateWorking
+	initialMsgCount := len(a.messages)
 	a.mu.Unlock()
 
 	defer func() {
 		a.mu.Lock()
 		a.state = types.AgentStateReady
+		// 检查是否有新消息需要处理
+		hasNewMessages := len(a.messages) > initialMsgCount
 		a.mu.Unlock()
+
+		// 如果有新消息，重新触发处理
+		if hasNewMessages {
+			go a.processMessages(ctx)
+		}
 	}()
 
 	// 发送状态变更事件

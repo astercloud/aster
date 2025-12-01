@@ -67,14 +67,26 @@ func (eb *EventBus) emit(channel types.AgentChannel, event any) types.AgentEvent
 	eb.timeline = append(eb.timeline, envelope)
 	eb.bookmarks[eb.cursor] = bookmark
 
+	// 检查是否是重要事件（done事件必须送达）
+	_, isDoneEvent := event.(*types.ProgressDoneEvent)
+
 	// 分发到对应通道的订阅者
 	switch channel {
 	case types.ChannelProgress:
 		for _, ch := range eb.progressSubs {
-			select {
-			case ch <- envelope:
-			default:
-				// 非阻塞发送,如果channel满了则跳过
+			if isDoneEvent {
+				// done 事件使用带超时的发送，确保送达
+				select {
+				case ch <- envelope:
+				case <-time.After(5 * time.Second):
+					// 超时，记录日志但继续
+				}
+			} else {
+				select {
+				case ch <- envelope:
+				default:
+					// 非阻塞发送,如果channel满了则跳过
+				}
 			}
 		}
 	case types.ChannelControl:
