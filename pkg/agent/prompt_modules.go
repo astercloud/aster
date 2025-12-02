@@ -34,29 +34,12 @@ func (m *EnvironmentModule) Build(ctx *PromptContext) (string, error) {
 	lines = append(lines, "")
 	lines = append(lines, fmt.Sprintf("- Working Directory: %s", env.WorkingDir))
 	lines = append(lines, fmt.Sprintf("- Platform: %s", env.Platform))
-	lines = append(lines, fmt.Sprintf("- OS Version: %s", env.OSVersion))
 	lines = append(lines, fmt.Sprintf("- Date: %s", env.Date.Format("2006-01-02")))
 
+	// 精简 Git 信息，只保留关键内容以减少 token 消耗
 	if env.GitRepo != nil && env.GitRepo.IsRepo {
-		lines = append(lines, "- Git Repository: Yes")
-		lines = append(lines, fmt.Sprintf("- Current Branch: %s", env.GitRepo.CurrentBranch))
-		if env.GitRepo.MainBranch != "" {
-			lines = append(lines, fmt.Sprintf("- Main Branch: %s", env.GitRepo.MainBranch))
-		}
-		if env.GitRepo.Status != "" {
-			lines = append(lines, "- Status:")
-			lines = append(lines, "```")
-			lines = append(lines, env.GitRepo.Status)
-			lines = append(lines, "```")
-		}
-		if len(env.GitRepo.RecentCommits) > 0 {
-			lines = append(lines, "- Recent Commits:")
-			for _, commit := range env.GitRepo.RecentCommits {
-				lines = append(lines, fmt.Sprintf("  - %s", commit))
-			}
-		}
-	} else {
-		lines = append(lines, "- Git Repository: No")
+		lines = append(lines, fmt.Sprintf("- Git Branch: %s", env.GitRepo.CurrentBranch))
+		// 不再输出 git status 和 recent commits，这些可以通过工具获取
 	}
 
 	return strings.Join(lines, "\n"), nil
@@ -176,13 +159,13 @@ type CodeReferenceModule struct{}
 func (m *CodeReferenceModule) Name() string  { return "code_reference" }
 func (m *CodeReferenceModule) Priority() int { return 30 }
 func (m *CodeReferenceModule) Condition(ctx *PromptContext) bool {
-	// 默认启用，除非明确禁用
+	// 优化：默认禁用以减少 token，需要时明确启用
 	if ctx.Metadata != nil {
-		if disabled, ok := ctx.Metadata["disable_code_reference"].(bool); ok && disabled {
-			return false
+		if enabled, ok := ctx.Metadata["enable_code_reference"].(bool); ok && enabled {
+			return true
 		}
 	}
-	return true
+	return false
 }
 func (m *CodeReferenceModule) Build(ctx *PromptContext) (string, error) {
 	return `## Code References
@@ -470,13 +453,13 @@ type ProfessionalObjectivityModule struct{}
 func (m *ProfessionalObjectivityModule) Name() string  { return "professional_objectivity" }
 func (m *ProfessionalObjectivityModule) Priority() int { return 8 }
 func (m *ProfessionalObjectivityModule) Condition(ctx *PromptContext) bool {
-	// 默认启用
+	// 优化：默认禁用以减少 token，这些原则可以内嵌到 base prompt
 	if ctx.Metadata != nil {
-		if disabled, ok := ctx.Metadata["disable_objectivity"].(bool); ok && disabled {
-			return false
+		if enabled, ok := ctx.Metadata["enable_objectivity"].(bool); ok && enabled {
+			return true
 		}
 	}
-	return true
+	return false
 }
 func (m *ProfessionalObjectivityModule) Build(ctx *PromptContext) (string, error) {
 	return `## Professional Objectivity
@@ -499,13 +482,13 @@ type ConcisenessModule struct{}
 func (m *ConcisenessModule) Name() string  { return "conciseness" }
 func (m *ConcisenessModule) Priority() int { return 9 }
 func (m *ConcisenessModule) Condition(ctx *PromptContext) bool {
-	// 默认启用
+	// 优化：默认禁用以减少 token，这些原则可以内嵌到 base prompt
 	if ctx.Metadata != nil {
-		if disabled, ok := ctx.Metadata["disable_conciseness"].(bool); ok && disabled {
-			return false
+		if enabled, ok := ctx.Metadata["enable_conciseness"].(bool); ok && enabled {
+			return true
 		}
 	}
-	return true
+	return false
 }
 func (m *ConcisenessModule) Build(ctx *PromptContext) (string, error) {
 	return `## Tone and Style
@@ -524,13 +507,13 @@ type AvoidOverEngineeringModule struct{}
 func (m *AvoidOverEngineeringModule) Name() string  { return "avoid_over_engineering" }
 func (m *AvoidOverEngineeringModule) Priority() int { return 12 }
 func (m *AvoidOverEngineeringModule) Condition(ctx *PromptContext) bool {
-	// 默认启用
+	// 优化：默认禁用以减少 token，这些原则可以内嵌到 base prompt
 	if ctx.Metadata != nil {
-		if disabled, ok := ctx.Metadata["disable_avoid_over_engineering"].(bool); ok && disabled {
-			return false
+		if enabled, ok := ctx.Metadata["enable_avoid_over_engineering"].(bool); ok && enabled {
+			return true
 		}
 	}
-	return true
+	return false
 }
 func (m *AvoidOverEngineeringModule) Build(ctx *PromptContext) (string, error) {
 	return `## Avoid Over-Engineering

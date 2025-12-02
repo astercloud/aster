@@ -8,6 +8,7 @@ import (
 	"strings"
 	"time"
 
+	"github.com/astercloud/aster/pkg/memory"
 	"github.com/astercloud/aster/pkg/middleware"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/tools"
@@ -551,11 +552,11 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 	// 设置断点
 	a.setBreakpoint(types.BreakpointPostTool)
 
-	// 构建工具结果
+	// 构建工具结果（使用 ObservationCompressor 智能压缩）
 	if execResult.Success {
 		return &types.ToolResultBlock{
 			ToolUseID: tu.ID,
-			Content:   fmt.Sprintf("%v", execResult.Output),
+			Content:   compressToolResult(tu.Name, execResult.Output),
 			IsError:   false,
 		}
 	} else {
@@ -981,4 +982,32 @@ func (a *Agent) runNonStreamingStep(ctx context.Context) error {
 	log.Printf("[runNonStreamingStep] Execution completed")
 
 	return nil
+}
+
+// compressToolResult 使用已有的 ObservationCompressor 智能压缩工具结果
+// 复用 memory.DefaultObservationCompressor 的实现，按工具类型压缩
+func compressToolResult(toolName string, output any) string {
+	s := fmt.Sprintf("%v", output)
+
+	// 内容较短时不压缩
+	if len(s) < 3000 {
+		return s
+	}
+
+	// 使用已有的 ObservationCompressor 进行智能压缩
+	compressor := memory.NewObservationCompressorWithConfig(&memory.ObservationCompressorConfig{
+		MaxSummaryLength:  3000, // 约 750 tokens
+		MinCompressLength: 3000, // 3k 字符以上才压缩
+	})
+
+	compressed, err := compressor.Compress(context.Background(), toolName, s)
+	if err != nil {
+		// 压缩失败，回退到简单截断
+		if len(s) > 8000 {
+			return s[:8000] + "\n... [truncated]"
+		}
+		return s
+	}
+
+	return compressed.Summary
 }

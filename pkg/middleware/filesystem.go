@@ -44,7 +44,7 @@ type FilesystemMiddleware struct {
 // NewFilesystemMiddleware 创建文件系统中间件
 func NewFilesystemMiddleware(config *FilesystemMiddlewareConfig) *FilesystemMiddleware {
 	if config.TokenLimit == 0 {
-		config.TokenLimit = 20000 // 默认 20k tokens
+		config.TokenLimit = 5000 // 默认 5k tokens（优化：降低阈值以减少 token 消耗）
 	}
 
 	// 默认启用路径验证

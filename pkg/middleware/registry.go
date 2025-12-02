@@ -88,8 +88,8 @@ func (r *Registry) registerBuiltin() {
 			return nil, fmt.Errorf("summarization middleware requires provider")
 		}
 
-		// 自定义配置(可选)
-		maxTokens := 170000
+		// 自定义配置(可选) - 优化: 降低默认阈值以更早触发压缩
+		maxTokens := 50000
 		messagesToKeep := 6
 		if config.CustomConfig != nil {
 			// 支持 int 和 float64 (JSON 解析可能产生 float64)
@@ -131,8 +131,48 @@ func (r *Registry) registerBuiltin() {
 
 		fsBackend := backends.NewFilesystemBackend(config.Sandbox.FS())
 
+		// 优化: 支持自定义 TokenLimit
+		tokenLimit := 5000 // 默认 5k tokens
+		if config.CustomConfig != nil {
+			if tl, ok := config.CustomConfig["token_limit"].(int); ok {
+				tokenLimit = tl
+			} else if tl, ok := config.CustomConfig["token_limit"].(float64); ok {
+				tokenLimit = int(tl)
+			}
+		}
+
 		return NewFilesystemMiddleware(&FilesystemMiddlewareConfig{
-			Backend: fsBackend,
+			Backend:    fsBackend,
+			TokenLimit: tokenLimit,
+		}), nil
+	})
+
+	// ObservationCompression Middleware (工具结果压缩)
+	r.Register("observation_compression", func(config *MiddlewareFactoryConfig) (Middleware, error) {
+		// 默认配置
+		enabled := true
+		minContentLength := 3000
+
+		if config.CustomConfig != nil {
+			if e, ok := config.CustomConfig["enabled"].(bool); ok {
+				enabled = e
+			}
+			if mcl, ok := config.CustomConfig["min_content_length"].(int); ok {
+				minContentLength = mcl
+			} else if mcl, ok := config.CustomConfig["min_content_length"].(float64); ok {
+				minContentLength = int(mcl)
+			}
+		}
+
+		compressor := memory.NewObservationCompressorWithConfig(&memory.ObservationCompressorConfig{
+			MaxSummaryLength:  3000,
+			MinCompressLength: minContentLength,
+		})
+
+		return NewObservationCompressionMiddleware(&ObservationCompressionConfig{
+			Compressor:       compressor,
+			Enabled:          enabled,
+			MinContentLength: minContentLength,
 		}), nil
 	})
 
