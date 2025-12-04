@@ -6,10 +6,11 @@ navigation: false
 
 # MCP HTTP Server 示例
 
-aster 已经支持作为 MCP 客户端连接外部 MCP Server (`pkg/tools/mcp` + `pkg/sandbox/cloud`)。  
+aster 已经支持作为 MCP 客户端连接外部 MCP Server (`pkg/tools/mcp` + `pkg/sandbox/cloud`)。
 本示例展示如何使用 `pkg/mcpserver` 将本地工具暴露为一个兼容的 MCP HTTP Server, 方便 IDE/Agent 统一访问项目文档与工具。
 
 示例代码路径:
+
 - `pkg/mcpserver/server.go`
 - `examples/mcp/server/main.go`
 - 客户端示例: `examples/mcp/main.go`

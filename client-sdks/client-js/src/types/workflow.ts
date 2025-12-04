@@ -10,19 +10,19 @@
 /**
  * Workflow 类型
  */
-export type WorkflowType = 
-  | 'parallel'    // 并行执行
-  | 'sequential'  // 顺序执行
-  | 'loop';       // 循环执行
+export type WorkflowType =
+  | "parallel" // 并行执行
+  | "sequential" // 顺序执行
+  | "loop"; // 循环执行
 
 /**
  * Workflow 状态
  */
-export type WorkflowStatus = 
-  | 'draft'       // 草稿
-  | 'active'      // 活跃
-  | 'paused'      // 暂停
-  | 'archived';   // 归档
+export type WorkflowStatus =
+  | "draft" // 草稿
+  | "active" // 活跃
+  | "paused" // 暂停
+  | "archived"; // 归档
 
 // ============================================================================
 // Workflow Definition
@@ -45,7 +45,7 @@ interface BaseWorkflowDefinition {
  * 多个 Agent 并行执行
  */
 export interface ParallelWorkflowDefinition extends BaseWorkflowDefinition {
-  type: 'parallel';
+  type: "parallel";
   /** Agent 配置列表 */
   agents: Array<{
     id: string;
@@ -63,7 +63,7 @@ export interface ParallelWorkflowDefinition extends BaseWorkflowDefinition {
  * Agent 按顺序执行
  */
 export interface SequentialWorkflowDefinition extends BaseWorkflowDefinition {
-  type: 'sequential';
+  type: "sequential";
   /** 执行步骤 */
   steps: Array<{
     agent: string;
@@ -81,7 +81,7 @@ export interface SequentialWorkflowDefinition extends BaseWorkflowDefinition {
  * 循环执行直到满足条件
  */
 export interface LoopWorkflowDefinition extends BaseWorkflowDefinition {
-  type: 'loop';
+  type: "loop";
   /** Agent ID */
   agent: string;
   /** 循环条件（JavaScript 表达式） */
@@ -95,7 +95,7 @@ export interface LoopWorkflowDefinition extends BaseWorkflowDefinition {
 /**
  * Workflow 定义联合类型
  */
-export type WorkflowDefinition = 
+export type WorkflowDefinition =
   | ParallelWorkflowDefinition
   | SequentialWorkflowDefinition
   | LoopWorkflowDefinition;
@@ -139,13 +139,13 @@ export interface WorkflowInfo {
 /**
  * Workflow 执行状态
  */
-export type WorkflowRunStatus = 
-  | 'pending'     // 等待中
-  | 'running'     // 运行中
-  | 'suspended'   // 已暂停
-  | 'completed'   // 完成
-  | 'failed'      // 失败
-  | 'cancelled';  // 已取消
+export type WorkflowRunStatus =
+  | "pending" // 等待中
+  | "running" // 运行中
+  | "suspended" // 已暂停
+  | "completed" // 完成
+  | "failed" // 失败
+  | "cancelled"; // 已取消
 
 /**
  * Workflow 执行记录
@@ -194,7 +194,7 @@ export interface WorkflowStepResult {
   /** Agent ID */
   agentId: string;
   /** 状态 */
-  status: 'pending' | 'running' | 'completed' | 'failed' | 'skipped';
+  status: "pending" | "running" | "completed" | "failed" | "skipped";
   /** 开始时间 */
   startedAt?: string;
   /** 结束时间 */

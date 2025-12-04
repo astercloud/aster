@@ -670,16 +670,16 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
     },
     ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
         action := req.ActionRequests[0]
-        
+
         // 记录审核请求
         log.Printf("[HITL] Tool: %s, Input: %+v", action.ToolName, action.Input)
-        
+
         // 基于风险评估自动决策
         risk := assessRisk(action)
         if risk == RiskLow {
             return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
         }
-        
+
         // 高风险操作需要人工确认
         return requestHumanApproval(action)
     },
@@ -698,6 +698,7 @@ stack.Use(hitlMW)
 5. **分级审核** - 根据风险级别采用不同策略
 
 **更多信息**:
+
 - [HITL 完整指南](/guides/advanced/human-in-the-loop)
 - [HITL 中间件文档](/middleware/builtin/human-in-the-loop)
 
@@ -1038,6 +1039,7 @@ func encrypt(plaintext, key []byte) ([]byte, error) {
 **风险**: 用户通过精心构造的输入操纵 Agent 行为
 
 **防护**:
+
 ```go
 // ✅ 使用结构化输入
 systemPrompt := `你是客服助手，只能回答产品相关问题。
@@ -1056,6 +1058,7 @@ userInput := fmt.Sprintf("[USER_INPUT_START]\n%s\n[USER_INPUT_END]", input)
 **风险**: `../../etc/passwd` 访问敏感文件
 
 **防护**:
+
 ```go
 // ✅ 路径规范化和验证
 cleanPath := filepath.Clean(path)
@@ -1070,6 +1073,7 @@ if !strings.HasPrefix(absPath, allowedDir) {
 **风险**: `; rm -rf /` 执行危险命令
 
 **防护**:
+
 ```go
 // ✅ 使用命令白名单
 // ✅ 避免 shell 执行，使用 exec.Command
@@ -1081,6 +1085,7 @@ if !strings.HasPrefix(absPath, allowedDir) {
 **风险**: 日志或输出包含敏感信息
 
 **防护**:
+
 ```go
 // ✅ 日志脱敏
 log.Printf("API call with key: %s", maskAPIKey(key))

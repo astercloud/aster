@@ -20,6 +20,7 @@ navigation:
 ### 白皮书对比评分
 
 **实现前**: 81/100
+
 - ✅ 语义内存
 - ✅ 工作记忆
 - ✅ 会话管理
@@ -28,6 +29,7 @@ navigation:
 - ❌ 内存合并
 
 **实现后**: **95/100**
+
 - ✅ 语义内存
 - ✅ 工作记忆
 - ✅ 会话管理
@@ -39,18 +41,19 @@ navigation:
 
 ### 完成度详情
 
-| 功能模块 | 实现状态 | 测试覆盖 | 文档完整度 |
-|---------|---------|---------|----------|
-| Memory Provenance | ✅ 100% | 29 tests | ✅ 完整 |
-| PII Auto-Redaction | ✅ 100% | 31 tests | ✅ 完整 |
-| Memory Consolidation | ✅ 100% | 12 tests | ✅ 完整 |
-| **总计** | **✅ 100%** | **72 tests** | **✅ 完整** |
+| 功能模块             | 实现状态    | 测试覆盖     | 文档完整度  |
+| -------------------- | ----------- | ------------ | ----------- |
+| Memory Provenance    | ✅ 100%     | 29 tests     | ✅ 完整     |
+| PII Auto-Redaction   | ✅ 100%     | 31 tests     | ✅ 完整     |
+| Memory Consolidation | ✅ 100%     | 12 tests     | ✅ 完整     |
+| **总计**             | **✅ 100%** | **72 tests** | **✅ 完整** |
 
 ## Week 1: Memory Provenance (内存溯源)
 
 ### 实现内容
 
 #### 1. 核心数据结构
+
 **文件**: `pkg/memory/provenance.go` (289 lines)
 
 ```go
@@ -69,15 +72,18 @@ type MemoryProvenance struct {
 ```
 
 **支持的来源类型**:
+
 - `SourceBootstrapped`: 初始化数据（100% 置信度）
 - `SourceUserInput`: 用户输入（90% 置信度）
 - `SourceAgent`: Agent 推理（70% 置信度）
 - `SourceToolOutput`: 工具输出（80% 置信度）
 
 #### 2. 置信度计算
+
 **文件**: `pkg/memory/confidence.go` (218 lines)
 
 **算法**:
+
 ```
 最终置信度 = 基础置信度 × 衰减因子 × 佐证提升 × 新鲜度权重
 ```
@@ -87,18 +93,22 @@ type MemoryProvenance struct {
 - **新鲜度权重**: 最近访问的记忆权重更高
 
 #### 3. 谱系追踪
+
 **文件**: `pkg/memory/lineage.go` (325 lines)
 
 **功能**:
+
 - 追踪记忆派生关系（父子关系）
 - 级联删除派生记忆
 - 数据源撤销（revoke source）
 - 递归遍历完整谱系树
 
 #### 4. SemanticMemory 集成
+
 **更新**: `pkg/memory/semantic.go` (+180 lines)
 
 **新方法**:
+
 - `IndexWithProvenance()`: 带溯源的索引
 - `SearchWithConfidenceFilter()`: 按置信度过滤
 - `DeleteMemoryWithLineage()`: 带谱系的删除
@@ -123,9 +133,11 @@ type MemoryProvenance struct {
 ### 实现内容
 
 #### 1. PII 检测系统
+
 **文件**: `pkg/security/pii_detector.go`, `pii_patterns.go` (628 lines)
 
 **支持的 PII 类型** (10+):
+
 - ✅ 邮箱地址
 - ✅ 电话号码（美国/中国）
 - ✅ 信用卡号（Visa/MasterCard/Amex）
@@ -136,17 +148,20 @@ type MemoryProvenance struct {
 - ✅ 出生日期
 
 **验证器**:
+
 - `validateLuhn()`: Luhn 算法验证信用卡
 - `validateChineseID()`: 中国身份证校验码
 - `validateChinesePhone()`: 中国手机号运营商号段
 - `validateSSN()`: SSN 区域号/组号/序列号验证
 
 #### 2. 脱敏策略
+
 **文件**: `pkg/security/redaction_strategies.go` (426 lines)
 
 **策略实现**:
 
 **MaskStrategy** - 部分掩码
+
 ```
 邮箱: john.doe@example.com → j*******@example.com
 电话: 13812345678 → 138****5678
@@ -154,6 +169,7 @@ type MemoryProvenance struct {
 ```
 
 **ReplaceStrategy** - 完全替换
+
 ```
 邮箱: user@example.com → [EMAIL]
 电话: 13812345678 → [CHINESE_PHONE]
@@ -161,25 +177,30 @@ type MemoryProvenance struct {
 ```
 
 **HashStrategy** - SHA256 哈希
+
 ```
 任何 PII → [HASH:a3f58b1d...]
 ```
 
 **AdaptiveStrategy** - 自适应
+
 - 低敏感（邮箱）→ MaskStrategy
 - 中等敏感（电话）→ MaskStrategy
 - 高敏感（信用卡/身份证）→ ReplaceStrategy
 
 #### 3. Middleware 集成
+
 **文件**: `pkg/security/pii_middleware.go` (297 lines)
 
 **功能**:
+
 - 自动拦截发送到 LLM 的消息
 - PII 检测和脱敏
 - 追踪功能（可选）
 - 条件脱敏支持
 
 **使用示例**:
+
 ```go
 piiMiddleware := security.NewDefaultPIIMiddleware()
 agent.AddMiddleware(piiMiddleware)
@@ -188,6 +209,7 @@ agent.AddMiddleware(piiMiddleware)
 ```
 
 #### 4. 多字节字符支持
+
 **关键修复**: 字节位置到 rune 位置的转换
 
 ```go
@@ -205,6 +227,7 @@ func buildByteToRuneMap(text string) []int {
 - `redaction_test.go`: 22 tests
 
 **关键测试**:
+
 - 中国手机号检测和验证
 - 信用卡 Luhn 算法验证
 - 中国身份证校验码验证
@@ -222,9 +245,11 @@ func buildByteToRuneMap(text string) []int {
 ### 实现内容
 
 #### 1. 合并引擎
+
 **文件**: `pkg/memory/consolidation.go` (314 lines)
 
 **核心组件**:
+
 ```go
 type ConsolidationEngine struct {
     memory              *SemanticMemory
@@ -235,6 +260,7 @@ type ConsolidationEngine struct {
 ```
 
 **配置选项**:
+
 - `SimilarityThreshold`: 相似度阈值 (默认 0.85)
 - `ConflictThreshold`: 冲突检测阈值 (默认 0.75)
 - `MinMemoryCount`: 最小记忆数量 (默认 10)
@@ -242,14 +268,17 @@ type ConsolidationEngine struct {
 - `PreserveOriginal`: 是否保留原始记忆 (默认 true)
 
 #### 2. 合并策略
+
 **文件**: `pkg/memory/consolidation_strategies.go` (453 lines)
 
 **RedundancyStrategy** - 冗余合并
+
 - 检测高度相似的重复记忆
 - 使用 LLM 合并为单条精炼记忆
 - 保留所有重要信息
 
 **示例**:
+
 ```
 输入:
 - "User prefers dark mode"
@@ -261,11 +290,13 @@ type ConsolidationEngine struct {
 ```
 
 **ConflictResolutionStrategy** - 冲突解决
+
 - 检测矛盾信息
 - 基于置信度和新鲜度选择最佳版本
 - 保留历史变化记录
 
 **示例**:
+
 ```
 输入:
 - "User likes coffee" (置信度 0.6)
@@ -276,11 +307,13 @@ type ConsolidationEngine struct {
 ```
 
 **SummarizationStrategy** - 总结
+
 - 将多条相关记忆总结为简洁表述
 - 压缩信息密度
 - 提高检索效率
 
 **示例**:
+
 ```
 输入 (5条记忆):
 - "User lives in New York"
@@ -297,6 +330,7 @@ type ConsolidationEngine struct {
 #### 3. LLM 提示工程
 
 **冗余合并提示**:
+
 ```
 You are a memory consolidation assistant.
 The following memory entries are redundant (saying similar things).
@@ -311,6 +345,7 @@ Instructions:
 ```
 
 **冲突解决提示**:
+
 ```
 You are a memory conflict resolution assistant.
 The following memory entries contain conflicting information.
@@ -326,6 +361,7 @@ Instructions:
 #### 4. 溯源保留
 
 合并后的记忆保留完整溯源链：
+
 ```go
 consolidated.Provenance.Sources = [
     "original-memory-1",
@@ -358,6 +394,7 @@ consolidated.Provenance.CorroborationCount = 3
 ### 1. 架构设计
 
 **分层架构**:
+
 ```
 Application Layer
     ├─ Agent
@@ -378,6 +415,7 @@ Storage Layer
 ### 2. 数据流
 
 **记忆创建流程**:
+
 ```
 User Input
     ↓
@@ -393,6 +431,7 @@ Vector Store
 ```
 
 **记忆检索流程**:
+
 ```
 Query
     ↓
@@ -408,6 +447,7 @@ Results
 ```
 
 **记忆合并流程**:
+
 ```
 Trigger (Auto/Manual)
     ↓
@@ -425,18 +465,21 @@ Save & Cleanup
 ### 3. 性能优化
 
 **置信度计算缓存**:
+
 ```go
 // 避免重复计算
 cache := make(map[string]float64)
 ```
 
 **批处理向量嵌入**:
+
 ```go
 // 一次调用处理多条记忆
 vecs, err := embedder.EmbedText(ctx, texts)
 ```
 
 **并发合并**:
+
 ```go
 // 并发处理不相关的记忆组
 for _, group := range groups {
@@ -447,12 +490,14 @@ for _, group := range groups {
 ### 4. 安全特性
 
 **PII 多层防护**:
+
 1. 检测层：正则表达式 + 验证器
 2. 脱敏层：多种策略可选
 3. 追踪层：记录所有 PII 检测
 4. 审计层：完整的操作日志
 
 **数据完整性**:
+
 1. 溯源链完整性验证
 2. 谱系循环检测
 3. 置信度边界检查
@@ -462,12 +507,12 @@ for _, group := range groups {
 
 ### 新增代码
 
-| 模块 | 文件数 | 代码行数 | 测试行数 | 文档行数 |
-|------|-------|---------|---------|---------|
-| Memory Provenance | 3 | 832 | 857 | 300+ |
-| PII Redaction | 4 | 1,351 | 822 | 450+ |
-| Memory Consolidation | 2 | 767 | 389 | 500+ |
-| **总计** | **9** | **2,950** | **2,068** | **1,250+** |
+| 模块                 | 文件数 | 代码行数  | 测试行数  | 文档行数   |
+| -------------------- | ------ | --------- | --------- | ---------- |
+| Memory Provenance    | 3      | 832       | 857       | 300+       |
+| PII Redaction        | 4      | 1,351     | 822       | 450+       |
+| Memory Consolidation | 2      | 767       | 389       | 500+       |
+| **总计**             | **9**  | **2,950** | **2,068** | **1,250+** |
 
 ### 测试覆盖率
 
@@ -606,13 +651,13 @@ func main() {
 
 ### 相比 Google ADK-Python
 
-| 功能 | aster (Go) | ADK-Python | 优势 |
-|-----|---------------|------------|------|
-| Memory Provenance | ✅ 完整实现 | ✅ 完整实现 | 性能更好 |
-| PII Redaction | ✅ 10+ 类型 | ✅ 基础实现 | 更多 PII 类型 |
-| Consolidation | ✅ 3 种策略 | ✅ 基础实现 | 更多策略 |
-| 测试覆盖 | ✅ 72 tests | ✅ 基础测试 | 更全面 |
-| 文档 | ✅ 1250+ 行 | ✅ 基础文档 | 更详细 |
+| 功能              | aster (Go)  | ADK-Python  | 优势          |
+| ----------------- | ----------- | ----------- | ------------- |
+| Memory Provenance | ✅ 完整实现 | ✅ 完整实现 | 性能更好      |
+| PII Redaction     | ✅ 10+ 类型 | ✅ 基础实现 | 更多 PII 类型 |
+| Consolidation     | ✅ 3 种策略 | ✅ 基础实现 | 更多策略      |
+| 测试覆盖          | ✅ 72 tests | ✅ 基础测试 | 更全面        |
+| 文档              | ✅ 1250+ 行 | ✅ 基础文档 | 更详细        |
 
 aster 现已达到世界级 Agent 框架的水平！🚀
 

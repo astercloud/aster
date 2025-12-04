@@ -109,17 +109,17 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
 ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, error) {
     // 一次性审核所有操作
     decisions := make([]Decision, len(req.ActionRequests))
-    
+
     for i, action := range req.ActionRequests {
         // 展示操作详情
         fmt.Printf("%d. %s: %+v\n", i+1, action.ToolName, action.Input)
     }
-    
+
     // 批量决策
     fmt.Print("批准所有? (y/n): ")
     var answer string
     fmt.Scanln(&answer)
-    
+
     for i := range decisions {
         if answer == "y" {
             decisions[i] = Decision{Type: DecisionApprove}
@@ -127,7 +127,7 @@ ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, erro
             decisions[i] = Decision{Type: DecisionReject}
         }
     }
-    
+
     return decisions, nil
 }
 ```
@@ -143,10 +143,10 @@ func cliApprovalHandler(ctx context.Context, req *ReviewRequest) ([]Decision, er
         fmt.Printf("参数: %+v\n", action.Input)
         fmt.Printf("风险: %s\n", req.RiskLevel)
         fmt.Print("决策 (approve/reject/edit): ")
-        
+
         var decision string
         fmt.Scanln(&decision)
-        
+
         switch decision {
         case "approve":
             return []Decision{{Type: DecisionApprove}}, nil
@@ -171,13 +171,13 @@ func cliApprovalHandler(ctx context.Context, req *ReviewRequest) ([]Decision, er
 func webUIApprovalHandler(ctx context.Context, req *ReviewRequest) ([]Decision, error) {
     // 1. 将审核请求存储到数据库
     reviewID := saveReviewRequest(req)
-    
+
     // 2. 通过 WebSocket 通知前端
     notifyWebUI(reviewID, req)
-    
+
     // 3. 等待用户决策
     decision := waitForDecision(ctx, reviewID)
-    
+
     return []Decision{decision}, nil
 }
 ```
@@ -192,10 +192,10 @@ func mqApprovalHandler(ctx context.Context, req *ReviewRequest) ([]Decision, err
         ID:      reviewID,
         Request: req,
     })
-    
+
     // 2. 订阅决策队列
     decisionChan := subscribeToQueue(fmt.Sprintf("decisions-%s", reviewID))
-    
+
     // 3. 等待决策（支持超时）
     select {
     case decision := <-decisionChan:
@@ -217,14 +217,14 @@ func mqApprovalHandler(ctx context.Context, req *ReviewRequest) ([]Decision, err
 hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMiddlewareConfig{
     ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, error) {
         decision, err := getHumanDecision(req)
-        
+
         // 记录审核日志
         telemetry.RecordEvent(ctx, "hitl.review", map[string]interface{}{
             "tool":     req.ActionRequests[0].ToolName,
             "decision": decision.Type,
             "risk":     req.RiskLevel,
         })
-        
+
         return []Decision{decision}, err
     },
 })
@@ -236,7 +236,7 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
 // 记住审核决策，用于学习
 ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, error) {
     decision, err := getHumanDecision(req)
-    
+
     // 存储审核历史
     memory.Store(ctx, "approval_history", ApprovalRecord{
         Timestamp:  time.Now(),
@@ -245,7 +245,7 @@ ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, erro
         Decision:   decision.Type,
         RiskLevel:  req.RiskLevel,
     })
-    
+
     return []Decision{decision}, err
 }
 ```
@@ -274,12 +274,12 @@ workflow.AddStep(&workflow.Step{
 ```go
 RiskAssessor: func(ctx context.Context, action *ActionRequest) (RiskLevel, error) {
     score := 0
-    
+
     // 基于工具评分
     if action.ToolName == "Bash" {
         score += 50
     }
-    
+
     // 基于参数评分
     if cmd, ok := action.Input["command"].(string); ok {
         if strings.Contains(cmd, "rm") {
@@ -289,7 +289,7 @@ RiskAssessor: func(ctx context.Context, action *ActionRequest) (RiskLevel, error
             score += 20
         }
     }
-    
+
     // 评估风险等级
     switch {
     case score >= 80:
@@ -344,7 +344,7 @@ InterruptOn: map[string]interface{}{
     "Bash":         true,
     "fs_delete":    true,
     "database_update": true,
-    
+
     // ❌ 不需要审核
     "fs_read":      false,
     "http_get":     false,
@@ -381,7 +381,7 @@ ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, erro
 ```go
 ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, error) {
     decision, err := getDecision(req)
-    
+
     // 记录审核日志
     auditLog.Record(AuditEntry{
         Timestamp:  time.Now(),
@@ -391,7 +391,7 @@ ApprovalHandler: func(ctx context.Context, req *ReviewRequest) ([]Decision, erro
         Decision:   decision.Type,
         Reason:     decision.Reason,
     })
-    
+
     return []Decision{decision}, err
 }
 ```

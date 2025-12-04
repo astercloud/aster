@@ -34,17 +34,17 @@ hitlMW, err := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoop
         "fs_delete":    true,  // 文件删除需要审核
         "HttpRequest": true,  // HTTP 请求需要审核
     },
-    
+
     // 审核处理器
     ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
         for _, action := range req.ActionRequests {
             fmt.Printf("工具: %s\n", action.ToolName)
             fmt.Printf("参数: %+v\n", action.Input)
             fmt.Print("批准? (y/n): ")
-            
+
             var answer string
             fmt.Scanln(&answer)
-            
+
             if answer == "y" {
                 return []middleware.Decision{{
                     Type: middleware.DecisionApprove,
@@ -106,11 +106,11 @@ InterruptOn: map[string]interface{}{
 
 ### 决策类型
 
-| 类型 | 说明 | 使用场景 |
-|------|------|---------|
-| `DecisionApprove` | 批准执行 | 操作安全，可以执行 |
-| `DecisionReject` | 拒绝执行 | 操作不安全或不合理 |
-| `DecisionEdit` | 编辑参数后执行 | 参数需要调整 |
+| 类型              | 说明           | 使用场景           |
+| ----------------- | -------------- | ------------------ |
+| `DecisionApprove` | 批准执行       | 操作安全，可以执行 |
+| `DecisionReject`  | 拒绝执行       | 操作不安全或不合理 |
+| `DecisionEdit`    | 编辑参数后执行 | 参数需要调整       |
 
 ### ApprovalHandler - 审核处理器
 
@@ -121,13 +121,13 @@ InterruptOn: map[string]interface{}{
 ```go
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     action := req.ActionRequests[0]
-    
+
     fmt.Printf("工具: %s\n参数: %+v\n", action.ToolName, action.Input)
     fmt.Print("选择 (approve/reject/edit): ")
-    
+
     var choice string
     fmt.Scanln(&choice)
-    
+
     switch choice {
     case "approve":
         return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
@@ -150,21 +150,21 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     action := req.ActionRequests[0]
     risk := assessRisk(action)
-    
+
     switch risk {
     case RiskLow:
         // 低风险自动批准
         return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
-        
+
     case RiskMedium:
         // 中风险需要确认
         return promptForConfirmation(action)
-        
+
     case RiskHigh:
         // 高风险需要明确确认
         return promptForExplicitConfirmation(action)
     }
-    
+
     return nil, nil
 }
 ```
@@ -199,27 +199,27 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
     ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
         action := req.ActionRequests[0]
         cmd := action.Input["command"].(string)
-        
+
         // 检测危险命令
         if strings.Contains(cmd, "rm -rf") {
             fmt.Println("🚨 检测到危险命令！")
             fmt.Printf("命令: %s\n", cmd)
             fmt.Print("输入 'CONFIRM' 确认执行: ")
-            
+
             var confirm string
             fmt.Scanln(&confirm)
-            
+
             if confirm == "CONFIRM" {
                 return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
             }
             return []middleware.Decision{{Type: middleware.DecisionReject}}, nil
         }
-        
+
         // 普通命令简单确认
         fmt.Printf("命令: %s\n批准? (y/n): ", cmd)
         var answer string
         fmt.Scanln(&answer)
-        
+
         if answer == "y" {
             return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
         }
@@ -233,39 +233,39 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
 ```go
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     action := req.ActionRequests[0]
-    
+
     fmt.Printf("工具: %s\n", action.ToolName)
     fmt.Println("当前参数:")
     for key, value := range action.Input {
         fmt.Printf("  %s: %v\n", key, value)
     }
-    
+
     fmt.Print("\n选择 (approve/reject/edit): ")
     var choice string
     fmt.Scanln(&choice)
-    
+
     if choice == "edit" {
         editedInput := make(map[string]interface{})
-        
+
         for key, value := range action.Input {
             fmt.Printf("编辑 %s (当前: %v, 回车保持): ", key, value)
             var newValue string
             fmt.Scanln(&newValue)
-            
+
             if newValue != "" {
                 editedInput[key] = newValue
             } else {
                 editedInput[key] = value
             }
         }
-        
+
         return []middleware.Decision{{
             Type:        middleware.DecisionEdit,
             EditedInput: editedInput,
             Reason:      "参数已编辑",
         }}, nil
     }
-    
+
     // ... 处理其他选择
 }
 ```
@@ -278,10 +278,10 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
 type HumanInTheLoopMiddlewareConfig struct {
     // InterruptOn 配置哪些工具需要审核
     InterruptOn map[string]interface{}
-    
+
     // ApprovalHandler 审核处理器
     ApprovalHandler ApprovalHandler
-    
+
     // DefaultAllowedDecisions 默认允许的决策类型
     DefaultAllowedDecisions []DecisionType
 }
@@ -339,13 +339,13 @@ sequenceDiagram
 
     Agent->>HITL: 调用工具
     HITL->>HITL: 检查是否需要审核
-    
+
     alt 需要审核
         HITL->>Handler: 发送审核请求
         Handler->>Human: 显示操作信息
         Human->>Handler: 做出决策
         Handler->>HITL: 返回决策
-        
+
         alt 批准
             HITL->>Tool: 执行工具
             Tool->>HITL: 返回结果
@@ -359,7 +359,7 @@ sequenceDiagram
         HITL->>Tool: 直接执行
         Tool->>HITL: 返回结果
     end
-    
+
     HITL->>Agent: 返回最终结果
 ```
 
@@ -401,7 +401,7 @@ InterruptOn: map[string]interface{}{
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
     defer cancel()
-    
+
     select {
     case decision := <-getDecisionAsync(req):
         return []middleware.Decision{decision}, nil

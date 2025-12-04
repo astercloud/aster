@@ -3,7 +3,7 @@
  * 可观测性：Metrics、Traces、Logs
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   MetricInfo,
   MetricDataPoint,
@@ -17,8 +17,8 @@ import {
   PerformanceMetrics,
   UsageStatistics,
   ExportTelemetryRequest,
-  ExportTelemetryResult
-} from '../types/telemetry';
+  ExportTelemetryResult,
+} from "../types/telemetry";
 
 /**
  * Telemetry 资源类
@@ -37,7 +37,7 @@ export class TelemetryResource extends BaseResource {
    * @returns Telemetry 配置
    */
   async getConfig(): Promise<TelemetryConfig> {
-    return this.request<TelemetryConfig>('/v1/telemetry/config');
+    return this.request<TelemetryConfig>("/v1/telemetry/config");
   }
 
   /**
@@ -46,11 +46,11 @@ export class TelemetryResource extends BaseResource {
    * @returns 更新后的配置
    */
   async updateConfig(
-    config: Partial<TelemetryConfig>
+    config: Partial<TelemetryConfig>,
   ): Promise<TelemetryConfig> {
-    return this.request<TelemetryConfig>('/v1/telemetry/config', {
-      method: 'PATCH',
-      body: config
+    return this.request<TelemetryConfig>("/v1/telemetry/config", {
+      method: "PATCH",
+      body: config,
     });
   }
 
@@ -64,7 +64,7 @@ export class TelemetryResource extends BaseResource {
    */
   async listMetrics(): Promise<MetricInfo[]> {
     const result = await this.request<{ metrics: MetricInfo[] }>(
-      '/v1/telemetry/metrics'
+      "/v1/telemetry/metrics",
     );
     return result.metrics;
   }
@@ -83,15 +83,13 @@ export class TelemetryResource extends BaseResource {
    * @param options 查询选项
    * @returns 数据点列表
    */
-  async queryMetrics(
-    options: MetricQueryOptions
-  ): Promise<MetricDataPoint[]> {
+  async queryMetrics(options: MetricQueryOptions): Promise<MetricDataPoint[]> {
     const result = await this.request<{ dataPoints: MetricDataPoint[] }>(
-      '/v1/telemetry/metrics/query',
+      "/v1/telemetry/metrics/query",
       {
-        method: 'POST',
-        body: options
-      }
+        method: "POST",
+        body: options,
+      },
     );
     return result.dataPoints;
   }
@@ -105,7 +103,7 @@ export class TelemetryResource extends BaseResource {
   async recordMetric(
     name: string,
     value: number,
-    labels?: Record<string, string>
+    labels?: Record<string, string>,
   ): Promise<void>;
   async recordMetric(data: {
     name: string;
@@ -114,19 +112,26 @@ export class TelemetryResource extends BaseResource {
     labels?: Record<string, string>;
   }): Promise<void>;
   async recordMetric(
-    nameOrData: string | { name: string; type?: string; value: number; labels?: Record<string, string> },
+    nameOrData:
+      | string
+      | {
+          name: string;
+          type?: string;
+          value: number;
+          labels?: Record<string, string>;
+        },
     value?: number,
-    labels?: Record<string, string>
+    labels?: Record<string, string>,
   ): Promise<void> {
     let body: any;
-    if (typeof nameOrData === 'string') {
+    if (typeof nameOrData === "string") {
       body = { name: nameOrData, value: value!, labels };
     } else {
       body = nameOrData;
     }
-    await this.request('/v1/telemetry/metrics', {
-      method: 'POST',
-      body
+    await this.request("/v1/telemetry/metrics", {
+      method: "POST",
+      body,
     });
   }
 
@@ -146,9 +151,9 @@ export class TelemetryResource extends BaseResource {
     parent_id?: string;
     [key: string]: any;
   }): Promise<TraceInfo> {
-    return this.request<TraceInfo>('/v1/telemetry/traces', {
-      method: 'POST',
-      body: trace
+    return this.request<TraceInfo>("/v1/telemetry/traces", {
+      method: "POST",
+      body: trace,
     });
   }
 
@@ -159,11 +164,11 @@ export class TelemetryResource extends BaseResource {
    */
   async queryTraces(options?: TraceQueryOptions): Promise<TraceInfo[]> {
     const result = await this.request<{ traces: TraceInfo[] }>(
-      '/v1/telemetry/traces/query',
+      "/v1/telemetry/traces/query",
       {
-        method: 'POST',
-        body: options || {}
-      }
+        method: "POST",
+        body: options || {},
+      },
     );
     return result.traces;
   }
@@ -193,7 +198,7 @@ export class TelemetryResource extends BaseResource {
    */
   async getTraceSpans(traceId: string): Promise<TraceInfo[]> {
     const result = await this.request<{ spans: TraceInfo[] }>(
-      `/v1/telemetry/traces/${traceId}/spans`
+      `/v1/telemetry/traces/${traceId}/spans`,
     );
     return result.spans;
   }
@@ -209,11 +214,11 @@ export class TelemetryResource extends BaseResource {
    */
   async queryLogs(options: LogQueryOptions): Promise<LogEntry[]> {
     const result = await this.request<{ logs: LogEntry[] }>(
-      '/v1/telemetry/logs/query',
+      "/v1/telemetry/logs/query",
       {
-        method: 'POST',
-        body: options
-      }
+        method: "POST",
+        body: options,
+      },
     );
     return result.logs;
   }
@@ -222,10 +227,10 @@ export class TelemetryResource extends BaseResource {
    * 写入日志
    * @param entry 日志条目
    */
-  async writeLog(entry: Omit<LogEntry, 'timestamp'>): Promise<void> {
-    await this.request('/v1/telemetry/logs', {
-      method: 'POST',
-      body: entry
+  async writeLog(entry: Omit<LogEntry, "timestamp">): Promise<void> {
+    await this.request("/v1/telemetry/logs", {
+      method: "POST",
+      body: entry,
     });
   }
 
@@ -236,7 +241,7 @@ export class TelemetryResource extends BaseResource {
    */
   async getTraceLogs(traceId: string): Promise<LogEntry[]> {
     const result = await this.request<{ logs: LogEntry[] }>(
-      `/v1/telemetry/traces/${traceId}/logs`
+      `/v1/telemetry/traces/${traceId}/logs`,
     );
     return result.logs;
   }
@@ -250,7 +255,7 @@ export class TelemetryResource extends BaseResource {
    * @returns 健康状态
    */
   async healthCheck(): Promise<HealthCheckResult> {
-    return this.request<HealthCheckResult>('/v1/telemetry/health');
+    return this.request<HealthCheckResult>("/v1/telemetry/health");
   }
 
   /**
@@ -263,7 +268,7 @@ export class TelemetryResource extends BaseResource {
     version: string;
     [key: string]: any;
   }> {
-    return this.request('/v1/telemetry/status');
+    return this.request("/v1/telemetry/status");
   }
 
   // ==========================================================================
@@ -279,10 +284,9 @@ export class TelemetryResource extends BaseResource {
     start: string;
     end: string;
   }): Promise<PerformanceMetrics> {
-    return this.request<PerformanceMetrics>(
-      '/v1/telemetry/performance',
-      { params: timeRange }
-    );
+    return this.request<PerformanceMetrics>("/v1/telemetry/performance", {
+      params: timeRange,
+    });
   }
 
   /**
@@ -294,10 +298,9 @@ export class TelemetryResource extends BaseResource {
     start: string;
     end: string;
   }): Promise<UsageStatistics> {
-    return this.request<UsageStatistics>(
-      '/v1/telemetry/usage',
-      { params: timeRange }
-    );
+    return this.request<UsageStatistics>("/v1/telemetry/usage", {
+      params: timeRange,
+    });
   }
 
   // ==========================================================================
@@ -310,11 +313,11 @@ export class TelemetryResource extends BaseResource {
    * @returns 导出结果
    */
   async export(
-    request: ExportTelemetryRequest
+    request: ExportTelemetryRequest,
   ): Promise<ExportTelemetryResult> {
-    return this.request<ExportTelemetryResult>('/v1/telemetry/export', {
-      method: 'POST',
-      body: request
+    return this.request<ExportTelemetryResult>("/v1/telemetry/export", {
+      method: "POST",
+      body: request,
     });
   }
 
@@ -325,13 +328,13 @@ export class TelemetryResource extends BaseResource {
    * @returns 导出结果
    */
   async exportMetrics(
-    format: 'json' | 'csv' | 'prometheus',
-    timeRange?: { start: string; end: string }
+    format: "json" | "csv" | "prometheus",
+    timeRange?: { start: string; end: string },
   ): Promise<ExportTelemetryResult> {
     return this.export({
-      type: 'metrics',
+      type: "metrics",
       format,
-      timeRange
+      timeRange,
     });
   }
 
@@ -342,13 +345,13 @@ export class TelemetryResource extends BaseResource {
    * @returns 导出结果
    */
   async exportTraces(
-    format: 'json' | 'opentelemetry',
-    timeRange?: { start: string; end: string }
+    format: "json" | "opentelemetry",
+    timeRange?: { start: string; end: string },
   ): Promise<ExportTelemetryResult> {
     return this.export({
-      type: 'traces',
+      type: "traces",
       format,
-      timeRange
+      timeRange,
     });
   }
 
@@ -359,13 +362,13 @@ export class TelemetryResource extends BaseResource {
    * @returns 导出结果
    */
   async exportLogs(
-    format: 'json' | 'csv',
-    timeRange?: { start: string; end: string }
+    format: "json" | "csv",
+    timeRange?: { start: string; end: string },
   ): Promise<ExportTelemetryResult> {
     return this.export({
-      type: 'logs',
+      type: "logs",
       format,
-      timeRange
+      timeRange,
     });
   }
 }

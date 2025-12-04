@@ -160,7 +160,7 @@ go run evals/main.go
 
 ## 5. 与 session 结合: 对会话进行评估
 
-很多时候我们希望对**完整会话**中的最终回答进行评估。  
+很多时候我们希望对**完整会话**中的最终回答进行评估。
 `pkg/evals` 提供了一个辅助函数,可以从 `session.Event` 列表中构建 `TextEvalInput`:
 
 ```go
@@ -230,7 +230,7 @@ go run evals-session/main.go
 
 推荐下一步:
 
-- 在 CI 或离线脚本中,结合 `session` 或业务日志,对一批历史问答进行 evals,并把 `ScoreResult` 写入你自己的指标系统(如 Prometheus/ClickHouse/OLAP)。 
+- 在 CI 或离线脚本中,结合 `session` 或业务日志,对一批历史问答进行 evals,并把 `ScoreResult` 写入你自己的指标系统(如 Prometheus/ClickHouse/OLAP)。
 - 对关键业务场景(问答正确性、安全性)建立稳定的“评估集”,用上述 scorer 做定期回归测试。
 
 ## 7. 通过 HTTP API 使用 evals
@@ -362,33 +362,37 @@ lexical_similarity: 0.8000
 
 ### 常用参数
 
-- `-answer string`  
+- `-answer string`
   直接通过参数提供待评估文本。未提供时会从 `stdin` 读取。
 
-- `-reference string`  
+- `-reference string`
   参考答案,启用 `lexical_similarity` 时推荐设置。
 
-- `-keywords string`  
+- `-keywords string`
   逗号分隔的关键词列表,用于 `keyword_coverage` scorer。
 
-- `-min-token-length int`  
+- `-min-token-length int`
   词汇相似度中参与比较的最小 token 长度(默认 2)。
 
-- `-no-keywords` / `-no-similarity`  
+- `-no-keywords` / `-no-similarity`
   分别关闭关键词覆盖率/词汇相似度 scorer。
 
-- `-json`  
+- `-json`
   以 JSON 格式输出评估结果,适合脚本消费:
 
   ```bash
   echo "text..." | aster eval -reference "ref..." -json
   ```
 
-- `-file path`  
+- `-file path`
   从 JSONL 文件中批量读取样本进行评估。文件中每行是一个 JSON 对象:
 
   ```jsonc
-  {"answer": "Paris is the capital of France.", "reference": "Paris is the capital city of France, a country in Europe.", "keywords": ["paris","capital","france","europe"]}
+  {
+    "answer": "Paris is the capital of France.",
+    "reference": "Paris is the capital city of France, a country in Europe.",
+    "keywords": ["paris", "capital", "france", "europe"],
+  }
   ```
 
   使用示例:
@@ -398,7 +402,6 @@ lexical_similarity: 0.8000
   ```
 
   输出中每条结果(在 JSON 模式下)包含:
-
   - `line` – 样本所在的行号
   - `answer` – 原始答案文本
   - `keywords` – 样本中使用的关键词
@@ -410,16 +413,16 @@ lexical_similarity: 0.8000
 
 ### 5.1 可用的 LLM-based Scorers
 
-| Scorer | 名称 | 评估内容 |
-|--------|------|---------|
-| `faithfulness` | 忠实度评分器 | 答案是否忠实于提供的上下文，没有添加虚假信息 |
-| `hallucination` | 幻觉检测评分器 | 答案是否包含幻觉（虚假或无法验证的信息） |
-| `answer_relevancy` | 答案相关性评分器 | 答案是否直接回答了问题 |
-| `context_relevancy` | 上下文相关性评分器 | 提供的上下文是否对回答问题有帮助 |
-| `toxicity` | 毒性检测评分器 | 文本是否包含有害或不当内容 |
-| `tone_consistency` | 语气一致性评分器 | 文本的语气是否统一 |
-| `coherence` | 连贯性评分器 | 文本的逻辑结构和流畅度 |
-| `completeness` | 完整性评分器 | 答案是否全面回答了问题 |
+| Scorer              | 名称               | 评估内容                                     |
+| ------------------- | ------------------ | -------------------------------------------- |
+| `faithfulness`      | 忠实度评分器       | 答案是否忠实于提供的上下文，没有添加虚假信息 |
+| `hallucination`     | 幻觉检测评分器     | 答案是否包含幻觉（虚假或无法验证的信息）     |
+| `answer_relevancy`  | 答案相关性评分器   | 答案是否直接回答了问题                       |
+| `context_relevancy` | 上下文相关性评分器 | 提供的上下文是否对回答问题有帮助             |
+| `toxicity`          | 毒性检测评分器     | 文本是否包含有害或不当内容                   |
+| `tone_consistency`  | 语气一致性评分器   | 文本的语气是否统一                           |
+| `coherence`         | 连贯性评分器       | 文本的逻辑结构和流畅度                       |
+| `completeness`      | 完整性评分器       | 答案是否全面回答了问题                       |
 
 ### 5.2 Go代码使用示例
 

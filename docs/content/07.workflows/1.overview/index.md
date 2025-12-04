@@ -10,6 +10,7 @@ Aster Workflow 是一个强大的工作流编排系统，提供了灵活的步�
 ## 🎯 核心特性
 
 ### 🧩 8种步骤类型
+
 - **FunctionStep** - 自定义函数执行
 - **AgentStep** - Agent 调用
 - **RoomStep** - Room 协作
@@ -20,16 +21,19 @@ Aster Workflow 是一个强大的工作流编排系统，提供了灵活的步�
 - **StepsGroup** - 步骤组
 
 ### 🔀 Router 动态路由
+
 - **SimpleRouter** - 单步骤条件路由
 - **ChainRouter** - 多步骤链式路由
 - **DynamicRouter** - 完全自定义路由
 
 ### 🤖 WorkflowAgent 编排
+
 - Agentic Workflow - Agent 决定何时运行
 - 历史访问和上下文
 - 智能决策引擎
 
 ### 🔄 完整功能
+
 - ✅ 流式执行和事件系统
 - ✅ 会话管理和持久化
 - ✅ 历史记录和回放
@@ -286,6 +290,7 @@ func main() {
 ```
 
 **执行流程**:
+
 ```
 NestedWorkflow
 ├── ParallelCollector (并行)
@@ -325,6 +330,7 @@ gantt
 ```
 
 **性能分析**:
+
 - **SequentialAgent**: 总时间 = Sum(子Agent耗时) = 9s
 - **ParallelAgent**: 总时间 = Max(子Agent耗时) = 4s (最快的并行优势)
 - **LoopAgent**: 总时间 = 迭代次数 × Sum(子Agent耗时) = 5s (3次迭代)
@@ -477,6 +483,7 @@ go run main.go
 ```
 
 **输出示例**:
+
 ```
 === 工作流 Agent 演示 ===
 
@@ -519,13 +526,13 @@ go run main.go
 
 ### 1. 选择合适的工作流模式
 
-| 场景 | 推荐模式 | 原因 |
-|------|---------|------|
-| 数据处理流水线 | SequentialAgent | 步骤间有依赖关系 |
-| 多方案比较 | ParallelAgent | 需要同时评估多个选项 |
-| 质量优化循环 | LoopAgent | 需要迭代改进 |
-| 数据聚合 | Parallel → Sequential | 先并行收集，再串行汇总 |
-| 多轮改进 | Sequential + Loop | 顺序执行多个优化循环 |
+| 场景           | 推荐模式              | 原因                   |
+| -------------- | --------------------- | ---------------------- |
+| 数据处理流水线 | SequentialAgent       | 步骤间有依赖关系       |
+| 多方案比较     | ParallelAgent         | 需要同时评估多个选项   |
+| 质量优化循环   | LoopAgent             | 需要迭代改进           |
+| 数据聚合       | Parallel → Sequential | 先并行收集，再串行汇总 |
+| 多轮改进       | Sequential + Loop     | 顺序执行多个优化循环   |
 
 ### 2. 性能优化
 
@@ -630,6 +637,7 @@ A: 所有子 Agent 同时启动，但事件返回顺序不确定（取决于哪�
 ### Q3: LoopAgent 如何避免无限循环？
 
 A: 必须设置 `MaxIterations` 或 `StopCondition` 之一。建议同时设置两者：
+
 ```go
 MaxIterations: 10,  // 最多10次迭代
 StopCondition: func(event *session.Event) bool {
@@ -640,6 +648,7 @@ StopCondition: func(event *session.Event) bool {
 ### Q4: 如何调试嵌套工作流？
 
 A: 使用 `event.Branch` 字段追踪事件来源：
+
 ```go
 reader := nestedWorkflow.Execute(ctx, msg)
 for {

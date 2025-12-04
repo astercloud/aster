@@ -10,15 +10,15 @@
 /**
  * 内置 Middleware 名称
  */
-export type BuiltinMiddlewareName = 
-  | 'summarization'      // 1. 总结中间件（上下文压缩）
-  | 'tool_approval'      // 2. 工具审批
-  | 'pii_redaction'      // 3. PII 脱敏
-  | 'token_limiter'      // 4. Token 限制
-  | 'rate_limiter'       // 5. 速率限制
-  | 'cost_tracker'       // 6. 成本追踪
-  | 'logging'            // 7. 日志记录
-  | 'telemetry';         // 8. 遥测
+export type BuiltinMiddlewareName =
+  | "summarization" // 1. 总结中间件（上下文压缩）
+  | "tool_approval" // 2. 工具审批
+  | "pii_redaction" // 3. PII 脱敏
+  | "token_limiter" // 4. Token 限制
+  | "rate_limiter" // 5. 速率限制
+  | "cost_tracker" // 6. 成本追踪
+  | "logging" // 7. 日志记录
+  | "telemetry"; // 8. 遥测
 
 /**
  * Middleware 信息
@@ -31,7 +31,7 @@ export interface MiddlewareInfo {
   /** 描述 */
   description: string;
   /** 类型 */
-  type: 'builtin' | 'custom';
+  type: "builtin" | "custom";
   /** 是否启用 */
   enabled: boolean;
   /** 优先级（数字越小越早执行） */
@@ -49,14 +49,17 @@ export interface MiddlewareConfigSchema {
   /** Schema 类型 */
   type: string;
   /** 属性定义 */
-  properties: Record<string, {
-    type: string;
-    description?: string;
-    default?: any;
-    enum?: any[];
-    minimum?: number;
-    maximum?: number;
-  }>;
+  properties: Record<
+    string,
+    {
+      type: string;
+      description?: string;
+      default?: any;
+      enum?: any[];
+      minimum?: number;
+      maximum?: number;
+    }
+  >;
   /** 必需字段 */
   required?: string[];
 }
@@ -94,7 +97,7 @@ export interface ToolApprovalConfig {
   /** 审批超时时间（秒） */
   approvalTimeout: number;
   /** 超时默认行为 */
-  timeoutBehavior: 'approve' | 'reject';
+  timeoutBehavior: "approve" | "reject";
 }
 
 /**
@@ -103,9 +106,11 @@ export interface ToolApprovalConfig {
  */
 export interface PIIRedactionConfig {
   /** 启用的 PII 类型 */
-  enabledTypes: Array<'email' | 'phone' | 'ssn' | 'credit_card' | 'ip_address' | 'name'>;
+  enabledTypes: Array<
+    "email" | "phone" | "ssn" | "credit_card" | "ip_address" | "name"
+  >;
   /** 脱敏策略 */
-  strategy: 'mask' | 'remove' | 'replace';
+  strategy: "mask" | "remove" | "replace";
   /** 替换文本（strategy=replace 时使用） */
   replacementText?: string;
   /** 是否保留部分信息 */
@@ -124,7 +129,7 @@ export interface TokenLimiterConfig {
   /** 每天最大 Token 数 */
   maxTokensPerDay?: number;
   /** 超限行为 */
-  onExceeded: 'reject' | 'truncate' | 'queue';
+  onExceeded: "reject" | "truncate" | "queue";
 }
 
 /**
@@ -137,9 +142,9 @@ export interface RateLimiterConfig {
   /** 窗口内最大请求数 */
   maxRequests: number;
   /** 限流策略 */
-  strategy: 'fixed_window' | 'sliding_window' | 'token_bucket';
+  strategy: "fixed_window" | "sliding_window" | "token_bucket";
   /** 超限行为 */
-  onExceeded: 'reject' | 'queue' | 'delay';
+  onExceeded: "reject" | "queue" | "delay";
 }
 
 /**
@@ -150,12 +155,12 @@ export interface CostTrackerConfig {
   /** 是否启用成本追踪 */
   enabled: boolean;
   /** 成本模型 */
-  costModel: 'token_based' | 'time_based' | 'custom';
+  costModel: "token_based" | "time_based" | "custom";
   /** 成本计算方式 */
   pricing?: {
-    promptTokenPrice: number;      // 每 1K prompt tokens 的价格
-    completionTokenPrice: number;  // 每 1K completion tokens 的价格
-    currency: string;              // 货币单位
+    promptTokenPrice: number; // 每 1K prompt tokens 的价格
+    completionTokenPrice: number; // 每 1K completion tokens 的价格
+    currency: string; // 货币单位
   };
   /** 预算限制 */
   budget?: {
@@ -170,7 +175,7 @@ export interface CostTrackerConfig {
  */
 export interface LoggingConfig {
   /** 日志级别 */
-  level: 'debug' | 'info' | 'warn' | 'error';
+  level: "debug" | "info" | "warn" | "error";
   /** 是否记录请求 */
   logRequests: boolean;
   /** 是否记录响应 */
@@ -180,9 +185,9 @@ export interface LoggingConfig {
   /** 是否记录错误 */
   logErrors: boolean;
   /** 日志格式 */
-  format: 'json' | 'text';
+  format: "json" | "text";
   /** 输出目标 */
-  outputs: Array<'console' | 'file' | 'remote'>;
+  outputs: Array<"console" | "file" | "remote">;
 }
 
 /**
@@ -195,7 +200,7 @@ export interface TelemetryMiddlewareConfig {
   /** 采样率（0-1） */
   samplingRate: number;
   /** 收集的指标 */
-  metrics: Array<'latency' | 'tokens' | 'cost' | 'errors' | 'tool_calls'>;
+  metrics: Array<"latency" | "tokens" | "cost" | "errors" | "tool_calls">;
   /** 导出端点 */
   exportEndpoint?: string;
   /** 导出间隔（秒） */

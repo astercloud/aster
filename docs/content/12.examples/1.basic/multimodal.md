@@ -144,13 +144,13 @@ messages := []types.Message{
 
 ## 支持情况
 
-| Provider | 图片 | 音频 | 视频 |
-|----------|------|------|------|
-| OpenAI | ✅ | ✅ | ❌ |
-| Anthropic | ✅ | ❌ | ❌ |
-| Gemini | ✅ | ✅ | ✅ |
-| Groq | ❌ | ❌ | ❌ |
-| DeepSeek | ❌ | ❌ | ❌ |
+| Provider  | 图片 | 音频 | 视频 |
+| --------- | ---- | ---- | ---- |
+| OpenAI    | ✅   | ✅   | ❌   |
+| Anthropic | ✅   | ❌   | ❌   |
+| Gemini    | ✅   | ✅   | ✅   |
+| Groq      | ❌   | ❌   | ❌   |
+| DeepSeek  | ❌   | ❌   | ❌   |
 
 ## 相关资源
 

@@ -642,51 +642,51 @@ groups:
 # alertmanager.yml
 global:
   resolve_timeout: 5m
-  slack_api_url: 'https://hooks.slack.com/services/YOUR/WEBHOOK/URL'
+  slack_api_url: "https://hooks.slack.com/services/YOUR/WEBHOOK/URL"
 
 route:
-  group_by: ['alertname', 'severity']
+  group_by: ["alertname", "severity"]
   group_wait: 10s
   group_interval: 10s
   repeat_interval: 12h
-  receiver: 'default'
+  receiver: "default"
 
   routes:
     # 严重告警立即发送
     - match:
         severity: critical
-      receiver: 'pagerduty'
+      receiver: "pagerduty"
       continue: true
 
     # 警告发送到 Slack
     - match:
         severity: warning
-      receiver: 'slack'
+      receiver: "slack"
 
     # 信息只记录
     - match:
         severity: info
-      receiver: 'log'
+      receiver: "log"
 
 receivers:
-  - name: 'default'
+  - name: "default"
     slack_configs:
-      - channel: '#alerts'
-        title: 'Agent Alert'
+      - channel: "#alerts"
+        title: "Agent Alert"
         text: '{{ range .Alerts }}{{ .Annotations.summary }}\n{{ .Annotations.description }}\n{{ end }}'
 
-  - name: 'pagerduty'
+  - name: "pagerduty"
     pagerduty_configs:
-      - service_key: 'YOUR_PAGERDUTY_KEY'
+      - service_key: "YOUR_PAGERDUTY_KEY"
 
-  - name: 'slack'
+  - name: "slack"
     slack_configs:
-      - channel: '#agent-warnings'
-        title: 'Agent Warning'
+      - channel: "#agent-warnings"
+        title: "Agent Warning"
 
-  - name: 'log'
+  - name: "log"
     webhook_configs:
-      - url: 'http://logger:8080/alerts'
+      - url: "http://logger:8080/alerts"
 ```
 
 ### 自定义告警处理

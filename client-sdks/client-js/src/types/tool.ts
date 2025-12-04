@@ -10,34 +10,34 @@
 /**
  * 工具类型
  */
-export type ToolType = 
-  | 'builtin'     // 内置工具
-  | 'custom'      // 自定义工具
-  | 'mcp';        // MCP 工具
+export type ToolType =
+  | "builtin" // 内置工具
+  | "custom" // 自定义工具
+  | "mcp"; // MCP 工具
 
 /**
  * 工具分类
  */
-export type ToolCategory = 
-  | 'system'          // 系统工具
-  | 'file'            // 文件操作
-  | 'network'         // 网络请求
-  | 'data'            // 数据处理
-  | 'code'            // 代码执行
-  | 'integration'     // 第三方集成
-  | 'other';          // 其他
+export type ToolCategory =
+  | "system" // 系统工具
+  | "file" // 文件操作
+  | "network" // 网络请求
+  | "data" // 数据处理
+  | "code" // 代码执行
+  | "integration" // 第三方集成
+  | "other"; // 其他
 
 /**
  * 内置工具名称
  */
-export type BuiltinToolName = 
-  | 'bash'                  // Bash 命令执行
-  | 'python'                // Python 代码执行
-  | 'http_request'          // HTTP 请求
-  | 'file_read'             // 文件读取
-  | 'file_write'            // 文件写入
-  | 'web_scraper'           // 网页抓取
-  | 'database_query';       // 数据库查询
+export type BuiltinToolName =
+  | "bash" // Bash 命令执行
+  | "python" // Python 代码执行
+  | "http_request" // HTTP 请求
+  | "file_read" // 文件读取
+  | "file_write" // 文件写入
+  | "web_scraper" // 网页抓取
+  | "database_query"; // 数据库查询
 
 // ============================================================================
 // Tool Info
@@ -154,7 +154,7 @@ export interface AsyncToolExecutionResponse {
   /** 任务 ID */
   taskId: string;
   /** 状态 */
-  status: 'pending' | 'running';
+  status: "pending" | "running";
   /** 创建时间 */
   createdAt: string;
 }
@@ -166,12 +166,12 @@ export interface AsyncToolExecutionResponse {
 /**
  * 长时运行任务状态
  */
-export type TaskStatus = 
-  | 'pending'     // 等待中
-  | 'running'     // 运行中
-  | 'completed'   // 完成
-  | 'failed'      // 失败
-  | 'cancelled';  // 已取消
+export type TaskStatus =
+  | "pending" // 等待中
+  | "running" // 运行中
+  | "completed" // 完成
+  | "failed" // 失败
+  | "cancelled"; // 已取消
 
 /**
  * 任务进度信息
@@ -238,7 +238,7 @@ export interface HttpRequestToolParams {
   /** URL */
   url: string;
   /** 方法 */
-  method: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   /** Headers */
   headers?: Record<string, string>;
   /** 请求体 */

@@ -11,21 +11,21 @@
  * Eval 类型
  */
 export type EvalType =
-  | 'single'        // 单次评估
-  | 'batch'         // 批量评估
-  | 'benchmark'     // 基准测试
-  | 'regression'    // 回归测试
-  | 'ab_test';      // A/B 测试
+  | "single" // 单次评估
+  | "batch" // 批量评估
+  | "benchmark" // 基准测试
+  | "regression" // 回归测试
+  | "ab_test"; // A/B 测试
 
 /**
  * Eval 状态
  */
 export type EvalStatus =
-  | 'pending'       // 待执行
-  | 'running'       // 执行中
-  | 'completed'     // 已完成
-  | 'failed'        // 失败
-  | 'cancelled';    // 已取消
+  | "pending" // 待执行
+  | "running" // 执行中
+  | "completed" // 已完成
+  | "failed" // 失败
+  | "cancelled"; // 已取消
 
 // ============================================================================
 // Scorers
@@ -35,16 +35,16 @@ export type EvalStatus =
  * Scorer 类型
  */
 export type ScorerType =
-  | 'exact_match'           // 精确匹配
-  | 'contains'              // 包含检查
-  | 'semantic_similarity'   // 语义相似度
-  | 'llm_judge'            // LLM 评分
-  | 'keyword_coverage'      // 关键词覆盖率
-  | 'sentiment'            // 情感分析
-  | 'factuality'           // 事实准确性
-  | 'coherence'            // 连贯性
-  | 'relevance'            // 相关性
-  | 'custom';              // 自定义
+  | "exact_match" // 精确匹配
+  | "contains" // 包含检查
+  | "semantic_similarity" // 语义相似度
+  | "llm_judge" // LLM 评分
+  | "keyword_coverage" // 关键词覆盖率
+  | "sentiment" // 情感分析
+  | "factuality" // 事实准确性
+  | "coherence" // 连贯性
+  | "relevance" // 相关性
+  | "custom"; // 自定义
 
 /**
  * Scorer 配置
@@ -62,7 +62,7 @@ export interface ScorerConfig {
  * LLM Judge Scorer 配置
  */
 export interface LLMJudgeScorerConfig extends ScorerConfig {
-  type: 'llm_judge';
+  type: "llm_judge";
   params: {
     /** LLM Provider */
     provider: string;
@@ -84,7 +84,7 @@ export interface LLMJudgeScorerConfig extends ScorerConfig {
  * Semantic Similarity Scorer 配置
  */
 export interface SemanticSimilarityScorerConfig extends ScorerConfig {
-  type: 'semantic_similarity';
+  type: "semantic_similarity";
   params: {
     /** 嵌入模型 */
     embeddingModel?: string;
@@ -401,7 +401,7 @@ export interface ABTestResult {
     /** 是否显著 */
     isSignificant: boolean;
     /** 胜者 */
-    winner?: 'A' | 'B' | 'tie';
+    winner?: "A" | "B" | "tie";
   };
   /** 创建时间 */
   createdAt: string;
@@ -427,9 +427,9 @@ export interface EvalFilter {
   createdAfter?: string;
   createdBefore?: string;
   /** 排序字段 */
-  sortBy?: 'createdAt' | 'completedAt' | 'avgScore' | 'passRate';
+  sortBy?: "createdAt" | "completedAt" | "avgScore" | "passRate";
   /** 排序方向 */
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
   /** 分页 */
   page?: number;
   pageSize?: number;
@@ -458,7 +458,7 @@ export interface PaginatedEvalResponse {
 /**
  * 报告格式
  */
-export type ReportFormat = 'json' | 'html' | 'markdown' | 'csv';
+export type ReportFormat = "json" | "html" | "markdown" | "csv";
 
 /**
  * 报告请求

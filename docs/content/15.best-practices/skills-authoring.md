@@ -39,9 +39,11 @@ allowed-tools: ["Bash", "Read", "Write"]
 # Markdown 分段翻译技能
 
 ## 使用场景
+
 …
 
 ## 操作步骤
+
 …
 ```
 
@@ -88,25 +90,32 @@ allowed-tools: ["Bash", "Read", "Write"]
 # 技能名称（人类可读）
 
 ## 何时使用
+
 - 列出 3–5 条“典型场景”
 - 尽量使用用户原话风格，例如“当用户说‘翻译整篇 Markdown 文档’时…”
 
 ## 前置假设
+
 - 环境依赖（例如：已安装 python3 / 某些 pip 包）
 - 目录结构（用代码块展示 workspace 下的相对路径）
 
 ## 操作步骤
+
 ### 第 1 步：…
+
 1. 用什么工具做什么事（必须写清楚命令示例）
 2. 需要关注的输出字段（例如 Bash 返回的 `ok` / `output`）
 
 ### 第 2 步：…
+
 …
 
 ## 错误处理
+
 - 列出常见错误及建议的处理方式
 
 ## 安全注意事项
+
 - 列出禁止做的事情（例如“不直接调用外部 API”“不修改原始文件”）
 ```
 
@@ -114,7 +123,7 @@ allowed-tools: ["Bash", "Read", "Write"]
 
 不要假设 Agent 会“猜对”命令行。用真实命令举例：
 
-```markdown
+````markdown
 ### 第 1 步：分段
 
 使用 `Bash` 工具执行：
@@ -126,12 +135,15 @@ python3 workspace/skills/markdown-segment-translator/scripts/segment_tool.py \
   --segment-size 1000 \
   --max-segments 3
 ```
+````
 
 执行完成后，你应该在输出中看到类似：
+
 - `output/segments/segment_1.md`
 - `output/segments/segment_2.md`
 - `output/segments/segment_3.md`
-```
+
+````
 
 这样模型可以直接复用示例，而不是自己发明命令。
 
@@ -149,7 +161,7 @@ python3 workspace/skills/markdown-segment-translator/scripts/segment_tool.py \
 2. 使用自己的语言能力将内容翻译为中文，保持 Markdown 结构不变；
 3. 使用 `Write` 工具将翻译结果写入：
    - `{"path": "output/translations/translated_segment_1.md", "content": "<你的翻译结果>"}`
-```
+````
 
 ## 4. 与系统提示配合
 
@@ -180,11 +192,13 @@ allowed-tools: ["Read", "Grep"]
 # 写作一致性检查 Skill
 
 ## 何时使用
+
 - 用户要求“检查角色/设定/时间线一致性”
 - 用户在写长篇故事，多次提到“前面说过”“和之前冲突”等
 - 需要跨章节对比设定或角色档案
 
 ## 前置假设
+
 - 角色档案位于 `spec/knowledge/characters/`
 - 世界观设定位于 `spec/knowledge/worldbuilding/`
 - 时间线记录为 `spec/tracking/timeline.json`
@@ -195,6 +209,7 @@ allowed-tools: ["Read", "Grep"]
 ### 第 1 步：加载参考资料
 
 使用 `Read` 工具读取以下文件（如存在）：
+
 - 主角角色档案，例如：`spec/knowledge/characters/main-character.md`
 - 当前章节草稿：`drafts/current-chapter.md`
 - 时间线文件：`spec/tracking/timeline.json`
@@ -202,6 +217,7 @@ allowed-tools: ["Read", "Grep"]
 在后续分析中，将这些内容作为“事实来源”。
 
 ### 第 2 步：检查角色一致性
+
 - 比对当前章节中的角色行为、外貌特征、知识状态是否与角色档案中的设定一致；
 - 对发现的潜在冲突，给出：
   - 冲突描述
@@ -209,19 +225,21 @@ allowed-tools: ["Read", "Grep"]
   - 建议修正方案
 
 ### 第 3 步：检查世界设定与时间线一致性
+
 - 对照世界观设定文档和时间线 JSON，找出：
   - 时间顺序错乱
   - 设定被隐形修改
   - 明显违反已建立规则的情节
 
 ## 错误处理
+
 - 如果任何参考文件不存在，说明清楚缺失的是哪一类信息，并继续使用你能获取到的部分做最佳努力分析；
 - 如果文本中没有发现明确冲突，也要明确说明“未发现明显一致性问题”。
 
 ## 安全注意事项
+
 - 不要随意修改原始参考文件；
 - 如果用户要求自动修正文本，应先给出变更建议，再根据用户确认执行写入。
 ```
 
 这个示例的结构、注释和命名都可以作为你编写其他 SKILL.md 的模板。
-

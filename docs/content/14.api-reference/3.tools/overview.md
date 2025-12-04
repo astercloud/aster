@@ -42,6 +42,7 @@ type ToolHandler func(ctx context.Context, tc *ToolContext) (interface{}, error)
 文件系统操作工具集。
 
 **工具列表**：
+
 - `filesystem_read` - 读取文件
 - `filesystem_write` - 写入文件
 - `filesystem_list` - 列出目录
@@ -77,6 +78,7 @@ ag.Chat(ctx, "创建一个 hello.txt 文件，内容为 Hello World")
 **工具名称**：`bash`
 
 **功能**：
+
 - 执行 Shell 命令
 - 支持沙箱隔离
 - 超时控制
@@ -104,6 +106,7 @@ ag.Chat(ctx, "列出当前目录的文件")
 HTTP 请求工具。
 
 **工具列表**：
+
 - `http_get` - GET 请求
 - `http_post` - POST 请求
 - `http_put` - PUT 请求
@@ -125,6 +128,7 @@ ag.Chat(ctx, "获取 https://api.github.com/users/octocat 的数据")
 **工具名称**：`websearch`
 
 **功能**：
+
 - 搜索网页内容
 - 返回搜索结果摘要
 
@@ -369,10 +373,12 @@ type ToolHandler func(ctx context.Context, tc *ToolContext) (interface{}, error)
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `tc`: 工具上下文
 
 **返回**：
+
 - `interface{}`: 工具执行结果（可序列化为 JSON）
 - `error`: 错误信息
 

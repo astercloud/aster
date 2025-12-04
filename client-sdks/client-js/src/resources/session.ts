@@ -3,7 +3,7 @@
  * 管理会话生命周期、消息历史、断点恢复
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   SessionConfig,
   SessionInfo,
@@ -17,8 +17,8 @@ import {
   SessionStats,
   UpdateSessionRequest,
   ExportOptions,
-  ExportResult
-} from '../types/session';
+  ExportResult,
+} from "../types/session";
 
 /**
  * Session 资源类
@@ -38,9 +38,9 @@ export class SessionResource extends BaseResource {
    * @returns Session 信息
    */
   async create(config: SessionConfig): Promise<SessionInfo> {
-    return this.request<SessionInfo>('/v1/sessions', {
-      method: 'POST',
-      body: config
+    return this.request<SessionInfo>("/v1/sessions", {
+      method: "POST",
+      body: config,
     });
   }
 
@@ -59,8 +59,8 @@ export class SessionResource extends BaseResource {
    * @returns Session 列表
    */
   async list(filter?: SessionFilter): Promise<PaginatedResponse<SessionInfo>> {
-    return this.request<PaginatedResponse<SessionInfo>>('/v1/sessions', {
-      params: filter
+    return this.request<PaginatedResponse<SessionInfo>>("/v1/sessions", {
+      params: filter,
     });
   }
 
@@ -71,11 +71,11 @@ export class SessionResource extends BaseResource {
    */
   async update(
     sessionId: string,
-    updates: UpdateSessionRequest
+    updates: UpdateSessionRequest,
   ): Promise<SessionInfo> {
     return this.request<SessionInfo>(`/v1/sessions/${sessionId}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -85,7 +85,7 @@ export class SessionResource extends BaseResource {
    */
   async delete(sessionId: string): Promise<void> {
     await this.request(`/v1/sessions/${sessionId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -101,11 +101,11 @@ export class SessionResource extends BaseResource {
    */
   async getMessages(
     sessionId: string,
-    pagination?: Pagination
+    pagination?: Pagination,
   ): Promise<PaginatedResponse<Message>> {
     return this.request<PaginatedResponse<Message>>(
       `/v1/sessions/${sessionId}/messages`,
-      { params: pagination }
+      { params: pagination },
     );
   }
 
@@ -117,15 +117,12 @@ export class SessionResource extends BaseResource {
    */
   async addMessage(
     sessionId: string,
-    message: Omit<Message, 'id' | 'timestamp'>
+    message: Omit<Message, "id" | "timestamp">,
   ): Promise<Message> {
-    return this.request<Message>(
-      `/v1/sessions/${sessionId}/messages`,
-      {
-        method: 'POST',
-        body: message
-      }
-    );
+    return this.request<Message>(`/v1/sessions/${sessionId}/messages`, {
+      method: "POST",
+      body: message,
+    });
   }
 
   /**
@@ -134,12 +131,9 @@ export class SessionResource extends BaseResource {
    * @param messageId Message ID
    * @returns 消息详情
    */
-  async getMessage(
-    sessionId: string,
-    messageId: string
-  ): Promise<Message> {
+  async getMessage(sessionId: string, messageId: string): Promise<Message> {
     return this.request<Message>(
-      `/v1/sessions/${sessionId}/messages/${messageId}`
+      `/v1/sessions/${sessionId}/messages/${messageId}`,
     );
   }
 
@@ -148,14 +142,10 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    * @param messageId Message ID
    */
-  async deleteMessage(
-    sessionId: string,
-    messageId: string
-  ): Promise<void> {
-    await this.request(
-      `/v1/sessions/${sessionId}/messages/${messageId}`,
-      { method: 'DELETE' }
-    );
+  async deleteMessage(sessionId: string, messageId: string): Promise<void> {
+    await this.request(`/v1/sessions/${sessionId}/messages/${messageId}`, {
+      method: "DELETE",
+    });
   }
 
   // ==========================================================================
@@ -169,7 +159,7 @@ export class SessionResource extends BaseResource {
    */
   async getCheckpoints(sessionId: string): Promise<Checkpoint[]> {
     const result = await this.request<{ checkpoints: Checkpoint[] }>(
-      `/v1/sessions/${sessionId}/checkpoints`
+      `/v1/sessions/${sessionId}/checkpoints`,
     );
     return result.checkpoints;
   }
@@ -182,10 +172,10 @@ export class SessionResource extends BaseResource {
    */
   async getCheckpoint(
     sessionId: string,
-    checkpointId: string
+    checkpointId: string,
   ): Promise<Checkpoint> {
     return this.request<Checkpoint>(
-      `/v1/sessions/${sessionId}/checkpoints/${checkpointId}`
+      `/v1/sessions/${sessionId}/checkpoints/${checkpointId}`,
     );
   }
 
@@ -196,15 +186,12 @@ export class SessionResource extends BaseResource {
    */
   async resume(
     sessionId: string,
-    options?: ResumeOptions
+    options?: ResumeOptions,
   ): Promise<SessionInfo> {
-    return this.request<SessionInfo>(
-      `/v1/sessions/${sessionId}/resume`,
-      {
-        method: 'POST',
-        body: options
-      }
-    );
+    return this.request<SessionInfo>(`/v1/sessions/${sessionId}/resume`, {
+      method: "POST",
+      body: options,
+    });
   }
 
   /**
@@ -215,15 +202,12 @@ export class SessionResource extends BaseResource {
    */
   async createCheckpoint(
     sessionId: string,
-    label?: string
+    label?: string,
   ): Promise<Checkpoint> {
-    return this.request<Checkpoint>(
-      `/v1/sessions/${sessionId}/checkpoints`,
-      {
-        method: 'POST',
-        body: { label }
-      }
-    );
+    return this.request<Checkpoint>(`/v1/sessions/${sessionId}/checkpoints`, {
+      method: "POST",
+      body: { label },
+    });
   }
 
   // ==========================================================================
@@ -236,9 +220,7 @@ export class SessionResource extends BaseResource {
    * @returns 统计数据
    */
   async getStats(sessionId: string): Promise<SessionStats> {
-    return this.request<SessionStats>(
-      `/v1/sessions/${sessionId}/stats`
-    );
+    return this.request<SessionStats>(`/v1/sessions/${sessionId}/stats`);
   }
 
   // ==========================================================================
@@ -250,7 +232,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    */
   async pause(sessionId: string): Promise<SessionInfo> {
-    return this.update(sessionId, { status: 'paused' });
+    return this.update(sessionId, { status: "paused" });
   }
 
   /**
@@ -258,7 +240,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    */
   async activate(sessionId: string): Promise<SessionInfo> {
-    return this.update(sessionId, { status: 'active' });
+    return this.update(sessionId, { status: "active" });
   }
 
   /**
@@ -266,7 +248,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    */
   async complete(sessionId: string): Promise<SessionInfo> {
-    return this.update(sessionId, { status: 'completed' });
+    return this.update(sessionId, { status: "completed" });
   }
 
   /**
@@ -274,7 +256,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    */
   async archive(sessionId: string): Promise<SessionInfo> {
-    return this.update(sessionId, { status: 'archived' });
+    return this.update(sessionId, { status: "archived" });
   }
 
   // ==========================================================================
@@ -289,15 +271,12 @@ export class SessionResource extends BaseResource {
    */
   async export(
     sessionId: string,
-    options: ExportOptions
+    options: ExportOptions,
   ): Promise<ExportResult> {
-    return this.request<ExportResult>(
-      `/v1/sessions/${sessionId}/export`,
-      {
-        method: 'POST',
-        body: options
-      }
-    );
+    return this.request<ExportResult>(`/v1/sessions/${sessionId}/export`, {
+      method: "POST",
+      body: options,
+    });
   }
 
   // ==========================================================================
@@ -309,9 +288,9 @@ export class SessionResource extends BaseResource {
    * @param sessionIds Session ID 列表
    */
   async deleteBatch(sessionIds: string[]): Promise<void> {
-    await this.request('/v1/sessions/batch', {
-      method: 'DELETE',
-      body: { sessionIds }
+    await this.request("/v1/sessions/batch", {
+      method: "DELETE",
+      body: { sessionIds },
     });
   }
 
@@ -320,9 +299,9 @@ export class SessionResource extends BaseResource {
    * @param sessionIds Session ID 列表
    */
   async archiveBatch(sessionIds: string[]): Promise<void> {
-    await this.request('/v1/sessions/batch/archive', {
-      method: 'POST',
-      body: { sessionIds }
+    await this.request("/v1/sessions/batch/archive", {
+      method: "POST",
+      body: { sessionIds },
     });
   }
 }

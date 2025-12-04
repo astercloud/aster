@@ -3,8 +3,8 @@
  * 支持异步迭代、背压控制、事件过滤
  */
 
-import { WebSocketClient, WebSocketState } from '../transport/websocket';
-import { StreamEvent, EventEnvelope, Channel, EventFilter } from './types';
+import { WebSocketClient, WebSocketState } from "../transport/websocket";
+import { StreamEvent, EventEnvelope, Channel, EventFilter } from "./types";
 
 /**
  * 事件订阅
@@ -19,11 +19,7 @@ export class EventSubscription {
   private resolvers: Array<(value: IteratorResult<EventEnvelope>) => void> = [];
   private unsubscribeWs?: () => void;
 
-  constructor(
-    ws: WebSocketClient,
-    channels: Channel[],
-    filter?: EventFilter
-  ) {
+  constructor(ws: WebSocketClient, channels: Channel[], filter?: EventFilter) {
     this.ws = ws;
     this.channels = channels;
     this.filter = filter;
@@ -51,14 +47,16 @@ export class EventSubscription {
       }
 
       // 等待新事件
-      const result = await new Promise<IteratorResult<EventEnvelope>>((resolve) => {
-        if (!this.isActive) {
-          resolve({ done: true, value: undefined });
-          return;
-        }
-        
-        this.resolvers.push(resolve);
-      });
+      const result = await new Promise<IteratorResult<EventEnvelope>>(
+        (resolve) => {
+          if (!this.isActive) {
+            resolve({ done: true, value: undefined });
+            return;
+          }
+
+          this.resolvers.push(resolve);
+        },
+      );
 
       if (result.done) {
         break;
@@ -90,7 +88,7 @@ export class EventSubscription {
     this.eventQueue = [];
 
     // 通知所有等待的迭代器
-    this.resolvers.forEach(resolve => {
+    this.resolvers.forEach((resolve) => {
       resolve({ done: true, value: undefined });
     });
     this.resolvers = [];
@@ -118,7 +116,10 @@ export class EventSubscription {
       }
 
       // 事件类型过滤
-      if (this.filter.eventTypes && !this.filter.eventTypes.includes(envelope.event.type)) {
+      if (
+        this.filter.eventTypes &&
+        !this.filter.eventTypes.includes(envelope.event.type)
+      ) {
         return;
       }
     }
@@ -133,7 +134,9 @@ export class EventSubscription {
 
       // 防止队列过大
       if (this.eventQueue.length > 1000) {
-        console.warn('[EventSubscription] Event queue overflow, dropping oldest events');
+        console.warn(
+          "[EventSubscription] Event queue overflow, dropping oldest events",
+        );
         this.eventQueue = this.eventQueue.slice(-500); // 保留最新的 500 个
       }
     }
@@ -144,9 +147,9 @@ export class EventSubscription {
    */
   private sendSubscribeRequest(): void {
     this.ws.send({
-      type: 'subscribe',
+      type: "subscribe",
       channels: this.channels,
-      filter: this.filter
+      filter: this.filter,
     });
   }
 
@@ -155,8 +158,8 @@ export class EventSubscription {
    */
   private sendUnsubscribeRequest(): void {
     this.ws.send({
-      type: 'unsubscribe',
-      channels: this.channels
+      type: "unsubscribe",
+      channels: this.channels,
     });
   }
 }
@@ -177,13 +180,10 @@ export class SubscriptionManager {
   /**
    * 创建订阅
    */
-  subscribe(
-    channels: Channel[],
-    filter?: EventFilter
-  ): EventSubscription {
+  subscribe(channels: Channel[], filter?: EventFilter): EventSubscription {
     const subscription = new EventSubscription(this.ws, channels, filter);
     const subscriptionId = `sub_${++this.subscriptionCounter}`;
-    
+
     this.subscriptions.set(subscriptionId, subscription);
 
     return subscription;
@@ -204,7 +204,7 @@ export class SubscriptionManager {
    * 取消所有订阅
    */
   unsubscribeAll(): void {
-    this.subscriptions.forEach(subscription => {
+    this.subscriptions.forEach((subscription) => {
       subscription.unsubscribe();
     });
     this.subscriptions.clear();

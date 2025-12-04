@@ -42,11 +42,11 @@ export interface AgentConfig {
 /**
  * Agent 状态
  */
-export type AgentStatus = 
-  | 'active'      // 活跃
-  | 'inactive'    // 未激活
-  | 'disabled'    // 已禁用
-  | 'archived';   // 已归档
+export type AgentStatus =
+  | "active" // 活跃
+  | "inactive" // 未激活
+  | "disabled" // 已禁用
+  | "archived"; // 已归档
 
 /**
  * Agent 信息
@@ -73,14 +73,14 @@ export interface AgentInfo extends AgentConfig {
 /**
  * Agent 模板类型
  */
-export type AgentTemplateType = 
-  | 'assistant'       // 通用助手
-  | 'researcher'      // 研究员
-  | 'coder'          // 程序员
-  | 'writer'         // 写作者
-  | 'analyzer'       // 分析师
-  | 'translator'     // 翻译员
-  | 'custom';        // 自定义
+export type AgentTemplateType =
+  | "assistant" // 通用助手
+  | "researcher" // 研究员
+  | "coder" // 程序员
+  | "writer" // 写作者
+  | "analyzer" // 分析师
+  | "translator" // 翻译员
+  | "custom"; // 自定义
 
 /**
  * Agent 模板
@@ -230,18 +230,18 @@ export interface ToolCall {
   /** 结果 */
   result?: any;
   /** 状态 */
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  status: "pending" | "running" | "completed" | "failed";
 }
 
 /**
  * 流式 Chat 事件
  */
-export type StreamChatEvent = 
-  | { type: 'start'; sessionId: string }
-  | { type: 'token'; token: string }
-  | { type: 'tool_call'; toolCall: ToolCall }
-  | { type: 'end'; response: ChatResponse }
-  | { type: 'error'; error: string };
+export type StreamChatEvent =
+  | { type: "start"; sessionId: string }
+  | { type: "token"; token: string }
+  | { type: "tool_call"; toolCall: ToolCall }
+  | { type: "end"; response: ChatResponse }
+  | { type: "error"; error: string };
 
 // ============================================================================
 // Agent Statistics
@@ -308,9 +308,9 @@ export interface AgentFilter {
   createdAfter?: string;
   createdBefore?: string;
   /** 排序字段 */
-  sortBy?: 'name' | 'createdAt' | 'updatedAt' | 'lastUsedAt';
+  sortBy?: "name" | "createdAt" | "updatedAt" | "lastUsedAt";
   /** 排序方向 */
-  sortOrder?: 'asc' | 'desc';
+  sortOrder?: "asc" | "desc";
   /** 分页 */
   page?: number;
   pageSize?: number;

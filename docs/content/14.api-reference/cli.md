@@ -138,8 +138,8 @@ aster mcp-serve \
 
 会启动一个 MCP HTTP Server, 监听 `http://localhost:8090/mcp`, 默认提供:
 
-- `echo`        – 简单回显工具
-- `docs_get`    – 读取 `--docs` 目录下的文档文件
+- `echo` – 简单回显工具
+- `docs_get` – 读取 `--docs` 目录下的文档文件
 - `docs_search` – 在 `--docs` 目录中搜索关键字
 
 ## 3. 调用示例

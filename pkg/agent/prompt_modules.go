@@ -161,7 +161,12 @@ func (m *CodeReferenceModule) Priority() int { return 30 }
 func (m *CodeReferenceModule) Condition(ctx *PromptContext) bool {
 	// 优化：默认禁用以减少 token，需要时明确启用
 	if ctx.Metadata != nil {
+		// 显式启用
 		if enabled, ok := ctx.Metadata["enable_code_reference"].(bool); ok && enabled {
+			return true
+		}
+		// 对于代码助手类型的 agent 自动启用
+		if agentType, ok := ctx.Metadata["agent_type"].(string); ok && agentType == "code_assistant" {
 			return true
 		}
 	}

@@ -11,12 +11,14 @@ navigation: false
 ## 📚 分类
 
 ### [基础工作流](/workflows/basic)
+
 - Sequential - 顺序执行
 - Parallel - 并行执行
 - Conditional - 条件分支
 - Loop - 循环执行
 
 ### [高级模式](/workflows/advanced)
+
 - 错误处理与重试
 - 工作流持久化
 - 动态工作流构建

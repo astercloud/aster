@@ -11,6 +11,7 @@ navigation: false
 ## 📚 分类
 
 ### [内置中间件](/middleware/builtin)
+
 - Filesystem - 文件系统访问控制
 - SubAgent - 子 Agent 支持
 - Summarization - 自动上下文总结
@@ -18,6 +19,7 @@ navigation: false
 - SimplicityChecker - 简洁性检查（防止过度工程）
 
 ### [自定义中间件](/middleware/custom)
+
 - 创建自定义中间件
 - 中间件注册
 - 优先级配置

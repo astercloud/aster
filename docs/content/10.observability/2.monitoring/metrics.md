@@ -32,34 +32,42 @@ curl http://localhost:8080/metrics
 ### HTTP 指标
 
 #### 请求总数
+
 ```
 aster_http_requests_total{method="GET",path="/v1/agents",status="2xx"}
 ```
+
 - **类型**: Counter
 - **标签**: method, path, status
 - **描述**: HTTP 请求总数，按方法、路径和状态分类
 
 #### 请求延迟
+
 ```
 aster_http_request_duration_seconds{method="GET",path="/v1/agents"}
 ```
+
 - **类型**: Histogram
 - **标签**: method, path
 - **描述**: HTTP 请求处理时间（秒）
 - **分位数**: p50, p90, p95, p99
 
 #### 请求大小
+
 ```
 aster_http_request_size_bytes{method="POST",path="/v1/agents"}
 ```
+
 - **类型**: Histogram
 - **标签**: method, path
 - **描述**: HTTP 请求body大小（字节）
 
 #### 响应大小
+
 ```
 aster_http_response_size_bytes{method="GET",path="/v1/agents"}
 ```
+
 - **类型**: Histogram
 - **标签**: method, path
 - **描述**: HTTP 响应body大小（字节）
@@ -67,23 +75,29 @@ aster_http_response_size_bytes{method="GET",path="/v1/agents"}
 ### 业务指标
 
 #### Agents 总数
+
 ```
 aster_agents_total
 ```
+
 - **类型**: Gauge
 - **描述**: 系统中 Agent 的总数
 
 #### 活跃 Sessions
+
 ```
 aster_sessions_active
 ```
+
 - **类型**: Gauge
 - **描述**: 当前活跃的 Session 数量
 
 #### 运行中的 Workflows
+
 ```
 aster_workflows_running
 ```
+
 - **类型**: Gauge
 - **描述**: 当前正在运行的 Workflow 数量
 
@@ -107,7 +121,7 @@ aster_workflows_running
 // 在 Handler 中更新指标
 func (h *AgentHandler) Create(c *gin.Context) {
     // 创建 agent...
-    
+
     // 更新指标
     if h.metrics != nil {
         count := getAgentCount()  // 获取总数
@@ -147,16 +161,16 @@ global:
   evaluation_interval: 15s
 
 scrape_configs:
-  - job_name: 'aster'
+  - job_name: "aster"
     static_configs:
-      - targets: ['localhost:8080']
-    metrics_path: '/metrics'
+      - targets: ["localhost:8080"]
+    metrics_path: "/metrics"
 ```
 
 ### Docker Compose
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   aster:
@@ -165,7 +179,7 @@ services:
       - "8080:8080"
     environment:
       - OBSERVABILITY_METRICS_ENABLED=true
-  
+
   prometheus:
     image: prom/prometheus:latest
     ports:
@@ -173,7 +187,7 @@ services:
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
+      - "--config.file=/etc/prometheus/prometheus.yml"
 ```
 
 ## Grafana Dashboard
@@ -187,16 +201,19 @@ services:
 ### 关键面板
 
 **HTTP Performance**
+
 - Request Rate (req/s)
 - Response Time (p50, p90, p99)
 - Error Rate (%)
 
 **Business Metrics**
+
 - Active Agents
 - Active Sessions
 - Running Workflows
 
 **System Resources**
+
 - CPU Usage
 - Memory Usage
 - Goroutines
@@ -205,28 +222,32 @@ services:
 ### 示例查询
 
 #### 请求速率
+
 ```promql
 rate(aster_http_requests_total[5m])
 ```
 
 #### p99 延迟
+
 ```promql
-histogram_quantile(0.99, 
+histogram_quantile(0.99,
   rate(aster_http_request_duration_seconds_bucket[5m])
 )
 ```
 
 #### 错误率
+
 ```promql
 rate(aster_http_requests_total{status="5xx"}[5m])
-  / 
+  /
 rate(aster_http_requests_total[5m])
 ```
 
 #### 平均响应大小
+
 ```promql
 rate(aster_http_response_size_bytes_sum[5m])
-  / 
+  /
 rate(aster_http_response_size_bytes_count[5m])
 ```
 
@@ -242,7 +263,7 @@ groups:
       - alert: HighErrorRate
         expr: |
           rate(aster_http_requests_total{status="5xx"}[5m])
-            / 
+            /
           rate(aster_http_requests_total[5m])
           > 0.05
         for: 5m
@@ -251,7 +272,7 @@ groups:
         annotations:
           summary: "High error rate detected"
           description: "Error rate is {{ $value | humanizePercentage }}"
-      
+
       # 高延迟告警
       - alert: HighLatency
         expr: |
@@ -264,7 +285,7 @@ groups:
         annotations:
           summary: "High latency detected"
           description: "p99 latency is {{ $value }}s"
-      
+
       # 高内存使用告警
       - alert: HighMemoryUsage
         expr: |
@@ -282,8 +303,9 @@ groups:
 ### 1. 指标命名
 
 遵循 Prometheus 命名约定：
+
 - 使用小写和下划线
-- 使用有意义的前缀 (aster_)
+- 使用有意义的前缀 (aster\_)
 - Counter 后缀 `_total`
 - 时间单位后缀 `_seconds`
 - 大小单位后缀 `_bytes`
@@ -311,11 +333,13 @@ groups:
 ### Metrics 不可用
 
 检查配置：
+
 ```go
 config.Observability.Metrics.Enabled = true
 ```
 
 检查端点：
+
 ```bash
 curl http://localhost:8080/metrics
 ```
@@ -323,6 +347,7 @@ curl http://localhost:8080/metrics
 ### 指标不更新
 
 确保中间件已注册：
+
 ```go
 if s.metrics != nil {
     s.router.Use(s.metrics.Middleware())

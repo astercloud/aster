@@ -48,7 +48,7 @@ aster: HTTP server started at http://localhost:8080
 ```jsonc
 {
   "workflow_id": "sequential_demo", // 或 parallel_demo / loop_demo / nested_demo
-  "input": "处理用户数据"
+  "input": "处理用户数据",
 }
 ```
 
@@ -73,11 +73,11 @@ aster: HTTP server started at http://localhost:8080
       "text": "[DataCollector] 收集数据 - 处理: 处理用户数据",
       "metadata": {
         "agent_description": "收集数据",
-        "quality_score": 89
-      }
-    }
+        "quality_score": 89,
+      },
+    },
   ],
-  "error_message": ""
+  "error_message": "",
 }
 ```
 

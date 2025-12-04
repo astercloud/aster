@@ -3,7 +3,7 @@
  * 管理内置工具和长时运行工具
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   ToolInfo,
   ToolExecutionRequest,
@@ -11,8 +11,8 @@ import {
   AsyncToolExecutionResponse,
   TaskProgress,
   ToolStats,
-  ToolUsageReport
-} from '../types/tool';
+  ToolUsageReport,
+} from "../types/tool";
 
 /**
  * Tool 资源类
@@ -37,9 +37,9 @@ export class ToolResource extends BaseResource {
     schema: Record<string, any>;
     description?: string;
   }): Promise<ToolInfo> {
-    return this.request<ToolInfo>('/v1/tools', {
-      method: 'POST',
-      body: tool
+    return this.request<ToolInfo>("/v1/tools", {
+      method: "POST",
+      body: tool,
     });
   }
 
@@ -49,14 +49,13 @@ export class ToolResource extends BaseResource {
    * @returns 工具列表
    */
   async list(filter?: {
-    type?: 'builtin' | 'custom' | 'mcp';
+    type?: "builtin" | "custom" | "mcp";
     category?: string;
     enabled?: boolean;
   }): Promise<ToolInfo[]> {
-    const result = await this.request<{ tools: ToolInfo[] }>(
-      '/v1/tools',
-      { params: filter }
-    );
+    const result = await this.request<{ tools: ToolInfo[] }>("/v1/tools", {
+      params: filter,
+    });
     return result.tools;
   }
 
@@ -75,7 +74,7 @@ export class ToolResource extends BaseResource {
    */
   async enable(toolName: string): Promise<ToolInfo> {
     return this.request<ToolInfo>(`/v1/tools/${toolName}/enable`, {
-      method: 'POST'
+      method: "POST",
     });
   }
 
@@ -85,7 +84,7 @@ export class ToolResource extends BaseResource {
    */
   async disable(toolName: string): Promise<ToolInfo> {
     return this.request<ToolInfo>(`/v1/tools/${toolName}/disable`, {
-      method: 'POST'
+      method: "POST",
     });
   }
 
@@ -95,7 +94,7 @@ export class ToolResource extends BaseResource {
    */
   async delete(toolId: string): Promise<void> {
     await this.request(`/v1/tools/${toolId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -111,8 +110,8 @@ export class ToolResource extends BaseResource {
    */
   async execute(toolId: string, input: Record<string, any>): Promise<any> {
     return this.request(`/v1/tools/${toolId}/execute`, {
-      method: 'POST',
-      body: { input }
+      method: "POST",
+      body: { input },
     });
   }
 
@@ -124,15 +123,15 @@ export class ToolResource extends BaseResource {
    */
   async executeAsync(
     toolName: string,
-    params: Record<string, any>
+    params: Record<string, any>,
   ): Promise<AsyncToolExecutionResponse> {
-    return this.request<AsyncToolExecutionResponse>('/v1/tools/execute', {
-      method: 'POST',
+    return this.request<AsyncToolExecutionResponse>("/v1/tools/execute", {
+      method: "POST",
       body: {
         toolName,
         params,
-        async: true
-      }
+        async: true,
+      },
     });
   }
 
@@ -142,12 +141,12 @@ export class ToolResource extends BaseResource {
    * @returns 执行结果或任务信息
    */
   async executeWithOptions(
-    request: ToolExecutionRequest
+    request: ToolExecutionRequest,
   ): Promise<ToolExecutionResponse | AsyncToolExecutionResponse> {
-    return this.request('/v1/tools/execute', {
-      method: 'POST',
+    return this.request("/v1/tools/execute", {
+      method: "POST",
       body: request,
-      timeout: request.timeout
+      timeout: request.timeout,
     });
   }
 
@@ -170,12 +169,12 @@ export class ToolResource extends BaseResource {
    * @returns 任务列表
    */
   async listTasks(filter?: {
-    status?: 'pending' | 'running' | 'completed' | 'failed' | 'cancelled';
+    status?: "pending" | "running" | "completed" | "failed" | "cancelled";
     toolName?: string;
   }): Promise<TaskProgress[]> {
     const result = await this.request<{ tasks: TaskProgress[] }>(
-      '/v1/tools/tasks',
-      { params: filter }
+      "/v1/tools/tasks",
+      { params: filter },
     );
     return result.tasks;
   }
@@ -186,7 +185,7 @@ export class ToolResource extends BaseResource {
    */
   async cancelTask(taskId: string): Promise<void> {
     await this.request(`/v1/tools/tasks/${taskId}/cancel`, {
-      method: 'POST'
+      method: "POST",
     });
   }
 
@@ -199,9 +198,9 @@ export class ToolResource extends BaseResource {
   async waitForTask(
     taskId: string,
     options?: {
-      pollInterval?: number;  // 轮询间隔（毫秒），默认 1000
-      timeout?: number;       // 超时时间（毫秒），默认 300000 (5分钟)
-    }
+      pollInterval?: number; // 轮询间隔（毫秒），默认 1000
+      timeout?: number; // 超时时间（毫秒），默认 300000 (5分钟)
+    },
   ): Promise<TaskProgress> {
     const pollInterval = options?.pollInterval ?? 1000;
     const timeout = options?.timeout ?? 300000;
@@ -212,9 +211,9 @@ export class ToolResource extends BaseResource {
 
       // 检查是否完成
       if (
-        task.status === 'completed' ||
-        task.status === 'failed' ||
-        task.status === 'cancelled'
+        task.status === "completed" ||
+        task.status === "failed" ||
+        task.status === "cancelled"
       ) {
         return task;
       }
@@ -222,12 +221,12 @@ export class ToolResource extends BaseResource {
       // 检查超时
       if (Date.now() - startTime > timeout) {
         throw new Error(
-          `Task timeout after ${timeout}ms. Current status: ${task.status}`
+          `Task timeout after ${timeout}ms. Current status: ${task.status}`,
         );
       }
 
       // 等待后继续轮询
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
   }
 
@@ -250,7 +249,7 @@ export class ToolResource extends BaseResource {
    */
   async getAllStats(): Promise<ToolStats[]> {
     const result = await this.request<{ stats: ToolStats[] }>(
-      '/v1/tools/stats'
+      "/v1/tools/stats",
     );
     return result.stats;
   }
@@ -264,8 +263,8 @@ export class ToolResource extends BaseResource {
     start: string;
     end: string;
   }): Promise<ToolUsageReport> {
-    return this.request<ToolUsageReport>('/v1/tools/usage-report', {
-      params: timeRange
+    return this.request<ToolUsageReport>("/v1/tools/usage-report", {
+      params: timeRange,
     });
   }
 
@@ -278,9 +277,9 @@ export class ToolResource extends BaseResource {
    * @param toolNames 工具名称列表
    */
   async enableBatch(toolNames: string[]): Promise<void> {
-    await this.request('/v1/tools/batch/enable', {
-      method: 'POST',
-      body: { toolNames }
+    await this.request("/v1/tools/batch/enable", {
+      method: "POST",
+      body: { toolNames },
     });
   }
 
@@ -289,9 +288,9 @@ export class ToolResource extends BaseResource {
    * @param toolNames 工具名称列表
    */
   async disableBatch(toolNames: string[]): Promise<void> {
-    await this.request('/v1/tools/batch/disable', {
-      method: 'POST',
-      body: { toolNames }
+    await this.request("/v1/tools/batch/disable", {
+      method: "POST",
+      body: { toolNames },
     });
   }
 }

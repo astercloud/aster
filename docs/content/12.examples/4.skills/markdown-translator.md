@@ -51,6 +51,7 @@ go run ./main.go -message "翻译 your-document.md"
 ```
 
 Agent 会自动：
+
 1. 检测到翻译需求，激活此Skill
 2. 调用 `segment_tool.py` 分段
 3. 逐段翻译（使用Agent的LLM）
@@ -80,12 +81,12 @@ python3 workspace/skills/markdown-segment-translator/scripts/segment_tool.py mer
 
 ### segment_tool.py 参数
 
-| 参数 | 说明 | 默认值 | 推荐值 |
-|------|------|--------|--------|
-| `--segment-size` | 每段行数 | 1000 | **200** (v0.8.0) |
-| `--max-segments` | 最大段数 | 无限制 | 0 (不限制) |
-| `--input` | 输入文件 | - | 必填 |
-| `--output-dir` | 输出目录 | workspace/output | - |
+| 参数             | 说明     | 默认值           | 推荐值           |
+| ---------------- | -------- | ---------------- | ---------------- |
+| `--segment-size` | 每段行数 | 1000             | **200** (v0.8.0) |
+| `--max-segments` | 最大段数 | 无限制           | 0 (不限制)       |
+| `--input`        | 输入文件 | -                | 必填             |
+| `--output-dir`   | 输出目录 | workspace/output | -                |
 
 ### Agent ExecutionMode 配置
 
@@ -103,30 +104,32 @@ ModelConfig: &types.ModelConfig{
 ## 📊 性能测试数据
 
 ### 测试环境
+
 - **模型**: DeepSeek Chat
 - **ExecutionMode**: NonStreaming
 - **网络**: 标准网络环境
 
 ### 不同segment-size对比
 
-| Segment大小 | 文件大小 | 翻译时间 | API调用 | 稳定性 | 推荐 |
-|------------|---------|---------|---------|--------|------|
-| 50行 | 5KB | 很快 | 多次 | ✅ 稳定 | 测试用 |
-| **200行** | 15-20KB | **5-10秒/段** | **11次/段** | ✅ **稳定** | **推荐** |
-| 500行 | 50KB | 20-30秒/段 | 13次/段 | ⚠️ 偶尔慢 | 中等文档 |
-| 1000行 | 100KB | 60秒+/段 | 15次/段 | ❌ 易超时 | 不推荐 |
+| Segment大小 | 文件大小 | 翻译时间      | API调用     | 稳定性      | 推荐     |
+| ----------- | -------- | ------------- | ----------- | ----------- | -------- |
+| 50行        | 5KB      | 很快          | 多次        | ✅ 稳定     | 测试用   |
+| **200行**   | 15-20KB  | **5-10秒/段** | **11次/段** | ✅ **稳定** | **推荐** |
+| 500行       | 50KB     | 20-30秒/段    | 13次/段     | ⚠️ 偶尔慢   | 中等文档 |
+| 1000行      | 100KB    | 60秒+/段      | 15次/段     | ❌ 易超时   | 不推荐   |
 
 ### 完整文档翻译性能
 
 **测试文档**: 学术论文 (2500行, 约150KB)
 
-| 配置 | 总时间 | Token | 成本 | 成功率 |
-|------|--------|-------|------|--------|
+| 配置                  | 总时间   | Token     | 成本      | 成功率   |
+| --------------------- | -------- | --------- | --------- | -------- |
 | **v0.8.0 (200行/段)** | **90秒** | **~200K** | **¥0.20** | **100%** |
-| v0.7.0 (1000行/段) | 300秒+ | ~250K | ¥0.25 | 60% |
-| v0.7.0 (单次翻译) | 超时 | - | - | 0% |
+| v0.7.0 (1000行/段)    | 300秒+   | ~250K     | ¥0.25     | 60%      |
+| v0.7.0 (单次翻译)     | 超时     | -         | -         | 0%       |
 
 **性能提升**：
+
 - ⚡ 速度提升：**3-4倍**
 - 💰 成本降低：**20%**
 - ✅ 成功率：**40%→100%**
@@ -151,6 +154,7 @@ python3 segment_tool.py merge
 ```
 
 **预期结果**：
+
 - 分成13个segment (200行/段)
 - 每段翻译约5-10秒
 - 总时间约90-130秒
@@ -164,6 +168,7 @@ go run ./main.go -message "将README.md翻译成中文"
 ```
 
 **预期结果**：
+
 - 分成3个segment
 - 总时间约20-30秒
 - 保留代码块、链接等格式
@@ -223,31 +228,31 @@ class MarkdownSegmentTool:
         """分段文档"""
         lines = self.read_file(input_file)
         total_lines = len(lines)
-        
+
         # 计算分段数 - 严格按segment_size分段
         num_segments = (total_lines + segment_size - 1) // segment_size
         if max_segments and num_segments > max_segments:
             num_segments = max_segments
-        
+
         # 创建segments
         for i in range(num_segments):
             start = i * segment_size
             end = min(start + segment_size, total_lines)
             segment_lines = lines[start:end]
-            
+
             self.write_segment(i + 1, segment_lines)
-        
+
         return num_segments
-    
+
     def merge_translations(self):
         """合并翻译结果"""
         segment_files = sorted(glob.glob("output/translations/translated_segment_*.md"))
-        
+
         merged_content = []
         for file in segment_files:
             content = self.read_file(file)
             merged_content.extend(content)
-        
+
         self.write_merged(merged_content)
 ```
 
@@ -267,10 +272,10 @@ for i := 1; i <= numSegments; i++ {
     content := agent.executeToolCall("Read", map[string]interface{}{
         "path": fmt.Sprintf("output/segments/segment_%d.md", i),
     })
-    
+
     // 翻译（使用Agent的LLM）
     translated := agent.translate(content, "中文")
-    
+
     // 保存翻译
     agent.executeToolCall("Write", map[string]interface{}{
         "path": fmt.Sprintf("output/translations/translated_segment_%d.md", i),
@@ -295,6 +300,7 @@ agent.executeToolCall("Bash", map[string]interface{}{
 **原因**: segment-size 设置过大
 
 **解决**:
+
 ```bash
 # 减小segment-size
 python3 segment_tool.py segment --input doc.md --segment-size 200  # ✅
@@ -314,6 +320,7 @@ python3 segment_tool.py segment --input doc.md --segment-size 1000 # ❌
 **症状**: 学术术语翻译不准确
 
 **解决**:
+
 1. 在SKILL.md中添加术语表
 2. 使用更好的模型（如deepseek-reasoner）
 3. 在System Prompt中添加专业领域说明

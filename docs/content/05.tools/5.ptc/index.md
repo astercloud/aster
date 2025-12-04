@@ -5,11 +5,13 @@ Programmatic Tool Calling (PTC) 是 Aster 实现的 Anthropic 协议扩展,允�
 ## 概述
 
 传统的工具调用流程:
+
 ```
 LLM → 工具调用请求 → Aster 执行工具 → 返回结果 → LLM
 ```
 
 PTC 流程:
+
 ```
 LLM → 生成 Python 代码 → CodeExecute 工具执行代码 →
 代码中调用 Aster 工具 → 返回结果 → LLM
@@ -160,6 +162,7 @@ func (t *ReadTool) Schema() provider.ToolSchema {
 ```
 
 AllowedCallers 可选值:
+
 - `"direct"`: 允许 LLM 直接调用(默认)
 - `"code_execution_20250825"`: 允许在 CodeExecute 生成的代码中调用
 
@@ -167,13 +170,13 @@ AllowedCallers 可选值:
 
 以下内置工具默认支持 PTC:
 
-| 工具名 | 功能 | 示例 |
-|--------|------|------|
-| `Read` | 读取文件 | `await Read(path="file.txt")` |
-| `Write` | 写入文件 | `await Write(path="out.txt", content="data")` |
-| `Glob` | 文件模式匹配 | `await Glob(pattern="*.py")` |
-| `Grep` | 内容搜索 | `await Grep(pattern="TODO", path=".")` |
-| `Bash` | 执行命令 | `await Bash(command="ls -la")` |
+| 工具名  | 功能         | 示例                                          |
+| ------- | ------------ | --------------------------------------------- |
+| `Read`  | 读取文件     | `await Read(path="file.txt")`                 |
+| `Write` | 写入文件     | `await Write(path="out.txt", content="data")` |
+| `Glob`  | 文件模式匹配 | `await Glob(pattern="*.py")`                  |
+| `Grep`  | 内容搜索     | `await Grep(pattern="TODO", path=".")`        |
+| `Bash`  | 执行命令     | `await Bash(command="ls -la")`                |
 
 ## 高级用法
 
@@ -242,6 +245,7 @@ Error: aiohttp is required. Install it with: pip install aiohttp
 ```
 
 解决方案:
+
 ```bash
 pip install aiohttp
 ```
@@ -284,6 +288,7 @@ log.SetFlags(log.LstdFlags | log.Lshortfile)
 ### 查看生成的 Python 代码
 
 CodeExecute 工具执行的完整 Python 代码会包含:
+
 1. SDK 注入代码
 2. 工具函数生成
 3. 用户代码包装
@@ -293,6 +298,7 @@ CodeExecute 工具执行的完整 Python 代码会包含:
 ### HTTP 请求日志
 
 HTTP 桥接服务器会输出:
+
 ```
 HTTP Bridge Server listening on localhost:8080
 ```
@@ -310,6 +316,7 @@ HTTP Bridge Server listening on localhost:8080
 ### Q: PTC 和普通工具调用有什么区别?
 
 A:
+
 - 普通工具调用: LLM 一次调用一个工具,适合简单场景
 - PTC: LLM 生成 Python 代码,可以组合多个工具,适合复杂逻辑
 

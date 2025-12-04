@@ -36,7 +36,7 @@ type Server struct {
     config *Config
     router *gin.Engine
     store  store.Store
-    
+
     // Auth & Observability
     authManager   *auth.Manager
     rbac          *auth.RBAC
@@ -48,6 +48,7 @@ type Server struct {
 ```
 
 **功能**:
+
 - 服务器生命周期管理
 - 中间件配置
 - 路由注册
@@ -58,6 +59,7 @@ type Server struct {
 完整的认证和授权系统。
 
 #### 认证管理器
+
 ```go
 // 支持多种认证方法
 authManager := auth.NewManager(auth.AuthMethodAPIKey)
@@ -76,6 +78,7 @@ authManager.Register(jwtAuth)
 ```
 
 #### RBAC 权限控制
+
 ```go
 rbac := auth.NewRBAC()
 
@@ -92,6 +95,7 @@ hasPermission := rbac.HasPermission(ctx, user, "agents", "create")
 ### 3. 可观测性 (`server/observability/`)
 
 #### Prometheus Metrics
+
 ```go
 metrics := observability.NewMetricsManager("aster")
 
@@ -106,6 +110,7 @@ aster_workflows_running
 ```
 
 #### OpenTelemetry 追踪
+
 ```go
 tracing, _ := observability.NewTracingManager(observability.TracingConfig{
     Enabled: true,
@@ -119,6 +124,7 @@ tracing, _ := observability.NewTracingManager(observability.TracingConfig{
 ```
 
 #### 增强健康检查
+
 ```go
 healthChecker := observability.NewHealthChecker("v0.11.0")
 
@@ -141,6 +147,7 @@ healthChecker.RegisterCheck(storeCheck)
 支持两种算法：
 
 #### 令牌桶 (Token Bucket)
+
 ```go
 limiter := ratelimit.NewTokenBucketLimiter(
     rate,     // 令牌补充速率
@@ -150,6 +157,7 @@ limiter := ratelimit.NewTokenBucketLimiter(
 ```
 
 #### 滑动窗口 (Sliding Window)
+
 ```go
 limiter := ratelimit.NewSlidingWindowLimiter(
     limit,  // 请求限制
@@ -158,6 +166,7 @@ limiter := ratelimit.NewSlidingWindowLimiter(
 ```
 
 #### 中间件集成
+
 ```go
 // 基于 IP 限流
 ratelimit.Middleware(config, limiter)
@@ -183,6 +192,7 @@ ratelimit.PerEndpointMiddleware(config, limiter)
 - `mcp.go` - MCP 服务器
 
 所有 Handler 使用统一模式：
+
 ```go
 type Handler struct {
     store *store.Store
@@ -219,7 +229,7 @@ config := &server.Config{
     Host: "0.0.0.0",
     Port: 8080,
     Mode: "production",
-    
+
     // 认证
     Auth: server.AuthConfig{
         APIKey: server.APIKeyConfig{
@@ -232,14 +242,14 @@ config := &server.Config{
             Expiry: 86400, // 24 hours
         },
     },
-    
+
     // CORS
     CORS: server.CORSConfig{
         Enabled: true,
         AllowOrigins: []string{"*"},
         AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
     },
-    
+
     // 速率限制
     RateLimit: server.RateLimitConfig{
         Enabled: true,
@@ -247,7 +257,7 @@ config := &server.Config{
         WindowSize: time.Minute,
         BurstSize: 20,
     },
-    
+
     // 可观测性
     Observability: server.ObservabilityConfig{
         Enabled: true,
@@ -287,10 +297,10 @@ func main() {
     deps := &server.Dependencies{
         Store: st,
     }
-    
+
     // 创建服务器
     srv, _ := server.New(server.DefaultConfig(), deps)
-    
+
     // 启动
     srv.Start()
 }
@@ -337,11 +347,13 @@ if err := srv.Stop(ctx); err != nil {
 ### 开发模式 (`cmd/aster`)
 
 简化配置，快速启动：
+
 ```bash
 aster serve --port 8080 --mode debug
 ```
 
 特点：
+
 - 无认证
 - CORS 允许所有来源
 - 详细日志
@@ -350,12 +362,14 @@ aster serve --port 8080 --mode debug
 ### 生产模式 (`cmd/aster-server`)
 
 完整特性：
+
 ```bash
 export API_KEY=your-secret-key
 aster-server
 ```
 
 特点：
+
 - API Key/JWT 认证
 - 速率限制
 - 结构化日志

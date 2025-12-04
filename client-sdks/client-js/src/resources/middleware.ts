@@ -3,12 +3,12 @@
  * 管理洋葱模型中间件系统
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   MiddlewareInfo,
   UpdateMiddlewareRequest,
-  MiddlewareStats
-} from '../types/middleware';
+  MiddlewareStats,
+} from "../types/middleware";
 
 /**
  * Middleware 资源类
@@ -33,9 +33,9 @@ export class MiddlewareResource extends BaseResource {
     priority: number;
     config?: Record<string, any>;
   }): Promise<MiddlewareInfo> {
-    return this.request<MiddlewareInfo>('/v1/middlewares', {
-      method: 'POST',
-      body: middleware
+    return this.request<MiddlewareInfo>("/v1/middlewares", {
+      method: "POST",
+      body: middleware,
     });
   }
 
@@ -45,7 +45,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async list(): Promise<MiddlewareInfo[]> {
     const result = await this.request<{ middlewares: MiddlewareInfo[] }>(
-      '/v1/middlewares'
+      "/v1/middlewares",
     );
     return result.middlewares;
   }
@@ -67,11 +67,11 @@ export class MiddlewareResource extends BaseResource {
    */
   async update(
     name: string,
-    updates: UpdateMiddlewareRequest
+    updates: UpdateMiddlewareRequest,
   ): Promise<MiddlewareInfo> {
     return this.request<MiddlewareInfo>(`/v1/middlewares/${name}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -97,7 +97,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async delete(nameOrId: string): Promise<void> {
     await this.request(`/v1/middlewares/${nameOrId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -108,7 +108,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async updateConfig(
     name: string,
-    config: Record<string, any>
+    config: Record<string, any>,
   ): Promise<MiddlewareInfo> {
     return this.update(name, { config });
   }
@@ -120,7 +120,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async updatePriority(
     name: string,
-    priority: number
+    priority: number,
   ): Promise<MiddlewareInfo> {
     return this.update(name, { priority });
   }
@@ -144,7 +144,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async getAllStats(): Promise<MiddlewareStats[]> {
     const result = await this.request<{ stats: MiddlewareStats[] }>(
-      '/v1/middlewares/stats'
+      "/v1/middlewares/stats",
     );
     return result.stats;
   }
@@ -158,9 +158,9 @@ export class MiddlewareResource extends BaseResource {
    * @param names Middleware 名称列表
    */
   async enableBatch(names: string[]): Promise<void> {
-    await this.request('/v1/middlewares/batch/enable', {
-      method: 'POST',
-      body: { names }
+    await this.request("/v1/middlewares/batch/enable", {
+      method: "POST",
+      body: { names },
     });
   }
 
@@ -169,9 +169,9 @@ export class MiddlewareResource extends BaseResource {
    * @param names Middleware 名称列表
    */
   async disableBatch(names: string[]): Promise<void> {
-    await this.request('/v1/middlewares/batch/disable', {
-      method: 'POST',
-      body: { names }
+    await this.request("/v1/middlewares/batch/disable", {
+      method: "POST",
+      body: { names },
     });
   }
 
@@ -185,7 +185,7 @@ export class MiddlewareResource extends BaseResource {
    */
   async getExecutionOrder(): Promise<string[]> {
     const result = await this.request<{ order: string[] }>(
-      '/v1/middlewares/execution-order'
+      "/v1/middlewares/execution-order",
     );
     return result.order;
   }
@@ -195,9 +195,9 @@ export class MiddlewareResource extends BaseResource {
    * @param order Middleware 名称列表（按执行顺序）
    */
   async setExecutionOrder(order: string[]): Promise<void> {
-    await this.request('/v1/middlewares/execution-order', {
-      method: 'PUT',
-      body: { order }
+    await this.request("/v1/middlewares/execution-order", {
+      method: "PUT",
+      body: { order },
     });
   }
 
@@ -205,8 +205,8 @@ export class MiddlewareResource extends BaseResource {
    * 重置 Middleware 顺序为默认值
    */
   async resetExecutionOrder(): Promise<void> {
-    await this.request('/v1/middlewares/execution-order/reset', {
-      method: 'POST'
+    await this.request("/v1/middlewares/execution-order/reset", {
+      method: "POST",
     });
   }
 }

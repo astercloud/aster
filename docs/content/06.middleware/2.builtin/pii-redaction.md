@@ -99,6 +99,7 @@ strategy := security.NewMaskStrategy()
 ```
 
 **配置选项**:
+
 ```go
 strategy := &security.MaskStrategy{
     MaskChar:      '*',  // 掩码字符
@@ -121,6 +122,7 @@ strategy := security.NewReplaceStrategy()
 ```
 
 **自定义标签**:
+
 ```go
 strategy := &security.ReplaceStrategy{
     UseTypeLabel: true,
@@ -142,6 +144,7 @@ strategy := security.NewHashStrategy()
 ```
 
 **配置选项**:
+
 ```go
 strategy := &security.HashStrategy{
     ShowPrefix:   true,
@@ -163,6 +166,7 @@ strategy := security.NewAdaptiveStrategy()
 ```
 
 **自定义策略**:
+
 ```go
 strategy := &security.AdaptiveStrategy{
     LowStrategy:    security.NewMaskStrategy(),

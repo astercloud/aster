@@ -3,7 +3,7 @@
  * Agent 评估和测试系统
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   EvalRequest,
   EvalInfo,
@@ -18,8 +18,8 @@ import {
   ABTestResult,
   EvalReportRequest,
   EvalReportResult,
-  ScorerConfig
-} from '../types/eval';
+  ScorerConfig,
+} from "../types/eval";
 
 /**
  * Eval 资源类
@@ -39,9 +39,9 @@ export class EvalResource extends BaseResource {
    * @returns Eval 信息
    */
   async create(request: EvalRequest): Promise<EvalInfo> {
-    return this.request<EvalInfo>('/v1/evals', {
-      method: 'POST',
-      body: request
+    return this.request<EvalInfo>("/v1/evals", {
+      method: "POST",
+      body: request,
     });
   }
 
@@ -57,8 +57,8 @@ export class EvalResource extends BaseResource {
     [key: string]: any;
   }): Promise<EvalResult> {
     const evalInfo = await this.create({
-      type: 'text',
-      ...request
+      type: "text",
+      ...request,
     } as unknown as EvalRequest);
     return this.waitForCompletion(evalInfo.id);
   }
@@ -74,8 +74,8 @@ export class EvalResource extends BaseResource {
     [key: string]: any;
   }): Promise<EvalResult> {
     const evalInfo = await this.create({
-      type: 'batch',
-      ...request
+      type: "batch",
+      ...request,
     } as unknown as EvalRequest);
     return this.waitForCompletion(evalInfo.id);
   }
@@ -95,8 +95,8 @@ export class EvalResource extends BaseResource {
    * @returns Eval 列表
    */
   async list(filter?: EvalFilter): Promise<PaginatedEvalResponse> {
-    return this.request<PaginatedEvalResponse>('/v1/evals', {
-      params: filter
+    return this.request<PaginatedEvalResponse>("/v1/evals", {
+      params: filter,
     });
   }
 
@@ -107,7 +107,7 @@ export class EvalResource extends BaseResource {
    */
   async cancel(evalId: string): Promise<EvalInfo> {
     return this.request<EvalInfo>(`/v1/evals/${evalId}/cancel`, {
-      method: 'POST'
+      method: "POST",
     });
   }
 
@@ -117,7 +117,7 @@ export class EvalResource extends BaseResource {
    */
   async delete(evalId: string): Promise<void> {
     await this.request(`/v1/evals/${evalId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -144,25 +144,25 @@ export class EvalResource extends BaseResource {
   async waitForCompletion(
     evalId: string,
     pollInterval: number = 1000,
-    maxWaitTime: number = 300000
+    maxWaitTime: number = 300000,
   ): Promise<EvalResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
       const evalInfo = await this.get(evalId);
 
-      if (evalInfo.status === 'completed') {
+      if (evalInfo.status === "completed") {
         return this.getResult(evalId);
       }
 
-      if (evalInfo.status === 'failed' || evalInfo.status === 'cancelled') {
+      if (evalInfo.status === "failed" || evalInfo.status === "cancelled") {
         throw new Error(
-          `Eval ${evalId} ${evalInfo.status}${evalInfo.error ? `: ${evalInfo.error}` : ''}`
+          `Eval ${evalId} ${evalInfo.status}${evalInfo.error ? `: ${evalInfo.error}` : ""}`,
         );
       }
 
       // 等待下次轮询
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
 
     throw new Error(`Eval ${evalId} did not complete within ${maxWaitTime}ms`);
@@ -182,11 +182,11 @@ export class EvalResource extends BaseResource {
   async createTestCaseSet(
     name: string,
     testCases: TestCase[],
-    description?: string
+    description?: string,
   ): Promise<TestCaseSet> {
-    return this.request<TestCaseSet>('/v1/evals/test-cases', {
-      method: 'POST',
-      body: { name, testCases, description }
+    return this.request<TestCaseSet>("/v1/evals/test-cases", {
+      method: "POST",
+      body: { name, testCases, description },
     });
   }
 
@@ -205,7 +205,7 @@ export class EvalResource extends BaseResource {
    */
   async listTestCaseSets(): Promise<TestCaseSet[]> {
     const result = await this.request<{ items: TestCaseSet[] }>(
-      '/v1/evals/test-cases'
+      "/v1/evals/test-cases",
     );
     return result.items;
   }
@@ -222,11 +222,11 @@ export class EvalResource extends BaseResource {
       name?: string;
       description?: string;
       testCases?: TestCase[];
-    }
+    },
   ): Promise<TestCaseSet> {
     return this.request<TestCaseSet>(`/v1/evals/test-cases/${testCaseSetId}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -236,7 +236,7 @@ export class EvalResource extends BaseResource {
    */
   async deleteTestCaseSet(testCaseSetId: string): Promise<void> {
     await this.request(`/v1/evals/test-cases/${testCaseSetId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -250,9 +250,9 @@ export class EvalResource extends BaseResource {
    * @returns Benchmark 结果
    */
   async createBenchmark(config: BenchmarkConfig): Promise<BenchmarkResult> {
-    return this.request<BenchmarkResult>('/v1/evals/benchmark', {
-      method: 'POST',
-      body: config
+    return this.request<BenchmarkResult>("/v1/evals/benchmark", {
+      method: "POST",
+      body: config,
     });
   }
 
@@ -271,7 +271,7 @@ export class EvalResource extends BaseResource {
    */
   async deleteBenchmark(benchmarkId: string): Promise<void> {
     await this.request(`/v1/evals/benchmark/${benchmarkId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -285,25 +285,27 @@ export class EvalResource extends BaseResource {
   async waitForBenchmarkCompletion(
     benchmarkId: string,
     pollInterval: number = 2000,
-    maxWaitTime: number = 600000
+    maxWaitTime: number = 600000,
   ): Promise<BenchmarkResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
       const result = await this.getBenchmark(benchmarkId);
 
-      if (result.status === 'completed') {
+      if (result.status === "completed") {
         return result;
       }
 
-      if (result.status === 'failed' || result.status === 'cancelled') {
+      if (result.status === "failed" || result.status === "cancelled") {
         throw new Error(`Benchmark ${benchmarkId} ${result.status}`);
       }
 
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
 
-    throw new Error(`Benchmark ${benchmarkId} did not complete within ${maxWaitTime}ms`);
+    throw new Error(
+      `Benchmark ${benchmarkId} did not complete within ${maxWaitTime}ms`,
+    );
   }
 
   // ==========================================================================
@@ -316,9 +318,9 @@ export class EvalResource extends BaseResource {
    * @returns A/B 测试结果
    */
   async createABTest(config: ABTestConfig): Promise<ABTestResult> {
-    return this.request<ABTestResult>('/v1/evals/ab-test', {
-      method: 'POST',
-      body: config
+    return this.request<ABTestResult>("/v1/evals/ab-test", {
+      method: "POST",
+      body: config,
     });
   }
 
@@ -341,25 +343,27 @@ export class EvalResource extends BaseResource {
   async waitForABTestCompletion(
     abTestId: string,
     pollInterval: number = 2000,
-    maxWaitTime: number = 600000
+    maxWaitTime: number = 600000,
   ): Promise<ABTestResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
       const result = await this.getABTest(abTestId);
 
-      if (result.status === 'completed') {
+      if (result.status === "completed") {
         return result;
       }
 
-      if (result.status === 'failed' || result.status === 'cancelled') {
+      if (result.status === "failed" || result.status === "cancelled") {
         throw new Error(`A/B Test ${abTestId} ${result.status}`);
       }
 
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
 
-    throw new Error(`A/B Test ${abTestId} did not complete within ${maxWaitTime}ms`);
+    throw new Error(
+      `A/B Test ${abTestId} did not complete within ${maxWaitTime}ms`,
+    );
   }
 
   // ==========================================================================
@@ -372,9 +376,9 @@ export class EvalResource extends BaseResource {
    * @returns 报告结果
    */
   async generateReport(request: EvalReportRequest): Promise<EvalReportResult> {
-    return this.request<EvalReportResult>('/v1/evals/reports', {
-      method: 'POST',
-      body: request
+    return this.request<EvalReportResult>("/v1/evals/reports", {
+      method: "POST",
+      body: request,
     });
   }
 
@@ -384,15 +388,12 @@ export class EvalResource extends BaseResource {
    * @param format 导出格式
    * @returns 导出内容
    */
-  async exportResult(
-    evalId: string,
-    format: 'json' | 'csv'
-  ): Promise<string> {
+  async exportResult(evalId: string, format: "json" | "csv"): Promise<string> {
     const result = await this.request<{ content: string }>(
       `/v1/evals/${evalId}/export`,
       {
-        params: { format }
-      }
+        params: { format },
+      },
     );
     return result.content;
   }
@@ -413,21 +414,21 @@ export class EvalResource extends BaseResource {
     agentId: string,
     input: string,
     expectedOutput: string,
-    scorers: ScorerConfig[]
+    scorers: ScorerConfig[],
   ): Promise<EvalResult> {
     const evalInfo = await this.create({
       name: `Quick Eval - ${new Date().toISOString()}`,
-      type: 'single',
+      type: "single",
       agentId,
       testCases: [
         {
-          id: 'quick-test-1',
-          name: 'Quick Test',
+          id: "quick-test-1",
+          name: "Quick Test",
           input,
-          expectedOutput
-        }
+          expectedOutput,
+        },
       ],
-      scorers
+      scorers,
     });
 
     return this.waitForCompletion(evalInfo.id);
@@ -445,15 +446,15 @@ export class EvalResource extends BaseResource {
     agentId: string,
     testCases: TestCase[],
     scorers: ScorerConfig[],
-    concurrency?: number
+    concurrency?: number,
   ): Promise<EvalResult> {
     const evalInfo = await this.create({
       name: `Batch Eval - ${new Date().toISOString()}`,
-      type: 'batch',
+      type: "batch",
       agentId,
       testCases,
       scorers,
-      concurrency
+      concurrency,
     });
 
     return this.waitForCompletion(evalInfo.id);
@@ -471,14 +472,14 @@ export class EvalResource extends BaseResource {
     agentAId: string,
     agentBId: string,
     testCaseSetId: string,
-    scorers: ScorerConfig[]
+    scorers: ScorerConfig[],
   ): Promise<ABTestResult> {
     const abTest = await this.createABTest({
       name: `Compare ${agentAId} vs ${agentBId}`,
       agentAId,
       agentBId,
       testCaseSetId,
-      scorers
+      scorers,
     });
 
     return this.waitForABTestCompletion(abTest.id);

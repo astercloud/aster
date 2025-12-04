@@ -3,7 +3,7 @@
  * 会话生命周期管理、消息历史、断点恢复
  */
 
-import { Message as MemoryMessage } from './memory';
+import { Message as MemoryMessage } from "./memory";
 
 // 重新导出 Message 类型
 export type { MemoryMessage as Message };
@@ -59,11 +59,11 @@ export interface SessionInfo {
 /**
  * Session 状态
  */
-export type SessionStatus = 
-  | 'active'      // 活跃
-  | 'paused'      // 暂停
-  | 'completed'   // 完成
-  | 'archived';   // 归档
+export type SessionStatus =
+  | "active" // 活跃
+  | "paused" // 暂停
+  | "completed" // 完成
+  | "archived"; // 归档
 
 /**
  * Session 过滤器
@@ -98,7 +98,7 @@ export interface Pagination {
   /** 每页数量 */
   pageSize?: number;
   /** 排序方式 */
-  sort?: 'asc' | 'desc';
+  sort?: "asc" | "desc";
 }
 
 /**
@@ -125,14 +125,14 @@ export interface PaginatedResponse<T> {
  * Checkpoint 类型
  * AsterClient 使用 7 段断点机制
  */
-export type CheckpointType = 
-  | 'user_input'        // 1. 用户输入
-  | 'agent_thinking'    // 2. Agent 思考
-  | 'tool_call'         // 3. 工具调用
-  | 'tool_result'       // 4. 工具结果
-  | 'agent_response'    // 5. Agent 响应
-  | 'memory_update'     // 6. 记忆更新
-  | 'session_state';    // 7. 会话状态
+export type CheckpointType =
+  | "user_input" // 1. 用户输入
+  | "agent_thinking" // 2. Agent 思考
+  | "tool_call" // 3. 工具调用
+  | "tool_result" // 4. 工具结果
+  | "agent_response" // 5. Agent 响应
+  | "memory_update" // 6. 记忆更新
+  | "session_state"; // 7. 会话状态
 
 /**
  * Checkpoint 信息
@@ -225,7 +225,7 @@ export interface AddMessageRequest {
   /** Session ID */
   sessionId: string;
   /** 消息内容 */
-  message: Omit<MemoryMessage, 'id' | 'timestamp'>;
+  message: Omit<MemoryMessage, "id" | "timestamp">;
 }
 
 /**
@@ -243,7 +243,7 @@ export interface UpdateSessionRequest {
  */
 export interface ExportOptions {
   /** 格式 */
-  format: 'json' | 'markdown' | 'html';
+  format: "json" | "markdown" | "html";
   /** 是否包含元数据 */
   includeMetadata?: boolean;
   /** 是否包含统计信息 */

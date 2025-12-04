@@ -74,19 +74,19 @@ defer p.Close()
 
 ### 支持的 Provider 名称
 
-| Provider | 配置名称 | 别名 |
-|----------|---------|------|
-| OpenAI | `openai` | - |
-| Anthropic | `anthropic` | - |
-| Gemini | `gemini` | `google` |
-| Groq | `groq` | - |
-| OpenRouter | `openrouter` | - |
-| Mistral | `mistral` | - |
-| Ollama | `ollama` | - |
-| DeepSeek | `deepseek` | - |
-| 智谱 GLM | `glm` | `zhipu` |
-| 豆包 | `doubao` | `bytedance` |
-| 月之暗面 | `moonshot` | `kimi` |
+| Provider   | 配置名称     | 别名        |
+| ---------- | ------------ | ----------- |
+| OpenAI     | `openai`     | -           |
+| Anthropic  | `anthropic`  | -           |
+| Gemini     | `gemini`     | `google`    |
+| Groq       | `groq`       | -           |
+| OpenRouter | `openrouter` | -           |
+| Mistral    | `mistral`    | -           |
+| Ollama     | `ollama`     | -           |
+| DeepSeek   | `deepseek`   | -           |
+| 智谱 GLM   | `glm`        | `zhipu`     |
+| 豆包       | `doubao`     | `bytedance` |
+| 月之暗面   | `moonshot`   | `kimi`      |
 
 完整 Provider 文档：[Provider 总览](../providers/overview.md)
 
@@ -103,11 +103,13 @@ func Stream(ctx context.Context, messages []types.Message, opts *StreamOptions) 
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `messages`: 消息历史
 - `opts`: 流式选项（工具、温度等）
 
 **返回**：
+
 - `<-chan StreamChunk`: 流式响应通道
 - `error`: 创建流失败时返回错误
 
@@ -143,12 +145,12 @@ for chunk := range stream {
 
 **StreamChunk 类型**：
 
-| Type | 说明 | 字段 |
-|------|------|------|
-| `text` | 文本增量 | `TextDelta` |
-| `tool_call` | 工具调用 | `ToolCall`, `ToolCallID` |
-| `usage` | Token 使用 | `Usage` |
-| `error` | 错误 | `Error` |
+| Type        | 说明       | 字段                     |
+| ----------- | ---------- | ------------------------ |
+| `text`      | 文本增量   | `TextDelta`              |
+| `tool_call` | 工具调用   | `ToolCall`, `ToolCallID` |
+| `usage`     | Token 使用 | `Usage`                  |
+| `error`     | 错误       | `Error`                  |
 
 ---
 
@@ -161,11 +163,13 @@ func Complete(ctx context.Context, messages []types.Message, opts *StreamOptions
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `messages`: 消息历史
 - `opts`: 生成选项
 
 **返回**：
+
 - `*CompleteResponse`: 完整响应
 - `error`: 错误信息
 
@@ -462,7 +466,7 @@ type ModelConfig struct {
     APIKey      string   // API Key
     BaseURL     string   // 自定义端点（可选）
 
-    // 执行模式 
+    // 执行模式
     ExecutionMode ExecutionMode // 执行模式：streaming/non-streaming/auto
 
     // 生成参数
@@ -491,11 +495,11 @@ const (
 
 **ExecutionMode 说明**：
 
-| 模式 | 适用场景 | 性能特点 |
-|------|---------|---------|
-| `Streaming` | 交互式对话、实时反馈 | 用户体验好，逐字输出 |
-| `NonStreaming` | 批量翻译、文档处理 | **速度快3-5倍**，一次性返回 |
-| `Auto` | 通用场景 | 自动根据任务类型选择 |
+| 模式           | 适用场景             | 性能特点                    |
+| -------------- | -------------------- | --------------------------- |
+| `Streaming`    | 交互式对话、实时反馈 | 用户体验好，逐字输出        |
+| `NonStreaming` | 批量翻译、文档处理   | **速度快3-5倍**，一次性返回 |
+| `Auto`         | 通用场景             | 自动根据任务类型选择        |
 
 **使用示例**：
 
@@ -581,6 +585,7 @@ type ToolSchema struct {
 ### 国际主流
 
 **OpenAI**
+
 ```go
 config := &types.ModelConfig{
     Provider: "openai",
@@ -594,6 +599,7 @@ config := &types.ModelConfig{
 ---
 
 **Anthropic**
+
 ```go
 config := &types.ModelConfig{
     Provider: "anthropic",
@@ -607,6 +613,7 @@ config := &types.ModelConfig{
 ---
 
 **Gemini**
+
 ```go
 config := &types.ModelConfig{
     Provider: "gemini",
@@ -620,6 +627,7 @@ config := &types.ModelConfig{
 ---
 
 **Groq**
+
 ```go
 config := &types.ModelConfig{
     Provider: "groq",
@@ -635,6 +643,7 @@ config := &types.ModelConfig{
 ### 中国市场
 
 **DeepSeek**
+
 ```go
 config := &types.ModelConfig{
     Provider: "deepseek",
@@ -648,6 +657,7 @@ config := &types.ModelConfig{
 ---
 
 **智谱 GLM**
+
 ```go
 config := &types.ModelConfig{
     Provider: "glm",
@@ -663,6 +673,7 @@ config := &types.ModelConfig{
 ### 本地部署
 
 **Ollama**
+
 ```go
 config := &types.ModelConfig{
     Provider: "ollama",

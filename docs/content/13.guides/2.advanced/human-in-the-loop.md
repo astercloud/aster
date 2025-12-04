@@ -22,13 +22,13 @@ HITL 是一种设计模式，在自动化流程中引入人工决策点，确保
 
 ### 适用场景
 
-| 场景 | 示例 | 风险等级 |
-|------|------|---------|
-| 文件操作 | 删除文件、修改配置 | 🔴 高 |
-| 系统命令 | 执行 Shell 命令 | 🔴 高 |
-| 外部 API | 发送邮件、调用付费 API | 🟡 中 |
-| 数据修改 | 更新数据库、修改记录 | 🟡 中 |
-| 资源消耗 | 大规模计算、批量处理 | 🟡 中 |
+| 场景     | 示例                   | 风险等级 |
+| -------- | ---------------------- | -------- |
+| 文件操作 | 删除文件、修改配置     | 🔴 高    |
+| 系统命令 | 执行 Shell 命令        | 🔴 高    |
+| 外部 API | 发送邮件、调用付费 API | 🟡 中    |
+| 数据修改 | 更新数据库、修改记录   | 🟡 中    |
+| 资源消耗 | 大规模计算、批量处理   | 🟡 中    |
 
 ## 🚀 快速开始
 
@@ -57,7 +57,7 @@ func main() {
             "fs_delete":    true,  // 文件删除需要审核
             "HttpRequest": true,  // HTTP 请求需要审核
         },
-        
+
         // 审核处理器
         ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
             // 显示待审核的操作
@@ -66,25 +66,25 @@ func main() {
                 fmt.Printf("  工具: %s\n", action.ToolName)
                 fmt.Printf("  参数: %+v\n", action.Input)
                 fmt.Printf("  说明: %s\n\n", action.Message)
-                
+
                 // 获取人工决策
                 fmt.Print("请选择操作 (approve/reject): ")
                 var choice string
                 fmt.Scanln(&choice)
-                
+
                 if choice == "approve" || choice == "y" {
                     return []middleware.Decision{{
                         Type:   middleware.DecisionApprove,
                         Reason: "用户批准",
                     }}, nil
                 }
-                
+
                 return []middleware.Decision{{
                     Type:   middleware.DecisionReject,
                     Reason: "用户拒绝",
                 }}, nil
             }
-            
+
             return nil, fmt.Errorf("no decision")
         },
     })
@@ -158,11 +158,11 @@ InterruptOn: map[string]interface{}{
 
 HITL 支持三种决策类型：
 
-| 决策类型 | 说明 | 使用场景 |
-|---------|------|---------|
-| `DecisionApprove` | 批准：按原参数执行 | 操作合理，可以执行 |
-| `DecisionReject` | 拒绝：取消执行 | 操作不安全或不合理 |
-| `DecisionEdit` | 编辑：修改参数后执行 | 参数需要调整 |
+| 决策类型          | 说明                 | 使用场景           |
+| ----------------- | -------------------- | ------------------ |
+| `DecisionApprove` | 批准：按原参数执行   | 操作合理，可以执行 |
+| `DecisionReject`  | 拒绝：取消执行       | 操作不安全或不合理 |
+| `DecisionEdit`    | 编辑：修改参数后执行 | 参数需要调整       |
 
 ```go
 const (
@@ -181,10 +181,10 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
     for _, action := range req.ActionRequests {
         fmt.Printf("工具: %s\n参数: %+v\n", action.ToolName, action.Input)
         fmt.Print("批准? (y/n): ")
-        
+
         var answer string
         fmt.Scanln(&answer)
-        
+
         if answer == "y" {
             return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
         }
@@ -199,21 +199,21 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
 ```go
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     action := req.ActionRequests[0]
-    
+
     fmt.Printf("工具: %s\n", action.ToolName)
     fmt.Printf("当前参数: %+v\n", action.Input)
     fmt.Print("选择操作 (approve/reject/edit): ")
-    
+
     var choice string
     fmt.Scanln(&choice)
-    
+
     switch choice {
     case "approve":
         return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
-        
+
     case "reject":
         return []middleware.Decision{{Type: middleware.DecisionReject}}, nil
-        
+
     case "edit":
         editedInput := make(map[string]interface{})
         for key, value := range action.Input {
@@ -226,13 +226,13 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
                 editedInput[key] = value
             }
         }
-        
+
         return []middleware.Decision{{
             Type:        middleware.DecisionEdit,
             EditedInput: editedInput,
         }}, nil
     }
-    
+
     return nil, fmt.Errorf("invalid choice")
 }
 ```
@@ -252,7 +252,7 @@ func NewFileOperationHITL() (*middleware.HumanInTheLoopMiddleware, error) {
         },
         ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
             action := req.ActionRequests[0]
-            
+
             // 检查危险路径
             if path, ok := action.Input["path"].(string); ok {
                 dangerousPaths := []string{"/", "/etc", "/usr", "/bin", "/home"}
@@ -267,14 +267,14 @@ func NewFileOperationHITL() (*middleware.HumanInTheLoopMiddleware, error) {
                     }
                 }
             }
-            
+
             // 正常审核流程
             fmt.Printf("操作: %s\n参数: %+v\n", action.ToolName, action.Input)
             fmt.Print("批准? (y/n): ")
-            
+
             var answer string
             fmt.Scanln(&answer)
-            
+
             if answer == "y" {
                 return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
             }
@@ -312,7 +312,7 @@ func assessRisk(action middleware.ActionRequest) RiskLevel {
 func smartApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     action := req.ActionRequests[0]
     risk := assessRisk(action)
-    
+
     switch risk {
     case RiskLow:
         fmt.Printf("✅ 自动批准低风险操作: %s\n", action.ToolName)
@@ -320,7 +320,7 @@ func smartApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([
             Type:   middleware.DecisionApprove,
             Reason: "低风险操作自动批准",
         }}, nil
-        
+
     case RiskMedium:
         fmt.Printf("⚠️  中风险操作: %s\n", action.ToolName)
         fmt.Print("是否批准? (y/n): ")
@@ -330,7 +330,7 @@ func smartApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([
             return []middleware.Decision{{Type: middleware.DecisionApprove}}, nil
         }
         return []middleware.Decision{{Type: middleware.DecisionReject}}, nil
-        
+
     case RiskHigh:
         fmt.Printf("🚨 高风险操作: %s\n", action.ToolName)
         fmt.Printf("参数: %+v\n", action.Input)
@@ -342,7 +342,7 @@ func smartApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([
         }
         return []middleware.Decision{{Type: middleware.DecisionReject}}, nil
     }
-    
+
     return nil, fmt.Errorf("unknown risk level")
 }
 ```
@@ -382,12 +382,12 @@ InterruptOn: map[string]interface{}{
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     ctx, cancel := context.WithTimeout(ctx, 5*time.Minute)
     defer cancel()
-    
+
     decisionCh := make(chan middleware.Decision, 1)
     go func() {
         decisionCh <- getUserDecision(req)
     }()
-    
+
     select {
     case decision := <-decisionCh:
         return []middleware.Decision{decision}, nil
@@ -428,15 +428,15 @@ func logApproval(action middleware.ActionRequest, decision middleware.Decision) 
 ```go
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     fmt.Printf("有 %d 个操作需要审核:\n", len(req.ActionRequests))
-    
+
     for i, action := range req.ActionRequests {
         fmt.Printf("%d. %s: %+v\n", i+1, action.ToolName, action.Input)
     }
-    
+
     fmt.Print("批准所有? (y/n/详细审核): ")
     var choice string
     fmt.Scanln(&choice)
-    
+
     if choice == "y" {
         // 批准所有
         decisions := make([]middleware.Decision, len(req.ActionRequests))
@@ -445,7 +445,7 @@ ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]mid
         }
         return decisions, nil
     }
-    
+
     // 逐个审核...
     return nil, nil
 }
@@ -483,7 +483,7 @@ type ApprovalPolicy struct {
 func (p *ApprovalPolicy) CheckPermission(user string, toolName string) bool {
     roles := getUserRoles(user)
     allowedRoles := p.AllowedRoles[toolName]
-    
+
     for _, role := range roles {
         for _, allowed := range allowedRoles {
             if role == allowed {
@@ -503,7 +503,7 @@ func (p *ApprovalPolicy) CheckPermission(user string, toolName string) bool {
 func appendOnlyAuditLog(entry AuditLog) {
     f, _ := os.OpenFile("audit.log", os.O_APPEND|os.O_CREATE|os.O_WRONLY, 0644)
     defer f.Close()
-    
+
     data, _ := json.Marshal(entry)
     f.WriteString(string(data) + "\n")
 }
@@ -574,6 +574,7 @@ if isProduction {
 ### Q: HITL 会影响性能吗？
 
 A: 是的，HITL 会引入延迟，因为需要等待人工决策。建议：
+
 - 只对真正敏感的操作启用审核
 - 实现超时机制避免无限等待
 - 对低风险操作使用自动批准
@@ -581,6 +582,7 @@ A: 是的，HITL 会引入延迟，因为需要等待人工决策。建议：
 ### Q: 如何在 Agent 被拒绝后恢复？
 
 A: Agent 会收到拒绝信息，可以：
+
 - 尝试其他方法完成任务
 - 向用户解释原因并请求指导
 - 调整参数后重试
