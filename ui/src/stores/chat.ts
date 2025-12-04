@@ -4,12 +4,12 @@
  * 管理聊天消息、Agent 状态等核心功能
  */
 
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { Message, TextMessage, Agent } from '@/types';
-import { generateId } from '@/utils/format';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import type { Message, TextMessage, Agent } from "@/types";
+import { generateId } from "@/utils/format";
 
-export const useChatStore = defineStore('chat', () => {
+export const useChatStore = defineStore("chat", () => {
   // ==================
   // State
   // ==================
@@ -19,12 +19,12 @@ export const useChatStore = defineStore('chat', () => {
 
   // Agent 状态
   const agent = ref<Agent>({
-    id: '',
-    name: 'Aster Copilot',
-    description: '多模态执行、自动规划、符合企业安全的 Agent',
-    status: 'idle',
+    id: "",
+    name: "Aster Copilot",
+    description: "多模态执行、自动规划、符合企业安全的 Agent",
+    status: "idle",
     metadata: {
-      model: 'aster:builder',
+      model: "aster:builder",
     },
   });
 
@@ -32,10 +32,10 @@ export const useChatStore = defineStore('chat', () => {
   const isTyping = ref(false);
 
   // 当前输入内容
-  const currentInput = ref('');
+  const currentInput = ref("");
 
   // 当前激活的消息 ID (用于思维过程关联)
-  const activeMessageId = ref<string>('');
+  const activeMessageId = ref<string>("");
 
   // Plan Mode 状态
   const planMode = ref<{
@@ -44,7 +44,7 @@ export const useChatStore = defineStore('chat', () => {
     planId: string | null;
   }>({
     active: false,
-    planContent: '',
+    planContent: "",
     planId: null,
   });
 
@@ -67,7 +67,7 @@ export const useChatStore = defineStore('chat', () => {
   // 最后一条助手消息
   const lastAssistantMessage = computed(() => {
     const reversed = [...messages.value].reverse();
-    return reversed.find(m => m.role === 'assistant') || null;
+    return reversed.find((m) => m.role === "assistant") || null;
   });
 
   // 是否有消息
@@ -87,14 +87,14 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 添加文本消息（简便方法）
    */
-  const addTextMessage = (role: 'user' | 'assistant' | 'system', text: string): TextMessage => {
+  const addTextMessage = (role: "user" | "assistant" | "system", text: string): TextMessage => {
     const message: TextMessage = {
-      id: generateId('msg'),
-      type: 'text',
+      id: generateId("msg"),
+      type: "text",
       role,
       content: { text },
       createdAt: Date.now(),
-      status: role === 'user' ? 'sent' : undefined,
+      status: role === "user" ? "sent" : undefined,
     };
     addMessage(message);
     return message;
@@ -104,21 +104,21 @@ export const useChatStore = defineStore('chat', () => {
    * 创建用户消息
    */
   const createUserMessage = (text: string): TextMessage => {
-    return addTextMessage('user', text);
+    return addTextMessage("user", text);
   };
 
   /**
    * 创建助手消息占位符
    */
   const createAssistantPlaceholder = (): TextMessage => {
-    return addTextMessage('assistant', '');
+    return addTextMessage("assistant", "");
   };
 
   /**
    * 更新消息
    */
   const updateMessage = (messageId: string, updates: Partial<Message>) => {
-    const index = messages.value.findIndex(m => m.id === messageId);
+    const index = messages.value.findIndex((m) => m.id === messageId);
     if (index !== -1) {
       const msg = messages.value[index];
       if (msg) {
@@ -153,9 +153,9 @@ export const useChatStore = defineStore('chat', () => {
    */
   const flushTextChunks = () => {
     for (const [messageId, chunks] of pendingTextChunks.value) {
-      const msg = messages.value.find(m => m.id === messageId);
-      if (msg && msg.type === 'text') {
-        msg.content.text += chunks.join('');
+      const msg = messages.value.find((m) => m.id === messageId);
+      if (msg && msg.type === "text") {
+        msg.content.text += chunks.join("");
       }
     }
     pendingTextChunks.value.clear();
@@ -166,7 +166,7 @@ export const useChatStore = defineStore('chat', () => {
    */
   const updateLastAssistantMessage = (text: string) => {
     const lastMsg = lastAssistantMessage.value;
-    if (lastMsg && lastMsg.type === 'text') {
+    if (lastMsg && lastMsg.type === "text") {
       lastMsg.content.text = text;
     }
   };
@@ -176,7 +176,7 @@ export const useChatStore = defineStore('chat', () => {
    */
   const appendToLastAssistantMessage = (text: string) => {
     const lastMsg = lastAssistantMessage.value;
-    if (lastMsg && lastMsg.type === 'text') {
+    if (lastMsg && lastMsg.type === "text") {
       lastMsg.content.text += text;
     }
   };
@@ -185,7 +185,7 @@ export const useChatStore = defineStore('chat', () => {
    * 删除消息
    */
   const deleteMessage = (messageId: string) => {
-    const index = messages.value.findIndex(m => m.id === messageId);
+    const index = messages.value.findIndex((m) => m.id === messageId);
     if (index !== -1) {
       messages.value.splice(index, 1);
     }
@@ -216,7 +216,7 @@ export const useChatStore = defineStore('chat', () => {
   /**
    * 更新 Agent 状态
    */
-  const updateAgentStatus = (status: Agent['status']) => {
+  const updateAgentStatus = (status: Agent["status"]) => {
     agent.value.status = status;
   };
 
@@ -258,7 +258,7 @@ export const useChatStore = defineStore('chat', () => {
   const exitPlanMode = () => {
     planMode.value = {
       active: false,
-      planContent: '',
+      planContent: "",
       planId: null,
     };
   };
@@ -267,14 +267,14 @@ export const useChatStore = defineStore('chat', () => {
    * 获取消息索引
    */
   const getMessageIndex = (messageId: string): number => {
-    return messages.value.findIndex(m => m.id === messageId);
+    return messages.value.findIndex((m) => m.id === messageId);
   };
 
   /**
    * 获取消息
    */
   const getMessage = (messageId: string): Message | undefined => {
-    return messages.value.find(m => m.id === messageId);
+    return messages.value.find((m) => m.id === messageId);
   };
 
   // ==================

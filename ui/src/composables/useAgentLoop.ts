@@ -1,21 +1,21 @@
 /**
  * useAgentLoop Composable
- * 
+ *
  * 封装完整的 Agent Loop，支持：
  * - 重试逻辑 (Retry with exponential backoff)
  * - Human-in-the-Loop (HITL) 审批流程
  * - 真实工具执行 (通过 Aster 后端)
  * - 流式响应
- * 
+ *
  * 对应 geminiService.ts 的功能，但使用 Aster 后端真实实现
  */
 
-import { ref, reactive, computed } from 'vue';
-import { useWebSocket } from './useWebSocket';
-import { useApprovalStore } from '@/stores/approval';
-import { useThinkingStore } from '@/stores/thinking';
-import { useToolsStore } from '@/stores/tools';
-import { generateId } from '@/utils/format';
+import { ref, reactive, computed } from "vue";
+import { useWebSocket } from "./useWebSocket";
+import { useApprovalStore } from "@/stores/approval";
+import { useThinkingStore } from "@/stores/thinking";
+import { useToolsStore } from "@/stores/tools";
+import { generateId } from "@/utils/format";
 
 // ==================
 // Types
@@ -40,7 +40,7 @@ export interface ApprovalRequest {
 }
 
 export interface AgentExecutionResult {
-  status: 'finished' | 'paused' | 'error';
+  status: "finished" | "paused" | "error";
   output: string;
   history: any[];
   approvalRequest?: ApprovalRequest;
@@ -85,18 +85,18 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
   // 状态
   const isRunning = ref(false);
   const isPaused = ref(false);
-  const currentOutput = ref('');
+  const currentOutput = ref("");
   const history = ref<any[]>([]);
   const pendingApproval = ref<ApprovalRequest | null>(null);
 
   // 配置
-  const sensitiveTools = config.sensitiveTools || ['Edit', 'Write', 'bash', 'fs_write'];
+  const sensitiveTools = config.sensitiveTools || ["Edit", "Write", "bash", "fs_write"];
   const maxRetries = config.maxRetries || 3;
   const maxLoops = config.maxLoops || 10;
 
   // WebSocket URL
-  const apiUrl = config.apiUrl || import.meta.env.VITE_API_URL || 'http://localhost:8080';
-  const wsUrl = config.wsUrl || apiUrl.replace(/^http/, 'ws') + '/v1/ws';
+  const apiUrl = config.apiUrl || import.meta.env.VITE_API_URL || "http://localhost:8080";
+  const wsUrl = config.wsUrl || apiUrl.replace(/^http/, "ws") + "/v1/ws";
 
   /**
    * 初始化 WebSocket 连接
@@ -113,43 +113,39 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
    */
   const emitThink = (event: Partial<ThinkAloudEvent>) => {
     const fullEvent: ThinkAloudEvent = {
-      id: generateId('think'),
-      stage: event.stage || 'Thinking',
-      reasoning: event.reasoning || '',
-      decision: event.decision || '',
+      id: generateId("think"),
+      stage: event.stage || "Thinking",
+      reasoning: event.reasoning || "",
+      decision: event.decision || "",
       timestamp: new Date().toISOString(),
       ...event,
     };
-    
+
     config.onThink?.(fullEvent);
     return fullEvent;
   };
 
   /**
    * 执行 Agent Loop
-   * 
+   *
    * @param input 用户输入
    * @param contextData 上下文数据
    * @param resumeState 恢复状态 (用于 HITL 恢复)
    */
-  const execute = async (
-    input: string,
-    contextData: string = '',
-    resumeState?: { history: any[]; approvedTool?: ApprovalRequest }
-  ): Promise<AgentExecutionResult> => {
+  const execute = async (input: string, contextData: string = "", resumeState?: { history: any[]; approvedTool?: ApprovalRequest }): Promise<AgentExecutionResult> => {
     isRunning.value = true;
     isPaused.value = false;
-    currentOutput.value = '';
+    currentOutput.value = "";
 
     try {
       const ws = await initConnection();
       if (!ws) {
-        throw new Error('WebSocket connection failed');
+        throw new Error("WebSocket connection failed");
       }
 
       return new Promise((resolve, reject) => {
         let loopCount = 0;
-        let finalOutput = '';
+        let finalOutput = "";
 
         // 设置消息处理器
         const unsubscribe = ws.onMessage((message: any) => {
@@ -157,55 +153,55 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
           switch (type) {
             // 思考开始
-            case 'think_chunk_start':
-              thinkingStore.startThinking(generateId('msg'));
+            case "think_chunk_start":
+              thinkingStore.startThinking(generateId("msg"));
               emitThink({
-                stage: '任务规划',
-                reasoning: '分析用户请求...',
-                decision: '准备进入 Agent 执行循环',
+                stage: "任务规划",
+                reasoning: "分析用户请求...",
+                decision: "准备进入 Agent 执行循环",
               });
               break;
 
             // 思考内容
-            case 'think_chunk':
-              thinkingStore.handleThinkChunk(payload?.delta || '');
+            case "think_chunk":
+              thinkingStore.handleThinkChunk(payload?.delta || "");
               break;
 
             // 思考结束
-            case 'think_chunk_end':
+            case "think_chunk_end":
               thinkingStore.endThinking();
               break;
 
             // 文本增量
-            case 'text_delta':
-              const delta = payload?.text || '';
+            case "text_delta":
+              const delta = payload?.text || "";
               finalOutput += delta;
               currentOutput.value = finalOutput;
               config.onTextDelta?.(delta);
               break;
 
             // 工具开始
-            case 'tool_start':
-            case 'agent_event':
-              if (payload?.type === 'tool:start' || payload?.event?.type === 'tool:start') {
+            case "tool_start":
+            case "agent_event":
+              if (payload?.type === "tool:start" || payload?.event?.type === "tool:start") {
                 const call = payload?.event?.Call || payload?.call || {};
-                const toolName = call.name || 'unknown';
+                const toolName = call.name || "unknown";
                 const args = call.arguments || {};
 
                 // 检查是否需要审批
                 if (sensitiveTools.includes(toolName)) {
                   isPaused.value = true;
                   const approvalRequest: ApprovalRequest = {
-                    id: generateId('approval'),
+                    id: generateId("approval"),
                     toolName,
                     args,
                   };
                   pendingApproval.value = approvalRequest;
 
                   emitThink({
-                    stage: 'Human in the Loop',
+                    stage: "Human in the Loop",
                     reasoning: `工具 ${toolName} 被标记为敏感操作`,
-                    decision: '暂停执行，请求人工审批',
+                    decision: "暂停执行，请求人工审批",
                     approvalRequest,
                   });
 
@@ -222,7 +218,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
                   // 暂停并返回
                   unsubscribe();
                   resolve({
-                    status: 'paused',
+                    status: "paused",
                     output: finalOutput,
                     history: history.value,
                     approvalRequest,
@@ -232,9 +228,9 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
                 // 非敏感工具，正常执行
                 toolsStore.handleToolStart({
-                  id: call.id || generateId('tool'),
+                  id: call.id || generateId("tool"),
                   name: toolName,
-                  state: 'executing',
+                  state: "executing",
                   progress: 0,
                   arguments: args,
                 });
@@ -251,16 +247,16 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
               break;
 
             // 工具结束
-            case 'tool_end':
-              if (payload?.type === 'tool:end' || payload?.event?.type === 'tool:end') {
+            case "tool_end":
+              if (payload?.type === "tool:end" || payload?.event?.type === "tool:end") {
                 const call = payload?.event?.Call || payload?.call || {};
-                const toolName = call.name || 'unknown';
+                const toolName = call.name || "unknown";
                 const result = call.result || payload?.result;
 
                 toolsStore.handleToolEnd({
-                  id: call.id || '',
+                  id: call.id || "",
                   name: toolName,
-                  state: call.error ? 'failed' : 'completed',
+                  state: call.error ? "failed" : "completed",
                   progress: 1,
                   arguments: call.arguments || {},
                   result,
@@ -269,7 +265,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
                 emitThink({
                   stage: `工具返回: ${toolName}`,
-                  reasoning: '工具执行完毕',
+                  reasoning: "工具执行完毕",
                   decision: `获取结果: ${JSON.stringify(result).substring(0, 50)}...`,
                   toolResult: { toolName, result },
                 });
@@ -280,20 +276,20 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
               break;
 
             // 需要审批
-            case 'permission_required':
+            case "permission_required":
               isPaused.value = true;
               const call = payload?.call || {};
               const approvalRequest: ApprovalRequest = {
-                id: payload?.request_id || generateId('approval'),
-                toolName: call.name || '',
+                id: payload?.request_id || generateId("approval"),
+                toolName: call.name || "",
                 args: call.arguments || {},
               };
               pendingApproval.value = approvalRequest;
 
               emitThink({
-                stage: 'Human in the Loop',
+                stage: "Human in the Loop",
                 reasoning: `工具 ${approvalRequest.toolName} 需要人工审批`,
-                decision: '暂停执行，等待审批',
+                decision: "暂停执行，等待审批",
                 approvalRequest,
               });
 
@@ -308,7 +304,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
               unsubscribe();
               resolve({
-                status: 'paused',
+                status: "paused",
                 output: finalOutput,
                 history: history.value,
                 approvalRequest,
@@ -316,12 +312,12 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
               break;
 
             // 完成
-            case 'chat_complete':
+            case "chat_complete":
               isRunning.value = false;
               unsubscribe();
 
               const result: AgentExecutionResult = {
-                status: 'finished',
+                status: "finished",
                 output: finalOutput,
                 history: history.value,
               };
@@ -331,14 +327,14 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
               break;
 
             // 错误
-            case 'error':
+            case "error":
               isRunning.value = false;
               unsubscribe();
 
-              const error = new Error(payload?.message || 'Unknown error');
+              const error = new Error(payload?.message || "Unknown error");
               config.onError?.(error);
               resolve({
-                status: 'error',
+                status: "error",
                 output: finalOutput,
                 history: history.value,
                 error: payload?.message,
@@ -351,8 +347,8 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
             isRunning.value = false;
             unsubscribe();
             resolve({
-              status: 'finished',
-              output: finalOutput + '\n\n[达到最大循环次数限制]',
+              status: "finished",
+              output: finalOutput + "\n\n[达到最大循环次数限制]",
               history: history.value,
             });
           }
@@ -360,9 +356,9 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
         // 发送请求
         const messagePayload: any = {
-          type: 'chat',
+          type: "chat",
           payload: {
-            template_id: 'agent',
+            template_id: "agent",
             input: input,
             context: contextData,
             model_config: config.modelConfig,
@@ -384,7 +380,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
       isRunning.value = false;
       config.onError?.(error);
       return {
-        status: 'error',
+        status: "error",
         output: currentOutput.value,
         history: history.value,
         error: error.message,
@@ -398,7 +394,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
   const approveAndResume = async (requestId: string): Promise<AgentExecutionResult> => {
     const approval = pendingApproval.value;
     if (!approval || approval.id !== requestId) {
-      throw new Error('No pending approval or ID mismatch');
+      throw new Error("No pending approval or ID mismatch");
     }
 
     // 发送审批决策
@@ -408,12 +404,12 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
     emitThink({
       stage: `调用工具: ${approval.toolName} (已批准)`,
-      reasoning: '用户已批准敏感操作',
+      reasoning: "用户已批准敏感操作",
       decision: `执行 ${approval.toolName}`,
     });
 
     // 恢复执行
-    return execute('', '', {
+    return execute("", "", {
       history: history.value,
       approvedTool: approval,
     });
@@ -425,7 +421,7 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
   const rejectTool = (requestId: string, reason?: string): AgentExecutionResult => {
     const approval = pendingApproval.value;
     if (!approval || approval.id !== requestId) {
-      throw new Error('No pending approval or ID mismatch');
+      throw new Error("No pending approval or ID mismatch");
     }
 
     approvalStore.reject(requestId, reason);
@@ -435,13 +431,13 @@ export function useAgentLoop(config: AgentLoopConfig = {}) {
 
     emitThink({
       stage: `工具被拒绝: ${approval.toolName}`,
-      reasoning: reason || '用户拒绝了敏感操作',
-      decision: '终止执行',
+      reasoning: reason || "用户拒绝了敏感操作",
+      decision: "终止执行",
     });
 
     return {
-      status: 'finished',
-      output: currentOutput.value + `\n\n[工具 ${approval.toolName} 被拒绝: ${reason || '用户拒绝'}]`,
+      status: "finished",
+      output: currentOutput.value + `\n\n[工具 ${approval.toolName} 被拒绝: ${reason || "用户拒绝"}]`,
       history: history.value,
     };
   };

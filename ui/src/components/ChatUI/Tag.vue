@@ -8,18 +8,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Icon from './Icon.vue';
+import { computed } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
-  color?: 'default' | 'primary' | 'success' | 'warning' | 'error';
-  size?: 'sm' | 'md' | 'lg';
+  color?: "default" | "primary" | "success" | "warning" | "error";
+  size?: "sm" | "md" | "lg";
   closable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  color: 'default',
-  size: 'md',
+  color: "default",
+  size: "md",
   closable: false,
 });
 
@@ -29,20 +29,20 @@ defineEmits<{
 
 const colorClass = computed(() => {
   const map = {
-    default: 'tag-default',
-    primary: 'tag-primary',
-    success: 'tag-success',
-    warning: 'tag-warning',
-    error: 'tag-error',
+    default: "tag-default",
+    primary: "tag-primary",
+    success: "tag-success",
+    warning: "tag-warning",
+    error: "tag-error",
   };
   return map[props.color];
 });
 
 const sizeClass = computed(() => {
   const map = {
-    sm: 'tag-sm',
-    md: 'tag-md',
-    lg: 'tag-lg',
+    sm: "tag-sm",
+    md: "tag-md",
+    lg: "tag-lg",
   };
   return map[props.size];
 });

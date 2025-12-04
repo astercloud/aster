@@ -1,11 +1,6 @@
 <template>
   <div class="list-container">
-    <div
-      v-for="(item, index) in items"
-      :key="index"
-      class="list-item"
-      @click="$emit('select', item)"
-    >
+    <div v-for="(item, index) in items" :key="index" class="list-item" @click="$emit('select', item)">
       <slot :item="item" :index="index">
         {{ item }}
       </slot>

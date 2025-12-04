@@ -15,7 +15,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  text: '正在输入',
+  text: "正在输入",
 });
 </script>
 
@@ -46,7 +46,9 @@ withDefaults(defineProps<Props>(), {
 }
 
 @keyframes typing {
-  0%, 60%, 100% {
+  0%,
+  60%,
+  100% {
     transform: translateY(0);
   }
   30% {

@@ -1,12 +1,5 @@
 <template>
-  <div
-    :class="[
-      'workflow-step',
-      `workflow-step--${step.status}`,
-      { 'workflow-step--clickable': isClickable }
-    ]"
-    @click="handleClick"
-  >
+  <div :class="['workflow-step', `workflow-step--${step.status}`, { 'workflow-step--clickable': isClickable }]" @click="handleClick">
     <!-- 步骤指示器 -->
     <div class="step-indicator">
       <!-- 状态图标 -->
@@ -17,67 +10,23 @@
         <!-- 默认状态图标 -->
         <template v-else>
           <!-- Pending -->
-          <svg
-            v-if="step.status === 'pending'"
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          <svg v-if="step.status === 'pending'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
           <!-- Active -->
-          <svg
-            v-else-if="step.status === 'active'"
-            class="w-5 h-5 animate-pulse"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M13 10V3L4 14h7v7l9-11h-7z"
-            />
+          <svg v-else-if="step.status === 'active'" class="w-5 h-5 animate-pulse" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
           </svg>
 
           <!-- Completed -->
-          <svg
-            v-else-if="step.status === 'completed'"
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          <svg v-else-if="step.status === 'completed'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
 
           <!-- Failed -->
-          <svg
-            v-else-if="step.status === 'failed'"
-            class="w-5 h-5"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z"
-            />
+          <svg v-else-if="step.status === 'failed'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
         </template>
       </div>
@@ -101,23 +50,14 @@
 
       <!-- 步骤操作 -->
       <div v-if="step.actions && step.actions.length > 0" class="step-actions">
-        <button
-          v-for="action in step.actions"
-          :key="action.label"
-          @click.stop="handleAction(action)"
-          :class="['action-button', `action-button--${action.type}`]"
-        >
+        <button v-for="action in step.actions" :key="action.label" @click.stop="handleAction(action)" :class="['action-button', `action-button--${action.type}`]">
           {{ action.label }}
         </button>
       </div>
 
       <!-- 元数据 -->
       <div v-if="step.metadata && showMetadata" class="step-metadata">
-        <div
-          v-for="(value, key) in step.metadata"
-          :key="key"
-          class="metadata-item"
-        >
+        <div v-for="(value, key) in step.metadata" :key="key" class="metadata-item">
           <span class="metadata-key">{{ key }}:</span>
           <span class="metadata-value">{{ formatMetadataValue(value) }}</span>
         </div>
@@ -127,11 +67,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed, type PropType } from 'vue';
-import type { WorkflowStep, WorkflowAction } from '@/types/workflow';
+import { defineComponent, computed, type PropType } from "vue";
+import type { WorkflowStep, WorkflowAction } from "@/types/workflow";
 
 export default defineComponent({
-  name: 'WorkflowStep',
+  name: "WorkflowStep",
   props: {
     step: {
       type: Object as PropType<WorkflowStep>,
@@ -157,54 +97,54 @@ export default defineComponent({
   setup(props, { emit }) {
     const stepIconClass = computed(() => {
       const classes: Record<string, string> = {
-        pending: 'step-icon--pending',
-        active: 'step-icon--active',
-        completed: 'step-icon--completed',
-        failed: 'step-icon--failed',
+        pending: "step-icon--pending",
+        active: "step-icon--active",
+        completed: "step-icon--completed",
+        failed: "step-icon--failed",
       };
-      return classes[props.step.status] || 'step-icon--pending';
+      return classes[props.step.status] || "step-icon--pending";
     });
 
     const stepConnectorClass = computed(() => {
       // 如果当前步骤已完成,连接线也显示为完成状态
-      if (props.step.status === 'completed') {
-        return 'step-connector--completed';
+      if (props.step.status === "completed") {
+        return "step-connector--completed";
       }
-      return 'step-connector--default';
+      return "step-connector--default";
     });
 
     const stepBadgeClass = computed(() => {
       const classes: Record<string, string> = {
-        pending: 'step-badge--pending',
-        active: 'step-badge--active',
-        completed: 'step-badge--completed',
-        failed: 'step-badge--failed',
+        pending: "step-badge--pending",
+        active: "step-badge--active",
+        completed: "step-badge--completed",
+        failed: "step-badge--failed",
       };
-      return classes[props.step.status] || 'step-badge--pending';
+      return classes[props.step.status] || "step-badge--pending";
     });
 
     const stepStatusLabel = computed(() => {
       const labels: Record<string, string> = {
-        pending: '待执行',
-        active: '进行中',
-        completed: '已完成',
-        failed: '失败',
+        pending: "待执行",
+        active: "进行中",
+        completed: "已完成",
+        failed: "失败",
       };
       return labels[props.step.status] || props.step.status;
     });
 
     const handleClick = () => {
       if (props.isClickable) {
-        emit('click', props.step);
+        emit("click", props.step);
       }
     };
 
     const handleAction = (action: WorkflowAction) => {
-      emit('action', action, props.step);
+      emit("action", action, props.step);
     };
 
     const formatMetadataValue = (value: any): string => {
-      if (typeof value === 'object') {
+      if (typeof value === "object") {
         return JSON.stringify(value);
       }
       return String(value);

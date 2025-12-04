@@ -9,22 +9,16 @@
 ```vue
 <template>
   <div class="space-y-4">
-    <SystemMessage>
-      欢迎来到聊天系统！
-    </SystemMessage>
+    <SystemMessage> 欢迎来到聊天系统！ </SystemMessage>
 
-    <SystemMessage>
-      用户 张三 加入了聊天室
-    </SystemMessage>
+    <SystemMessage> 用户 张三 加入了聊天室 </SystemMessage>
 
-    <SystemMessage>
-      消息历史记录已加载完成
-    </SystemMessage>
+    <SystemMessage> 消息历史记录已加载完成 </SystemMessage>
   </div>
 </template>
 
 <script setup>
-import { SystemMessage } from '@/components/ChatUI';
+import { SystemMessage } from "@/components/ChatUI";
 </script>
 ```
 
@@ -70,7 +64,7 @@ import { SystemMessage } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { SystemMessage, Icon } from '@/components/ChatUI';
+import { SystemMessage, Icon } from "@/components/ChatUI";
 </script>
 ```
 
@@ -98,7 +92,7 @@ import { SystemMessage, Icon } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { SystemMessage } from '@/components/ChatUI';
+import { SystemMessage } from "@/components/ChatUI";
 </script>
 ```
 
@@ -133,7 +127,7 @@ import { SystemMessage } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { SystemMessage, Button } from '@/components/ChatUI';
+import { SystemMessage, Button } from "@/components/ChatUI";
 </script>
 ```
 
@@ -162,7 +156,7 @@ import { SystemMessage, Button } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { SystemMessage, Icon } from '@/components/ChatUI';
+import { SystemMessage, Icon } from "@/components/ChatUI";
 </script>
 ```
 
@@ -174,19 +168,13 @@ import { SystemMessage, Icon } from '@/components/ChatUI';
 <template>
   <div class="space-y-4">
     <!-- 系统欢迎消息 -->
-    <SystemMessage class="text-center">
-      开始新的对话会话
-    </SystemMessage>
+    <SystemMessage class="text-center"> 开始新的对话会话 </SystemMessage>
 
     <!-- 用户消息 -->
-    <Bubble position="right">
-      你好，我想了解产品功能
-    </Bubble>
+    <Bubble position="right"> 你好，我想了解产品功能 </Bubble>
 
     <!-- AI 回复 -->
-    <Bubble position="left">
-      您好！我很乐意为您介绍我们的产品功能...
-    </Bubble>
+    <Bubble position="left"> 您好！我很乐意为您介绍我们的产品功能... </Bubble>
 
     <!-- 系统提示 -->
     <SystemMessage>
@@ -201,7 +189,7 @@ import { SystemMessage, Icon } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { SystemMessage, Bubble, Icon } from '@/components/ChatUI';
+import { SystemMessage, Bubble, Icon } from "@/components/ChatUI";
 </script>
 ```
 
@@ -211,13 +199,14 @@ SystemMessage 是一个简单的展示组件，主要通过插槽传递内容。
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明           |
+| ------- | -------------- |
 | default | 系统消息的内容 |
 
 ### 默认样式
 
 组件内置了以下样式：
+
 - 居中显示
 - 浅色背景和边框
 - 较小的字体尺寸
@@ -226,16 +215,19 @@ SystemMessage 是一个简单的展示组件，主要通过插槽传递内容。
 ### 使用说明
 
 #### 内容设计
+
 - 保持系统消息简洁明了
 - 使用中性或友好的语言
 - 提供必要的操作指引
 
 #### 视觉区分
+
 - 可以通过添加背景色来区分不同类型的消息
 - 使用图标增强视觉传达效果
 - 保持与整体设计风格一致
 
 #### 交互设计
+
 - 避免在系统消息中放置过多交互元素
 - 为重要操作提供明确的按钮
 - 考虑移动设备的触摸体验

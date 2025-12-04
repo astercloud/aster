@@ -25,11 +25,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { SystemMessage as SystemMessageType } from '@/types';
+import { defineComponent } from "vue";
+import type { SystemMessage as SystemMessageType } from "@/types";
 
 export default defineComponent({
-  name: 'SystemMessage',
+  name: "SystemMessage",
 
   props: {
     message: {
@@ -41,9 +41,9 @@ export default defineComponent({
   setup() {
     function formatTime(timestamp: number): string {
       const date = new Date(timestamp);
-      return date.toLocaleTimeString('zh-CN', {
-        hour: '2-digit',
-        minute: '2-digit',
+      return date.toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
       });
     }
 

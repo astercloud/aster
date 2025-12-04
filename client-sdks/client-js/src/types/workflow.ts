@@ -95,10 +95,7 @@ export interface LoopWorkflowDefinition extends BaseWorkflowDefinition {
 /**
  * Workflow 定义联合类型
  */
-export type WorkflowDefinition =
-  | ParallelWorkflowDefinition
-  | SequentialWorkflowDefinition
-  | LoopWorkflowDefinition;
+export type WorkflowDefinition = ParallelWorkflowDefinition | SequentialWorkflowDefinition | LoopWorkflowDefinition;
 
 // ============================================================================
 // Workflow Info

@@ -3,16 +3,16 @@
  * 剪贴板操作
  */
 
-import { ref } from 'vue';
+import { ref } from "vue";
 
 export function useClipboard() {
-  const isSupported = ref(typeof navigator !== 'undefined' && 'clipboard' in navigator);
+  const isSupported = ref(typeof navigator !== "undefined" && "clipboard" in navigator);
   const copied = ref(false);
   const error = ref<Error | null>(null);
 
   async function copy(text: string): Promise<boolean> {
     if (!isSupported.value) {
-      error.value = new Error('Clipboard API not supported');
+      error.value = new Error("Clipboard API not supported");
       return false;
     }
 
@@ -36,7 +36,7 @@ export function useClipboard() {
 
   async function read(): Promise<string | null> {
     if (!isSupported.value) {
-      error.value = new Error('Clipboard API not supported');
+      error.value = new Error("Clipboard API not supported");
       return null;
     }
 

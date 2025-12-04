@@ -3,7 +3,7 @@
  */
 
 // 模拟 matchMedia (Tailwind dark mode 等需要)
-Object.defineProperty(window, 'matchMedia', {
+Object.defineProperty(window, "matchMedia", {
   writable: true,
   value: (query: string) => ({
     matches: false,
@@ -26,7 +26,7 @@ const localStorageMock = {
   length: 0,
   key: () => null,
 };
-Object.defineProperty(window, 'localStorage', { value: localStorageMock });
+Object.defineProperty(window, "localStorage", { value: localStorageMock });
 
 // 模拟 ResizeObserver
 class ResizeObserverMock {
@@ -34,4 +34,4 @@ class ResizeObserverMock {
   unobserve() {}
   disconnect() {}
 }
-Object.defineProperty(window, 'ResizeObserver', { value: ResizeObserverMock });
+Object.defineProperty(window, "ResizeObserver", { value: ResizeObserverMock });

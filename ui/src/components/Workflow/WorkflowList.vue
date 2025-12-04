@@ -23,12 +23,7 @@
         <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="搜索 Workflow..."
-          class="search-input"
-        />
+        <input v-model="searchQuery" type="text" placeholder="搜索 Workflow..." class="search-input" />
       </div>
 
       <select v-model="statusFilter" class="filter-select">
@@ -45,41 +40,28 @@
     <LoadingSpinner v-if="loading" class="my-8" />
 
     <!-- Empty State -->
-    <EmptyState
-      v-else-if="filteredWorkflows.length === 0"
-      title="暂无 Workflow"
-      description="还没有创建任何 Workflow，点击上方按钮创建第一个"
-    >
+    <EmptyState v-else-if="filteredWorkflows.length === 0" title="暂无 Workflow" description="还没有创建任何 Workflow，点击上方按钮创建第一个">
       <template #action>
-        <button @click="$emit('create')" class="btn-create">
-          创建 Workflow
-        </button>
+        <button @click="$emit('create')" class="btn-create">创建 Workflow</button>
       </template>
     </EmptyState>
 
     <!-- Workflow Grid -->
     <div v-else class="workflow-grid">
-      <WorkflowCard
-        v-for="workflow in filteredWorkflows"
-        :key="workflow.id"
-        :workflow="workflow"
-        @execute="$emit('execute', $event)"
-        @edit="$emit('edit', $event)"
-        @delete="$emit('delete', $event)"
-      />
+      <WorkflowCard v-for="workflow in filteredWorkflows" :key="workflow.id" :workflow="workflow" @execute="$emit('execute', $event)" @edit="$emit('edit', $event)" @delete="$emit('delete', $event)" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, type PropType } from 'vue';
-import WorkflowCard from './WorkflowCard.vue';
-import LoadingSpinner from '../Common/LoadingSpinner.vue';
-import EmptyState from '../Common/EmptyState.vue';
-import type { Workflow } from '@/types';
+import { defineComponent, ref, computed, type PropType } from "vue";
+import WorkflowCard from "./WorkflowCard.vue";
+import LoadingSpinner from "../Common/LoadingSpinner.vue";
+import EmptyState from "../Common/EmptyState.vue";
+import type { Workflow } from "@/types";
 
 export default defineComponent({
-  name: 'WorkflowList',
+  name: "WorkflowList",
   components: {
     WorkflowCard,
     LoadingSpinner,
@@ -102,8 +84,8 @@ export default defineComponent({
     delete: (workflow: Workflow) => true,
   },
   setup(props) {
-    const searchQuery = ref('');
-    const statusFilter = ref('');
+    const searchQuery = ref("");
+    const statusFilter = ref("");
 
     const filteredWorkflows = computed(() => {
       let result = props.workflows;
@@ -111,15 +93,12 @@ export default defineComponent({
       // 搜索过滤
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        result = result.filter(workflow =>
-          workflow.name.toLowerCase().includes(query) ||
-          workflow.description?.toLowerCase().includes(query)
-        );
+        result = result.filter((workflow) => workflow.name.toLowerCase().includes(query) || workflow.description?.toLowerCase().includes(query));
       }
 
       // 状态过滤
       if (statusFilter.value) {
-        result = result.filter(workflow => workflow.status === statusFilter.value);
+        result = result.filter((workflow) => workflow.status === statusFilter.value);
       }
 
       return result;

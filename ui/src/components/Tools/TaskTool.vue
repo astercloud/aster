@@ -7,18 +7,10 @@
         <span>任务执行</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="刷新任务"
-          @click="refreshTasks"
-        >
+        <button class="action-button" title="刷新任务" @click="refreshTasks">
           <Icon type="refresh" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="清理已完成"
-          @click="clearCompleted"
-        >
+        <button class="action-button" title="清理已完成" @click="clearCompleted">
           <Icon type="trash" size="sm" />
         </button>
       </div>
@@ -27,15 +19,7 @@
     <!-- 任务创建区域 -->
     <div class="task-create">
       <div class="create-content">
-        <input
-          v-model="newTask.command"
-          ref="commandInput"
-          type="text"
-          placeholder="输入任务命令..."
-          class="task-input"
-          @keydown.enter="executeTask"
-          @keydown.esc="newTask.command = ''"
-        />
+        <input v-model="newTask.command" ref="commandInput" type="text" placeholder="输入任务命令..." class="task-input" @keydown.enter="executeTask" @keydown.esc="newTask.command = ''" />
         <div class="create-options">
           <select v-model="newTask.type" class="task-type-select">
             <option value="">任务类型</option>
@@ -50,11 +34,7 @@
             <option value="medium">中</option>
             <option value="high">高</option>
           </select>
-          <button
-            class="execute-button"
-            :disabled="!newTask.command.trim() || isExecuting"
-            @click="executeTask"
-          >
+          <button class="execute-button" :disabled="!newTask.command.trim() || isExecuting" @click="executeTask">
             <span v-if="isExecuting">执行中...</span>
             <span v-else>执行</span>
           </button>
@@ -64,13 +44,8 @@
 
     <!-- 过滤器 -->
     <div class="task-filters">
-      <button
-        v-for="filter in filters"
-        :key="filter.key"
-        :class="['filter-button', { active: currentFilter === filter.key }]"
-        @click="currentFilter = filter.key"
-      >
-        <Icon :type="(filter.icon as any)" size="sm" />
+      <button v-for="filter in filters" :key="filter.key" :class="['filter-button', { active: currentFilter === filter.key }]" @click="currentFilter = filter.key">
+        <Icon :type="filter.icon as any" size="sm" />
         {{ filter.label }}
         <span class="filter-count">{{ filter.count }}</span>
       </button>
@@ -81,14 +56,17 @@
       <div
         v-for="task in filteredTasks"
         :key="task.id"
-        :class="['task-item', {
-          'task-running': task.status === 'running',
-          'task-completed': task.status === 'completed',
-          'task-failed': task.status === 'failed',
-          'task-priority-high': task.priority === 'high',
-          'task-priority-medium': task.priority === 'medium',
-          'task-priority-low': task.priority === 'low'
-        }]"
+        :class="[
+          'task-item',
+          {
+            'task-running': task.status === 'running',
+            'task-completed': task.status === 'completed',
+            'task-failed': task.status === 'failed',
+            'task-priority-high': task.priority === 'high',
+            'task-priority-medium': task.priority === 'medium',
+            'task-priority-low': task.priority === 'low',
+          },
+        ]"
       >
         <div class="task-main">
           <div class="task-status">
@@ -120,46 +98,23 @@
         </div>
 
         <div class="task-actions">
-          <button
-            v-if="task.status === 'completed'"
-            class="action-btn view-btn"
-            title="查看结果"
-            @click="viewResult(task)"
-          >
+          <button v-if="task.status === 'completed'" class="action-btn view-btn" title="查看结果" @click="viewResult(task)">
             <Icon type="eye" size="xs" />
           </button>
-          <button
-            v-if="task.status === 'running'"
-            class="action-btn stop-btn"
-            title="停止任务"
-            @click="stopTask(task.id)"
-          >
+          <button v-if="task.status === 'running'" class="action-btn stop-btn" title="停止任务" @click="stopTask(task.id)">
             <Icon type="stop" size="xs" />
           </button>
-          <button
-            v-if="task.status === 'failed'"
-            class="action-btn retry-btn"
-            title="重试"
-            @click="retryTask(task)"
-          >
+          <button v-if="task.status === 'failed'" class="action-btn retry-btn" title="重试" @click="retryTask(task)">
             <Icon type="refresh" size="xs" />
           </button>
-          <button
-            class="action-btn delete-btn"
-            title="删除任务"
-            @click="deleteTask(task.id)"
-          >
+          <button class="action-btn delete-btn" title="删除任务" @click="deleteTask(task.id)">
             <Icon type="trash" size="xs" />
           </button>
         </div>
       </div>
 
       <!-- 运行中的任务进度 -->
-      <div
-        v-for="task in runningTasks"
-        :key="`progress-${task.id}`"
-        class="task-progress"
-      >
+      <div v-for="task in runningTasks" :key="`progress-${task.id}`" class="task-progress">
         <div class="progress-info">
           <span class="progress-command">{{ task.command }}</span>
           <span class="progress-time">{{ formatDuration(Date.now() - (task.startedAt ?? Date.now())) }}</span>
@@ -246,15 +201,15 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface Task {
   id: string;
   command: string;
-  type: 'shell' | 'script' | 'api' | 'file' | '';
-  priority: 'low' | 'medium' | 'high' | '';
-  status: 'pending' | 'running' | 'completed' | 'failed';
+  type: "shell" | "script" | "api" | "file" | "";
+  priority: "low" | "medium" | "high" | "";
+  status: "pending" | "running" | "completed" | "failed";
   output?: string;
   error?: string;
   exitCode?: number;
@@ -271,8 +226,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -286,24 +241,24 @@ const tasks = ref<Task[]>([]);
 const runningTasks = ref<Task[]>([]);
 const showResultModal = ref(false);
 const selectedTask = ref<Task | null>(null);
-const currentFilter = ref('all');
+const currentFilter = ref("all");
 const isExecuting = ref(false);
 const commandInput = ref<HTMLInputElement>();
 const websocket = ref<WebSocket | null>(null);
 
 const newTask = ref({
-  command: '',
-  type: '' as 'shell' | 'script' | 'api' | 'file' | '',
-  priority: '' as 'low' | 'medium' | 'high' | '',
+  command: "",
+  type: "" as "shell" | "script" | "api" | "file" | "",
+  priority: "" as "low" | "medium" | "high" | "",
 });
 
 // 过滤器选项
 const filters = computed(() => [
-  { key: 'all', label: '全部', icon: 'list', count: tasks.value.length },
-  { key: 'pending', label: '等待中', icon: 'clock', count: tasks.value.filter(t => t.status === 'pending').length },
-  { key: 'running', label: '运行中', icon: 'play', count: tasks.value.filter(t => t.status === 'running').length },
-  { key: 'completed', label: '已完成', icon: 'check', count: tasks.value.filter(t => t.status === 'completed').length },
-  { key: 'failed', label: '失败', icon: 'close', count: tasks.value.filter(t => t.status === 'failed').length },
+  { key: "all", label: "全部", icon: "list", count: tasks.value.length },
+  { key: "pending", label: "等待中", icon: "clock", count: tasks.value.filter((t) => t.status === "pending").length },
+  { key: "running", label: "运行中", icon: "play", count: tasks.value.filter((t) => t.status === "running").length },
+  { key: "completed", label: "已完成", icon: "check", count: tasks.value.filter((t) => t.status === "completed").length },
+  { key: "failed", label: "失败", icon: "close", count: tasks.value.filter((t) => t.status === "failed").length },
 ]);
 
 // 计算属性
@@ -311,23 +266,23 @@ const filteredTasks = computed(() => {
   let filtered = tasks.value;
 
   switch (currentFilter.value) {
-    case 'pending':
-      filtered = filtered.filter(t => t.status === 'pending');
+    case "pending":
+      filtered = filtered.filter((t) => t.status === "pending");
       break;
-    case 'running':
-      filtered = filtered.filter(t => t.status === 'running');
+    case "running":
+      filtered = filtered.filter((t) => t.status === "running");
       break;
-    case 'completed':
-      filtered = filtered.filter(t => t.status === 'completed');
+    case "completed":
+      filtered = filtered.filter((t) => t.status === "completed");
       break;
-    case 'failed':
-      filtered = filtered.filter(t => t.status === 'failed');
+    case "failed":
+      filtered = filtered.filter((t) => t.status === "failed");
       break;
   }
 
   return filtered.sort((a, b) => {
     // 优先级排序
-    const priorityOrder = { high: 0, medium: 1, low: 2, '': 3 };
+    const priorityOrder = { high: 0, medium: 1, low: 2, "": 3 };
     if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     }
@@ -338,9 +293,9 @@ const filteredTasks = computed(() => {
 });
 
 const totalTasks = computed(() => tasks.value.length);
-const runningCount = computed(() => tasks.value.filter(t => t.status === 'running').length);
-const completedCount = computed(() => tasks.value.filter(t => t.status === 'completed').length);
-const failedCount = computed(() => tasks.value.filter(t => t.status === 'failed').length);
+const runningCount = computed(() => tasks.value.filter((t) => t.status === "running").length);
+const completedCount = computed(() => tasks.value.filter((t) => t.status === "completed").length);
+const failedCount = computed(() => tasks.value.filter((t) => t.status === "failed").length);
 
 // WebSocket 连接
 const connectWebSocket = () => {
@@ -348,7 +303,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('TaskTool WebSocket connected');
+      console.log("TaskTool WebSocket connected");
       requestTasks();
     };
 
@@ -357,51 +312,51 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('TaskTool WebSocket disconnected');
+      console.log("TaskTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('TaskTool WebSocket error:', error);
+      console.error("TaskTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'task_list_response':
+    case "task_list_response":
       tasks.value = message.tasks || [];
       break;
-    case 'task_started':
+    case "task_started":
       const startedTask = message.task;
-      updateTaskStatus(startedTask.id, 'running');
-      if (!runningTasks.value.find(t => t.id === startedTask.id)) {
+      updateTaskStatus(startedTask.id, "running");
+      if (!runningTasks.value.find((t) => t.id === startedTask.id)) {
         runningTasks.value.push({ ...startedTask, startedAt: Date.now() });
       }
       break;
-    case 'task_progress':
+    case "task_progress":
       updateTaskProgress(message.task_id, message.progress, message.output);
       break;
-    case 'task_completed':
+    case "task_completed":
       const completedTask = message.task;
-      updateTaskStatus(completedTask.id, 'completed', completedTask.output, completedTask.exitCode);
+      updateTaskStatus(completedTask.id, "completed", completedTask.output, completedTask.exitCode);
       removeRunningTask(completedTask.id);
-      emit('taskCompleted', completedTask);
+      emit("taskCompleted", completedTask);
       break;
-    case 'task_failed':
+    case "task_failed":
       const failedTask = message.task;
-      updateTaskStatus(failedTask.id, 'failed', undefined, undefined, failedTask.error);
+      updateTaskStatus(failedTask.id, "failed", undefined, undefined, failedTask.error);
       removeRunningTask(failedTask.id);
-      emit('taskFailed', failedTask);
+      emit("taskFailed", failedTask);
       break;
-    case 'task_deleted':
+    case "task_deleted":
       removeTask(message.id);
       break;
   }
@@ -415,7 +370,7 @@ const sendWebSocketMessage = (message: any) => {
 
 // 任务操作方法
 const requestTasks = () => {
-  sendWebSocketMessage({ type: 'task_list_request' });
+  sendWebSocketMessage({ type: "task_list_request" });
 };
 
 const executeTask = () => {
@@ -425,16 +380,16 @@ const executeTask = () => {
     command: newTask.value.command.trim(),
     type: newTask.value.type,
     priority: newTask.value.priority,
-    status: 'pending',
+    status: "pending",
   };
 
   sendWebSocketMessage({
-    type: 'task_execute',
+    type: "task_execute",
     task,
   });
 
   // 重置表单
-  newTask.value = { command: '', type: '', priority: '' };
+  newTask.value = { command: "", type: "", priority: "" };
   isExecuting.value = false;
 
   nextTick(() => {
@@ -444,14 +399,14 @@ const executeTask = () => {
 
 const stopTask = (taskId: string) => {
   sendWebSocketMessage({
-    type: 'task_stop',
+    type: "task_stop",
     id: taskId,
   });
 };
 
 const retryTask = (task: Task) => {
   sendWebSocketMessage({
-    type: 'task_execute',
+    type: "task_execute",
     task: {
       command: task.command,
       type: task.type,
@@ -461,18 +416,18 @@ const retryTask = (task: Task) => {
 };
 
 const deleteTask = (taskId: string) => {
-  if (confirm('确定要删除这个任务吗？')) {
+  if (confirm("确定要删除这个任务吗？")) {
     sendWebSocketMessage({
-      type: 'task_delete',
+      type: "task_delete",
       id: taskId,
     });
   }
 };
 
 const clearCompleted = () => {
-  if (confirm('确定要清理所有已完成的任务吗？')) {
+  if (confirm("确定要清理所有已完成的任务吗？")) {
     sendWebSocketMessage({
-      type: 'task_clear_completed',
+      type: "task_clear_completed",
     });
   }
 };
@@ -487,15 +442,15 @@ const viewResult = (task: Task) => {
 };
 
 // 内部方法
-const updateTaskStatus = (taskId: string, status: Task['status'], output?: string, exitCode?: number, error?: string) => {
-  const task = tasks.value.find(t => t.id === taskId);
+const updateTaskStatus = (taskId: string, status: Task["status"], output?: string, exitCode?: number, error?: string) => {
+  const task = tasks.value.find((t) => t.id === taskId);
   if (task) {
     task.status = status;
     if (output) task.output = output;
     if (exitCode !== undefined) task.exitCode = exitCode;
     if (error) task.error = error;
 
-    if (status === 'completed' || status === 'failed') {
+    if (status === "completed" || status === "failed") {
       task.completedAt = Date.now();
       task.duration = task.completedAt - task.createdAt;
     }
@@ -503,8 +458,8 @@ const updateTaskStatus = (taskId: string, status: Task['status'], output?: strin
 };
 
 const updateTaskProgress = (taskId: string, progress: number, output?: string) => {
-  const task = tasks.value.find(t => t.id === taskId);
-  const runningTask = runningTasks.value.find(t => t.id === taskId);
+  const task = tasks.value.find((t) => t.id === taskId);
+  const runningTask = runningTasks.value.find((t) => t.id === taskId);
   if (task) {
     task.progress = progress;
     if (output) task.output = output;
@@ -516,14 +471,14 @@ const updateTaskProgress = (taskId: string, progress: number, output?: string) =
 };
 
 const removeRunningTask = (taskId: string) => {
-  const index = runningTasks.value.findIndex(t => t.id === taskId);
+  const index = runningTasks.value.findIndex((t) => t.id === taskId);
   if (index !== -1) {
     runningTasks.value.splice(index, 1);
   }
 };
 
 const removeTask = (taskId: string) => {
-  const index = tasks.value.findIndex(t => t.id === taskId);
+  const index = tasks.value.findIndex((t) => t.id === taskId);
   if (index !== -1) {
     tasks.value.splice(index, 1);
   }
@@ -532,23 +487,23 @@ const removeTask = (taskId: string) => {
 
 // 工具方法
 const getTypeText = (type: string) => {
-  const map = { shell: 'Shell', script: '脚本', api: 'API', file: '文件' };
+  const map = { shell: "Shell", script: "脚本", api: "API", file: "文件" };
   return map[type as keyof typeof map] || type;
 };
 
 const getPriorityText = (priority: string) => {
-  const map = { high: '高', medium: '中', low: '低' };
+  const map = { high: "高", medium: "中", low: "低" };
   return map[priority as keyof typeof map] || priority;
 };
 
 const getStatusText = (status: string) => {
-  const map = { pending: '等待中', running: '运行中', completed: '已完成', failed: '失败' };
+  const map = { pending: "等待中", running: "运行中", completed: "已完成", failed: "失败" };
   return map[status as keyof typeof map] || status;
 };
 
 const formatDateTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleString('zh-CN');
+  return date.toLocaleString("zh-CN");
 };
 
 const formatDuration = (duration: number) => {
@@ -559,11 +514,11 @@ const formatDuration = (duration: number) => {
 
 const getEmptyMessage = () => {
   const messages = {
-    all: '暂无任务，输入命令开始执行任务',
-    pending: '暂无等待中的任务',
-    running: '暂无运行中的任务',
-    completed: '暂无已完成的任务',
-    failed: '暂无失败的任务',
+    all: "暂无任务，输入命令开始执行任务",
+    pending: "暂无等待中的任务",
+    running: "暂无运行中的任务",
+    completed: "暂无已完成的任务",
+    failed: "暂无失败的任务",
   };
   return messages[currentFilter.value as keyof typeof messages];
 };
@@ -621,7 +576,8 @@ onMounted(() => {
   @apply flex gap-2 items-center;
 }
 
-.task-type-select, .priority-select {
+.task-type-select,
+.priority-select {
   @apply px-2 py-1 text-sm border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white;
 }
 
@@ -749,7 +705,8 @@ onMounted(() => {
   @apply bg-green-100 dark:bg-green-900/30 text-green-700 dark:text-green-300;
 }
 
-.created-time, .duration {
+.created-time,
+.duration {
   @apply flex items-center gap-1 text-xs text-gray-500 dark:text-gray-400;
 }
 
@@ -900,15 +857,18 @@ onMounted(() => {
   @apply text-red-600 dark:text-red-400;
 }
 
-.result-output, .result-error {
+.result-output,
+.result-error {
   @apply space-y-2;
 }
 
-.result-output h4, .result-error h4 {
+.result-output h4,
+.result-error h4 {
   @apply text-sm font-semibold text-gray-900 dark:text-white;
 }
 
-.result-output pre, .result-error pre {
+.result-output pre,
+.result-error pre {
   @apply bg-gray-100 dark:bg-gray-700 p-3 rounded text-xs overflow-x-auto font-mono text-gray-800 dark:text-gray-200;
 }
 

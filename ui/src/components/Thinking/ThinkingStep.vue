@@ -4,13 +4,7 @@
     <div class="step-indicator">
       <div :class="['step-dot', stepDotClass]">
         <!-- 推理图标 -->
-        <svg
-          v-if="step.type === 'reasoning'"
-          class="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg v-if="step.type === 'reasoning'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -20,77 +14,28 @@
         </svg>
 
         <!-- 工具调用图标 -->
-        <svg
-          v-else-if="step.type === 'tool_call'"
-          class="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-          />
+        <svg v-else-if="step.type === 'tool_call'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
         </svg>
 
         <!-- 工具结果图标 -->
-        <svg
-          v-else-if="step.type === 'tool_result'"
-          class="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
+        <svg v-else-if="step.type === 'tool_result'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
 
         <!-- 决策图标 -->
-        <svg
-          v-else-if="step.type === 'decision'"
-          class="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 10V3L4 14h7v7l9-11h-7z"
-          />
+        <svg v-else-if="step.type === 'decision'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 10V3L4 14h7v7l9-11h-7z" />
         </svg>
 
         <!-- 审批图标 -->
-        <svg
-          v-else-if="step.type === 'approval'"
-          class="w-3 h-3"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
+        <svg v-else-if="step.type === 'approval'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
 
         <!-- 默认图标 -->
         <svg v-else class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
       </div>
 
@@ -131,12 +76,7 @@
         <div class="tool-call">
           <div class="tool-header">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4" />
             </svg>
             <span class="font-mono font-semibold">{{ step.tool.name }}</span>
           </div>
@@ -149,12 +89,7 @@
         <div class="tool-result">
           <div class="result-header">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M5 13l4 4L19 7"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
             </svg>
             <span class="font-semibold">执行结果</span>
           </div>
@@ -167,12 +102,7 @@
         <div class="approval-step">
           <div class="approval-step-header">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             <span class="font-semibold">等待审批</span>
           </div>
@@ -186,12 +116,12 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import type { ThinkingStep } from '@/types/thinking';
-import type { PropType } from 'vue';
+import { defineComponent, computed } from "vue";
+import type { ThinkingStep } from "@/types/thinking";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'ThinkingStep',
+  name: "ThinkingStep",
   props: {
     step: {
       type: Object as PropType<ThinkingStep>,
@@ -205,43 +135,43 @@ export default defineComponent({
   setup(props) {
     const stepDotClass = computed(() => {
       const classes: Record<string, string> = {
-        reasoning: 'step-dot-reasoning',
-        tool_call: 'step-dot-tool-call',
-        tool_result: 'step-dot-tool-result',
-        decision: 'step-dot-decision',
-        approval: 'step-dot-approval',
+        reasoning: "step-dot-reasoning",
+        tool_call: "step-dot-tool-call",
+        tool_result: "step-dot-tool-result",
+        decision: "step-dot-decision",
+        approval: "step-dot-approval",
       };
-      return classes[props.step.type] || '';
+      return classes[props.step.type] || "";
     });
 
     const stepTypeClass = computed(() => {
       const classes: Record<string, string> = {
-        reasoning: 'step-type-reasoning',
-        tool_call: 'step-type-tool-call',
-        tool_result: 'step-type-tool-result',
-        decision: 'step-type-decision',
-        approval: 'step-type-approval',
+        reasoning: "step-type-reasoning",
+        tool_call: "step-type-tool-call",
+        tool_result: "step-type-tool-result",
+        decision: "step-type-decision",
+        approval: "step-type-approval",
       };
-      return classes[props.step.type] || '';
+      return classes[props.step.type] || "";
     });
 
     const stepLabel = computed(() => {
       const labels: Record<string, string> = {
-        reasoning: '推理',
-        tool_call: '工具调用',
-        tool_result: '执行结果',
-        decision: '决策',
-        approval: '审批请求',
+        reasoning: "推理",
+        tool_call: "工具调用",
+        tool_result: "执行结果",
+        decision: "决策",
+        approval: "审批请求",
       };
       return labels[props.step.type] || props.step.type;
     });
 
     const formatTime = (timestamp: number): string => {
       const date = new Date(timestamp);
-      return date.toLocaleTimeString('zh-CN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      return date.toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       });
     };
 
@@ -255,7 +185,7 @@ export default defineComponent({
 
     const formatResult = (result: any): string => {
       try {
-        if (typeof result === 'string') return result;
+        if (typeof result === "string") return result;
         return JSON.stringify(result, null, 2);
       } catch (e) {
         return String(result);

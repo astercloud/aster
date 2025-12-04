@@ -47,16 +47,14 @@ export class EventSubscription {
       }
 
       // 等待新事件
-      const result = await new Promise<IteratorResult<EventEnvelope>>(
-        (resolve) => {
-          if (!this.isActive) {
-            resolve({ done: true, value: undefined });
-            return;
-          }
+      const result = await new Promise<IteratorResult<EventEnvelope>>((resolve) => {
+        if (!this.isActive) {
+          resolve({ done: true, value: undefined });
+          return;
+        }
 
-          this.resolvers.push(resolve);
-        },
-      );
+        this.resolvers.push(resolve);
+      });
 
       if (result.done) {
         break;
@@ -116,10 +114,7 @@ export class EventSubscription {
       }
 
       // 事件类型过滤
-      if (
-        this.filter.eventTypes &&
-        !this.filter.eventTypes.includes(envelope.event.type)
-      ) {
+      if (this.filter.eventTypes && !this.filter.eventTypes.includes(envelope.event.type)) {
         return;
       }
     }
@@ -134,9 +129,7 @@ export class EventSubscription {
 
       // 防止队列过大
       if (this.eventQueue.length > 1000) {
-        console.warn(
-          "[EventSubscription] Event queue overflow, dropping oldest events",
-        );
+        console.warn("[EventSubscription] Event queue overflow, dropping oldest events");
         this.eventQueue = this.eventQueue.slice(-500); // 保留最新的 500 个
       }
     }

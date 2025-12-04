@@ -3,42 +3,18 @@
     <!-- 标题区域 -->
     <div v-if="title || showProgress" class="view-header">
       <h4 v-if="title" class="view-title">{{ title }}</h4>
-      <WorkflowProgress
-        v-if="showProgress && steps.length > 0"
-        :total="steps.length"
-        :completed="completedCount"
-        :current="currentIndex"
-        :show-dots="showDots"
-      />
+      <WorkflowProgress v-if="showProgress && steps.length > 0" :total="steps.length" :completed="completedCount" :current="currentIndex" :show-dots="showDots" />
     </div>
 
     <!-- 步骤列表 -->
     <div v-if="showSteps" class="view-steps">
-      <WorkflowStep
-        v-for="(step, index) in visibleSteps"
-        :key="step.id"
-        :step="step"
-        :is-last="index === visibleSteps.length - 1"
-        :is-clickable="allowNavigation"
-        :show-metadata="showMetadata"
-        @click="handleStepClick"
-        @action="handleStepAction"
-      />
+      <WorkflowStep v-for="(step, index) in visibleSteps" :key="step.id" :step="step" :is-last="index === visibleSteps.length - 1" :is-clickable="allowNavigation" :show-metadata="showMetadata" @click="handleStepClick" @action="handleStepAction" />
 
       <!-- 展开/收起按钮 -->
-      <button
-        v-if="hasMoreSteps"
-        @click="toggleExpanded"
-        class="toggle-button"
-      >
+      <button v-if="hasMoreSteps" @click="toggleExpanded" class="toggle-button">
         <span v-if="isExpanded">收起</span>
         <span v-else>显示全部 {{ steps.length }} 个步骤</span>
-        <svg
-          :class="['w-4 h-4 transition-transform', { 'rotate-180': isExpanded }]"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg :class="['w-4 h-4 transition-transform', { 'rotate-180': isExpanded }]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7" />
         </svg>
       </button>
@@ -52,13 +28,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, type PropType } from 'vue';
-import WorkflowStep from './WorkflowStep.vue';
-import WorkflowProgress from './WorkflowProgress.vue';
-import type { WorkflowStep as WorkflowStepType, WorkflowAction } from '@/types/workflow';
+import { defineComponent, ref, computed, type PropType } from "vue";
+import WorkflowStep from "./WorkflowStep.vue";
+import WorkflowProgress from "./WorkflowProgress.vue";
+import type { WorkflowStep as WorkflowStepType, WorkflowAction } from "@/types/workflow";
 
 export default defineComponent({
-  name: 'WorkflowProgressView',
+  name: "WorkflowProgressView",
   components: {
     WorkflowStep,
     WorkflowProgress,
@@ -106,12 +82,12 @@ export default defineComponent({
 
     // 已完成步骤数
     const completedCount = computed(() => {
-      return props.steps.filter(s => s.status === 'completed').length;
+      return props.steps.filter((s) => s.status === "completed").length;
     });
 
     // 当前激活步骤索引
     const currentIndex = computed(() => {
-      return props.steps.findIndex(s => s.status === 'active');
+      return props.steps.findIndex((s) => s.status === "active");
     });
 
     // 是否有更多步骤
@@ -132,11 +108,11 @@ export default defineComponent({
     };
 
     const handleStepClick = (step: WorkflowStepType) => {
-      emit('stepClick', step);
+      emit("stepClick", step);
     };
 
     const handleStepAction = (action: WorkflowAction, step: WorkflowStepType) => {
-      emit('stepAction', action, step);
+      emit("stepAction", action, step);
     };
 
     return {

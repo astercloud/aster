@@ -4,19 +4,16 @@
       <AgentDashboard @chat="handleSelectAgent" />
     </div>
     <div v-else class="chat-view">
-      <AgentChatSession
-        :agent="selectedAgent"
-        @back="selectedAgent = null"
-      />
+      <AgentChatSession :agent="selectedAgent" @back="selectedAgent = null" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import { AgentDashboard } from '@/components/Agent';
-import AgentChatSession from '@/components/Agent/AgentChatSession.vue';
-import type { Agent } from '@/types';
+import { ref } from "vue";
+import { AgentDashboard } from "@/components/Agent";
+import AgentChatSession from "@/components/Agent/AgentChatSession.vue";
+import type { Agent } from "@/types";
 
 const selectedAgent = ref<Agent | null>(null);
 

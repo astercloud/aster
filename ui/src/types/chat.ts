@@ -2,13 +2,13 @@
  * Chat 配置类型
  */
 
-import type { Message, QuickReply, Suggestion } from './message';
+import type { Message, QuickReply, Suggestion } from "./message";
 
 export interface AgentProfile {
   name: string;
   description?: string;
   avatar?: string;
-  status?: 'idle' | 'thinking' | 'busy' | 'error';
+  status?: "idle" | "thinking" | "busy" | "error";
 }
 
 export interface ChatConfig {
@@ -54,7 +54,7 @@ export interface ChatConfig {
   demoDelay?: number;
 
   // 主题配置
-  theme?: 'light' | 'dark' | 'auto';
+  theme?: "light" | "dark" | "auto";
   primaryColor?: string;
 
   // 行为配置

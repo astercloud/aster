@@ -1,12 +1,7 @@
 <template>
   <div class="tabs">
     <div class="tabs-header">
-      <button
-        v-for="tab in tabs"
-        :key="tab.key"
-        :class="['tab-item', { active: activeKey === tab.key }]"
-        @click="handleTabClick(tab.key)"
-      >
+      <button v-for="tab in tabs" :key="tab.key" :class="['tab-item', { active: activeKey === tab.key }]" @click="handleTabClick(tab.key)">
         {{ tab.label }}
       </button>
     </div>
@@ -17,7 +12,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
+import { ref, watch } from "vue";
 
 interface Tab {
   key: string;
@@ -32,20 +27,23 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [key: string];
+  "update:modelValue": [key: string];
   change: [key: string];
 }>();
 
 const activeKey = ref(props.modelValue || props.tabs[0]?.key);
 
-watch(() => props.modelValue, (val) => {
-  if (val) activeKey.value = val;
-});
+watch(
+  () => props.modelValue,
+  (val) => {
+    if (val) activeKey.value = val;
+  },
+);
 
 const handleTabClick = (key: string) => {
   activeKey.value = key;
-  emit('update:modelValue', key);
-  emit('change', key);
+  emit("update:modelValue", key);
+  emit("change", key);
 };
 </script>
 

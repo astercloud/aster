@@ -73,24 +73,24 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| type | 图标类型 | `IconType` | - |
+| 参数 | 说明     | 类型                   | 默认值 |
+| ---- | -------- | ---------------------- | ------ |
+| type | 图标类型 | `IconType`             | -      |
 | size | 图标尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
 
 ### IconType
 
 ```typescript
-type IconType = 
-  | 'send'      // 发送
-  | 'image'     // 图片
-  | 'mic'       // 麦克风
-  | 'attach'    // 附件
-  | 'emoji'     // 表情
-  | 'more'      // 更多
-  | 'close'     // 关闭
-  | 'check'     // 勾选
-  | 'loading';  // 加载
+type IconType =
+  | "send" // 发送
+  | "image" // 图片
+  | "mic" // 麦克风
+  | "attach" // 附件
+  | "emoji" // 表情
+  | "more" // 更多
+  | "close" // 关闭
+  | "check" // 勾选
+  | "loading"; // 加载
 ```
 
 ## 示例
@@ -115,7 +115,7 @@ type IconType =
       <Icon type="loading" class="text-blue-500" />
       <span>加载中...</span>
     </div>
-    
+
     <div class="flex items-center gap-2">
       <Icon type="check" class="text-green-500" />
       <span>已完成</span>

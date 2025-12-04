@@ -106,9 +106,7 @@ export interface ToolApprovalConfig {
  */
 export interface PIIRedactionConfig {
   /** 启用的 PII 类型 */
-  enabledTypes: Array<
-    "email" | "phone" | "ssn" | "credit_card" | "ip_address" | "name"
-  >;
+  enabledTypes: Array<"email" | "phone" | "ssn" | "credit_card" | "ip_address" | "name">;
   /** 脱敏策略 */
   strategy: "mask" | "remove" | "replace";
   /** 替换文本（strategy=replace 时使用） */

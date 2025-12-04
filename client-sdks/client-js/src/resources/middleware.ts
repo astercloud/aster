@@ -4,11 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  MiddlewareInfo,
-  UpdateMiddlewareRequest,
-  MiddlewareStats,
-} from "../types/middleware";
+import { MiddlewareInfo, UpdateMiddlewareRequest, MiddlewareStats } from "../types/middleware";
 
 /**
  * Middleware 资源类
@@ -27,12 +23,7 @@ export class MiddlewareResource extends BaseResource {
    * @param middleware Middleware 定义
    * @returns Middleware 信息
    */
-  async create(middleware: {
-    name: string;
-    type: string;
-    priority: number;
-    config?: Record<string, any>;
-  }): Promise<MiddlewareInfo> {
+  async create(middleware: { name: string; type: string; priority: number; config?: Record<string, any> }): Promise<MiddlewareInfo> {
     return this.request<MiddlewareInfo>("/v1/middlewares", {
       method: "POST",
       body: middleware,
@@ -44,9 +35,7 @@ export class MiddlewareResource extends BaseResource {
    * @returns Middleware 列表
    */
   async list(): Promise<MiddlewareInfo[]> {
-    const result = await this.request<{ middlewares: MiddlewareInfo[] }>(
-      "/v1/middlewares",
-    );
+    const result = await this.request<{ middlewares: MiddlewareInfo[] }>("/v1/middlewares");
     return result.middlewares;
   }
 
@@ -65,10 +54,7 @@ export class MiddlewareResource extends BaseResource {
    * @param updates 更新内容
    * @returns 更新后的 Middleware 信息
    */
-  async update(
-    name: string,
-    updates: UpdateMiddlewareRequest,
-  ): Promise<MiddlewareInfo> {
+  async update(name: string, updates: UpdateMiddlewareRequest): Promise<MiddlewareInfo> {
     return this.request<MiddlewareInfo>(`/v1/middlewares/${name}`, {
       method: "PATCH",
       body: updates,
@@ -106,10 +92,7 @@ export class MiddlewareResource extends BaseResource {
    * @param name Middleware 名称
    * @param config 配置
    */
-  async updateConfig(
-    name: string,
-    config: Record<string, any>,
-  ): Promise<MiddlewareInfo> {
+  async updateConfig(name: string, config: Record<string, any>): Promise<MiddlewareInfo> {
     return this.update(name, { config });
   }
 
@@ -118,10 +101,7 @@ export class MiddlewareResource extends BaseResource {
    * @param name Middleware 名称
    * @param priority 优先级（数字越小越早执行）
    */
-  async updatePriority(
-    name: string,
-    priority: number,
-  ): Promise<MiddlewareInfo> {
+  async updatePriority(name: string, priority: number): Promise<MiddlewareInfo> {
     return this.update(name, { priority });
   }
 
@@ -143,9 +123,7 @@ export class MiddlewareResource extends BaseResource {
    * @returns 统计数据列表
    */
   async getAllStats(): Promise<MiddlewareStats[]> {
-    const result = await this.request<{ stats: MiddlewareStats[] }>(
-      "/v1/middlewares/stats",
-    );
+    const result = await this.request<{ stats: MiddlewareStats[] }>("/v1/middlewares/stats");
     return result.stats;
   }
 
@@ -184,9 +162,7 @@ export class MiddlewareResource extends BaseResource {
    * @returns Middleware 名称列表（按执行顺序）
    */
   async getExecutionOrder(): Promise<string[]> {
-    const result = await this.request<{ order: string[] }>(
-      "/v1/middlewares/execution-order",
-    );
+    const result = await this.request<{ order: string[] }>("/v1/middlewares/execution-order");
     return result.order;
   }
 

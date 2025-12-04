@@ -48,14 +48,12 @@
 
 ```vue
 <template>
-  <Tag closable @close="handleClose">
-    可关闭标签
-  </Tag>
+  <Tag closable @close="handleClose"> 可关闭标签 </Tag>
 </template>
 
 <script setup>
 const handleClose = () => {
-  console.log('Tag closed');
+  console.log("Tag closed");
 };
 </script>
 ```
@@ -67,25 +65,18 @@ const handleClose = () => {
 ```vue
 <template>
   <Flex gap="sm" wrap>
-    <Tag
-      v-for="tag in tags"
-      :key="tag"
-      closable
-      @close="removeTag(tag)"
-    >
+    <Tag v-for="tag in tags" :key="tag" closable @close="removeTag(tag)">
       {{ tag }}
     </Tag>
-    
-    <Button size="sm" @click="addTag">
-      + 添加标签
-    </Button>
+
+    <Button size="sm" @click="addTag"> + 添加标签 </Button>
   </Flex>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const tags = ref(['标签1', '标签2', '标签3']);
+const tags = ref(["标签1", "标签2", "标签3"]);
 
 const removeTag = (tag) => {
   const index = tags.value.indexOf(tag);
@@ -104,22 +95,22 @@ const addTag = () => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| color | 标签颜色 | `'default' \| 'primary' \| 'success' \| 'warning' \| 'error'` | `'default'` |
-| size | 标签尺寸 | `'sm' \| 'md' \| 'lg'` | `'md'` |
-| closable | 是否可关闭 | `boolean` | `false` |
+| 参数     | 说明       | 类型                                                          | 默认值      |
+| -------- | ---------- | ------------------------------------------------------------- | ----------- |
+| color    | 标签颜色   | `'default' \| 'primary' \| 'success' \| 'warning' \| 'error'` | `'default'` |
+| size     | 标签尺寸   | `'sm' \| 'md' \| 'lg'`                                        | `'md'`      |
+| closable | 是否可关闭 | `boolean`                                                     | `false`     |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| close | 关闭标签时触发 | - |
+| 事件名 | 说明           | 回调参数 |
+| ------ | -------------- | -------- |
+| close  | 关闭标签时触发 | -        |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明     |
+| ------- | -------- |
 | default | 标签内容 |
 
 ## 示例

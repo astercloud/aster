@@ -7,18 +7,10 @@
         <span>语义搜索</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="搜索设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="搜索设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="向量可视化"
-          @click="toggleVisualization"
-        >
+        <button class="action-button" title="向量可视化" @click="toggleVisualization">
           <Icon type="bar-chart" size="sm" />
         </button>
       </div>
@@ -50,14 +42,7 @@
         </div>
         <div class="setting-group">
           <label>相似度阈值</label>
-          <input
-            v-model.number="searchSettings.threshold"
-            type="range"
-            min="0"
-            max="1"
-            step="0.1"
-            class="setting-range"
-          />
+          <input v-model.number="searchSettings.threshold" type="range" min="0" max="1" step="0.1" class="setting-range" />
           <span class="threshold-value">{{ searchSettings.threshold }}</span>
         </div>
         <div class="setting-group">
@@ -71,21 +56,13 @@
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="searchSettings.includeMetadata"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="searchSettings.includeMetadata" type="checkbox" class="setting-checkbox" />
             包含元数据
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="searchSettings.enableClustering"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="searchSettings.enableClustering" type="checkbox" class="setting-checkbox" />
             启用结果聚类
           </label>
         </div>
@@ -100,33 +77,16 @@
     <div class="search-area">
       <div class="search-input-section">
         <div class="search-mode-selector">
-          <button
-            v-for="mode in searchModes"
-            :key="mode.key"
-            :class="['mode-btn', { active: currentMode === mode.key }]"
-            @click="currentMode = mode.key"
-          >
-            <Icon :type="(mode.icon as any)" size="xs" />
+          <button v-for="mode in searchModes" :key="mode.key" :class="['mode-btn', { active: currentMode === mode.key }]" @click="currentMode = mode.key">
+            <Icon :type="mode.icon as any" size="xs" />
             {{ mode.label }}
           </button>
         </div>
 
         <div class="search-input-wrapper">
           <Icon type="search" size="sm" class="search-icon" />
-          <textarea
-            v-model="searchQuery"
-            ref="searchInput"
-            :placeholder="getSearchPlaceholder()"
-            class="search-textarea"
-            rows="3"
-            @keydown.ctrl.enter="performSearch"
-            @input="handleSearchInput"
-          ></textarea>
-          <button
-            class="search-button"
-            :disabled="!searchQuery.trim() || isSearching"
-            @click="performSearch"
-          >
+          <textarea v-model="searchQuery" ref="searchInput" :placeholder="getSearchPlaceholder()" class="search-textarea" rows="3" @keydown.ctrl.enter="performSearch" @input="handleSearchInput"></textarea>
+          <button class="search-button" :disabled="!searchQuery.trim() || isSearching" @click="performSearch">
             <Icon v-if="isSearching" type="spinner" size="sm" class="animate-spin" />
             <Icon v-else type="search" size="sm" />
           </button>
@@ -138,18 +98,9 @@
         <div class="filter-group">
           <label class="filter-label">内容类型:</label>
           <div class="filter-options">
-            <label
-              v-for="type in contentTypes"
-              :key="type.value"
-              class="filter-option"
-            >
-              <input
-                v-model="selectedContentTypes"
-                type="checkbox"
-                :value="type.value"
-                class="filter-checkbox"
-              />
-              <Icon :type="(type.icon as any)" size="xs" />
+            <label v-for="type in contentTypes" :key="type.value" class="filter-option">
+              <input v-model="selectedContentTypes" type="checkbox" :value="type.value" class="filter-checkbox" />
+              <Icon :type="type.icon as any" size="xs" />
               {{ type.label }}
             </label>
           </div>
@@ -184,10 +135,7 @@
     <div v-if="showVisualization && searchResults.length > 0" class="visualization-panel">
       <div class="viz-header">
         <h4>向量可视化</h4>
-        <button
-          class="viz-close-btn"
-          @click="showVisualization = false"
-        >
+        <button class="viz-close-btn" @click="showVisualization = false">
           <Icon type="close" size="xs" />
         </button>
       </div>
@@ -230,25 +178,13 @@
           <span class="avg-similarity">平均相似度: {{ averageSimilarity.toFixed(3) }}</span>
         </div>
         <div class="results-actions">
-          <button
-            class="action-btn"
-            title="导出结果"
-            @click="exportResults"
-          >
+          <button class="action-btn" title="导出结果" @click="exportResults">
             <Icon type="download" size="xs" />
           </button>
-          <button
-            class="action-btn"
-            title="聚类分析"
-            @click="showClusters = !showClusters"
-          >
+          <button class="action-btn" title="聚类分析" @click="showClusters = !showClusters">
             <Icon type="layers" size="xs" />
           </button>
-          <button
-            class="action-btn"
-            title="重新搜索"
-            @click="performSearch"
-          >
+          <button class="action-btn" title="重新搜索" @click="performSearch">
             <Icon type="refresh" size="xs" />
           </button>
         </div>
@@ -256,28 +192,17 @@
 
       <!-- 聚类视图 -->
       <div v-if="showClusters && clusters.length > 0" class="clusters-view">
-        <div
-          v-for="(cluster, index) in clusters"
-          :key="index"
-          class="cluster-group"
-        >
+        <div v-for="(cluster, index) in clusters" :key="index" class="cluster-group">
           <div class="cluster-header">
             <div class="cluster-title">
               <Icon type="folder" size="sm" />
               <span>{{ cluster.name }}</span>
               <span class="cluster-count">({{ cluster.items.length }})</span>
             </div>
-            <div class="cluster-similarity">
-              相似度: {{ cluster.avgSimilarity.toFixed(3) }}
-            </div>
+            <div class="cluster-similarity">相似度: {{ cluster.avgSimilarity.toFixed(3) }}</div>
           </div>
           <div class="cluster-items">
-            <div
-              v-for="(item, itemIndex) in cluster.items"
-              :key="itemIndex"
-              class="cluster-result-item"
-              @click="openResult(item)"
-            >
+            <div v-for="(item, itemIndex) in cluster.items" :key="itemIndex" class="cluster-result-item" @click="openResult(item)">
               <div class="cluster-result-title">{{ item.title }}</div>
               <div class="cluster-result-score">相似度: {{ item.similarity.toFixed(3) }}</div>
             </div>
@@ -287,22 +212,14 @@
 
       <!-- 列表视图 -->
       <div v-else class="results-list">
-        <div
-          v-for="(result, index) in searchResults"
-          :key="index"
-          class="result-item"
-          @click="openResult(result)"
-        >
+        <div v-for="(result, index) in searchResults" :key="index" class="result-item" @click="openResult(result)">
           <div class="result-header">
             <div class="result-title">
               <h3>{{ result.title }}</h3>
             </div>
             <div class="result-similarity">
               <div class="similarity-bar">
-                <div
-                  class="similarity-fill"
-                  :style="{ width: (result.similarity * 100) + '%' }"
-                ></div>
+                <div class="similarity-fill" :style="{ width: result.similarity * 100 + '%' }"></div>
               </div>
               <span class="similarity-text">{{ (result.similarity * 100).toFixed(1) }}%</span>
             </div>
@@ -315,12 +232,7 @@
             <div v-if="result.keywords && result.keywords.length > 0" class="result-keywords">
               <div class="keywords-label">关键词:</div>
               <div class="keywords-list">
-                <span
-                  v-for="(keyword, kIndex) in result.keywords"
-                  :key="kIndex"
-                  class="keyword-tag"
-                  :style="{ fontSize: getKeywordFontSize(keyword.score) }"
-                >
+                <span v-for="(keyword, kIndex) in result.keywords" :key="kIndex" class="keyword-tag" :style="{ fontSize: getKeywordFontSize(keyword.score) }">
                   {{ keyword.word }}
                 </span>
               </div>
@@ -358,25 +270,13 @@
 
           <!-- 操作按钮 -->
           <div class="result-actions">
-            <button
-              class="result-action-btn"
-              title="查看详情"
-              @click.stop="showResultDetails(result)"
-            >
+            <button class="result-action-btn" title="查看详情" @click.stop="showResultDetails(result)">
               <Icon type="eye" size="xs" />
             </button>
-            <button
-              class="result-action-btn"
-              title="复制内容"
-              @click.stop="copyContent(result)"
-            >
+            <button class="result-action-btn" title="复制内容" @click.stop="copyContent(result)">
               <Icon type="copy" size="xs" />
             </button>
-            <button
-              class="result-action-btn"
-              title="相关搜索"
-              @click.stop="findSimilar(result)"
-            >
+            <button class="result-action-btn" title="相关搜索" @click.stop="findSimilar(result)">
               <Icon type="search" size="xs" />
             </button>
           </div>
@@ -388,9 +288,7 @@
     <div v-if="!isSearching && searchResults.length === 0 && searchQuery" class="empty-results">
       <Icon type="brain" size="lg" />
       <h3>未找到相似内容</h3>
-      <p class="empty-hint">
-        尝试调整搜索词或降低相似度阈值
-      </p>
+      <p class="empty-hint">尝试调整搜索词或降低相似度阈值</p>
       <div class="suggestions">
         <p class="suggestions-title">建议:</p>
         <ul class="suggestions-list">
@@ -406,22 +304,15 @@
     <div v-if="!isSearching && searchResults.length === 0 && !searchQuery" class="initial-state">
       <Icon type="brain" size="lg" />
       <h3>智能语义搜索</h3>
-      <p class="initial-hint">
-        基于AI的智能搜索，理解内容语义而非关键词匹配
-      </p>
+      <p class="initial-hint">基于AI的智能搜索，理解内容语义而非关键词匹配</p>
 
       <!-- 搜索示例 -->
       <div class="search-examples">
         <h4>搜索示例</h4>
         <div class="example-grid">
-          <button
-            v-for="(example, index) in searchExamples"
-            :key="index"
-            class="example-card"
-            @click="useExample(example)"
-          >
+          <button v-for="(example, index) in searchExamples" :key="index" class="example-card" @click="useExample(example)">
             <div class="example-icon">
-              <Icon :type="(example.icon as any)" size="sm" />
+              <Icon :type="example.icon as any" size="sm" />
             </div>
             <div class="example-content">
               <div class="example-title">{{ example.title }}</div>
@@ -460,10 +351,7 @@
       <div class="modal-content" @click.stop>
         <div class="modal-header">
           <h3>内容详情</h3>
-          <button
-            class="modal-close-btn"
-            @click="closeDetailsModal"
-          >
+          <button class="modal-close-btn" @click="closeDetailsModal">
             <Icon type="close" size="sm" />
           </button>
         </div>
@@ -486,7 +374,7 @@
                 </div>
                 <div class="detail-item">
                   <label>向量维度:</label>
-                  <span>{{ selectedResult.vectorInfo?.dimensions || 'N/A' }}</span>
+                  <span>{{ selectedResult.vectorInfo?.dimensions || "N/A" }}</span>
                 </div>
               </div>
             </div>
@@ -501,17 +389,10 @@
             <div v-if="selectedResult.keywords" class="detail-section">
               <h4>关键词权重</h4>
               <div class="keyword-analysis">
-                <div
-                  v-for="(keyword, index) in selectedResult.keywords"
-                  :key="index"
-                  class="keyword-analysis-item"
-                >
+                <div v-for="(keyword, index) in selectedResult.keywords" :key="index" class="keyword-analysis-item">
                   <span class="keyword-word">{{ keyword.word }}</span>
                   <div class="keyword-score-bar">
-                    <div
-                      class="keyword-score-fill"
-                      :style="{ width: (keyword.score * 100) + '%' }"
-                    ></div>
+                    <div class="keyword-score-fill" :style="{ width: keyword.score * 100 + '%' }"></div>
                   </div>
                   <span class="keyword-score">{{ keyword.score.toFixed(3) }}</span>
                 </div>
@@ -525,8 +406,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface SearchResult {
   id: string;
@@ -584,8 +465,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -594,8 +475,8 @@ const emit = defineEmits<{
 }>();
 
 // 响应式数据
-const searchQuery = ref('');
-const currentMode = ref('semantic');
+const searchQuery = ref("");
+const currentMode = ref("semantic");
 const searchResults = ref<SearchResult[]>([]);
 const clusters = ref<SearchCluster[]>([]);
 const isSearching = ref(false);
@@ -608,14 +489,14 @@ const showDetailsModal = ref(false);
 const selectedResult = ref<SearchResult | null>(null);
 
 // 搜索过滤器
-const selectedContentTypes = ref(['text', 'code', 'markdown']);
-const timeRange = ref('');
-const fileSize = ref('');
+const selectedContentTypes = ref(["text", "code", "markdown"]);
+const timeRange = ref("");
+const fileSize = ref("");
 
 // 搜索设置
 const searchSettings = ref<SearchSettings>({
-  model: 'text-embedding-ada-002',
-  scope: 'workspace',
+  model: "text-embedding-ada-002",
+  scope: "workspace",
   threshold: 0.7,
   maxResults: 10,
   includeMetadata: true,
@@ -624,46 +505,46 @@ const searchSettings = ref<SearchSettings>({
 
 // 搜索模式
 const searchModes = ref([
-  { key: 'semantic', label: '语义', icon: 'brain' },
-  { key: 'hybrid', label: '混合', icon: 'layers' },
-  { key: 'keyword', label: '关键词', icon: 'type' },
+  { key: "semantic", label: "语义", icon: "brain" },
+  { key: "hybrid", label: "混合", icon: "layers" },
+  { key: "keyword", label: "关键词", icon: "type" },
 ]);
 
 // 内容类型
 const contentTypes = ref([
-  { value: 'text', label: '文本', icon: 'file-text' },
-  { value: 'code', label: '代码', icon: 'file-code' },
-  { value: 'markdown', label: 'Markdown', icon: 'file-text' },
-  { value: 'json', label: 'JSON', icon: 'file-code' },
-  { value: 'config', label: '配置', icon: 'settings' },
-  { value: 'documentation', label: '文档', icon: 'book-open' },
+  { value: "text", label: "文本", icon: "file-text" },
+  { value: "code", label: "代码", icon: "file-code" },
+  { value: "markdown", label: "Markdown", icon: "file-text" },
+  { value: "json", label: "JSON", icon: "file-code" },
+  { value: "config", label: "配置", icon: "settings" },
+  { value: "documentation", label: "文档", icon: "book-open" },
 ]);
 
 // 搜索示例
 const searchExamples = ref<SearchExample[]>([
   {
-    title: '查找数据库配置',
-    description: '搜索项目中所有数据库相关配置文件',
-    icon: 'database',
-    query: '数据库连接配置 settings database',
+    title: "查找数据库配置",
+    description: "搜索项目中所有数据库相关配置文件",
+    icon: "database",
+    query: "数据库连接配置 settings database",
   },
   {
-    title: '错误处理逻辑',
-    description: '查找代码中的错误处理和异常管理',
-    icon: 'alert-triangle',
-    query: '错误处理 try catch exception error handling',
+    title: "错误处理逻辑",
+    description: "查找代码中的错误处理和异常管理",
+    icon: "alert-triangle",
+    query: "错误处理 try catch exception error handling",
   },
   {
-    title: '用户认证功能',
-    description: '搜索用户登录、注册和权限管理相关代码',
-    icon: 'shield',
-    query: '用户认证 登录注册 权限管理 authentication',
+    title: "用户认证功能",
+    description: "搜索用户登录、注册和权限管理相关代码",
+    icon: "shield",
+    query: "用户认证 登录注册 权限管理 authentication",
   },
   {
-    title: 'API接口文档',
-    description: '查找REST API接口定义和文档说明',
-    icon: 'globe',
-    query: 'API接口 REST endpoint 文档 接口说明',
+    title: "API接口文档",
+    description: "查找REST API接口定义和文档说明",
+    icon: "globe",
+    query: "API接口 REST endpoint 文档 接口说明",
   },
 ]);
 
@@ -687,7 +568,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('SemanticSearchTool WebSocket connected');
+      console.log("SemanticSearchTool WebSocket connected");
       loadSearchStats();
     };
 
@@ -696,31 +577,31 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('SemanticSearchTool WebSocket disconnected');
+      console.log("SemanticSearchTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('SemanticSearchTool WebSocket error:', error);
+      console.error("SemanticSearchTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'semantic_search_results':
+    case "semantic_search_results":
       if (message.results) {
         handleSearchResults(message.results);
       }
       break;
-    case 'search_stats':
+    case "search_stats":
       if (message.stats) {
         searchStats.value = message.stats;
       }
@@ -764,7 +645,7 @@ const performSearch = async () => {
 
     // 发送搜索请求
     sendWebSocketMessage({
-      type: 'semantic_search',
+      type: "semantic_search",
       params: searchParams,
     });
 
@@ -784,10 +665,9 @@ const performSearch = async () => {
       generateClusters(mockResults);
     }
 
-    emit('searchPerformed', searchQuery.value.trim(), mockResults);
-
+    emit("searchPerformed", searchQuery.value.trim(), mockResults);
   } catch (error) {
-    console.error('Search failed:', error);
+    console.error("Search failed:", error);
     searchResults.value = [];
   } finally {
     isSearching.value = false;
@@ -799,25 +679,25 @@ const performSearch = async () => {
 
 const mockSemanticSearch = async (params: any): Promise<SearchResult[]> => {
   // 模拟搜索延迟
-  await new Promise(resolve => setTimeout(resolve, 1500 + Math.random() * 1000));
+  await new Promise((resolve) => setTimeout(resolve, 1500 + Math.random() * 1000));
 
   // 生成模拟搜索结果
   const mockResults: SearchResult[] = [
     {
-      id: '1',
+      id: "1",
       title: `与 "${params.query}" 相关的配置文件`,
       content: `这是关于 ${params.query} 的详细配置内容，包含了相关的参数设置和配置选项...`,
       snippet: `配置文件包含了 ${params.query} 相关的重要参数和设置`,
-      path: '/config/app.json',
-      fileType: 'json',
+      path: "/config/app.json",
+      fileType: "json",
       size: 2048,
       modified: new Date(Date.now() - 86400000).toISOString(),
-      hash: 'abc123def456',
+      hash: "abc123def456",
       similarity: 0.92,
       keywords: [
         { word: params.query, score: 0.95 },
-        { word: '配置', score: 0.87 },
-        { word: '参数', score: 0.76 },
+        { word: "配置", score: 0.87 },
+        { word: "参数", score: 0.76 },
       ],
       vectorInfo: {
         dimensions: 1536,
@@ -825,20 +705,20 @@ const mockSemanticSearch = async (params: any): Promise<SearchResult[]> => {
       },
     },
     {
-      id: '2',
+      id: "2",
       title: `${params.query} 实现代码`,
       content: `这是一个实现 ${params.query} 功能的核心代码模块，包含了完整的业务逻辑和错误处理...`,
       snippet: `代码实现了 ${params.query} 的核心功能，具有良好的错误处理机制`,
-      path: '/src/components/FeatureComponent.vue',
-      fileType: 'vue',
+      path: "/src/components/FeatureComponent.vue",
+      fileType: "vue",
       size: 8192,
       modified: new Date(Date.now() - 172800000).toISOString(),
-      hash: 'def456ghi789',
+      hash: "def456ghi789",
       similarity: 0.88,
       keywords: [
         { word: params.query, score: 0.91 },
-        { word: '实现', score: 0.82 },
-        { word: '代码', score: 0.78 },
+        { word: "实现", score: 0.82 },
+        { word: "代码", score: 0.78 },
       ],
       vectorInfo: {
         dimensions: 1536,
@@ -846,20 +726,20 @@ const mockSemanticSearch = async (params: any): Promise<SearchResult[]> => {
       },
     },
     {
-      id: '3',
+      id: "3",
       title: `${params.query} 相关的文档说明`,
       content: `这份文档详细说明了 ${params.query} 的使用方法、最佳实践和常见问题解决方案...`,
       snippet: `文档提供了 ${params.query} 的完整使用指南和示例代码`,
-      path: '/docs/api-reference.md',
-      fileType: 'markdown',
+      path: "/docs/api-reference.md",
+      fileType: "markdown",
       size: 4096,
       modified: new Date(Date.now() - 259200000).toISOString(),
-      hash: 'ghi789jkl012',
+      hash: "ghi789jkl012",
       similarity: 0.85,
       keywords: [
         { word: params.query, score: 0.89 },
-        { word: '文档', score: 0.84 },
-        { word: '说明', score: 0.79 },
+        { word: "文档", score: 0.84 },
+        { word: "说明", score: 0.79 },
       ],
       vectorInfo: {
         dimensions: 1536,
@@ -867,20 +747,20 @@ const mockSemanticSearch = async (params: any): Promise<SearchResult[]> => {
       },
     },
     {
-      id: '4',
+      id: "4",
       title: `${params.query} 测试用例`,
       content: `这是一套完整的 ${params.query} 测试用例，包含了单元测试、集成测试和端到端测试...`,
       snippet: `测试用例覆盖了 ${params.query} 的各种使用场景和边界条件`,
-      path: '/tests/feature.test.js',
-      fileType: 'javascript',
+      path: "/tests/feature.test.js",
+      fileType: "javascript",
       size: 6144,
       modified: new Date(Date.now() - 345600000).toISOString(),
-      hash: 'jkl012mno345',
+      hash: "jkl012mno345",
       similarity: 0.79,
       keywords: [
         { word: params.query, score: 0.83 },
-        { word: '测试', score: 0.88 },
-        { word: '用例', score: 0.75 },
+        { word: "测试", score: 0.88 },
+        { word: "用例", score: 0.75 },
       ],
       vectorInfo: {
         dimensions: 1536,
@@ -888,29 +768,29 @@ const mockSemanticSearch = async (params: any): Promise<SearchResult[]> => {
       },
     },
     {
-      id: '5',
+      id: "5",
       title: `${params.query} 性能优化`,
       content: `本文档介绍了 ${params.query} 的性能优化策略和技巧，包括缓存机制、数据库优化等...`,
       snippet: `性能优化方案显著提升了 ${params.query} 的执行效率和响应速度`,
-      path: '/docs/performance.md',
-      fileType: 'markdown',
+      path: "/docs/performance.md",
+      fileType: "markdown",
       size: 3072,
       modified: new Date(Date.now() - 432000000).toISOString(),
-      hash: 'mno345pqr678',
+      hash: "mno345pqr678",
       similarity: 0.75,
       keywords: [
-        { word: params.query, score: 0.80 },
-        { word: '性能', score: 0.86 },
-        { word: '优化', score: 0.82 },
+        { word: params.query, score: 0.8 },
+        { word: "性能", score: 0.86 },
+        { word: "优化", score: 0.82 },
       ],
       vectorInfo: {
         dimensions: 1536,
-        distance: 0.567890,
+        distance: 0.56789,
       },
     },
   ];
 
-  return mockResults.filter(result => result.similarity >= params.threshold);
+  return mockResults.filter((result) => result.similarity >= params.threshold);
 };
 
 const handleSearchResults = (results: SearchResult[]) => {
@@ -935,8 +815,7 @@ const generateClusters = (results: SearchResult[]) => {
       if (usedIndices.has(otherIndex) || index === otherIndex) return;
 
       // 简单的聚类逻辑：相同文件类型且相似度高的归为一类
-      if (result.fileType === otherResult.fileType &&
-          Math.abs(result.similarity - otherResult.similarity) < 0.1) {
+      if (result.fileType === otherResult.fileType && Math.abs(result.similarity - otherResult.similarity) < 0.1) {
         clusterItems.push(otherResult);
         usedIndices.add(otherIndex);
       }
@@ -966,7 +845,7 @@ const drawVectorVisualization = () => {
   if (!vectorCanvas.value || searchResults.value.length === 0) return;
 
   const canvas = vectorCanvas.value;
-  const ctx = canvas.getContext('2d');
+  const ctx = canvas.getContext("2d");
   if (!ctx) return;
 
   // 设置画布大小
@@ -980,7 +859,7 @@ const drawVectorVisualization = () => {
   const centerX = canvas.width / 2;
   const centerY = canvas.height / 2;
 
-  ctx.fillStyle = '#3B82F6';
+  ctx.fillStyle = "#3B82F6";
   ctx.beginPath();
   ctx.arc(centerX, centerY, 8, 0, 2 * Math.PI);
   ctx.fill();
@@ -1013,8 +892,8 @@ const drawVectorVisualization = () => {
 // 结果操作
 const openResult = (result: SearchResult) => {
   // 这里可以打开文件或跳转到相应位置
-  console.log('Open result:', result);
-  emit('resultSelected', result);
+  console.log("Open result:", result);
+  emit("resultSelected", result);
 };
 
 const showResultDetails = (result: SearchResult) => {
@@ -1031,7 +910,7 @@ const copyContent = async (result: SearchResult) => {
   try {
     await navigator.clipboard.writeText(result.content);
   } catch (error) {
-    console.error('Failed to copy content:', error);
+    console.error("Failed to copy content:", error);
   }
 };
 
@@ -1048,9 +927,9 @@ const exportResults = () => {
   };
 
   const dataStr = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
+  const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `semantic-search-${Date.now()}.json`;
   a.click();
@@ -1064,27 +943,27 @@ const getSearchPlaceholder = () => {
     hybrid: '结合语义和关键词搜索，如："API接口文档 REST endpoint"',
     keyword: '输入关键词搜索，如："database config settings"',
   };
-  return placeholders[currentMode.value] || '输入搜索内容...';
+  return placeholders[currentMode.value] || "输入搜索内容...";
 };
 
 const getKeywordFontSize = (score: number): string => {
-  if (score > 0.8) return '1.2em';
-  if (score > 0.6) return '1em';
-  if (score > 0.4) return '0.9em';
-  return '0.8em';
+  if (score > 0.8) return "1.2em";
+  if (score > 0.6) return "1em";
+  if (score > 0.4) return "0.9em";
+  return "0.8em";
 };
 
 const formatFileSize = (bytes: number): string => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatDate = (dateString: string): string => {
   const date = new Date(dateString);
-  return date.toLocaleDateString('zh-CN');
+  return date.toLocaleDateString("zh-CN");
 };
 
 const useExample = (example: SearchExample) => {
@@ -1113,14 +992,14 @@ const toggleVisualization = () => {
 
 // 设置管理
 const saveSettings = () => {
-  localStorage.setItem('semantic-search-settings', JSON.stringify(searchSettings.value));
+  localStorage.setItem("semantic-search-settings", JSON.stringify(searchSettings.value));
   showSettings.value = false;
 };
 
 const resetSettings = () => {
   searchSettings.value = {
-    model: 'text-embedding-ada-002',
-    scope: 'workspace',
+    model: "text-embedding-ada-002",
+    scope: "workspace",
     threshold: 0.7,
     maxResults: 10,
     includeMetadata: true,
@@ -1130,7 +1009,7 @@ const resetSettings = () => {
 
 const loadSearchStats = () => {
   sendWebSocketMessage({
-    type: 'get_search_stats',
+    type: "get_search_stats",
   });
 
   // 模拟搜索统计
@@ -1138,7 +1017,7 @@ const loadSearchStats = () => {
     totalDocuments: 1247,
     totalVectors: 1247,
     averageDimension: 1536,
-    lastUpdated: new Date().toLocaleDateString('zh-CN'),
+    lastUpdated: new Date().toLocaleDateString("zh-CN"),
   };
 };
 
@@ -1148,12 +1027,12 @@ onMounted(() => {
 
   // 加载设置
   try {
-    const saved = localStorage.getItem('semantic-search-settings');
+    const saved = localStorage.getItem("semantic-search-settings");
     if (saved) {
       searchSettings.value = { ...searchSettings.value, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load search settings:', error);
+    console.warn("Failed to load search settings:", error);
   }
 
   // 自动聚焦搜索框
@@ -1518,15 +1397,18 @@ watch(searchResults, () => {
   @apply p-1.5 text-gray-400 dark:text-gray-500 hover:text-gray-600 dark:hover:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors;
 }
 
-.empty-results, .initial-state {
+.empty-results,
+.initial-state {
   @apply flex-1 flex flex-col items-center justify-center p-8 text-gray-400 dark:text-gray-500;
 }
 
-.empty-results h3, .initial-state h3 {
+.empty-results h3,
+.initial-state h3 {
   @apply text-lg font-medium mb-2;
 }
 
-.empty-hint, .initial-hint {
+.empty-hint,
+.initial-hint {
   @apply text-sm text-center mb-6;
 }
 

@@ -4,11 +4,11 @@
  * 管理 Agent 的思维过程，包括推理、工具调用决策等
  */
 
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { ThinkingStep } from '@/types/thinking';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { ThinkingStep } from "@/types/thinking";
 
-export const useThinkingStore = defineStore('thinking', () => {
+export const useThinkingStore = defineStore("thinking", () => {
   // ==================
   // State
   // ==================
@@ -17,7 +17,7 @@ export const useThinkingStore = defineStore('thinking', () => {
   const stepsByMessage = ref<Map<string, ThinkingStep[]>>(new Map());
 
   // 当前思维内容（流式累积）
-  const currentThought = ref<string>('');
+  const currentThought = ref<string>("");
 
   // 当前思维所属的消息 ID
   const currentMessageId = ref<string | null>(null);
@@ -34,7 +34,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const startThinking = (messageId: string) => {
     currentMessageId.value = messageId;
-    currentThought.value = '';
+    currentThought.value = "";
     isThinking.value = true;
   };
 
@@ -51,12 +51,12 @@ export const useThinkingStore = defineStore('thinking', () => {
   const endThinking = () => {
     if (currentMessageId.value && currentThought.value) {
       addStep(currentMessageId.value, {
-        type: 'reasoning',
+        type: "reasoning",
         content: currentThought.value,
         timestamp: Date.now(),
       });
     }
-    currentThought.value = '';
+    currentThought.value = "";
     currentMessageId.value = null;
     isThinking.value = false;
   };
@@ -79,7 +79,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const addToolCallStep = (messageId: string, toolName: string, args: any) => {
     addStep(messageId, {
-      type: 'tool_call',
+      type: "tool_call",
       tool: { name: toolName, args },
       timestamp: Date.now(),
     });
@@ -90,7 +90,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const addToolResultStep = (messageId: string, result: any) => {
     addStep(messageId, {
-      type: 'tool_result',
+      type: "tool_result",
       result,
       timestamp: Date.now(),
     });
@@ -101,7 +101,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const addDecisionStep = (messageId: string, decision: string) => {
     addStep(messageId, {
-      type: 'decision',
+      type: "decision",
       content: decision,
       timestamp: Date.now(),
     });
@@ -112,7 +112,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const addApprovalStep = (messageId: string, toolName: string, args: any) => {
     addStep(messageId, {
-      type: 'approval',
+      type: "approval",
       tool: { name: toolName, args },
       timestamp: Date.now(),
     });
@@ -137,7 +137,7 @@ export const useThinkingStore = defineStore('thinking', () => {
    */
   const clearAllSteps = () => {
     stepsByMessage.value.clear();
-    currentThought.value = '';
+    currentThought.value = "";
     currentMessageId.value = null;
     isThinking.value = false;
   };

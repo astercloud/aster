@@ -5,11 +5,7 @@
     </div>
 
     <div class="questions-container">
-      <div
-        v-for="(question, index) in questions"
-        :key="index"
-        class="question-item"
-      >
+      <div v-for="(question, index) in questions" :key="index" class="question-item">
         <div class="question-header">
           <span class="question-chip">{{ question.header }}</span>
           <h4 class="question-text">{{ question.question }}</h4>
@@ -17,19 +13,8 @@
 
         <!-- 单选模式 -->
         <div v-if="!question.multi_select" class="options-single">
-          <label
-            v-for="option in question.options"
-            :key="option.label"
-            class="option-item"
-            :class="{ selected: answers[index] === option.label }"
-          >
-            <input
-              type="radio"
-              :name="`question-${index}`"
-              :value="option.label"
-              v-model="answers[index]"
-              class="option-radio"
-            />
+          <label v-for="option in question.options" :key="option.label" class="option-item" :class="{ selected: answers[index] === option.label }">
+            <input type="radio" :name="`question-${index}`" :value="option.label" v-model="answers[index]" class="option-radio" />
             <div class="option-content">
               <span class="option-label">{{ option.label }}</span>
               <p class="option-description">{{ option.description }}</p>
@@ -39,18 +24,8 @@
 
         <!-- 多选模式 -->
         <div v-else class="options-multi">
-          <label
-            v-for="option in question.options"
-            :key="option.label"
-            class="option-item"
-            :class="{ selected: multiAnswers[index]?.includes(option.label) }"
-          >
-            <input
-              type="checkbox"
-              :value="option.label"
-              v-model="multiAnswers[index]"
-              class="option-checkbox"
-            />
+          <label v-for="option in question.options" :key="option.label" class="option-item" :class="{ selected: multiAnswers[index]?.includes(option.label) }">
+            <input type="checkbox" :value="option.label" v-model="multiAnswers[index]" class="option-checkbox" />
             <div class="option-content">
               <span class="option-label">{{ option.label }}</span>
               <p class="option-description">{{ option.description }}</p>
@@ -61,45 +36,30 @@
         <!-- Other 选项 -->
         <div class="other-option">
           <label class="other-label">
-            <input
-              type="checkbox"
-              v-model="otherEnabled[index]"
-              class="other-checkbox"
-            />
+            <input type="checkbox" v-model="otherEnabled[index]" class="other-checkbox" />
             <span>其他（自定义输入）</span>
           </label>
-          <input
-            v-if="otherEnabled[index]"
-            v-model="otherAnswers[index]"
-            placeholder="请输入您的答案..."
-            class="other-input"
-          />
+          <input v-if="otherEnabled[index]" v-model="otherAnswers[index]" placeholder="请输入您的答案..." class="other-input" />
         </div>
       </div>
     </div>
 
     <div class="card-actions">
-      <button
-        @click="handleSubmit"
-        class="btn-submit"
-        :disabled="!isValid || answered"
-      >
-        {{ answered ? '已提交' : '提交回答' }}
+      <button @click="handleSubmit" class="btn-submit" :disabled="!isValid || answered">
+        {{ answered ? "已提交" : "提交回答" }}
       </button>
-      <span v-if="!isValid" class="validation-hint">
-        请至少选择一个选项或填写自定义答案
-      </span>
+      <span v-if="!isValid" class="validation-hint"> 请至少选择一个选项或填写自定义答案 </span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
-import type { Question } from '@/types/message';
-import type { PropType } from 'vue';
+import { defineComponent, ref, computed, watch } from "vue";
+import type { Question } from "@/types/message";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'AskUserQuestionCard',
+  name: "AskUserQuestionCard",
   props: {
     requestId: {
       type: String,
@@ -116,7 +76,7 @@ export default defineComponent({
   },
   emits: {
     submit: (payload: { requestId: string; answers: Record<string, any> }) => {
-      return typeof payload.requestId === 'string' && typeof payload.answers === 'object';
+      return typeof payload.requestId === "string" && typeof payload.answers === "object";
     },
   },
   setup(props, { emit }) {
@@ -138,7 +98,7 @@ export default defineComponent({
         multiAnswers.value[index] = [];
       }
       otherEnabled.value[index] = false;
-      otherAnswers.value[index] = '';
+      otherAnswers.value[index] = "";
     });
 
     // 验证所有问题是否都有答案
@@ -175,7 +135,7 @@ export default defineComponent({
           }
         });
       },
-      { deep: true }
+      { deep: true },
     );
 
     // 当选择其他选项时，禁用 Other
@@ -186,17 +146,17 @@ export default defineComponent({
           if (q.multi_select) {
             if ((multiAnswers.value[index]?.length ?? 0) > 0) {
               otherEnabled.value[index] = false;
-              otherAnswers.value[index] = '';
+              otherAnswers.value[index] = "";
             }
           } else {
             if (answers.value[index]) {
               otherEnabled.value[index] = false;
-              otherAnswers.value[index] = '';
+              otherAnswers.value[index] = "";
             }
           }
         });
       },
-      { deep: true }
+      { deep: true },
     );
 
     const handleSubmit = () => {
@@ -215,7 +175,7 @@ export default defineComponent({
         }
       });
 
-      emit('submit', {
+      emit("submit", {
         requestId: props.requestId,
         answers: finalAnswers,
       });

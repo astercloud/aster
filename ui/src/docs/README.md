@@ -29,28 +29,25 @@ npm install marked
 
 ```vue
 <template>
-  <AgentCard
-    :agent="agent"
-    @chat="startChat"
-  />
+  <AgentCard :agent="agent" @chat="startChat" />
 </template>
 
 <script setup>
-import { AgentCard } from '@/components/Agent';
+import { AgentCard } from "@/components/Agent";
 
 const agent = {
-  id: '1',
-  name: '写作助手',
-  description: '帮助你创作优质内容',
-  status: 'idle',
+  id: "1",
+  name: "写作助手",
+  description: "帮助你创作优质内容",
+  status: "idle",
   metadata: {
-    model: 'claude-3-5-sonnet',
-    provider: 'anthropic',
+    model: "claude-3-5-sonnet",
+    provider: "anthropic",
   },
 };
 
 const startChat = (agent) => {
-  console.log('Start chat with:', agent.name);
+  console.log("Start chat with:", agent.name);
 };
 </script>
 ```
@@ -59,22 +56,19 @@ const startChat = (agent) => {
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    @send="handleSend"
-  />
+  <Chat :messages="messages" @send="handleSend" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Chat } from '@/components/ChatUI';
+import { ref } from "vue";
+import { Chat } from "@/components/ChatUI";
 
 const messages = ref([
   {
-    id: '1',
-    type: 'text',
-    content: '你好！我是 AI Agent，有什么可以帮助你的吗？',
-    position: 'left',
+    id: "1",
+    type: "text",
+    content: "你好！我是 AI Agent，有什么可以帮助你的吗？",
+    position: "left",
   },
 ]);
 
@@ -82,20 +76,20 @@ const handleSend = async (message) => {
   // 添加用户消息
   messages.value.push({
     id: Date.now().toString(),
-    type: 'text',
+    type: "text",
     content: message.content,
-    position: 'right',
+    position: "right",
   });
-  
+
   // 调用 Agent API
   const response = await callAgent(message.content);
-  
+
   // 添加 Agent 回复
   messages.value.push({
     id: Date.now().toString(),
-    type: 'text',
+    type: "text",
     content: response,
-    position: 'left',
+    position: "left",
   });
 };
 </script>
@@ -104,6 +98,7 @@ const handleSend = async (message) => {
 ## 📦 组件分类
 
 ### Agent 组件
+
 专为 AI Agent 设计的核心组件。
 
 - [AgentCard](/docs/components/AgentCard.md) - Agent 信息卡片
@@ -113,6 +108,7 @@ const handleSend = async (message) => {
 - [RoomCard](/docs/components/RoomCard.md) - 协作房间卡片
 
 ### 对话组件
+
 用于构建 Agent 对话界面。
 
 - [Chat](/docs/components/Chat.md) - 聊天容器
@@ -121,6 +117,7 @@ const handleSend = async (message) => {
 - [Card](/docs/components/Card.md) - 卡片消息
 
 ### 基础组件
+
 通用的 UI 组件。
 
 - [Button](/docs/components/Button.md) - 按钮
@@ -129,6 +126,7 @@ const handleSend = async (message) => {
 - [Tag](/docs/components/Tag.md) - 标签
 
 ### 表单组件
+
 用于数据输入。
 
 - [Input](/docs/components/Input.md) - 输入框
@@ -137,6 +135,7 @@ const handleSend = async (message) => {
 - [Radio](/docs/components/Radio.md) - 单选框
 
 ### 反馈组件
+
 用于用户反馈。
 
 - [Notice](/docs/components/Notice.md) - 通知提示
@@ -158,10 +157,7 @@ const handleSend = async (message) => {
 
 ```vue
 <template>
-  <AgentChatSession
-    :agent="selectedAgent"
-    @back="goBack"
-  />
+  <AgentChatSession :agent="selectedAgent" @back="goBack" />
 </template>
 ```
 
@@ -169,10 +165,7 @@ const handleSend = async (message) => {
 
 ```vue
 <template>
-  <WorkflowCard
-    :workflow="workflow"
-    @run="runWorkflow"
-  />
+  <WorkflowCard :workflow="workflow" @run="runWorkflow" />
 </template>
 ```
 
@@ -180,10 +173,7 @@ const handleSend = async (message) => {
 
 ```vue
 <template>
-  <RoomCard
-    :room="room"
-    @join="joinRoom"
-  />
+  <RoomCard :room="room" @join="joinRoom" />
 </template>
 ```
 
@@ -193,7 +183,7 @@ const handleSend = async (message) => {
 
 ```vue
 <script setup>
-import { useAsterClient } from '@/composables/useAsterClient';
+import { useAsterClient } from "@/composables/useAsterClient";
 
 const { client } = useAsterClient();
 
@@ -205,11 +195,11 @@ const response = await client.agents.chat(agentId, message);
 
 // 创建 Agent
 const newAgent = await client.agents.create({
-  template_id: 'chat',
-  name: '我的 Agent',
+  template_id: "chat",
+  name: "我的 Agent",
   model_config: {
-    provider: 'anthropic',
-    model: 'claude-3-5-sonnet',
+    provider: "anthropic",
+    model: "claude-3-5-sonnet",
   },
 });
 </script>
@@ -219,7 +209,7 @@ const newAgent = await client.agents.create({
 
 ```vue
 <script setup>
-import { useAsterClient } from '@/composables/useAsterClient';
+import { useAsterClient } from "@/composables/useAsterClient";
 
 const { client, ws, subscribe } = useAsterClient();
 
@@ -227,13 +217,13 @@ const { client, ws, subscribe } = useAsterClient();
 await client.reconnect();
 
 // 订阅 Agent 事件
-const unsubscribe = subscribe(['progress'], {
-  agentId: 'agent-1',
+const unsubscribe = subscribe(["progress"], {
+  agentId: "agent-1",
 });
 
 // 监听消息
 ws.value.onMessage((message) => {
-  console.log('Agent message:', message);
+  console.log("Agent message:", message);
 });
 </script>
 ```
@@ -251,12 +241,12 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3b82f6',
-        secondary: '#64748b',
-      }
-    }
-  }
-}
+        primary: "#3b82f6",
+        secondary: "#64748b",
+      },
+    },
+  },
+};
 ```
 
 ## 📖 最佳实践
@@ -267,12 +257,10 @@ module.exports = {
 
 ```vue
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 const agents = ref([]);
-const activeAgents = computed(() => 
-  agents.value.filter(a => a.status !== 'idle')
-);
+const activeAgents = computed(() => agents.value.filter((a) => a.status !== "idle"));
 </script>
 ```
 
@@ -285,7 +273,7 @@ const activeAgents = computed(() =>
 const handleError = (error) => {
   // 显示错误通知
   showNotice({
-    type: 'error',
+    type: "error",
     content: error.message,
   });
 };

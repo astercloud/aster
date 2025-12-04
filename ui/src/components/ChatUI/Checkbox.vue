@@ -1,12 +1,6 @@
 <template>
   <label class="checkbox-container">
-    <input
-      type="checkbox"
-      :checked="modelValue"
-      :disabled="disabled"
-      class="checkbox-input"
-      @change="handleChange"
-    />
+    <input type="checkbox" :checked="modelValue" :disabled="disabled" class="checkbox-input" @change="handleChange" />
     <span class="checkbox-label">
       <slot></slot>
     </span>
@@ -22,12 +16,12 @@ interface Props {
 defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: boolean];
+  "update:modelValue": [value: boolean];
 }>();
 
 const handleChange = (e: Event) => {
   const target = e.target as HTMLInputElement;
-  emit('update:modelValue', target.checked);
+  emit("update:modelValue", target.checked);
 };
 </script>
 

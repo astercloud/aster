@@ -22,42 +22,31 @@
       <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
       </svg>
-      <input
-        v-model="searchQuery"
-        type="text"
-        placeholder="搜索 Room..."
-        class="search-input"
-      />
+      <input v-model="searchQuery" type="text" placeholder="搜索 Room..." class="search-input" />
     </div>
 
     <!-- Loading -->
     <LoadingSpinner v-if="loading" class="my-8" />
 
     <!-- Empty State -->
-    <EmptyState
-      v-else-if="filteredRooms.length === 0"
-      title="暂无 Room"
-      description="还没有创建任何 Room，点击上方按钮创建第一个"
-    >
+    <EmptyState v-else-if="filteredRooms.length === 0" title="暂无 Room" description="还没有创建任何 Room，点击上方按钮创建第一个">
       <template #action>
-        <button @click="$emit('create')" class="btn-create">
-          创建 Room
-        </button>
+        <button @click="$emit('create')" class="btn-create">创建 Room</button>
       </template>
     </EmptyState>
 
     <!-- Room List -->
     <div v-else class="room-grid">
-      <div
-        v-for="room in filteredRooms"
-        :key="room.id"
-        class="room-card"
-        @click="$emit('select', room)"
-      >
+      <div v-for="room in filteredRooms" :key="room.id" class="room-card" @click="$emit('select', room)">
         <div class="room-header">
           <div class="room-icon">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z"
+              ></path>
             </svg>
           </div>
 
@@ -75,11 +64,7 @@
           <span class="room-time">
             {{ formatTime(room.createdAt) }}
           </span>
-          <button
-            @click.stop="$emit('delete', room)"
-            class="btn-delete"
-            title="删除"
-          >
+          <button @click.stop="$emit('delete', room)" class="btn-delete" title="删除">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
             </svg>
@@ -91,13 +76,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, type PropType } from 'vue';
-import LoadingSpinner from '../Common/LoadingSpinner.vue';
-import EmptyState from '../Common/EmptyState.vue';
-import type { Room } from '@/types';
+import { defineComponent, ref, computed, type PropType } from "vue";
+import LoadingSpinner from "../Common/LoadingSpinner.vue";
+import EmptyState from "../Common/EmptyState.vue";
+import type { Room } from "@/types";
 
 export default defineComponent({
-  name: 'RoomList',
+  name: "RoomList",
   components: {
     LoadingSpinner,
     EmptyState,
@@ -118,15 +103,13 @@ export default defineComponent({
     delete: (room: Room) => true,
   },
   setup(props) {
-    const searchQuery = ref('');
+    const searchQuery = ref("");
 
     const filteredRooms = computed(() => {
       if (!searchQuery.value) return props.rooms;
 
       const query = searchQuery.value.toLowerCase();
-      return props.rooms.filter(room =>
-        room.name.toLowerCase().includes(query)
-      );
+      return props.rooms.filter((room) => room.name.toLowerCase().includes(query));
     });
 
     function formatTime(timestamp: number): string {
@@ -135,11 +118,11 @@ export default defineComponent({
       const diff = now.getTime() - date.getTime();
       const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
-      if (days === 0) return '今天';
-      if (days === 1) return '昨天';
+      if (days === 0) return "今天";
+      if (days === 1) return "昨天";
       if (days < 7) return `${days} 天前`;
 
-      return date.toLocaleDateString('zh-CN');
+      return date.toLocaleDateString("zh-CN");
     }
 
     return {

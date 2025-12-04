@@ -8,13 +8,11 @@
 
 ```vue
 <template>
-  <Checkbox v-model="checked">
-    同意用户协议
-  </Checkbox>
+  <Checkbox v-model="checked"> 同意用户协议 </Checkbox>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 const checked = ref(false);
 </script>
 ```
@@ -26,17 +24,13 @@ const checked = ref(false);
 ```vue
 <template>
   <Flex direction="column" gap="md">
-    <Checkbox v-model="checked1" disabled>
-      禁用未选中
-    </Checkbox>
-    <Checkbox v-model="checked2" disabled>
-      禁用已选中
-    </Checkbox>
+    <Checkbox v-model="checked1" disabled> 禁用未选中 </Checkbox>
+    <Checkbox v-model="checked2" disabled> 禁用已选中 </Checkbox>
   </Flex>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 const checked1 = ref(false);
 const checked2 = ref(true);
 </script>
@@ -53,14 +47,12 @@ const checked2 = ref(true);
     <Checkbox v-model="options.react">React</Checkbox>
     <Checkbox v-model="options.angular">Angular</Checkbox>
   </Flex>
-  
-  <div class="mt-4">
-    已选择: {{ selectedOptions }}
-  </div>
+
+  <div class="mt-4">已选择: {{ selectedOptions }}</div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 const options = ref({
   vue: true,
@@ -70,8 +62,8 @@ const options = ref({
 
 const selectedOptions = computed(() => {
   return Object.keys(options.value)
-    .filter(key => options.value[key])
-    .join(', ');
+    .filter((key) => options.value[key])
+    .join(", ");
 });
 </script>
 ```
@@ -80,21 +72,21 @@ const selectedOptions = computed(() => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 绑定值 | `boolean` | `false` |
-| disabled | 是否禁用 | `boolean` | `false` |
+| 参数       | 说明     | 类型      | 默认值  |
+| ---------- | -------- | --------- | ------- |
+| modelValue | 绑定值   | `boolean` | `false` |
+| disabled   | 是否禁用 | `boolean` | `false` |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名            | 说明         | 回调参数         |
+| ----------------- | ------------ | ---------------- |
 | update:modelValue | 值改变时触发 | `value: boolean` |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明           |
+| ------- | -------------- |
 | default | 复选框标签内容 |
 
 ## 示例
@@ -104,18 +96,12 @@ const selectedOptions = computed(() => {
 ```vue
 <template>
   <div>
-    <Checkbox v-model="checkAll" @update:modelValue="handleCheckAll">
-      全选
-    </Checkbox>
-    
+    <Checkbox v-model="checkAll" @update:modelValue="handleCheckAll"> 全选 </Checkbox>
+
     <Divider />
-    
+
     <Flex direction="column" gap="sm">
-      <Checkbox
-        v-for="item in items"
-        :key="item.id"
-        v-model="item.checked"
-      >
+      <Checkbox v-for="item in items" :key="item.id" v-model="item.checked">
         {{ item.label }}
       </Checkbox>
     </Flex>
@@ -123,25 +109,25 @@ const selectedOptions = computed(() => {
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 const items = ref([
-  { id: 1, label: '选项 1', checked: false },
-  { id: 2, label: '选项 2', checked: false },
-  { id: 3, label: '选项 3', checked: false },
+  { id: 1, label: "选项 1", checked: false },
+  { id: 2, label: "选项 2", checked: false },
+  { id: 3, label: "选项 3", checked: false },
 ]);
 
 const checkAll = computed({
-  get: () => items.value.every(item => item.checked),
+  get: () => items.value.every((item) => item.checked),
   set: (value) => {
-    items.value.forEach(item => {
+    items.value.forEach((item) => {
       item.checked = value;
     });
   },
 });
 
 const handleCheckAll = (value) => {
-  items.value.forEach(item => {
+  items.value.forEach((item) => {
     item.checked = value;
   });
 };

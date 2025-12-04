@@ -7,28 +7,13 @@
         <span>文件阅读</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="重新加载"
-          :disabled="!currentFile"
-          @click="reloadFile"
-        >
+        <button class="action-button" title="重新加载" :disabled="!currentFile" @click="reloadFile">
           <Icon type="refresh" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="切换只读模式"
-          :disabled="!currentFile"
-          @click="toggleReadonly"
-        >
+        <button class="action-button" title="切换只读模式" :disabled="!currentFile" @click="toggleReadonly">
           <Icon :type="isReadonly ? 'lock' : 'unlock'" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="关闭文件"
-          :disabled="!currentFile"
-          @click="closeFile"
-        >
+        <button class="action-button" title="关闭文件" :disabled="!currentFile" @click="closeFile">
           <Icon type="close" size="sm" />
         </button>
       </div>
@@ -46,12 +31,7 @@
       <div v-if="recentFiles.length > 0" class="recent-files">
         <h4>最近打开</h4>
         <div class="recent-list">
-          <div
-            v-for="(file, index) in recentFiles"
-            :key="index"
-            class="recent-item"
-            @click="openFile(file)"
-          >
+          <div v-for="(file, index) in recentFiles" :key="index" class="recent-item" @click="openFile(file)">
             <div class="file-icon">
               <Icon :type="getIconForFile(file)" size="sm" />
             </div>
@@ -64,23 +44,11 @@
       </div>
 
       <!-- 文件拖放区域 -->
-      <div
-        class="drop-zone"
-        :class="{ 'drag-over': isDragOver }"
-        @dragover.prevent="handleDragOver"
-        @dragleave.prevent="handleDragLeave"
-        @drop.prevent="handleDrop"
-      >
+      <div class="drop-zone" :class="{ 'drag-over': isDragOver }" @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop">
         <Icon type="upload" size="lg" />
         <p>拖拽文件到此处</p>
         <p class="drop-hint">或点击选择文件</p>
-        <input
-          type="file"
-          ref="fileInput"
-          class="file-input"
-          @change="handleFileSelect"
-          multiple
-        />
+        <input type="file" ref="fileInput" class="file-input" @change="handleFileSelect" multiple />
       </div>
     </div>
 
@@ -106,13 +74,7 @@
 
       <!-- 图片显示 -->
       <div v-if="isImageFile" class="image-viewer">
-        <img
-          :src="imageData"
-          :alt="currentFile.name"
-          class="file-image"
-          @load="handleImageLoad"
-          @error="handleImageError"
-        />
+        <img :src="imageData" :alt="currentFile.name" class="file-image" @load="handleImageLoad" @error="handleImageError" />
         <div v-if="imageInfo" class="image-info">
           <span>尺寸: {{ imageInfo.width }} × {{ imageInfo.height }}</span>
         </div>
@@ -120,18 +82,11 @@
 
       <!-- PDF显示 -->
       <div v-else-if="isPdfFile" class="pdf-viewer">
-        <iframe
-          v-if="pdfData"
-          :src="pdfData"
-          class="pdf-frame"
-          title="PDF Viewer"
-        ></iframe>
+        <iframe v-if="pdfData" :src="pdfData" class="pdf-frame" title="PDF Viewer"></iframe>
         <div v-else class="pdf-placeholder">
           <Icon type="file-pdf" size="lg" />
           <p>PDF预览不可用</p>
-          <button class="download-btn" @click="downloadFile">
-            下载文件
-          </button>
+          <button class="download-btn" @click="downloadFile">下载文件</button>
         </div>
       </div>
 
@@ -152,19 +107,11 @@
             </select>
           </div>
           <div class="toolbar-right">
-            <button
-              class="toolbar-btn"
-              title="复制内容"
-              @click="copyContent"
-            >
+            <button class="toolbar-btn" title="复制内容" @click="copyContent">
               <Icon type="copy" size="xs" />
               复制
             </button>
-            <button
-              class="toolbar-btn"
-              title="全选"
-              @click="selectAll"
-            >
+            <button class="toolbar-btn" title="全选" @click="selectAll">
               <Icon type="check-square" size="xs" />
               全选
             </button>
@@ -173,22 +120,12 @@
 
         <div class="code-container" :class="{ 'no-wrap': lineWrapMode === 'nowrap' }">
           <div class="line-numbers">
-            <div
-              v-for="(line, index) in contentLines"
-              :key="index"
-              class="line-number"
-            >
+            <div v-for="(line, index) in contentLines" :key="index" class="line-number">
               {{ index + 1 }}
             </div>
           </div>
           <div class="code-content">
-            <pre
-              ref="codeElement"
-              :class="['code-block', fontSize, { 'readonly': isReadonly }]"
-              :contenteditable="!isReadonly"
-              @blur="handleContentEdit"
-              @keydown="handleKeydown"
-            >{{ fileContent }}</pre>
+            <pre ref="codeElement" :class="['code-block', fontSize, { readonly: isReadonly }]" :contenteditable="!isReadonly" @blur="handleContentEdit" @keydown="handleKeydown">{{ fileContent }}</pre>
           </div>
         </div>
       </div>
@@ -199,9 +136,7 @@
           <Icon type="file" size="lg" />
           <p>二进制文件无法直接显示</p>
           <p class="binary-hint">{{ currentFile.name }}</p>
-          <button class="download-btn" @click="downloadFile">
-            下载文件
-          </button>
+          <button class="download-btn" @click="downloadFile">下载文件</button>
         </div>
       </div>
     </div>
@@ -217,16 +152,14 @@
       <Icon type="alert-circle" size="lg" />
       <p>文件加载失败</p>
       <p class="error-message">{{ error }}</p>
-      <button class="retry-btn" @click="retryLoading">
-        重试
-      </button>
+      <button class="retry-btn" @click="retryLoading">重试</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface FileItem {
   name: string;
@@ -248,8 +181,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -259,16 +192,16 @@ const emit = defineEmits<{
 
 // 响应式数据
 const currentFile = ref<FileItem | null>(null);
-const fileContent = ref('');
-const imageData = ref('');
-const pdfData = ref('');
+const fileContent = ref("");
+const imageData = ref("");
+const pdfData = ref("");
 const recentFiles = ref<FileItem[]>([]);
 const isLoading = ref(false);
-const error = ref('');
+const error = ref("");
 const isReadonly = ref(true);
 const isDragOver = ref(false);
-const lineWrapMode = ref<'wrap' | 'nowrap'>('wrap');
-const fontSize = ref<'text-xs' | 'text-sm' | 'text-base' | 'text-lg' | 'text-xl'>('text-sm');
+const lineWrapMode = ref<"wrap" | "nowrap">("wrap");
+const fontSize = ref<"text-xs" | "text-sm" | "text-base" | "text-lg" | "text-xl">("text-sm");
 
 const fileInput = ref<HTMLInputElement>();
 const codeElement = ref<HTMLElement>();
@@ -277,52 +210,86 @@ const imageInfo = ref<ImageInfo | null>(null);
 
 // 计算属性
 const contentLines = computed(() => {
-  return fileContent.value.split('\n');
+  return fileContent.value.split("\n");
 });
 
 const fileSize = computed(() => {
-  if (!currentFile.value?.size) return '';
+  if (!currentFile.value?.size) return "";
   const bytes = currentFile.value.size;
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 });
 
 const fileModified = computed(() => {
-  if (!currentFile.value?.modified) return '';
+  if (!currentFile.value?.modified) return "";
   const date = new Date(currentFile.value.modified);
-  return date.toLocaleDateString('zh-CN');
+  return date.toLocaleDateString("zh-CN");
 });
 
 const fileType = computed(() => {
-  if (!currentFile.value?.name) return '';
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
-  return extension?.toUpperCase() || '';
+  if (!currentFile.value?.name) return "";
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
+  return extension?.toUpperCase() || "";
 });
 
 const isImageFile = computed(() => {
   if (!currentFile.value?.name) return false;
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
-  return ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension || '');
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
+  return ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(extension || "");
 });
 
 const isPdfFile = computed(() => {
   if (!currentFile.value?.name) return false;
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
-  return extension === 'pdf';
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
+  return extension === "pdf";
 });
 
 const isTextFile = computed(() => {
   if (!currentFile.value?.name) return false;
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
   const textExtensions = [
-    'txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss',
-    'py', 'java', 'cpp', 'c', 'h', 'hpp', 'go', 'rs', 'sql', 'sh', 'bash',
-    'yml', 'yaml', 'xml', 'csv', 'log', 'vue', 'svelte', 'php', 'rb',
-    'swift', 'kt', 'scala', 'r', 'm', 'pl', 'lua', 'dockerfile'
+    "txt",
+    "md",
+    "json",
+    "js",
+    "ts",
+    "jsx",
+    "tsx",
+    "html",
+    "css",
+    "scss",
+    "py",
+    "java",
+    "cpp",
+    "c",
+    "h",
+    "hpp",
+    "go",
+    "rs",
+    "sql",
+    "sh",
+    "bash",
+    "yml",
+    "yaml",
+    "xml",
+    "csv",
+    "log",
+    "vue",
+    "svelte",
+    "php",
+    "rb",
+    "swift",
+    "kt",
+    "scala",
+    "r",
+    "m",
+    "pl",
+    "lua",
+    "dockerfile",
   ];
-  return textExtensions.includes(extension || '');
+  return textExtensions.includes(extension || "");
 });
 
 // WebSocket 连接
@@ -331,7 +298,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('ReadTool WebSocket connected');
+      console.log("ReadTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -339,26 +306,26 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('ReadTool WebSocket disconnected');
+      console.log("ReadTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('ReadTool WebSocket error:', error);
+      console.error("ReadTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'file_content':
+    case "file_content":
       if (message.file && message.content !== undefined) {
         fileContent.value = message.content;
         currentFile.value = { ...message.file, content: message.content };
@@ -366,10 +333,10 @@ const handleWebSocketMessage = (message: any) => {
           addToRecentFiles(currentFile.value);
         }
         isLoading.value = false;
-        error.value = '';
+        error.value = "";
       }
       break;
-    case 'file_image':
+    case "file_image":
       if (message.file && message.imageData) {
         imageData.value = message.imageData;
         currentFile.value = { ...message.file, imageData: message.imageData };
@@ -377,11 +344,11 @@ const handleWebSocketMessage = (message: any) => {
           addToRecentFiles(currentFile.value);
         }
         isLoading.value = false;
-        error.value = '';
+        error.value = "";
       }
       break;
-    case 'file_error':
-      error.value = message.error || '文件加载失败';
+    case "file_error":
+      error.value = message.error || "文件加载失败";
       isLoading.value = false;
       break;
   }
@@ -397,16 +364,16 @@ const sendWebSocketMessage = (message: any) => {
 const openFile = (file: FileItem) => {
   currentFile.value = file;
   isLoading.value = true;
-  error.value = '';
+  error.value = "";
 
   if (isImageFile.value) {
     sendWebSocketMessage({
-      type: 'read_image',
+      type: "read_image",
       path: file.path,
     });
   } else if (isTextFile.value) {
     sendWebSocketMessage({
-      type: 'read_file',
+      type: "read_file",
       path: file.path,
     });
   } else {
@@ -423,10 +390,10 @@ const reloadFile = () => {
 
 const closeFile = () => {
   currentFile.value = null;
-  fileContent.value = '';
-  imageData.value = '';
-  pdfData.value = '';
-  error.value = '';
+  fileContent.value = "";
+  imageData.value = "";
+  pdfData.value = "";
+  error.value = "";
   imageInfo.value = null;
 };
 
@@ -437,7 +404,7 @@ const toggleReadonly = () => {
 const downloadFile = () => {
   if (currentFile.value) {
     sendWebSocketMessage({
-      type: 'download_file',
+      type: "download_file",
       path: currentFile.value.path,
     });
   }
@@ -469,7 +436,7 @@ const handleFileSelect = (event: Event) => {
 };
 
 const handleFiles = (files: FileList) => {
-  Array.from(files).forEach(file => {
+  Array.from(files).forEach((file) => {
     const fileItem: FileItem = {
       name: file.name,
       path: file.name, // 本地文件使用文件名作为路径
@@ -477,7 +444,7 @@ const handleFiles = (files: FileList) => {
       modified: Date.now(),
     };
 
-    if (file.type.startsWith('image/')) {
+    if (file.type.startsWith("image/")) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -486,7 +453,7 @@ const handleFiles = (files: FileList) => {
         addToRecentFiles(currentFile.value);
       };
       reader.readAsDataURL(file);
-    } else if (file.type.startsWith('text/') || isTextFileName(file.name)) {
+    } else if (file.type.startsWith("text/") || isTextFileName(file.name)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -500,13 +467,9 @@ const handleFiles = (files: FileList) => {
 };
 
 const isTextFileName = (fileName: string): boolean => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  const textExtensions = [
-    'txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss',
-    'py', 'java', 'cpp', 'c', 'h', 'hpp', 'go', 'rs', 'sql', 'sh', 'bash',
-    'yml', 'yaml', 'xml', 'csv', 'log', 'vue', 'svelte', 'php', 'rb'
-  ];
-  return textExtensions.includes(extension || '');
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  const textExtensions = ["txt", "md", "json", "js", "ts", "jsx", "tsx", "html", "css", "scss", "py", "java", "cpp", "c", "h", "hpp", "go", "rs", "sql", "sh", "bash", "yml", "yaml", "xml", "csv", "log", "vue", "svelte", "php", "rb"];
+  return textExtensions.includes(extension || "");
 };
 
 // 图片处理
@@ -519,17 +482,17 @@ const handleImageLoad = (event: Event) => {
 };
 
 const handleImageError = () => {
-  error.value = '图片加载失败';
+  error.value = "图片加载失败";
   isLoading.value = false;
 };
 
 // 编辑处理
 const handleContentEdit = () => {
   if (codeElement.value && currentFile.value && !isReadonly.value) {
-    const newContent = codeElement.value.textContent || '';
+    const newContent = codeElement.value.textContent || "";
     if (newContent !== fileContent.value) {
       fileContent.value = newContent;
-      emit('fileEdit', { ...currentFile.value, content: newContent }, newContent);
+      emit("fileEdit", { ...currentFile.value, content: newContent }, newContent);
     }
   }
 };
@@ -541,12 +504,12 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 
   // 支持Tab缩进
-  if (event.key === 'Tab') {
+  if (event.key === "Tab") {
     event.preventDefault();
     const selection = window.getSelection();
     if (selection && selection.rangeCount > 0) {
       const range = selection.getRangeAt(0);
-      const tabNode = document.createTextNode('  ');
+      const tabNode = document.createTextNode("  ");
       range.insertNode(tabNode);
       range.collapse(false);
       selection.removeAllRanges();
@@ -573,26 +536,26 @@ const selectAll = () => {
 };
 
 const getIconForFile = (file: FileItem) => {
-  const extension = file.name.split('.').pop()?.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase();
 
-  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension || '')) {
-    return 'image';
+  if (["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(extension || "")) {
+    return "image";
   }
-  if (['pdf'].includes(extension || '')) {
-    return 'file-pdf';
+  if (["pdf"].includes(extension || "")) {
+    return "file-pdf";
   }
-  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension || '')) {
-    return 'archive';
+  if (["zip", "rar", "7z", "tar", "gz"].includes(extension || "")) {
+    return "archive";
   }
-  if (['txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'py', 'java', 'cpp', 'c', 'go', 'rs', 'sql'].includes(extension || '')) {
-    return 'file-text';
+  if (["txt", "md", "json", "js", "ts", "jsx", "tsx", "html", "css", "py", "java", "cpp", "c", "go", "rs", "sql"].includes(extension || "")) {
+    return "file-text";
   }
 
-  return 'file';
+  return "file";
 };
 
 const addToRecentFiles = (file: FileItem) => {
-  const existingIndex = recentFiles.value.findIndex(f => f.path === file.path);
+  const existingIndex = recentFiles.value.findIndex((f) => f.path === file.path);
   if (existingIndex !== -1) {
     recentFiles.value[existingIndex] = file;
   } else {
@@ -617,7 +580,7 @@ onMounted(() => {
 // 监听文件变化
 watch(currentFile, (newFile) => {
   if (newFile) {
-    emit('fileSelected', newFile);
+    emit("fileSelected", newFile);
   }
 });
 </script>
@@ -767,7 +730,8 @@ watch(currentFile, (newFile) => {
   @apply flex items-center gap-2;
 }
 
-.wrap-select, .font-select {
+.wrap-select,
+.font-select {
   @apply px-2 py-1 text-sm border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white;
 }
 

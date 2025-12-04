@@ -8,31 +8,27 @@
 
 ```vue
 <template>
-  <RoomCard
-    :room="room"
-    @join="handleJoin"
-    @leave="handleLeave"
-  />
+  <RoomCard :room="room" @join="handleJoin" @leave="handleLeave" />
 </template>
 
 <script setup>
 const room = {
-  id: '1',
-  name: '产品设计讨论',
+  id: "1",
+  name: "产品设计讨论",
   members: [
-    { name: '产品经理 Agent', agentId: 'pm-1', status: 'online' },
-    { name: '设计师 Agent', agentId: 'designer-1', status: 'online' },
-    { name: '开发 Agent', agentId: 'dev-1', status: 'busy' },
+    { name: "产品经理 Agent", agentId: "pm-1", status: "online" },
+    { name: "设计师 Agent", agentId: "designer-1", status: "online" },
+    { name: "开发 Agent", agentId: "dev-1", status: "busy" },
   ],
   createdAt: Date.now(),
 };
 
 const handleJoin = (room) => {
-  console.log('Join room:', room.name);
+  console.log("Join room:", room.name);
 };
 
 const handleLeave = (room) => {
-  console.log('Leave room:', room.id);
+  console.log("Leave room:", room.id);
 };
 </script>
 ```
@@ -48,21 +44,21 @@ const handleLeave = (room) => {
       id: '1',
       name: '技术讨论室',
       members: [
-        { 
-          name: '架构师 Agent', 
-          agentId: 'arch-1', 
+        {
+          name: '架构师 Agent',
+          agentId: 'arch-1',
           avatar: '/avatars/arch.jpg',
-          status: 'online' 
+          status: 'online',
         },
-        { 
-          name: '前端 Agent', 
+        {
+          name: '前端 Agent',
           agentId: 'fe-1',
-          status: 'online' 
+          status: 'online',
         },
-        { 
-          name: '后端 Agent', 
+        {
+          name: '后端 Agent',
           agentId: 'be-1',
-          status: 'busy' 
+          status: 'busy',
         },
       ],
       createdAt: Date.now(),
@@ -75,9 +71,9 @@ const handleLeave = (room) => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| room | 房间对象 | `Room` | - |
+| 参数 | 说明     | 类型   | 默认值 |
+| ---- | -------- | ------ | ------ |
+| room | 房间对象 | `Room` | -      |
 
 ### Room 类型
 
@@ -94,17 +90,17 @@ interface RoomMember {
   name: string;
   agentId: string;
   avatar?: string;
-  status?: 'online' | 'offline' | 'busy';
+  status?: "online" | "offline" | "busy";
 }
 ```
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| join | 点击加入按钮时触发 | `room: Room` |
-| leave | 点击离开按钮时触发 | `room: Room` |
-| edit | 点击编辑按钮时触发 | `room: Room` |
+| 事件名 | 说明               | 回调参数     |
+| ------ | ------------------ | ------------ |
+| join   | 点击加入按钮时触发 | `room: Room` |
+| leave  | 点击离开按钮时触发 | `room: Room` |
+| edit   | 点击编辑按钮时触发 | `room: Room` |
 
 ## 使用场景
 
@@ -120,42 +116,37 @@ interface RoomMember {
 ```vue
 <template>
   <div class="grid grid-cols-2 gap-4">
-    <RoomCard
-      v-for="room in rooms"
-      :key="room.id"
-      :room="room"
-      @join="joinRoom"
-    />
+    <RoomCard v-for="room in rooms" :key="room.id" :room="room" @join="joinRoom" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const rooms = ref([
   {
-    id: '1',
-    name: '产品策划室',
+    id: "1",
+    name: "产品策划室",
     members: [
-      { name: '产品 Agent', agentId: 'pm-1', status: 'online' },
-      { name: '市场 Agent', agentId: 'mkt-1', status: 'online' },
+      { name: "产品 Agent", agentId: "pm-1", status: "online" },
+      { name: "市场 Agent", agentId: "mkt-1", status: "online" },
     ],
     createdAt: Date.now(),
   },
   {
-    id: '2',
-    name: '技术攻关组',
+    id: "2",
+    name: "技术攻关组",
     members: [
-      { name: '架构 Agent', agentId: 'arch-1', status: 'busy' },
-      { name: '开发 Agent', agentId: 'dev-1', status: 'online' },
-      { name: '测试 Agent', agentId: 'qa-1', status: 'online' },
+      { name: "架构 Agent", agentId: "arch-1", status: "busy" },
+      { name: "开发 Agent", agentId: "dev-1", status: "online" },
+      { name: "测试 Agent", agentId: "qa-1", status: "online" },
     ],
     createdAt: Date.now(),
   },
 ]);
 
 const joinRoom = (room) => {
-  console.log('Joining room:', room.name);
+  console.log("Joining room:", room.name);
 };
 </script>
 ```

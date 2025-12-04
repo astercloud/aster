@@ -8,10 +8,7 @@
 
 ```vue
 <template>
-  <Image
-    src="https://example.com/image.jpg"
-    alt="示例图片"
-  />
+  <Image src="https://example.com/image.jpg" alt="示例图片" />
 </template>
 ```
 
@@ -35,11 +32,7 @@
 
 ```vue
 <template>
-  <Image
-    src="https://example.com/banner.jpg"
-    alt="横幅"
-    size="full"
-  />
+  <Image src="https://example.com/banner.jpg" alt="横幅" size="full" />
 </template>
 ```
 
@@ -65,10 +58,7 @@
 <template>
   <!-- 加载中显示加载图标 -->
   <!-- 加载失败显示错误提示 -->
-  <Image
-    src="https://example.com/image.jpg"
-    alt="图片"
-  />
+  <Image src="https://example.com/image.jpg" alt="图片" />
 </template>
 ```
 
@@ -76,11 +66,11 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| src | 图片地址 | `string` | - |
-| alt | 图片描述 | `string` | `''` |
-| size | 图片尺寸 | `'sm' \| 'md' \| 'lg' \| 'full'` | `'md'` |
+| 参数  | 说明     | 类型                                | 默认值      |
+| ----- | -------- | ----------------------------------- | ----------- |
+| src   | 图片地址 | `string`                            | -           |
+| alt   | 图片描述 | `string`                            | `''`        |
+| size  | 图片尺寸 | `'sm' \| 'md' \| 'lg' \| 'full'`    | `'md'`      |
 | shape | 图片形状 | `'square' \| 'rounded' \| 'circle'` | `'rounded'` |
 
 ## 示例
@@ -90,22 +80,15 @@
 ```vue
 <template>
   <div class="grid grid-cols-3 gap-4">
-    <Image
-      v-for="(img, index) in images"
-      :key="index"
-      :src="img.url"
-      :alt="img.alt"
-      size="full"
-      shape="rounded"
-    />
+    <Image v-for="(img, index) in images" :key="index" :src="img.url" :alt="img.alt" size="full" shape="rounded" />
   </div>
 </template>
 
 <script setup>
 const images = [
-  { url: 'https://example.com/1.jpg', alt: '图片 1' },
-  { url: 'https://example.com/2.jpg', alt: '图片 2' },
-  { url: 'https://example.com/3.jpg', alt: '图片 3' },
+  { url: "https://example.com/1.jpg", alt: "图片 1" },
+  { url: "https://example.com/2.jpg", alt: "图片 2" },
+  { url: "https://example.com/3.jpg", alt: "图片 3" },
 ];
 </script>
 ```
@@ -114,11 +97,6 @@ const images = [
 
 ```vue
 <template>
-  <Image
-    src="https://example.com/avatar.jpg"
-    alt="用户头像"
-    size="lg"
-    shape="circle"
-  />
+  <Image src="https://example.com/avatar.jpg" alt="用户头像" size="lg" shape="circle" />
 </template>
 ```

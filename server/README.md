@@ -35,18 +35,18 @@ import (
 func main() {
     // 创建存储
     st, _ := store.NewJSONStore(".data")
-    
+
     // 创建依赖
     deps := &server.Dependencies{
         Store: st,
     }
-    
+
     // 创建服务器（使用默认配置）
     srv, err := server.New(server.DefaultConfig(), deps)
     if err != nil {
         log.Fatal(err)
     }
-    
+
     // 启动服务器
     srv.Start()
 }
@@ -59,7 +59,7 @@ config := &server.Config{
     Host: "0.0.0.0",
     Port: 8080,
     Mode: "production",
-    
+
     // 认证配置
     Auth: server.AuthConfig{
         APIKey: server.APIKeyConfig{
@@ -68,14 +68,14 @@ config := &server.Config{
             Keys: []string{"your-secure-api-key"},
         },
     },
-    
+
     // CORS 配置
     CORS: server.CORSConfig{
         Enabled: true,
         AllowOrigins: []string{"https://yourdomain.com"},
         AllowMethods: []string{"GET", "POST", "PUT", "DELETE"},
     },
-    
+
     // 速率限制
     RateLimit: server.RateLimitConfig{
         Enabled: true,
@@ -147,12 +147,12 @@ kubectl scale deployment agentsdk-server --replicas=5
 
 ## 📝 环境变量
 
-| 变量 | 描述 | 默认值 |
-|------|------|--------|
-| `HOST` | 服务器监听地址 | `0.0.0.0` |
-| `PORT` | 服务器端口 | `8080` |
-| `MODE` | 运行模式 (`development`/`production`) | `development` |
-| `API_KEY` | API 密钥 | `dev-key-12345` |
+| 变量      | 描述                                  | 默认值          |
+| --------- | ------------------------------------- | --------------- |
+| `HOST`    | 服务器监听地址                        | `0.0.0.0`       |
+| `PORT`    | 服务器端口                            | `8080`          |
+| `MODE`    | 运行模式 (`development`/`production`) | `development`   |
+| `API_KEY` | API 密钥                              | `dev-key-12345` |
 
 ---
 
@@ -183,6 +183,7 @@ curl http://localhost:8080/health
 ```
 
 响应：
+
 ```json
 {
   "status": "healthy",
@@ -427,16 +428,16 @@ Logging: server.LoggingConfig{
 
 ## 🔄 与 cmd/agentsdk 的对比
 
-| 特性 | cmd/agentsdk | server/ |
-|------|--------------|---------|
-| **定位** | 演示/开发 | 生产部署 |
-| **认证** | ❌ | ✅ API Key + JWT |
-| **速率限制** | ❌ | ✅ |
-| **CORS** | 基础 | 完整配置 |
-| **日志** | 简单 | 结构化 |
-| **监控** | ❌ | ✅ Health + Metrics |
-| **部署** | 手动 | Docker + K8s |
-| **生产就绪** | ❌ | ✅ |
+| 特性         | cmd/agentsdk | server/             |
+| ------------ | ------------ | ------------------- |
+| **定位**     | 演示/开发    | 生产部署            |
+| **认证**     | ❌           | ✅ API Key + JWT    |
+| **速率限制** | ❌           | ✅                  |
+| **CORS**     | 基础         | 完整配置            |
+| **日志**     | 简单         | 结构化              |
+| **监控**     | ❌           | ✅ Health + Metrics |
+| **部署**     | 手动         | Docker + K8s        |
+| **生产就绪** | ❌           | ✅                  |
 
 ---
 

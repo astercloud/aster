@@ -4,37 +4,19 @@
       <!-- Name -->
       <div class="form-group">
         <label for="name" class="form-label">Agent 名称</label>
-        <input
-          id="name"
-          v-model="formData.name"
-          type="text"
-          class="form-input"
-          placeholder="输入 Agent 名称"
-          required
-        />
+        <input id="name" v-model="formData.name" type="text" class="form-input" placeholder="输入 Agent 名称" required />
       </div>
 
       <!-- Description -->
       <div class="form-group">
         <label for="description" class="form-label">描述</label>
-        <textarea
-          id="description"
-          v-model="formData.description"
-          class="form-input"
-          rows="3"
-          placeholder="描述 Agent 的功能和用途"
-        />
+        <textarea id="description" v-model="formData.description" class="form-input" rows="3" placeholder="描述 Agent 的功能和用途" />
       </div>
 
       <!-- Template ID -->
       <div class="form-group">
         <label for="template" class="form-label">模板</label>
-        <select
-          id="template"
-          v-model="formData.template_id"
-          class="form-input"
-          required
-        >
+        <select id="template" v-model="formData.template_id" class="form-input" required>
           <option value="">选择模板</option>
           <option value="chat">聊天助手</option>
           <option value="writer">写作助手</option>
@@ -50,11 +32,7 @@
         <div class="form-row">
           <div class="form-group">
             <label for="provider" class="form-label">提供商</label>
-            <select
-              id="provider"
-              v-model="formData.model_config.provider"
-              class="form-input"
-            >
+            <select id="provider" v-model="formData.model_config.provider" class="form-input">
               <option value="anthropic">Anthropic</option>
               <option value="openai">OpenAI</option>
               <option value="deepseek">DeepSeek</option>
@@ -63,57 +41,28 @@
 
           <div class="form-group">
             <label for="model" class="form-label">模型</label>
-            <input
-              id="model"
-              v-model="formData.model_config.model"
-              type="text"
-              class="form-input"
-              placeholder="claude-3-5-sonnet-20241022"
-            />
+            <input id="model" v-model="formData.model_config.model" type="text" class="form-input" placeholder="claude-3-5-sonnet-20241022" />
           </div>
         </div>
 
         <div class="form-row">
           <div class="form-group">
             <label for="temperature" class="form-label">Temperature</label>
-            <input
-              id="temperature"
-              v-model.number="formData.model_config.temperature"
-              type="number"
-              step="0.1"
-              min="0"
-              max="2"
-              class="form-input"
-            />
+            <input id="temperature" v-model.number="formData.model_config.temperature" type="number" step="0.1" min="0" max="2" class="form-input" />
           </div>
 
           <div class="form-group">
             <label for="max_tokens" class="form-label">Max Tokens</label>
-            <input
-              id="max_tokens"
-              v-model.number="formData.model_config.max_tokens"
-              type="number"
-              class="form-input"
-            />
+            <input id="max_tokens" v-model.number="formData.model_config.max_tokens" type="number" class="form-input" />
           </div>
         </div>
       </div>
 
       <!-- Actions -->
       <div class="form-actions">
-        <button
-          type="button"
-          @click="$emit('cancel')"
-          class="btn-secondary"
-        >
-          取消
-        </button>
-        <button
-          type="submit"
-          :disabled="loading"
-          class="btn-primary"
-        >
-          {{ loading ? '创建中...' : (agent ? '更新' : '创建') }}
+        <button type="button" @click="$emit('cancel')" class="btn-secondary">取消</button>
+        <button type="submit" :disabled="loading" class="btn-primary">
+          {{ loading ? "创建中..." : agent ? "更新" : "创建" }}
         </button>
       </div>
     </form>
@@ -121,35 +70,35 @@
 </template>
 
 <script lang="ts">
-import { ref, watch, defineComponent } from 'vue';
-import type { Agent } from '@/types';
-import type { PropType } from 'vue';
+import { ref, watch, defineComponent } from "vue";
+import type { Agent } from "@/types";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'AgentForm',
+  name: "AgentForm",
   props: {
     agent: {
       type: Object as PropType<Agent>,
       required: false,
-      default: undefined
+      default: undefined,
     },
     loading: {
       type: Boolean,
-      default: false
-    }
+      default: false,
+    },
   },
   emits: {
     submit: (data: any) => true,
-    cancel: () => true
+    cancel: () => true,
   },
   setup(props, { emit }) {
     const formData = ref({
-      name: '',
-      description: '',
-      template_id: '',
+      name: "",
+      description: "",
+      template_id: "",
       model_config: {
-        provider: 'anthropic',
-        model: 'claude-3-5-sonnet-20241022',
+        provider: "anthropic",
+        model: "claude-3-5-sonnet-20241022",
         temperature: 1.0,
         max_tokens: 4096,
       },
@@ -157,32 +106,36 @@ export default defineComponent({
     });
 
     // Load agent data if editing
-    watch(() => props.agent, (agent) => {
-      if (agent) {
-        formData.value = {
-          name: agent.name,
-          description: agent.description || '',
-          template_id: agent.metadata?.template_id || '',
-          model_config: {
-            provider: agent.metadata?.provider || 'anthropic',
-            model: agent.metadata?.model || 'claude-3-5-sonnet-20241022',
-            temperature: agent.metadata?.temperature || 1.0,
-            max_tokens: agent.metadata?.max_tokens || 4096,
-          },
-          metadata: agent.metadata || {},
-        };
-      }
-    }, { immediate: true });
+    watch(
+      () => props.agent,
+      (agent) => {
+        if (agent) {
+          formData.value = {
+            name: agent.name,
+            description: agent.description || "",
+            template_id: agent.metadata?.template_id || "",
+            model_config: {
+              provider: agent.metadata?.provider || "anthropic",
+              model: agent.metadata?.model || "claude-3-5-sonnet-20241022",
+              temperature: agent.metadata?.temperature || 1.0,
+              max_tokens: agent.metadata?.max_tokens || 4096,
+            },
+            metadata: agent.metadata || {},
+          };
+        }
+      },
+      { immediate: true },
+    );
 
     const handleSubmit = () => {
-      emit('submit', formData.value);
+      emit("submit", formData.value);
     };
 
     return {
       formData,
-      handleSubmit
+      handleSubmit,
     };
-  }
+  },
 });
 </script>
 

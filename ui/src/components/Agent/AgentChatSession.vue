@@ -8,13 +8,18 @@
         </svg>
         返回
       </button>
-      
+
       <div class="agent-info">
         <div class="agent-avatar">
           <img v-if="agent.avatar" :src="agent.avatar" :alt="agent.name" />
           <div v-else class="avatar-placeholder">
             <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                stroke-width="2"
+                d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+              ></path>
             </svg>
           </div>
         </div>
@@ -32,18 +37,15 @@
 
     <!-- Chat Area -->
     <div class="chat-container">
-      <AsterChat
-        :config="chatConfig"
-        :show-header="false"
-      />
+      <AsterChat :config="chatConfig" :show-header="false" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import AsterChat from '../AsterChat.vue';
-import type { Agent } from '@/types';
+import { computed } from "vue";
+import AsterChat from "../AsterChat.vue";
+import type { Agent } from "@/types";
 
 interface Props {
   agent: Agent;
@@ -57,22 +59,22 @@ defineEmits<{
 
 const statusClass = computed(() => {
   const classes: Record<string, string> = {
-    idle: 'status-idle',
-    thinking: 'status-thinking',
-    busy: 'status-busy',
-    error: 'status-error',
+    idle: "status-idle",
+    thinking: "status-thinking",
+    busy: "status-busy",
+    error: "status-error",
   };
-  return classes[props.agent.status] || 'status-idle';
+  return classes[props.agent.status] || "status-idle";
 });
 
 const statusText = computed(() => {
   const texts: Record<string, string> = {
-    idle: '空闲',
-    thinking: '思考中',
-    busy: '忙碌',
-    error: '错误',
+    idle: "空闲",
+    thinking: "思考中",
+    busy: "忙碌",
+    error: "错误",
   };
-  return texts[props.agent.status] || '未知';
+  return texts[props.agent.status] || "未知";
 });
 
 const chatConfig = computed(() => ({
@@ -86,10 +88,10 @@ const chatConfig = computed(() => ({
   enableApproval: true,
   enableQuickReplies: true,
   demoMode: false,
-  apiUrl: 'http://localhost:8080',
+  apiUrl: "http://localhost:8080",
   modelConfig: {
-    provider: props.agent.metadata?.provider || 'anthropic',
-    model: props.agent.metadata?.model || 'claude-3-5-sonnet-20241022',
+    provider: props.agent.metadata?.provider || "anthropic",
+    model: props.agent.metadata?.model || "claude-3-5-sonnet-20241022",
   },
 }));
 </script>

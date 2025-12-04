@@ -23,12 +23,7 @@
         <svg class="search-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
         </svg>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="搜索 Agent..."
-          class="search-input"
-        />
+        <input v-model="searchQuery" type="text" placeholder="搜索 Agent..." class="search-input" />
       </div>
 
       <select v-model="statusFilter" class="filter-select">
@@ -44,41 +39,28 @@
     <LoadingSpinner v-if="loading" class="my-8" />
 
     <!-- Empty State -->
-    <EmptyState
-      v-else-if="filteredAgents.length === 0"
-      title="暂无 Agent"
-      description="还没有创建任何 Agent，点击上方按钮创建第一个"
-    >
+    <EmptyState v-else-if="filteredAgents.length === 0" title="暂无 Agent" description="还没有创建任何 Agent，点击上方按钮创建第一个">
       <template #action>
-        <button @click="$emit('create')" class="btn-create">
-          创建 Agent
-        </button>
+        <button @click="$emit('create')" class="btn-create">创建 Agent</button>
       </template>
     </EmptyState>
 
     <!-- Agent Grid -->
     <div v-else class="agent-grid">
-      <AgentCard
-        v-for="agent in filteredAgents"
-        :key="agent.id"
-        :agent="agent"
-        @chat="$emit('chat', $event)"
-        @edit="$emit('edit', $event)"
-        @delete="$emit('delete', $event)"
-      />
+      <AgentCard v-for="agent in filteredAgents" :key="agent.id" :agent="agent" @chat="$emit('chat', $event)" @edit="$emit('edit', $event)" @delete="$emit('delete', $event)" />
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, type PropType } from 'vue';
-import AgentCard from './AgentCard.vue';
-import LoadingSpinner from '../Common/LoadingSpinner.vue';
-import EmptyState from '../Common/EmptyState.vue';
-import type { Agent } from '@/types';
+import { defineComponent, ref, computed, type PropType } from "vue";
+import AgentCard from "./AgentCard.vue";
+import LoadingSpinner from "../Common/LoadingSpinner.vue";
+import EmptyState from "../Common/EmptyState.vue";
+import type { Agent } from "@/types";
 
 export default defineComponent({
-  name: 'AgentList',
+  name: "AgentList",
   components: {
     AgentCard,
     LoadingSpinner,
@@ -101,8 +83,8 @@ export default defineComponent({
     delete: (agent: Agent) => true,
   },
   setup(props) {
-    const searchQuery = ref('');
-    const statusFilter = ref('');
+    const searchQuery = ref("");
+    const statusFilter = ref("");
 
     const filteredAgents = computed(() => {
       let result = props.agents;
@@ -110,15 +92,12 @@ export default defineComponent({
       // 搜索过滤
       if (searchQuery.value) {
         const query = searchQuery.value.toLowerCase();
-        result = result.filter(agent =>
-          agent.name.toLowerCase().includes(query) ||
-          agent.description?.toLowerCase().includes(query)
-        );
+        result = result.filter((agent) => agent.name.toLowerCase().includes(query) || agent.description?.toLowerCase().includes(query));
       }
 
       // 状态过滤
       if (statusFilter.value) {
-        result = result.filter(agent => agent.status === statusFilter.value);
+        result = result.filter((agent) => agent.status === statusFilter.value);
       }
 
       return result;

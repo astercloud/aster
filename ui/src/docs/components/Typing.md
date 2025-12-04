@@ -18,7 +18,7 @@
 </template>
 
 <script setup>
-import { Typing } from '@/components/ChatUI';
+import { Typing } from "@/components/ChatUI";
 </script>
 ```
 
@@ -47,7 +47,7 @@ import { Typing } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { Typing } from '@/components/ChatUI';
+import { Typing } from "@/components/ChatUI";
 </script>
 ```
 
@@ -60,30 +60,18 @@ import { Typing } from '@/components/ChatUI';
   <div class="space-y-6">
     <div>
       <h3 class="font-semibold mb-2">循环播放</h3>
-      <Typing
-        text="这条消息会循环播放..."
-        :loop="true"
-        :delay="1000"
-      />
+      <Typing text="这条消息会循环播放..." :loop="true" :delay="1000" />
     </div>
 
     <div>
       <h3 class="font-semibold mb-2">多条文本循环</h3>
-      <Typing
-        :texts="[
-          '第一条消息',
-          '第二条消息',
-          '第三条消息'
-        ]"
-        :loop="true"
-        :speed="80"
-      />
+      <Typing :texts="['第一条消息', '第二条消息', '第三条消息']" :loop="true" :speed="80" />
     </div>
   </div>
 </template>
 
 <script setup>
-import { Typing } from '@/components/ChatUI';
+import { Typing } from "@/components/ChatUI";
 </script>
 ```
 
@@ -94,21 +82,14 @@ import { Typing } from '@/components/ChatUI';
 ```vue
 <template>
   <div class="space-y-6">
-    <Typing
-      text="2秒后开始显示"
-      :delay="2000"
-    />
+    <Typing text="2秒后开始显示" :delay="2000" />
 
-    <Typing
-      text="这条消息会等待3秒"
-      :delay="3000"
-      :speed="60"
-    />
+    <Typing text="这条消息会等待3秒" :delay="3000" :speed="60" />
   </div>
 </template>
 
 <script setup>
-import { Typing } from '@/components/ChatUI';
+import { Typing } from "@/components/ChatUI";
 </script>
 ```
 
@@ -120,27 +101,19 @@ import { Typing } from '@/components/ChatUI';
 <template>
   <div class="space-y-4">
     <Bubble position="left">
-      <Typing
-        text="你好！我是AI助手，很高兴为您服务。"
-        :speed="80"
-      />
+      <Typing text="你好！我是AI助手，很高兴为您服务。" :speed="80" />
     </Bubble>
 
-    <Bubble position="right">
-      你好！我想了解一下产品功能
-    </Bubble>
+    <Bubble position="right"> 你好！我想了解一下产品功能 </Bubble>
 
     <Bubble position="left">
-      <Typing
-        text="我们的产品包含丰富的组件库..."
-        :speed="100"
-      />
+      <Typing text="我们的产品包含丰富的组件库..." :speed="100" />
     </Bubble>
   </div>
 </template>
 
 <script setup>
-import { Typing, Bubble } from '@/components/ChatUI';
+import { Typing, Bubble } from "@/components/ChatUI";
 </script>
 ```
 
@@ -157,25 +130,16 @@ import { Typing, Bubble } from '@/components/ChatUI';
       <Button @click="resumeText" variant="secondary">继续</Button>
     </div>
 
-    <Typing
-      :key="currentText"
-      :text="currentText"
-      :speed="70"
-      ref="typingRef"
-    />
+    <Typing :key="currentText" :text="currentText" :speed="70" ref="typingRef" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Typing, Button } from '@/components/ChatUI';
+import { ref } from "vue";
+import { Typing, Button } from "@/components/ChatUI";
 
 const typingRef = ref(null);
-const texts = [
-  '这是第一条消息',
-  '这是第二条不同的消息',
-  '这是第三条更新的消息'
-];
+const texts = ["这是第一条消息", "这是第二条不同的消息", "这是第三条更新的消息"];
 const currentIndex = ref(0);
 const currentText = ref(texts[0]);
 
@@ -201,25 +165,16 @@ const resumeText = () => {
 ```vue
 <template>
   <div class="space-y-6">
-    <Typing
-      text="带有光标效果的文本"
-      class="typing-with-cursor"
-    />
+    <Typing text="带有光标效果的文本" class="typing-with-cursor" />
 
-    <Typing
-      text="彩色打字效果"
-      class="typing-colorful"
-    />
+    <Typing text="彩色打字效果" class="typing-colorful" />
 
-    <Typing
-      text="大字体打字效果"
-      class="typing-large"
-    />
+    <Typing text="大字体打字效果" class="typing-large" />
   </div>
 </template>
 
 <script setup>
-import { Typing } from '@/components/ChatUI';
+import { Typing } from "@/components/ChatUI";
 </script>
 
 <style scoped>
@@ -241,37 +196,40 @@ import { Typing } from '@/components/ChatUI';
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| text | 要显示的文本内容 | `string` | `''` |
-| texts | 多条文本数组（与 text 二选一） | `string[]` | `[]` |
-| speed | 打字速度（毫秒/字符） | `number` | `100` |
-| delay | 开始延迟时间（毫秒） | `number` | `0` |
-| loop | 是否循环播放 | `boolean` | `false` |
+| 参数  | 说明                           | 类型       | 默认值  |
+| ----- | ------------------------------ | ---------- | ------- |
+| text  | 要显示的文本内容               | `string`   | `''`    |
+| texts | 多条文本数组（与 text 二选一） | `string[]` | `[]`    |
+| speed | 打字速度（毫秒/字符）          | `number`   | `100`   |
+| delay | 开始延迟时间（毫秒）           | `number`   | `0`     |
+| loop  | 是否循环播放                   | `boolean`  | `false` |
 
 ### Methods
 
 通过 ref 可以访问以下方法：
 
-| 方法 | 说明 | 参数 |
-| --- | --- | --- |
-| pause | 暂停打字效果 | - |
-| resume | 继续打字效果 | - |
-| restart | 重新开始 | - |
+| 方法    | 说明         | 参数 |
+| ------- | ------------ | ---- |
+| pause   | 暂停打字效果 | -    |
+| resume  | 继续打字效果 | -    |
+| restart | 重新开始     | -    |
 
 ### 使用说明
 
 #### 性能优化
+
 - 使用 requestAnimationFrame 优化动画性能
 - 避免频繁的 DOM 操作
 - 支持大量文本的高效渲染
 
 #### 字符处理
+
 - 支持中英文字符的正确显示
 - 处理空格和特殊字符
 - 保持文本的原始格式
 
 #### 状态管理
+
 - 组件内部维护打字状态
 - 支持暂停和恢复功能
 - 循环播放时正确重置状态

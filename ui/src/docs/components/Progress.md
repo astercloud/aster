@@ -18,11 +18,7 @@
 
 ```vue
 <template>
-  <Progress
-    :percent="30"
-    label="上传中"
-    :show-percent="true"
-  />
+  <Progress :percent="30" label="上传中" :show-percent="true" />
 </template>
 ```
 
@@ -53,7 +49,7 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const progress = ref(0);
 
@@ -75,11 +71,7 @@ const start = () => {
 
 ```vue
 <template>
-  <Progress
-    :percent="60"
-    label="下载中"
-    :show-percent="false"
-  />
+  <Progress :percent="60" label="下载中" :show-percent="false" />
 </template>
 ```
 
@@ -87,12 +79,12 @@ const start = () => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| percent | 进度百分比 | `number` | `0` |
-| label | 进度标签 | `string` | - |
-| showPercent | 是否显示百分比 | `boolean` | `true` |
-| status | 进度状态 | `'normal' \| 'success' \| 'error'` | `'normal'` |
+| 参数        | 说明           | 类型                               | 默认值     |
+| ----------- | -------------- | ---------------------------------- | ---------- |
+| percent     | 进度百分比     | `number`                           | `0`        |
+| label       | 进度标签       | `string`                           | -          |
+| showPercent | 是否显示百分比 | `boolean`                          | `true`     |
+| status      | 进度状态       | `'normal' \| 'success' \| 'error'` | `'normal'` |
 
 ## 示例
 
@@ -101,28 +93,24 @@ const start = () => {
 ```vue
 <template>
   <div>
-    <Progress
-      :percent="uploadProgress"
-      :status="uploadStatus"
-      :label="uploadLabel"
-    />
+    <Progress :percent="uploadProgress" :status="uploadStatus" :label="uploadLabel" />
   </div>
 </template>
 
 <script setup>
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 const uploadProgress = ref(0);
 const uploadStatus = computed(() => {
-  if (uploadProgress.value === 100) return 'success';
-  if (uploadProgress.value > 0) return 'normal';
-  return 'normal';
+  if (uploadProgress.value === 100) return "success";
+  if (uploadProgress.value > 0) return "normal";
+  return "normal";
 });
 
 const uploadLabel = computed(() => {
-  if (uploadProgress.value === 100) return '上传完成';
-  if (uploadProgress.value > 0) return '上传中';
-  return '准备上传';
+  if (uploadProgress.value === 100) return "上传完成";
+  if (uploadProgress.value > 0) return "上传中";
+  return "准备上传";
 });
 </script>
 ```

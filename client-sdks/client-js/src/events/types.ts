@@ -117,13 +117,7 @@ export interface ProgressErrorEvent {
 /**
  * Progress Channel 所有事件的联合类型
  */
-export type ProgressEvent =
-  | ProgressThinkingEvent
-  | ProgressTextChunkEvent
-  | ProgressToolStartEvent
-  | ProgressToolEndEvent
-  | ProgressDoneEvent
-  | ProgressErrorEvent;
+export type ProgressEvent = ProgressThinkingEvent | ProgressTextChunkEvent | ProgressToolStartEvent | ProgressToolEndEvent | ProgressDoneEvent | ProgressErrorEvent;
 
 // ============================================================================
 // Control Channel Events (审批流)
@@ -190,11 +184,7 @@ export interface ControlResumeEvent {
 /**
  * Control Channel 所有事件的联合类型
  */
-export type ControlEvent =
-  | ControlToolApprovalRequestEvent
-  | ControlToolApprovalResponseEvent
-  | ControlPauseEvent
-  | ControlResumeEvent;
+export type ControlEvent = ControlToolApprovalRequestEvent | ControlToolApprovalResponseEvent | ControlPauseEvent | ControlResumeEvent;
 
 // ============================================================================
 // Monitor Channel Events (治理流)
@@ -265,11 +255,7 @@ export interface MonitorComplianceEvent {
 /**
  * Monitor Channel 所有事件的联合类型
  */
-export type MonitorEvent =
-  | MonitorTokenUsageEvent
-  | MonitorLatencyEvent
-  | MonitorCostEvent
-  | MonitorComplianceEvent;
+export type MonitorEvent = MonitorTokenUsageEvent | MonitorLatencyEvent | MonitorCostEvent | MonitorComplianceEvent;
 
 // ============================================================================
 // 事件联合类型
@@ -324,9 +310,6 @@ export function isMonitorEvent(event: StreamEvent): event is MonitorEvent {
 /**
  * 类型守卫：检查具体事件类型
  */
-export function isEventType<T extends StreamEvent["type"]>(
-  event: StreamEvent,
-  type: T,
-): event is Extract<StreamEvent, { type: T }> {
+export function isEventType<T extends StreamEvent["type"]>(event: StreamEvent, type: T): event is Extract<StreamEvent, { type: T }> {
   return event.type === type;
 }

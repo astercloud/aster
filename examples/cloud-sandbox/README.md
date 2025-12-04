@@ -71,29 +71,29 @@ go run main.go
 
 ### 阿里云 AgentBay
 
-| 功能 | MCP 工具 |
-|------|---------|
-| 执行命令 | `shell` |
-| 读取文件 | `read_file` |
-| 写入文件 | `write_file` |
+| 功能     | MCP 工具         |
+| -------- | ---------------- |
+| 执行命令 | `shell`          |
+| 读取文件 | `read_file`      |
+| 写入文件 | `write_file`     |
 | 列出文件 | `list_directory` |
-| 文件信息 | `get_file_info` |
-| 删除文件 | `delete_file` |
-| 搜索文件 | `search_files` |
+| 文件信息 | `get_file_info`  |
+| 删除文件 | `delete_file`    |
+| 搜索文件 | `search_files`   |
 
 ### 火山引擎
 
-| 功能 | MCP 工具 |
-|------|---------|
-| 初始化会话 | `computer_init` |
-| 执行命令 | `computer_exec` |
-| 读取文件 | `computer_read_file` |
-| 写入文件 | `computer_write_file` |
-| 列出文件 | `computer_list_files` |
-| 文件信息 | `computer_stat_file` |
-| 删除文件 | `computer_delete_file` |
-| Glob 匹配 | `computer_glob` |
-| 终止会话 | `computer_terminate` |
+| 功能       | MCP 工具               |
+| ---------- | ---------------------- |
+| 初始化会话 | `computer_init`        |
+| 执行命令   | `computer_exec`        |
+| 读取文件   | `computer_read_file`   |
+| 写入文件   | `computer_write_file`  |
+| 列出文件   | `computer_list_files`  |
+| 文件信息   | `computer_stat_file`   |
+| 删除文件   | `computer_delete_file` |
+| Glob 匹配  | `computer_glob`        |
+| 终止会话   | `computer_terminate`   |
 
 ## 注意事项
 

@@ -6,11 +6,7 @@
     </div>
 
     <div class="questions-container">
-      <div
-        v-for="(question, qIndex) in questions"
-        :key="qIndex"
-        class="question-block"
-      >
+      <div v-for="(question, qIndex) in questions" :key="qIndex" class="question-block">
         <div class="question-header">
           <span class="question-label">{{ question.header }}</span>
         </div>
@@ -20,26 +16,16 @@
           <label
             v-for="(option, oIndex) in question.options"
             :key="oIndex"
-            :class="['option-item', { 
-              'selected': isSelected(qIndex, oIndex),
-              'multi-select': question.multi_select 
-            }]"
+            :class="[
+              'option-item',
+              {
+                selected: isSelected(qIndex, oIndex),
+                'multi-select': question.multi_select,
+              },
+            ]"
           >
-            <input
-              v-if="question.multi_select"
-              type="checkbox"
-              :checked="isSelected(qIndex, oIndex)"
-              @change="toggleOption(qIndex, oIndex)"
-              class="option-input"
-            />
-            <input
-              v-else
-              type="radio"
-              :name="`question-${qIndex}`"
-              :checked="isSelected(qIndex, oIndex)"
-              @change="selectOption(qIndex, oIndex)"
-              class="option-input"
-            />
+            <input v-if="question.multi_select" type="checkbox" :checked="isSelected(qIndex, oIndex)" @change="toggleOption(qIndex, oIndex)" class="option-input" />
+            <input v-else type="radio" :name="`question-${qIndex}`" :checked="isSelected(qIndex, oIndex)" @change="selectOption(qIndex, oIndex)" class="option-input" />
             <div class="option-content">
               <span class="option-label">{{ option.label }}</span>
               <span class="option-description">{{ option.description }}</span>
@@ -48,27 +34,18 @@
 
           <!-- Other 选项 -->
           <label
-            :class="['option-item', 'other-option', { 
-              'selected': isOtherSelected(qIndex) 
-            }]"
+            :class="[
+              'option-item',
+              'other-option',
+              {
+                selected: isOtherSelected(qIndex),
+              },
+            ]"
           >
-            <input
-              type="radio"
-              :name="`question-${qIndex}`"
-              :checked="isOtherSelected(qIndex)"
-              @change="selectOther(qIndex)"
-              class="option-input"
-            />
+            <input type="radio" :name="`question-${qIndex}`" :checked="isOtherSelected(qIndex)" @change="selectOther(qIndex)" class="option-input" />
             <div class="option-content">
               <span class="option-label">其他</span>
-              <input
-                v-if="isOtherSelected(qIndex)"
-                v-model="otherInputs[qIndex]"
-                type="text"
-                placeholder="请输入..."
-                class="other-input"
-                @click.stop
-              />
+              <input v-if="isOtherSelected(qIndex)" v-model="otherInputs[qIndex]" type="text" placeholder="请输入..." class="other-input" @click.stop />
               <span v-else class="option-description">提供自定义答案</span>
             </div>
           </label>
@@ -77,27 +54,16 @@
     </div>
 
     <div class="actions">
-      <button
-        class="submit-btn"
-        :disabled="!canSubmit"
-        @click="submitAnswers"
-      >
-        确认
-      </button>
-      <button
-        class="skip-btn"
-        @click="skipQuestions"
-      >
-        跳过
-      </button>
+      <button class="submit-btn" :disabled="!canSubmit" @click="submitAnswers">确认</button>
+      <button class="skip-btn" @click="skipQuestions">跳过</button>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
-import type { Question } from '@/types';
+import { ref, computed } from "vue";
+import Icon from "../ChatUI/Icon.vue";
+import type { Question } from "@/types";
 
 interface Props {
   requestId: string;
@@ -169,25 +135,25 @@ const canSubmit = computed(() => {
 
 const submitAnswers = () => {
   const answers: Record<string, any> = {};
-  
+
   props.questions.forEach((question, qIndex) => {
     if (otherSelected.value[qIndex]) {
-      answers[qIndex] = { type: 'other', value: otherInputs.value[qIndex] };
+      answers[qIndex] = { type: "other", value: otherInputs.value[qIndex] };
     } else {
       const answer = selectedAnswers.value[qIndex];
       if (Array.isArray(answer)) {
-        answers[qIndex] = answer.map(i => question.options[i]?.label ?? '');
+        answers[qIndex] = answer.map((i) => question.options[i]?.label ?? "");
       } else if (answer !== undefined && answer >= 0) {
-        answers[qIndex] = question.options[answer]?.label ?? '';
+        answers[qIndex] = question.options[answer]?.label ?? "";
       }
     }
   });
 
-  emit('answer', props.requestId, answers);
+  emit("answer", props.requestId, answers);
 };
 
 const skipQuestions = () => {
-  emit('skip', props.requestId);
+  emit("skip", props.requestId);
 };
 </script>
 

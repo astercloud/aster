@@ -4,22 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  EvalRequest,
-  EvalInfo,
-  EvalResult,
-  EvalFilter,
-  PaginatedEvalResponse,
-  TestCase,
-  TestCaseSet,
-  BenchmarkConfig,
-  BenchmarkResult,
-  ABTestConfig,
-  ABTestResult,
-  EvalReportRequest,
-  EvalReportResult,
-  ScorerConfig,
-} from "../types/eval";
+import { EvalRequest, EvalInfo, EvalResult, EvalFilter, PaginatedEvalResponse, TestCase, TestCaseSet, BenchmarkConfig, BenchmarkResult, ABTestConfig, ABTestResult, EvalReportRequest, EvalReportResult, ScorerConfig } from "../types/eval";
 
 /**
  * Eval 资源类
@@ -50,12 +35,7 @@ export class EvalResource extends BaseResource {
    * @param request 文本评估请求
    * @returns Eval 结果
    */
-  async runTextEval(request: {
-    prompt: string;
-    expected?: string;
-    scorer?: string;
-    [key: string]: any;
-  }): Promise<EvalResult> {
+  async runTextEval(request: { prompt: string; expected?: string; scorer?: string; [key: string]: any }): Promise<EvalResult> {
     const evalInfo = await this.create({
       type: "text",
       ...request,
@@ -68,11 +48,7 @@ export class EvalResource extends BaseResource {
    * @param request 批量评估请求
    * @returns Eval 结果
    */
-  async runBatchEval(request: {
-    items: Array<{ prompt: string; expected?: string; [key: string]: any }>;
-    scorer?: string;
-    [key: string]: any;
-  }): Promise<EvalResult> {
+  async runBatchEval(request: { items: Array<{ prompt: string; expected?: string; [key: string]: any }>; scorer?: string; [key: string]: any }): Promise<EvalResult> {
     const evalInfo = await this.create({
       type: "batch",
       ...request,
@@ -141,11 +117,7 @@ export class EvalResource extends BaseResource {
    * @param maxWaitTime 最大等待时间（毫秒），默认 300000 (5分钟)
    * @returns Eval 结果
    */
-  async waitForCompletion(
-    evalId: string,
-    pollInterval: number = 1000,
-    maxWaitTime: number = 300000,
-  ): Promise<EvalResult> {
+  async waitForCompletion(evalId: string, pollInterval: number = 1000, maxWaitTime: number = 300000): Promise<EvalResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
@@ -156,9 +128,7 @@ export class EvalResource extends BaseResource {
       }
 
       if (evalInfo.status === "failed" || evalInfo.status === "cancelled") {
-        throw new Error(
-          `Eval ${evalId} ${evalInfo.status}${evalInfo.error ? `: ${evalInfo.error}` : ""}`,
-        );
+        throw new Error(`Eval ${evalId} ${evalInfo.status}${evalInfo.error ? `: ${evalInfo.error}` : ""}`);
       }
 
       // 等待下次轮询
@@ -179,11 +149,7 @@ export class EvalResource extends BaseResource {
    * @param description 描述
    * @returns 测试用例集
    */
-  async createTestCaseSet(
-    name: string,
-    testCases: TestCase[],
-    description?: string,
-  ): Promise<TestCaseSet> {
+  async createTestCaseSet(name: string, testCases: TestCase[], description?: string): Promise<TestCaseSet> {
     return this.request<TestCaseSet>("/v1/evals/test-cases", {
       method: "POST",
       body: { name, testCases, description },
@@ -204,9 +170,7 @@ export class EvalResource extends BaseResource {
    * @returns 测试用例集列表
    */
   async listTestCaseSets(): Promise<TestCaseSet[]> {
-    const result = await this.request<{ items: TestCaseSet[] }>(
-      "/v1/evals/test-cases",
-    );
+    const result = await this.request<{ items: TestCaseSet[] }>("/v1/evals/test-cases");
     return result.items;
   }
 
@@ -282,11 +246,7 @@ export class EvalResource extends BaseResource {
    * @param maxWaitTime 最大等待时间（毫秒），默认 600000 (10分钟)
    * @returns Benchmark 结果
    */
-  async waitForBenchmarkCompletion(
-    benchmarkId: string,
-    pollInterval: number = 2000,
-    maxWaitTime: number = 600000,
-  ): Promise<BenchmarkResult> {
+  async waitForBenchmarkCompletion(benchmarkId: string, pollInterval: number = 2000, maxWaitTime: number = 600000): Promise<BenchmarkResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
@@ -303,9 +263,7 @@ export class EvalResource extends BaseResource {
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
 
-    throw new Error(
-      `Benchmark ${benchmarkId} did not complete within ${maxWaitTime}ms`,
-    );
+    throw new Error(`Benchmark ${benchmarkId} did not complete within ${maxWaitTime}ms`);
   }
 
   // ==========================================================================
@@ -340,11 +298,7 @@ export class EvalResource extends BaseResource {
    * @param maxWaitTime 最大等待时间（毫秒），默认 600000 (10分钟)
    * @returns A/B 测试结果
    */
-  async waitForABTestCompletion(
-    abTestId: string,
-    pollInterval: number = 2000,
-    maxWaitTime: number = 600000,
-  ): Promise<ABTestResult> {
+  async waitForABTestCompletion(abTestId: string, pollInterval: number = 2000, maxWaitTime: number = 600000): Promise<ABTestResult> {
     const startTime = Date.now();
 
     while (Date.now() - startTime < maxWaitTime) {
@@ -361,9 +315,7 @@ export class EvalResource extends BaseResource {
       await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
 
-    throw new Error(
-      `A/B Test ${abTestId} did not complete within ${maxWaitTime}ms`,
-    );
+    throw new Error(`A/B Test ${abTestId} did not complete within ${maxWaitTime}ms`);
   }
 
   // ==========================================================================
@@ -389,12 +341,9 @@ export class EvalResource extends BaseResource {
    * @returns 导出内容
    */
   async exportResult(evalId: string, format: "json" | "csv"): Promise<string> {
-    const result = await this.request<{ content: string }>(
-      `/v1/evals/${evalId}/export`,
-      {
-        params: { format },
-      },
-    );
+    const result = await this.request<{ content: string }>(`/v1/evals/${evalId}/export`, {
+      params: { format },
+    });
     return result.content;
   }
 
@@ -410,12 +359,7 @@ export class EvalResource extends BaseResource {
    * @param scorers Scorer 配置列表
    * @returns Eval 结果
    */
-  async quickEval(
-    agentId: string,
-    input: string,
-    expectedOutput: string,
-    scorers: ScorerConfig[],
-  ): Promise<EvalResult> {
+  async quickEval(agentId: string, input: string, expectedOutput: string, scorers: ScorerConfig[]): Promise<EvalResult> {
     const evalInfo = await this.create({
       name: `Quick Eval - ${new Date().toISOString()}`,
       type: "single",
@@ -442,12 +386,7 @@ export class EvalResource extends BaseResource {
    * @param concurrency 并发数
    * @returns Eval 结果
    */
-  async batchEval(
-    agentId: string,
-    testCases: TestCase[],
-    scorers: ScorerConfig[],
-    concurrency?: number,
-  ): Promise<EvalResult> {
+  async batchEval(agentId: string, testCases: TestCase[], scorers: ScorerConfig[], concurrency?: number): Promise<EvalResult> {
     const evalInfo = await this.create({
       name: `Batch Eval - ${new Date().toISOString()}`,
       type: "batch",
@@ -468,12 +407,7 @@ export class EvalResource extends BaseResource {
    * @param scorers Scorer 配置列表
    * @returns A/B 测试结果
    */
-  async compareAgents(
-    agentAId: string,
-    agentBId: string,
-    testCaseSetId: string,
-    scorers: ScorerConfig[],
-  ): Promise<ABTestResult> {
+  async compareAgents(agentAId: string, agentBId: string, testCaseSetId: string, scorers: ScorerConfig[]): Promise<ABTestResult> {
     const abTest = await this.createABTest({
       name: `Compare ${agentAId} vs ${agentBId}`,
       agentAId,

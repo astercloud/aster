@@ -4,11 +4,11 @@
  * 管理通用工作流的步骤和进度
  */
 
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { WorkflowStep, WorkflowConfig } from '@/types/workflow';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import type { WorkflowStep, WorkflowConfig } from "@/types/workflow";
 
-export const useWorkflowStore = defineStore('workflow', () => {
+export const useWorkflowStore = defineStore("workflow", () => {
   // ==================
   // State
   // ==================
@@ -33,9 +33,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const totalSteps = computed(() => steps.value.length);
 
   // 已完成步骤数
-  const completedSteps = computed(() =>
-    steps.value.filter(s => s.status === 'completed').length
-  );
+  const completedSteps = computed(() => steps.value.filter((s) => s.status === "completed").length);
 
   // 进度（0-1）
   const progress = computed(() => {
@@ -50,14 +48,10 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const isFirstStep = computed(() => currentStepIndex.value === 0);
 
   // 是否是最后一步
-  const isLastStep = computed(() =>
-    currentStepIndex.value === totalSteps.value - 1
-  );
+  const isLastStep = computed(() => currentStepIndex.value === totalSteps.value - 1);
 
   // 是否已完成所有步骤
-  const isCompleted = computed(() =>
-    steps.value.length > 0 && steps.value.every(s => s.status === 'completed')
-  );
+  const isCompleted = computed(() => steps.value.length > 0 && steps.value.every((s) => s.status === "completed"));
 
   // ==================
   // Actions
@@ -70,7 +64,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
     workflowId.value = config.id;
     steps.value = config.steps.map((step, index) => ({
       ...step,
-      status: index === 0 ? 'active' : 'pending',
+      status: index === 0 ? "active" : "pending",
     }));
     currentStepIndex.value = 0;
   };
@@ -81,14 +75,14 @@ export const useWorkflowStore = defineStore('workflow', () => {
   const completeCurrentStep = () => {
     const step = steps.value[currentStepIndex.value];
     if (step) {
-      step.status = 'completed';
+      step.status = "completed";
 
       // 激活下一步
       if (!isLastStep.value) {
         currentStepIndex.value++;
         const nextStep = steps.value[currentStepIndex.value];
         if (nextStep) {
-          nextStep.status = 'active';
+          nextStep.status = "active";
         }
       }
     }
@@ -98,11 +92,11 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 完成指定步骤
    */
   const completeStep = (stepId: string) => {
-    const index = steps.value.findIndex(s => s.id === stepId);
+    const index = steps.value.findIndex((s) => s.id === stepId);
     if (index !== -1) {
       const step = steps.value[index];
       if (step) {
-        step.status = 'completed';
+        step.status = "completed";
       }
 
       // 如果是当前步骤，激活下一步
@@ -110,7 +104,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
         currentStepIndex.value = index + 1;
         const nextStep = steps.value[currentStepIndex.value];
         if (nextStep) {
-          nextStep.status = 'active';
+          nextStep.status = "active";
         }
       }
     }
@@ -120,11 +114,11 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 标记步骤为失败
    */
   const failStep = (stepId: string) => {
-    const index = steps.value.findIndex(s => s.id === stepId);
+    const index = steps.value.findIndex((s) => s.id === stepId);
     if (index !== -1) {
       const step = steps.value[index];
       if (step) {
-        step.status = 'failed';
+        step.status = "failed";
       }
     }
   };
@@ -133,19 +127,19 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 跳转到指定步骤
    */
   const goToStep = (stepId: string) => {
-    const index = steps.value.findIndex(s => s.id === stepId);
+    const index = steps.value.findIndex((s) => s.id === stepId);
     if (index !== -1) {
       // 将当前激活步骤设为 pending
       const currentStepVal = steps.value[currentStepIndex.value];
-      if (currentStepVal && currentStepVal.status === 'active') {
-        currentStepVal.status = 'pending';
+      if (currentStepVal && currentStepVal.status === "active") {
+        currentStepVal.status = "pending";
       }
 
       // 激活目标步骤
       currentStepIndex.value = index;
       const targetStep = steps.value[index];
       if (targetStep) {
-        targetStep.status = 'active';
+        targetStep.status = "active";
       }
     }
   };
@@ -167,14 +161,14 @@ export const useWorkflowStore = defineStore('workflow', () => {
       // 将当前步骤设为 pending
       const currentStepVal = steps.value[currentStepIndex.value];
       if (currentStepVal) {
-        currentStepVal.status = 'pending';
+        currentStepVal.status = "pending";
       }
 
       // 回到上一步
       currentStepIndex.value--;
       const prevStep = steps.value[currentStepIndex.value];
       if (prevStep) {
-        prevStep.status = 'active';
+        prevStep.status = "active";
       }
     }
   };
@@ -184,7 +178,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
    */
   const resetWorkflow = () => {
     steps.value.forEach((step, index) => {
-      step.status = index === 0 ? 'active' : 'pending';
+      step.status = index === 0 ? "active" : "pending";
     });
     currentStepIndex.value = 0;
   };
@@ -202,7 +196,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 更新步骤元数据
    */
   const updateStepMetadata = (stepId: string, metadata: Record<string, any>) => {
-    const index = steps.value.findIndex(s => s.id === stepId);
+    const index = steps.value.findIndex((s) => s.id === stepId);
     if (index !== -1) {
       const step = steps.value[index];
       if (step) {
@@ -218,7 +212,7 @@ export const useWorkflowStore = defineStore('workflow', () => {
    * 更新步骤状态
    */
   const updateStep = (stepId: string, updates: Partial<WorkflowStep>) => {
-    const index = steps.value.findIndex(s => s.id === stepId);
+    const index = steps.value.findIndex((s) => s.id === stepId);
     if (index !== -1) {
       const step = steps.value[index];
       if (step) {

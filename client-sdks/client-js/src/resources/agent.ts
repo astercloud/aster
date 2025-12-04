@@ -4,20 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  AgentInfo,
-  AgentFilter,
-  PaginatedAgentResponse,
-  CreateAgentRequest,
-  UpdateAgentRequest,
-  ChatRequest,
-  ChatResponse,
-  StreamChatEvent,
-  AgentTemplate,
-  AgentStats,
-  AgentValidationResult,
-  AgentStatus,
-} from "../types/agent";
+import { AgentInfo, AgentFilter, PaginatedAgentResponse, CreateAgentRequest, UpdateAgentRequest, ChatRequest, ChatResponse, StreamChatEvent, AgentTemplate, AgentStats, AgentValidationResult, AgentStatus } from "../types/agent";
 
 /**
  * Agent 资源类
@@ -69,10 +56,7 @@ export class AgentResource extends BaseResource {
    * @param updates 更新内容
    * @returns 更新后的 Agent
    */
-  async update(
-    agentId: string,
-    updates: UpdateAgentRequest,
-  ): Promise<AgentInfo> {
+  async update(agentId: string, updates: UpdateAgentRequest): Promise<AgentInfo> {
     return this.request<AgentInfo>(`/v1/agents/${agentId}`, {
       method: "PATCH",
       body: updates,
@@ -126,10 +110,7 @@ export class AgentResource extends BaseResource {
    * @param status 新状态
    * @returns 更新后的 Agent
    */
-  private async updateStatus(
-    agentId: string,
-    status: AgentStatus,
-  ): Promise<AgentInfo> {
+  private async updateStatus(agentId: string, status: AgentStatus): Promise<AgentInfo> {
     return this.update(agentId, { status });
   }
 
@@ -156,23 +137,17 @@ export class AgentResource extends BaseResource {
    * @param request Chat 请求
    * @returns AsyncIterable 流式事件
    */
-  async *chatStream(
-    agentId: string,
-    request: ChatRequest,
-  ): AsyncIterable<StreamChatEvent> {
-    const response = await fetch(
-      `${this.options.baseUrl}/v1/agents/${agentId}/chat/stream`,
-      {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          ...(this.options.apiKey && {
-            Authorization: `Bearer ${this.options.apiKey}`,
-          }),
-        },
-        body: JSON.stringify(request),
+  async *chatStream(agentId: string, request: ChatRequest): AsyncIterable<StreamChatEvent> {
+    const response = await fetch(`${this.options.baseUrl}/v1/agents/${agentId}/chat/stream`, {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+        ...(this.options.apiKey && {
+          Authorization: `Bearer ${this.options.apiKey}`,
+        }),
       },
-    );
+      body: JSON.stringify(request),
+    });
 
     if (!response.ok) {
       throw new Error(`Chat stream failed: ${response.statusText}`);
@@ -224,9 +199,7 @@ export class AgentResource extends BaseResource {
    * @returns 模板列表
    */
   async listTemplates(): Promise<AgentTemplate[]> {
-    const result = await this.request<{ templates: AgentTemplate[] }>(
-      "/v1/agents/templates",
-    );
+    const result = await this.request<{ templates: AgentTemplate[] }>("/v1/agents/templates");
     return result.templates;
   }
 
@@ -245,17 +218,13 @@ export class AgentResource extends BaseResource {
    * @param overrides 覆盖配置
    * @returns 创建的 Agent
    */
-  async createFromTemplate(
-    templateId: string,
-    overrides: Partial<CreateAgentRequest>,
-  ): Promise<AgentInfo> {
+  async createFromTemplate(templateId: string, overrides: Partial<CreateAgentRequest>): Promise<AgentInfo> {
     const template = await this.getTemplate(templateId);
 
     const request: CreateAgentRequest = {
       name: overrides.name || `Agent from ${template.name}`,
       templateId,
-      llmProvider:
-        overrides.llmProvider || template.recommendedProvider || "openai",
+      llmProvider: overrides.llmProvider || template.recommendedProvider || "openai",
       llmModel: overrides.llmModel || template.recommendedModel || "gpt-4",
       systemPrompt: overrides.systemPrompt || template.defaultSystemPrompt,
       tools: overrides.tools || template.defaultTools,
@@ -278,10 +247,7 @@ export class AgentResource extends BaseResource {
    * @param timeRange 时间范围（可选）
    * @returns 统计数据
    */
-  async getStats(
-    agentId: string,
-    timeRange?: { start: string; end: string },
-  ): Promise<AgentStats> {
+  async getStats(agentId: string, timeRange?: { start: string; end: string }): Promise<AgentStats> {
     return this.request<AgentStats>(`/v1/agents/${agentId}/stats`, {
       params: timeRange,
     });
@@ -292,10 +258,7 @@ export class AgentResource extends BaseResource {
    * @param timeRange 时间范围（可选）
    * @returns 汇总统计数据
    */
-  async getAggregatedStats(timeRange?: {
-    start: string;
-    end: string;
-  }): Promise<{
+  async getAggregatedStats(timeRange?: { start: string; end: string }): Promise<{
     totalAgents: number;
     activeAgents: number;
     totalRequests: number;
@@ -317,9 +280,7 @@ export class AgentResource extends BaseResource {
    * @param config Agent 配置
    * @returns 验证结果
    */
-  async validate(
-    config: CreateAgentRequest | UpdateAgentRequest,
-  ): Promise<AgentValidationResult> {
+  async validate(config: CreateAgentRequest | UpdateAgentRequest): Promise<AgentValidationResult> {
     return this.request<AgentValidationResult>("/v1/agents/validate", {
       method: "POST",
       body: config,

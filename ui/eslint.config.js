@@ -1,4 +1,4 @@
-import antfu from '@antfu/eslint-config';
+import antfu from "@antfu/eslint-config";
 
 export default antfu({
   // 启用 Vue 支持
@@ -15,32 +15,27 @@ export default antfu({
   },
 
   // 忽略的文件
-  ignores: [
-    'dist',
-    'node_modules',
-    '*.min.js',
-    'coverage',
-  ],
+  ignores: ["dist", "node_modules", "*.min.js", "coverage"],
 
   // 自定义规则
   rules: {
     // Vue 相关
-    'vue/block-order': ['error', { order: ['template', 'script', 'style'] }],
-    'vue/define-macros-order': ['error', { order: ['defineProps', 'defineEmits'] }],
-    'vue/no-unused-refs': 'warn',
+    "vue/block-order": ["error", { order: ["template", "script", "style"] }],
+    "vue/define-macros-order": ["error", { order: ["defineProps", "defineEmits"] }],
+    "vue/no-unused-refs": "warn",
 
     // TypeScript 相关
-    'ts/no-unused-vars': ['warn', { argsIgnorePattern: '^_' }],
-    'ts/consistent-type-imports': ['error', { prefer: 'type-imports' }],
+    "ts/no-unused-vars": ["warn", { argsIgnorePattern: "^_" }],
+    "ts/consistent-type-imports": ["error", { prefer: "type-imports" }],
 
     // 通用规则
-    'no-console': ['warn', { allow: ['warn', 'error'] }],
-    'curly': ['error', 'multi-line'],
-    'antfu/if-newline': 'off',
+    "no-console": ["warn", { allow: ["warn", "error"] }],
+    curly: ["error", "multi-line"],
+    "antfu/if-newline": "off",
 
     // 样式规则
-    'style/semi': ['error', 'always'],
-    'style/quotes': ['error', 'single'],
-    'style/comma-dangle': ['error', 'always-multiline'],
+    "style/semi": ["error", "always"],
+    "style/quotes": ["error", "single"],
+    "style/comma-dangle": ["error", "always-multiline"],
   },
 });

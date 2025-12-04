@@ -11,12 +11,7 @@
     <!-- 折叠视图 -->
     <button v-if="!isExpanded" @click="expand" class="thinking-compact">
       <div class="flex items-center gap-2">
-        <svg
-          :class="['w-4 h-4', isActive ? 'text-blue-500 animate-pulse' : 'text-slate-500']"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
+        <svg :class="['w-4 h-4', isActive ? 'text-blue-500 animate-pulse' : 'text-slate-500']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path
             stroke-linecap="round"
             stroke-linejoin="round"
@@ -37,12 +32,7 @@
       <!-- 头部 -->
       <div class="thinking-header">
         <div class="flex items-center gap-2">
-          <svg
-            :class="['w-5 h-5', isActive ? 'text-blue-500 animate-pulse' : 'text-slate-500']"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
+          <svg :class="['w-5 h-5', isActive ? 'text-blue-500 animate-pulse' : 'text-slate-500']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path
               stroke-linecap="round"
               stroke-linejoin="round"
@@ -54,17 +44,9 @@
 
           <!-- 状态标签 -->
           <span v-if="isActive" class="status-badge status-badge--active">运行中</span>
-          <span
-            v-else-if="hasPendingApproval"
-            class="status-badge status-badge--warning animate-pulse"
-          >
+          <span v-else-if="hasPendingApproval" class="status-badge status-badge--warning animate-pulse">
             <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-              <path
-                stroke-linecap="round"
-                stroke-linejoin="round"
-                stroke-width="2"
-                d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-              />
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
             </svg>
             等待审批
           </span>
@@ -83,27 +65,12 @@
       <ThinkingTimeline :steps="steps" />
 
       <!-- 审批卡片 -->
-      <ApprovalCard
-        v-if="pendingApproval"
-        :request="pendingApproval"
-        @approve="handleApprove"
-        @reject="handleReject"
-      />
+      <ApprovalCard v-if="pendingApproval" :request="pendingApproval" @approve="handleApprove" @reject="handleReject" />
 
       <!-- 摘要 -->
       <div v-if="!isActive && summary" class="thinking-summary">
-        <svg
-          class="w-4 h-4 text-blue-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"
-          />
+        <svg class="w-4 h-4 text-blue-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
         </svg>
         <span class="text-sm text-slate-700 dark:text-slate-300">{{ summary }}</span>
       </div>
@@ -112,15 +79,15 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, computed, watch } from 'vue';
-import { useApprovalStore } from '@/stores/approval';
-import ThinkingTimeline from './ThinkingTimeline.vue';
-import ApprovalCard from './ApprovalCard.vue';
-import type { ThinkingStep } from '@/types/thinking';
-import type { PropType } from 'vue';
+import { defineComponent, ref, computed, watch } from "vue";
+import { useApprovalStore } from "@/stores/approval";
+import ThinkingTimeline from "./ThinkingTimeline.vue";
+import ApprovalCard from "./ApprovalCard.vue";
+import type { ThinkingStep } from "@/types/thinking";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'ThinkingBlock',
+  name: "ThinkingBlock",
   components: {
     ThinkingTimeline,
     ApprovalCard,
@@ -165,7 +132,7 @@ export default defineComponent({
           isExpanded.value = false;
         }
       },
-      { immediate: true }
+      { immediate: true },
     );
 
     const expand = () => {

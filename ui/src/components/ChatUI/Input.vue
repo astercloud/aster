@@ -2,16 +2,7 @@
   <div class="input-wrapper">
     <label v-if="label" class="input-label">{{ label }}</label>
     <div class="input-container">
-      <input
-        :type="type"
-        :value="modelValue"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        :class="['input-field', { 'input-error': error }]"
-        @input="handleInput"
-        @blur="$emit('blur')"
-        @focus="$emit('focus')"
-      />
+      <input :type="type" :value="modelValue" :placeholder="placeholder" :disabled="disabled" :class="['input-field', { 'input-error': error }]" @input="handleInput" @blur="$emit('blur')" @focus="$emit('focus')" />
       <span v-if="error" class="error-message">{{ error }}</span>
     </div>
   </div>
@@ -20,7 +11,7 @@
 <script setup lang="ts">
 interface Props {
   modelValue: string | number;
-  type?: 'text' | 'password' | 'email' | 'number';
+  type?: "text" | "password" | "email" | "number";
   label?: string;
   placeholder?: string;
   disabled?: boolean;
@@ -28,18 +19,18 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  type: 'text',
+  type: "text",
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string | number];
+  "update:modelValue": [value: string | number];
   blur: [];
   focus: [];
 }>();
 
 const handleInput = (e: Event) => {
   const target = e.target as HTMLInputElement;
-  emit('update:modelValue', target.value);
+  emit("update:modelValue", target.value);
 };
 </script>
 

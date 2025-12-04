@@ -41,11 +41,7 @@ export * from "./types/eval";
 
 // 资源类
 export { BaseResource } from "./resources/base";
-export type {
-  ClientOptions,
-  RequestOptions,
-  RetryOptions,
-} from "./resources/base";
+export type { ClientOptions, RequestOptions, RetryOptions } from "./resources/base";
 export { AgentResource } from "./resources/agent";
 export { MemoryResource } from "./resources/memory";
 export { SessionResource } from "./resources/session";

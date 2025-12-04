@@ -7,18 +7,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue";
 
 interface Props {
-  direction?: 'horizontal' | 'vertical';
+  direction?: "horizontal" | "vertical";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  direction: 'horizontal',
+  direction: "horizontal",
 });
 
 const directionClass = computed(() => {
-  return props.direction === 'vertical' ? 'divider-vertical' : 'divider-horizontal';
+  return props.direction === "vertical" ? "divider-vertical" : "divider-horizontal";
 });
 </script>
 
@@ -29,7 +29,7 @@ const directionClass = computed(() => {
 
 .divider-horizontal::before,
 .divider-horizontal::after {
-  content: '';
+  content: "";
   @apply flex-1 border-t border-gray-200 dark:border-gray-700;
 }
 

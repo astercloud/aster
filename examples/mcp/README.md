@@ -103,6 +103,7 @@ err := mcpManager.ConnectAll(ctx)
 ### 4. 使用 MCP 工具
 
 MCP 工具会被自动注册到 Tool Registry，工具名称格式为 `{server_id}:{tool_name}`，例如:
+
 - `my-server:calculator`
 - `my-server:WebSearch`
 - `my-server:database_query`
@@ -202,6 +203,7 @@ if __name__ == '__main__':
 ```
 
 运行:
+
 ```bash
 python simple_mcp_server.py
 ```
@@ -232,6 +234,7 @@ python simple_mcp_server.py
 ### MCPToolAdapter
 
 实现 `tools.Tool` 接口:
+
 - `Name()` - 工具名称
 - `Description()` - 工具描述
 - `InputSchema()` - 输入 Schema
@@ -247,6 +250,7 @@ python simple_mcp_server.py
 ```
 
 **解决方案:**
+
 - 确保 MCP Server 正在运行
 - 检查 `MCP_ENDPOINT` 环境变量是否正确
 - 验证网络连接和防火墙设置
@@ -258,12 +262,14 @@ python simple_mcp_server.py
 ```
 
 **解决方案:**
+
 - 检查 `MCP_ACCESS_KEY` 和 `MCP_SECRET_KEY`
 - 确认 MCP Server 的认证配置
 
 ### 工具未找到
 
 如果 Agent 无法找到 MCP 工具:
+
 1. 检查工具是否已注册: `toolRegistry.List()`
 2. 确认工具名称格式: `{server_id}:{tool_name}`
 3. 查看 MCP Server 返回的工具列表: `server.ListTools()`

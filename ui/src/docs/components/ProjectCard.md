@@ -16,12 +16,12 @@
 
 \`\`\`vue
 <template>
-  <ProjectCard
-    :project="project"
-    @open="handleOpen"
-    @edit="handleEdit"
-    @delete="handleDelete"
-  />
+<ProjectCard
+:project="project"
+@open="handleOpen"
+@edit="handleEdit"
+@delete="handleDelete"
+/>
 </template>
 
 <script setup>
@@ -52,57 +52,64 @@ const handleDelete = (project) => {
   console.log('删除项目:', project);
 };
 </script>
+
 \`\`\`
 
 ## 工作空间类型
 
 ### 微信公众号
+
 \`\`\`typescript
 {
-  workspace: 'wechat',
-  // 显示绿色图标 💬
+workspace: 'wechat',
+// 显示绿色图标 💬
 }
 \`\`\`
 
 ### 视频脚本
+
 \`\`\`typescript
 {
-  workspace: 'video',
-  // 显示紫色图标 🎬
+workspace: 'video',
+// 显示紫色图标 🎬
 }
 \`\`\`
 
 ### 通用文档
+
 \`\`\`typescript
 {
-  workspace: 'general',
-  // 显示蓝色图标 📄
+workspace: 'general',
+// 显示蓝色图标 📄
 }
 \`\`\`
 
 ## 项目状态
 
 ### 草稿
+
 \`\`\`typescript
 {
-  status: 'draft',
-  // 灰色标签
+status: 'draft',
+// 灰色标签
 }
 \`\`\`
 
 ### 进行中
+
 \`\`\`typescript
 {
-  status: 'in_progress',
-  // 蓝色标签
+status: 'in_progress',
+// 蓝色标签
 }
 \`\`\`
 
 ### 已完成
+
 \`\`\`typescript
 {
-  status: 'completed',
-  // 绿色标签
+status: 'completed',
+// 绿色标签
 }
 \`\`\`
 
@@ -112,13 +119,13 @@ const handleDelete = (project) => {
 
 \`\`\`vue
 <template>
-  <ProjectList
-    :projects="projects"
-    @create="handleCreate"
-    @open="handleOpen"
-    @edit="handleEdit"
-    @delete="handleDelete"
-  />
+<ProjectList
+:projects="projects"
+@create="handleCreate"
+@open="handleOpen"
+@edit="handleEdit"
+@delete="handleDelete"
+/>
 </template>
 
 <script setup>
@@ -162,94 +169,102 @@ const handleDelete = (project) => {
   console.log('删除项目:', project);
 };
 </script>
+
 \`\`\`
 
 ## Props
 
 ### ProjectCard
 
-| 属性 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| project | Project | 是 | 项目对象 |
+| 属性    | 类型    | 必填 | 说明     |
+| ------- | ------- | ---- | -------- |
+| project | Project | 是   | 项目对象 |
 
 ### ProjectList
 
-| 属性 | 类型 | 必填 | 说明 |
-|------|------|------|------|
-| projects | Project[] | 是 | 项目列表 |
+| 属性     | 类型      | 必填 | 说明     |
+| -------- | --------- | ---- | -------- |
+| projects | Project[] | 是   | 项目列表 |
 
 ## Events
 
 ### ProjectCard
 
-| 事件 | 参数 | 说明 |
-|------|------|------|
-| open | project: Project | 打开项目 |
-| edit | project: Project | 编辑项目 |
+| 事件   | 参数             | 说明     |
+| ------ | ---------------- | -------- |
+| open   | project: Project | 打开项目 |
+| edit   | project: Project | 编辑项目 |
 | delete | project: Project | 删除项目 |
 
 ### ProjectList
 
-| 事件 | 参数 | 说明 |
-|------|------|------|
-| create | - | 创建新项目 |
-| open | project: Project | 打开项目 |
-| edit | project: Project | 编辑项目 |
-| delete | project: Project | 删除项目 |
+| 事件   | 参数             | 说明       |
+| ------ | ---------------- | ---------- |
+| create | -                | 创建新项目 |
+| open   | project: Project | 打开项目   |
+| edit   | project: Project | 编辑项目   |
+| delete | project: Project | 删除项目   |
 
 ## 类型定义
 
 \`\`\`typescript
 export interface Project {
-  id: string;
-  name: string;
-  description?: string;
-  workspace: 'wechat' | 'video' | 'general';
-  lastModified: string;
-  status: 'draft' | 'in_progress' | 'completed';
-  stats: {
-    words: number;
-    materials: number;
-  };
+id: string;
+name: string;
+description?: string;
+workspace: 'wechat' | 'video' | 'general';
+lastModified: string;
+status: 'draft' | 'in_progress' | 'completed';
+stats: {
+words: number;
+materials: number;
+};
 }
 \`\`\`
 
 ## 样式定制
 
 ### 卡片悬停效果
+
 \`\`\`css
 .project-card:hover {
-  box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
+box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1);
 }
 \`\`\`
 
 ### 自定义工作空间颜色
+
 \`\`\`typescript
 const workspaceConfig = {
-  wechat: {
-    icon: '💬',
-    label: '微信公众号',
-    class: 'bg-green-100 text-green-600',
-  },
-  // 可以自定义更多工作空间类型
+wechat: {
+icon: '💬',
+label: '微信公众号',
+class: 'bg-green-100 text-green-600',
+},
+// 可以自定义更多工作空间类型
 };
 \`\`\`
 
 ## 最佳实践
 
 ### 1. 日期格式化
+
 组件自动将日期格式化为相对时间（今天、昨天、X天前等）。
 
 ### 2. 删除确认
+
 删除操作会弹出确认对话框，防止误删。
 
 ### 3. 响应式布局
+
 ProjectList 使用网格布局，自动适配不同屏幕尺寸：
+
 - 移动端：1列
 - 平板：2列
 - 桌面：3列
 
 ### 4. 筛选功能
+
 ProjectList 提供工作空间和状态筛选，方便用户查找项目。
 
 ## 使用场景

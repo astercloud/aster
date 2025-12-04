@@ -1,12 +1,6 @@
 <template>
   <div :class="['avatar', sizeClass, shapeClass]">
-    <img
-      v-if="src && !error"
-      :src="src"
-      :alt="alt"
-      class="avatar-image"
-      @error="handleError"
-    />
+    <img v-if="src && !error" :src="src" :alt="alt" class="avatar-image" @error="handleError" />
     <div v-else class="avatar-placeholder">
       {{ placeholder }}
     </div>
@@ -15,41 +9,41 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 interface Props {
   src?: string;
   alt?: string;
-  size?: 'xs' | 'sm' | 'md' | 'lg' | 'xl';
-  shape?: 'circle' | 'square';
-  status?: 'online' | 'offline' | 'busy';
+  size?: "xs" | "sm" | "md" | "lg" | "xl";
+  shape?: "circle" | "square";
+  status?: "online" | "offline" | "busy";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  alt: '',
-  size: 'md',
-  shape: 'circle',
+  alt: "",
+  size: "md",
+  shape: "circle",
 });
 
 const error = ref(false);
 
 const placeholder = computed(() => {
-  return props.alt && props.alt.length > 0 ? props.alt[0]!.toUpperCase() : '?';
+  return props.alt && props.alt.length > 0 ? props.alt[0]!.toUpperCase() : "?";
 });
 
 const sizeClass = computed(() => {
   const map = {
-    xs: 'w-6 h-6 text-xs',
-    sm: 'w-8 h-8 text-sm',
-    md: 'w-10 h-10 text-base',
-    lg: 'w-12 h-12 text-lg',
-    xl: 'w-16 h-16 text-xl',
+    xs: "w-6 h-6 text-xs",
+    sm: "w-8 h-8 text-sm",
+    md: "w-10 h-10 text-base",
+    lg: "w-12 h-12 text-lg",
+    xl: "w-16 h-16 text-xl",
   };
   return map[props.size];
 });
 
 const shapeClass = computed(() => {
-  return props.shape === 'circle' ? 'rounded-full' : 'rounded-lg';
+  return props.shape === "circle" ? "rounded-full" : "rounded-lg";
 });
 
 const handleError = () => {

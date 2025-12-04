@@ -3,14 +3,7 @@
  * 展示如何使用 aster 的三通道事件系统
  */
 
-import {
-  WebSocketClient,
-  SubscriptionManager,
-  isProgressEvent,
-  isControlEvent,
-  isMonitorEvent,
-  isEventType,
-} from "@aster/client-js";
+import { WebSocketClient, SubscriptionManager, isProgressEvent, isControlEvent, isMonitorEvent, isEventType } from "@aster/client-js";
 
 async function main() {
   // 1. 创建 WebSocket 客户端
@@ -34,13 +27,10 @@ async function main() {
   const subscriptionManager = new SubscriptionManager(ws);
 
   // 4. 订阅所有三个通道
-  const subscription = subscriptionManager.subscribe(
-    ["progress", "control", "monitor"],
-    {
-      agentId: "agent-123",
-      eventTypes: ["thinking", "text_chunk", "tool_start", "token_usage"],
-    },
-  );
+  const subscription = subscriptionManager.subscribe(["progress", "control", "monitor"], {
+    agentId: "agent-123",
+    eventTypes: ["thinking", "text_chunk", "tool_start", "token_usage"],
+  });
 
   // 5. 处理事件
   try {
@@ -76,12 +66,7 @@ function handleProgressEvent(event: any) {
   } else if (isEventType(event, "tool_start")) {
     console.log("🔧 调用工具:", event.data.toolName);
   } else if (isEventType(event, "tool_end")) {
-    console.log(
-      "✅ 工具完成:",
-      event.data.toolName,
-      "结果:",
-      event.data.result,
-    );
+    console.log("✅ 工具完成:", event.data.toolName, "结果:", event.data.result);
   } else if (isEventType(event, "done")) {
     console.log("\n\n✅ 任务完成:", event.data.text);
   } else if (isEventType(event, "error")) {
@@ -116,13 +101,7 @@ function handleMonitorEvent(event: any) {
       total: event.data.totalTokens,
     });
   } else if (isEventType(event, "latency")) {
-    console.log(
-      "⏱️  延迟:",
-      event.data.latencyMs,
-      "ms",
-      "操作:",
-      event.data.operation,
-    );
+    console.log("⏱️  延迟:", event.data.latencyMs, "ms", "操作:", event.data.operation);
   } else if (isEventType(event, "cost")) {
     console.log("💰 成本:", event.data.cost, event.data.currency);
   } else if (isEventType(event, "compliance")) {

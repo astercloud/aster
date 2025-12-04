@@ -207,3 +207,8 @@ article-writer-web-service/
 # claude
 .claude/
 *_PLAN.md
+
+# lwmacct conventions
+.local/
+.taskfile/
+Taskfile.yml

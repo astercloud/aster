@@ -66,8 +66,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const search = ref('');
+import { ref } from "vue";
+const search = ref("");
 </script>
 ```
 
@@ -84,13 +84,13 @@ const search = ref('');
         <span class="text-xl font-bold">ChatUI</span>
       </div>
     </template>
-    
+
     <template #menu>
       <a href="#" class="nav-link">组件</a>
       <a href="#" class="nav-link">文档</a>
       <a href="#" class="nav-link">示例</a>
     </template>
-    
+
     <template #actions>
       <Button variant="text">GitHub</Button>
       <Button variant="primary">开始使用</Button>
@@ -103,16 +103,16 @@ const search = ref('');
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
+| 参数  | 说明       | 类型     | 默认值          |
+| ----- | ---------- | -------- | --------------- |
 | title | 导航栏标题 | `string` | `'Aster Agent'` |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
-| brand | 左侧品牌区域 |
-| menu | 中间菜单区域 |
+| 名称    | 说明         |
+| ------- | ------------ |
+| brand   | 左侧品牌区域 |
+| menu    | 中间菜单区域 |
 | actions | 右侧操作区域 |
 
 ## 示例
@@ -125,19 +125,19 @@ const search = ref('');
     <template #brand>
       <span class="font-bold">My App</span>
     </template>
-    
+
     <template #menu>
       <div class="hidden md:flex gap-6">
         <a href="#">首页</a>
         <a href="#">产品</a>
         <a href="#">文档</a>
       </div>
-      
+
       <Button class="md:hidden" variant="text">
         <Icon type="menu" />
       </Button>
     </template>
-    
+
     <template #actions>
       <Avatar alt="User" />
     </template>

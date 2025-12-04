@@ -61,16 +61,19 @@ go run main.go
 ## 风险评估规则
 
 ### 低风险 (🟢)
+
 - 读取操作：`ls`, `cat`, `grep`
 - 查询命令：`ps`, `top`, `df`
 - 无副作用的操作
 
 ### 中风险 (🟡)
+
 - 文件操作：`rm`, `mv`, `chmod`
 - 进程控制：`kill`, `pkill`
 - 配置文件修改
 
 ### 高风险 (🔴)
+
 - 批量删除：`rm -rf`
 - 磁盘操作：`mkfs`, `dd`
 - 系统路径操作：`/etc`, `/usr`, `/bin`
@@ -119,7 +122,7 @@ InterruptOn: map[string]interface{}{
 ApprovalHandler: func(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     // 1. 评估风险
     risk := assessRisk(req.ActionRequests[0])
-    
+
     // 2. 根据风险决定策略
     switch risk {
     case RiskLow:
@@ -181,11 +184,11 @@ ApprovalHandler: webApprovalSystem.CreateHandler()
 ```go
 func roleBasedApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([]middleware.Decision, error) {
     user := getUserFromContext(ctx)
-    
+
     if hasPermission(user, req.ActionRequests[0].ToolName) {
         return autoApprove()
     }
-    
+
     return requestSupervisorApproval(req)
 }
 ```

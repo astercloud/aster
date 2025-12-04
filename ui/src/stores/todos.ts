@@ -4,12 +4,12 @@
  * 管理 Agent 的任务列表
  */
 
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { TodoItemData } from '@/types';
-import { useWebSocket } from '@/composables/useWebSocket';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import type { TodoItemData } from "@/types";
+import { useWebSocket } from "@/composables/useWebSocket";
 
-export const useTodosStore = defineStore('todos', () => {
+export const useTodosStore = defineStore("todos", () => {
   // ==================
   // State
   // ==================
@@ -22,19 +22,13 @@ export const useTodosStore = defineStore('todos', () => {
   // ==================
 
   // 待处理任务数量
-  const pendingCount = computed(() =>
-    todos.value.filter(t => t.status === 'pending').length
-  );
+  const pendingCount = computed(() => todos.value.filter((t) => t.status === "pending").length);
 
   // 进行中任务数量
-  const inProgressCount = computed(() =>
-    todos.value.filter(t => t.status === 'in_progress').length
-  );
+  const inProgressCount = computed(() => todos.value.filter((t) => t.status === "in_progress").length);
 
   // 已完成任务数量
-  const completedCount = computed(() =>
-    todos.value.filter(t => t.status === 'completed').length
-  );
+  const completedCount = computed(() => todos.value.filter((t) => t.status === "completed").length);
 
   // 总任务数量
   const totalCount = computed(() => todos.value.length);
@@ -49,9 +43,7 @@ export const useTodosStore = defineStore('todos', () => {
   const hasInProgressTask = computed(() => inProgressCount.value > 0);
 
   // 当前进行中的任务
-  const currentTask = computed(() =>
-    todos.value.find(t => t.status === 'in_progress')
-  );
+  const currentTask = computed(() => todos.value.find((t) => t.status === "in_progress"));
 
   // ==================
   // Actions
@@ -75,7 +67,7 @@ export const useTodosStore = defineStore('todos', () => {
    * 更新单个 Todo
    */
   const updateTodo = (id: string, updates: Partial<TodoItemData>) => {
-    const index = todos.value.findIndex(t => t.id === id);
+    const index = todos.value.findIndex((t) => t.id === id);
     if (index !== -1) {
       const todo = todos.value[index];
       if (todo) {
@@ -91,7 +83,7 @@ export const useTodosStore = defineStore('todos', () => {
    * 删除 Todo
    */
   const removeTodo = (id: string) => {
-    const index = todos.value.findIndex(t => t.id === id);
+    const index = todos.value.findIndex((t) => t.id === id);
     if (index !== -1) {
       todos.value.splice(index, 1);
     }
@@ -106,22 +98,22 @@ export const useTodosStore = defineStore('todos', () => {
    * - completed → pending
    */
   const toggleStatus = (id: string): boolean => {
-    const todo = todos.value.find(t => t.id === id);
+    const todo = todos.value.find((t) => t.id === id);
     if (!todo) return false;
 
-    let newStatus: TodoItemData['status'];
+    let newStatus: TodoItemData["status"];
 
-    if (todo.status === 'pending') {
+    if (todo.status === "pending") {
       // 检查是否已有进行中的任务
       if (hasInProgressTask.value) {
-        console.warn('同时只能有一个任务处于进行中状态');
+        console.warn("同时只能有一个任务处于进行中状态");
         return false;
       }
-      newStatus = 'in_progress';
-    } else if (todo.status === 'in_progress') {
-      newStatus = 'completed';
+      newStatus = "in_progress";
+    } else if (todo.status === "in_progress") {
+      newStatus = "completed";
     } else {
-      newStatus = 'pending';
+      newStatus = "pending";
     }
 
     updateTodo(id, { status: newStatus });
@@ -133,10 +125,10 @@ export const useTodosStore = defineStore('todos', () => {
    */
   const markAsInProgress = (id: string): boolean => {
     if (hasInProgressTask.value) {
-      console.warn('同时只能有一个任务处于进行中状态');
+      console.warn("同时只能有一个任务处于进行中状态");
       return false;
     }
-    updateTodo(id, { status: 'in_progress' });
+    updateTodo(id, { status: "in_progress" });
     return true;
   };
 
@@ -144,7 +136,7 @@ export const useTodosStore = defineStore('todos', () => {
    * 标记为已完成
    */
   const markAsCompleted = (id: string) => {
-    updateTodo(id, { status: 'completed' });
+    updateTodo(id, { status: "completed" });
   };
 
   /**
@@ -158,18 +150,18 @@ export const useTodosStore = defineStore('todos', () => {
    * 清除已完成的 Todo
    */
   const clearCompletedTodos = () => {
-    todos.value = todos.value.filter(t => t.status !== 'completed');
+    todos.value = todos.value.filter((t) => t.status !== "completed");
   };
 
   /**
    * 创建新 Todo (发送到后端)
    */
-  const createTodo = async (todo: Omit<TodoItemData, 'id' | 'created_at' | 'updated_at'>) => {
+  const createTodo = async (todo: Omit<TodoItemData, "id" | "created_at" | "updated_at">) => {
     const { getInstance } = useWebSocket();
     const ws = getInstance();
     if (ws) {
       ws.send({
-        type: 'todo_create',
+        type: "todo_create",
         payload: {
           content: todo.content,
           active_form: todo.active_form,
@@ -178,26 +170,26 @@ export const useTodosStore = defineStore('todos', () => {
         },
       });
     } else {
-      console.error('WebSocket not connected, cannot create todo');
+      console.error("WebSocket not connected, cannot create todo");
     }
   };
 
   /**
    * 更新 Todo 状态 (发送到后端)
    */
-  const updateTodoStatus = async (todoId: string, status: 'pending' | 'in_progress' | 'completed') => {
+  const updateTodoStatus = async (todoId: string, status: "pending" | "in_progress" | "completed") => {
     const { getInstance } = useWebSocket();
     const ws = getInstance();
     if (ws) {
       ws.send({
-        type: 'todo_update',
+        type: "todo_update",
         payload: {
           id: todoId,
           status,
         },
       });
     } else {
-      console.error('WebSocket not connected, cannot update todo');
+      console.error("WebSocket not connected, cannot update todo");
     }
   };
 
@@ -209,13 +201,13 @@ export const useTodosStore = defineStore('todos', () => {
     const ws = getInstance();
     if (ws) {
       ws.send({
-        type: 'todo_delete',
+        type: "todo_delete",
         payload: {
           id: todoId,
         },
       });
     } else {
-      console.error('WebSocket not connected, cannot delete todo');
+      console.error("WebSocket not connected, cannot delete todo");
     }
   };
 

@@ -4,18 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  MCPServerConfig,
-  MCPServerInfo,
-  MCPTool,
-  MCPToolCallRequest,
-  MCPToolCallResponse,
-  MCPResource as MCPResourceData,
-  MCPResourceContent,
-  MCPPrompt,
-  MCPPromptResult,
-  MCPStats,
-} from "../types/mcp";
+import { MCPServerConfig, MCPServerInfo, MCPTool, MCPToolCallRequest, MCPToolCallResponse, MCPResource as MCPResourceData, MCPResourceContent, MCPPrompt, MCPPromptResult, MCPStats } from "../types/mcp";
 
 /**
  * MCP 资源类
@@ -55,9 +44,7 @@ export class MCPResource extends BaseResource {
    * @returns Server 列表
    */
   async listServers(): Promise<MCPServerInfo[]> {
-    const result = await this.request<{ servers: MCPServerInfo[] }>(
-      "/v1/mcp/servers",
-    );
+    const result = await this.request<{ servers: MCPServerInfo[] }>("/v1/mcp/servers");
     return result.servers;
   }
 
@@ -76,10 +63,7 @@ export class MCPResource extends BaseResource {
    * @param updates 更新内容
    * @returns 更新后的 Server 信息
    */
-  async updateServer(
-    serverId: string,
-    updates: Partial<MCPServerConfig>,
-  ): Promise<MCPServerInfo> {
+  async updateServer(serverId: string, updates: Partial<MCPServerConfig>): Promise<MCPServerInfo> {
     return this.request<MCPServerInfo>(`/v1/mcp/servers/${serverId}`, {
       method: "PATCH",
       body: updates,
@@ -152,9 +136,7 @@ export class MCPResource extends BaseResource {
    * @returns 工具列表
    */
   async getServerTools(serverId: string): Promise<MCPTool[]> {
-    const result = await this.request<{ tools: MCPTool[] }>(
-      `/v1/mcp/servers/${serverId}/tools`,
-    );
+    const result = await this.request<{ tools: MCPTool[] }>(`/v1/mcp/servers/${serverId}/tools`);
     return result.tools;
   }
 
@@ -187,11 +169,7 @@ export class MCPResource extends BaseResource {
    * @param params 参数
    * @returns 调用响应
    */
-  async call(
-    serverId: string,
-    toolName: string,
-    params: Record<string, any>,
-  ): Promise<MCPToolCallResponse> {
+  async call(serverId: string, toolName: string, params: Record<string, any>): Promise<MCPToolCallResponse> {
     return this.callTool({ serverId, toolName, params });
   }
 
@@ -205,9 +183,7 @@ export class MCPResource extends BaseResource {
    * @returns 资源列表
    */
   async listResources(serverId: string): Promise<MCPResourceData[]> {
-    const result = await this.request<{ resources: MCPResourceData[] }>(
-      `/v1/mcp/servers/${serverId}/resources`,
-    );
+    const result = await this.request<{ resources: MCPResourceData[] }>(`/v1/mcp/servers/${serverId}/resources`);
     return result.resources;
   }
 
@@ -217,17 +193,11 @@ export class MCPResource extends BaseResource {
    * @param uri 资源 URI
    * @returns 资源内容
    */
-  async readResource(
-    serverId: string,
-    uri: string,
-  ): Promise<MCPResourceContent> {
-    return this.request<MCPResourceContent>(
-      `/v1/mcp/servers/${serverId}/resources/read`,
-      {
-        method: "POST",
-        body: { uri },
-      },
-    );
+  async readResource(serverId: string, uri: string): Promise<MCPResourceContent> {
+    return this.request<MCPResourceContent>(`/v1/mcp/servers/${serverId}/resources/read`, {
+      method: "POST",
+      body: { uri },
+    });
   }
 
   // ==========================================================================
@@ -240,9 +210,7 @@ export class MCPResource extends BaseResource {
    * @returns Prompt 列表
    */
   async listPrompts(serverId: string): Promise<MCPPrompt[]> {
-    const result = await this.request<{ prompts: MCPPrompt[] }>(
-      `/v1/mcp/servers/${serverId}/prompts`,
-    );
+    const result = await this.request<{ prompts: MCPPrompt[] }>(`/v1/mcp/servers/${serverId}/prompts`);
     return result.prompts;
   }
 
@@ -253,18 +221,11 @@ export class MCPResource extends BaseResource {
    * @param args Prompt 参数
    * @returns Prompt 结果
    */
-  async getPrompt(
-    serverId: string,
-    name: string,
-    args?: Record<string, any>,
-  ): Promise<MCPPromptResult> {
-    return this.request<MCPPromptResult>(
-      `/v1/mcp/servers/${serverId}/prompts/${name}`,
-      {
-        method: "POST",
-        body: { arguments: args },
-      },
-    );
+  async getPrompt(serverId: string, name: string, args?: Record<string, any>): Promise<MCPPromptResult> {
+    return this.request<MCPPromptResult>(`/v1/mcp/servers/${serverId}/prompts/${name}`, {
+      method: "POST",
+      body: { arguments: args },
+    });
   }
 
   // ==========================================================================

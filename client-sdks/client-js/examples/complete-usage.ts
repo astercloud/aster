@@ -67,18 +67,12 @@ async function main() {
   console.log("📝 获取 Working Memory:", preference?.value);
 
   // Semantic Memory
-  await client.memory.semantic.store(
-    "AsterClient is a powerful framework for building AI agents",
-    { source: "documentation", category: "introduction" },
-  );
+  await client.memory.semantic.store("AsterClient is a powerful framework for building AI agents", { source: "documentation", category: "introduction" });
   console.log("✅ Semantic Memory 已添加");
 
-  const searchResults = await client.memory.semantic.search(
-    "What is AsterClient?",
-    {
-      limit: 3,
-    },
-  );
+  const searchResults = await client.memory.semantic.search("What is AsterClient?", {
+    limit: 3,
+  });
   console.log(`🔍 搜索结果: ${searchResults.length} 条`);
 
   // ========================================================================
@@ -235,39 +229,16 @@ async function main() {
     });
     console.log("📈 性能指标（过去24小时）:");
     console.log("   总请求数:", performance.requests.total);
-    console.log(
-      "   成功率:",
-      (
-        (performance.requests.successful / performance.requests.total) *
-        100
-      ).toFixed(1),
-      "%",
-    );
-    console.log(
-      "   平均延迟:",
-      performance.requests.avgLatency.toFixed(2),
-      "ms",
-    );
-    console.log(
-      "   P95 延迟:",
-      performance.requests.p95Latency.toFixed(2),
-      "ms",
-    );
-    console.log(
-      "   P99 延迟:",
-      performance.requests.p99Latency.toFixed(2),
-      "ms",
-    );
+    console.log("   成功率:", ((performance.requests.successful / performance.requests.total) * 100).toFixed(1), "%");
+    console.log("   平均延迟:", performance.requests.avgLatency.toFixed(2), "ms");
+    console.log("   P95 延迟:", performance.requests.p95Latency.toFixed(2), "ms");
+    console.log("   P99 延迟:", performance.requests.p99Latency.toFixed(2), "ms");
 
     if (performance.tokens) {
       console.log("   总 Tokens:", performance.tokens.total.toLocaleString());
     }
     if (performance.cost) {
-      console.log(
-        "   总成本:",
-        performance.cost.currency,
-        performance.cost.total.toFixed(2),
-      );
+      console.log("   总成本:", performance.cost.currency, performance.cost.total.toFixed(2));
     }
 
     // 获取使用统计
@@ -277,21 +248,11 @@ async function main() {
     });
     console.log("\n📊 使用统计（过去7天）:");
     if (usage.sessions) {
-      console.log(
-        "   Sessions: 总计",
-        usage.sessions.total,
-        "| 活跃",
-        usage.sessions.active,
-      );
+      console.log("   Sessions: 总计", usage.sessions.total, "| 活跃", usage.sessions.active);
       console.log("   平均时长:", usage.sessions.avgDuration.toFixed(0), "秒");
     }
     if (usage.workflows) {
-      console.log(
-        "   Workflows: 成功",
-        usage.workflows.successful,
-        "| 失败",
-        usage.workflows.failed,
-      );
+      console.log("   Workflows: 成功", usage.workflows.successful, "| 失败", usage.workflows.failed);
     }
     if (usage.tools) {
       console.log("   工具调用:", usage.tools.total, "次");
@@ -307,9 +268,7 @@ async function main() {
     const metrics = await client.telemetry.listMetrics();
     console.log(`\n📊 Metrics: ${metrics.length} 个`);
     metrics.slice(0, 5).forEach((metric, i) => {
-      console.log(
-        `   ${i + 1}. ${metric.name} (${metric.type}): ${metric.value} ${metric.unit || ""}`,
-      );
+      console.log(`   ${i + 1}. ${metric.name} (${metric.type}): ${metric.value} ${metric.unit || ""}`);
     });
 
     // 查询 Traces
@@ -322,9 +281,7 @@ async function main() {
     });
     console.log(`\n🔍 Traces（过去1小时）: ${traces.length} 个`);
     traces.forEach((trace, i) => {
-      console.log(
-        `   ${i + 1}. ${trace.operationName} - ${trace.duration}ms (${trace.status})`,
-      );
+      console.log(`   ${i + 1}. ${trace.operationName} - ${trace.duration}ms (${trace.status})`);
     });
   } catch (error: any) {
     console.log("⚠️  Telemetry 查询失败:", error.message);

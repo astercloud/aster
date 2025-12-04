@@ -8,11 +8,11 @@
         <Icon :type="collapsed ? 'chevron-right' : 'chevron-left'" />
       </button>
     </div>
-    
+
     <div class="sidebar-content">
       <slot></slot>
     </div>
-    
+
     <div v-if="$slots.footer" class="sidebar-footer">
       <slot name="footer"></slot>
     </div>
@@ -20,19 +20,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import Icon from './Icon.vue';
+import { ref, computed } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   title?: string;
-  position?: 'left' | 'right';
+  position?: "left" | "right";
   collapsible?: boolean;
   defaultCollapsed?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: '',
-  position: 'left',
+  title: "",
+  position: "left",
   collapsible: false,
   defaultCollapsed: false,
 });
@@ -40,7 +40,7 @@ const props = withDefaults(defineProps<Props>(), {
 const collapsed = ref(props.defaultCollapsed);
 
 const positionClass = computed(() => {
-  return props.position === 'right' ? 'sidebar-right' : 'sidebar-left';
+  return props.position === "right" ? "sidebar-right" : "sidebar-left";
 });
 
 const toggle = () => {

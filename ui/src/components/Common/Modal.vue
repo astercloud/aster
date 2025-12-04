@@ -19,10 +19,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
+import { defineComponent } from "vue";
 
 export default defineComponent({
-  name: 'Modal',
+  name: "Modal",
 
   emits: {
     close: () => true,
@@ -30,7 +30,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     const handleOverlayClick = () => {
-      emit('close');
+      emit("close");
     };
 
     return {

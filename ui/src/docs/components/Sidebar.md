@@ -20,11 +20,7 @@
 
 ```vue
 <template>
-  <Sidebar
-    title="导航"
-    collapsible
-    :default-collapsed="false"
-  >
+  <Sidebar title="导航" collapsible :default-collapsed="false">
     <div>侧边栏内容</div>
   </Sidebar>
 </template>
@@ -36,10 +32,7 @@
 
 ```vue
 <template>
-  <Sidebar
-    title="设置"
-    position="right"
-  >
+  <Sidebar title="设置" position="right">
     <div>右侧侧边栏内容</div>
   </Sidebar>
 </template>
@@ -58,13 +51,11 @@
         <span>用户名</span>
       </div>
     </template>
-    
+
     <div>侧边栏内容</div>
-    
+
     <template #footer>
-      <Button variant="primary" class="w-full">
-        退出登录
-      </Button>
+      <Button variant="primary" class="w-full"> 退出登录 </Button>
     </template>
   </Sidebar>
 </template>
@@ -74,20 +65,20 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| title | 侧边栏标题 | `string` | `''` |
-| position | 侧边栏位置 | `'left' \| 'right'` | `'left'` |
-| collapsible | 是否可折叠 | `boolean` | `false` |
-| defaultCollapsed | 默认是否折叠 | `boolean` | `false` |
+| 参数             | 说明         | 类型                | 默认值   |
+| ---------------- | ------------ | ------------------- | -------- |
+| title            | 侧边栏标题   | `string`            | `''`     |
+| position         | 侧边栏位置   | `'left' \| 'right'` | `'left'` |
+| collapsible      | 是否可折叠   | `boolean`           | `false`  |
+| defaultCollapsed | 默认是否折叠 | `boolean`           | `false`  |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
-| header | 头部内容 |
+| 名称    | 说明     |
+| ------- | -------- |
+| header  | 头部内容 |
 | default | 主体内容 |
-| footer | 底部内容 |
+| footer  | 底部内容 |
 
 ## 示例
 
@@ -97,11 +88,7 @@
 <template>
   <Sidebar title="组件" collapsible>
     <div class="space-y-2">
-      <div
-        v-for="item in navItems"
-        :key="item.key"
-        class="nav-item"
-      >
+      <div v-for="item in navItems" :key="item.key" class="nav-item">
         {{ item.label }}
       </div>
     </div>
@@ -110,9 +97,9 @@
 
 <script setup>
 const navItems = [
-  { key: 'button', label: 'Button 按钮' },
-  { key: 'input', label: 'Input 输入框' },
-  { key: 'modal', label: 'Modal 模态框' },
+  { key: "button", label: "Button 按钮" },
+  { key: "input", label: "Input 输入框" },
+  { key: "modal", label: "Modal 模态框" },
 ];
 </script>
 
@@ -131,14 +118,14 @@ const navItems = [
     <template #header>
       <h3 class="font-bold">应用设置</h3>
     </template>
-    
+
     <div class="space-y-4">
       <div>
         <label>主题</label>
         <Radio v-model="theme" value="light">浅色</Radio>
         <Radio v-model="theme" value="dark">深色</Radio>
       </div>
-      
+
       <div>
         <label>语言</label>
         <select class="w-full">
@@ -147,17 +134,15 @@ const navItems = [
         </select>
       </div>
     </div>
-    
+
     <template #footer>
-      <Button variant="primary" class="w-full">
-        保存设置
-      </Button>
+      <Button variant="primary" class="w-full"> 保存设置 </Button>
     </template>
   </Sidebar>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const theme = ref('light');
+import { ref } from "vue";
+const theme = ref("light");
 </script>
 ```

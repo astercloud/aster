@@ -4,21 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  SessionConfig,
-  SessionInfo,
-  SessionFilter,
-  SessionStatus,
-  Message,
-  Pagination,
-  PaginatedResponse,
-  Checkpoint,
-  ResumeOptions,
-  SessionStats,
-  UpdateSessionRequest,
-  ExportOptions,
-  ExportResult,
-} from "../types/session";
+import { SessionConfig, SessionInfo, SessionFilter, SessionStatus, Message, Pagination, PaginatedResponse, Checkpoint, ResumeOptions, SessionStats, UpdateSessionRequest, ExportOptions, ExportResult } from "../types/session";
 
 /**
  * Session 资源类
@@ -69,10 +55,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    * @param updates 更新内容
    */
-  async update(
-    sessionId: string,
-    updates: UpdateSessionRequest,
-  ): Promise<SessionInfo> {
+  async update(sessionId: string, updates: UpdateSessionRequest): Promise<SessionInfo> {
     return this.request<SessionInfo>(`/v1/sessions/${sessionId}`, {
       method: "PATCH",
       body: updates,
@@ -99,14 +82,8 @@ export class SessionResource extends BaseResource {
    * @param pagination 分页参数
    * @returns 消息列表
    */
-  async getMessages(
-    sessionId: string,
-    pagination?: Pagination,
-  ): Promise<PaginatedResponse<Message>> {
-    return this.request<PaginatedResponse<Message>>(
-      `/v1/sessions/${sessionId}/messages`,
-      { params: pagination },
-    );
+  async getMessages(sessionId: string, pagination?: Pagination): Promise<PaginatedResponse<Message>> {
+    return this.request<PaginatedResponse<Message>>(`/v1/sessions/${sessionId}/messages`, { params: pagination });
   }
 
   /**
@@ -115,10 +92,7 @@ export class SessionResource extends BaseResource {
    * @param message 消息内容
    * @returns 创建的消息
    */
-  async addMessage(
-    sessionId: string,
-    message: Omit<Message, "id" | "timestamp">,
-  ): Promise<Message> {
+  async addMessage(sessionId: string, message: Omit<Message, "id" | "timestamp">): Promise<Message> {
     return this.request<Message>(`/v1/sessions/${sessionId}/messages`, {
       method: "POST",
       body: message,
@@ -132,9 +106,7 @@ export class SessionResource extends BaseResource {
    * @returns 消息详情
    */
   async getMessage(sessionId: string, messageId: string): Promise<Message> {
-    return this.request<Message>(
-      `/v1/sessions/${sessionId}/messages/${messageId}`,
-    );
+    return this.request<Message>(`/v1/sessions/${sessionId}/messages/${messageId}`);
   }
 
   /**
@@ -158,9 +130,7 @@ export class SessionResource extends BaseResource {
    * @returns Checkpoint 列表
    */
   async getCheckpoints(sessionId: string): Promise<Checkpoint[]> {
-    const result = await this.request<{ checkpoints: Checkpoint[] }>(
-      `/v1/sessions/${sessionId}/checkpoints`,
-    );
+    const result = await this.request<{ checkpoints: Checkpoint[] }>(`/v1/sessions/${sessionId}/checkpoints`);
     return result.checkpoints;
   }
 
@@ -170,13 +140,8 @@ export class SessionResource extends BaseResource {
    * @param checkpointId Checkpoint ID
    * @returns Checkpoint 详情
    */
-  async getCheckpoint(
-    sessionId: string,
-    checkpointId: string,
-  ): Promise<Checkpoint> {
-    return this.request<Checkpoint>(
-      `/v1/sessions/${sessionId}/checkpoints/${checkpointId}`,
-    );
+  async getCheckpoint(sessionId: string, checkpointId: string): Promise<Checkpoint> {
+    return this.request<Checkpoint>(`/v1/sessions/${sessionId}/checkpoints/${checkpointId}`);
   }
 
   /**
@@ -184,10 +149,7 @@ export class SessionResource extends BaseResource {
    * @param sessionId Session ID
    * @param options 恢复选项
    */
-  async resume(
-    sessionId: string,
-    options?: ResumeOptions,
-  ): Promise<SessionInfo> {
+  async resume(sessionId: string, options?: ResumeOptions): Promise<SessionInfo> {
     return this.request<SessionInfo>(`/v1/sessions/${sessionId}/resume`, {
       method: "POST",
       body: options,
@@ -200,10 +162,7 @@ export class SessionResource extends BaseResource {
    * @param label Checkpoint 标签（可选）
    * @returns 创建的 Checkpoint
    */
-  async createCheckpoint(
-    sessionId: string,
-    label?: string,
-  ): Promise<Checkpoint> {
+  async createCheckpoint(sessionId: string, label?: string): Promise<Checkpoint> {
     return this.request<Checkpoint>(`/v1/sessions/${sessionId}/checkpoints`, {
       method: "POST",
       body: { label },
@@ -269,10 +228,7 @@ export class SessionResource extends BaseResource {
    * @param options 导出选项
    * @returns 导出结果
    */
-  async export(
-    sessionId: string,
-    options: ExportOptions,
-  ): Promise<ExportResult> {
+  async export(sessionId: string, options: ExportOptions): Promise<ExportResult> {
     return this.request<ExportResult>(`/v1/sessions/${sessionId}/export`, {
       method: "POST",
       body: options,

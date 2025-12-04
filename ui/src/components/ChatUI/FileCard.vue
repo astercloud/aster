@@ -9,12 +9,7 @@
       <div class="file-name">{{ file.name }}</div>
       <div class="file-size">{{ formatSize(file.size) }}</div>
     </div>
-    <a
-      v-if="file.url"
-      :href="file.url"
-      target="_blank"
-      class="file-download"
-    >
+    <a v-if="file.url" :href="file.url" target="_blank" class="file-download">
       <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
       </svg>
@@ -36,9 +31,9 @@ interface Props {
 defineProps<Props>();
 
 const formatSize = (bytes: number): string => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
   return `${(bytes / Math.pow(k, i)).toFixed(1)} ${sizes[i]}`;
 };

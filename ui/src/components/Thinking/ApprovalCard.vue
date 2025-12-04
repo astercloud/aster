@@ -2,18 +2,8 @@
   <div class="approval-card">
     <div class="approval-header">
       <div class="approval-icon">
-        <svg
-          class="w-5 h-5 text-amber-600"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-          />
+        <svg class="w-5 h-5 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
         </svg>
       </div>
       <div>
@@ -43,47 +33,29 @@
 
     <!-- 操作按钮 -->
     <div class="approval-actions">
-      <button
-        @click="handleApprove"
-        class="btn-approve"
-        :disabled="isProcessing"
-      >
+      <button @click="handleApprove" class="btn-approve" :disabled="isProcessing">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M5 13l4 4L19 7"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7" />
         </svg>
-        {{ isProcessing ? '处理中...' : '批准执行' }}
+        {{ isProcessing ? "处理中..." : "批准执行" }}
       </button>
-      <button
-        @click="handleReject"
-        class="btn-reject"
-        :disabled="isProcessing"
-      >
+      <button @click="handleReject" class="btn-reject" :disabled="isProcessing">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            d="M6 18L18 6M6 6l12 12"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
         </svg>
-        {{ isProcessing ? '处理中...' : '拒绝' }}
+        {{ isProcessing ? "处理中..." : "拒绝" }}
       </button>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import type { ApprovalRequest } from '@/types/approval';
-import type { PropType } from 'vue';
+import { defineComponent, ref } from "vue";
+import type { ApprovalRequest } from "@/types/approval";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'ApprovalCard',
+  name: "ApprovalCard",
   props: {
     request: {
       type: Object as PropType<ApprovalRequest>,
@@ -109,7 +81,7 @@ export default defineComponent({
       if (isProcessing.value) return;
       isProcessing.value = true;
       try {
-        emit('approve');
+        emit("approve");
       } finally {
         // 延迟重置，避免按钮闪烁
         setTimeout(() => {
@@ -122,7 +94,7 @@ export default defineComponent({
       if (isProcessing.value) return;
       isProcessing.value = true;
       try {
-        emit('reject');
+        emit("reject");
       } finally {
         setTimeout(() => {
           isProcessing.value = false;
@@ -143,7 +115,9 @@ export default defineComponent({
 <style scoped>
 .approval-card {
   @apply mt-4 bg-amber-50 border border-amber-200 rounded-lg p-4 shadow-sm;
-  animation: fadeIn 0.3s ease-in-out, slideInFromTop 0.3s ease-out;
+  animation:
+    fadeIn 0.3s ease-in-out,
+    slideInFromTop 0.3s ease-out;
 }
 
 @keyframes fadeIn {

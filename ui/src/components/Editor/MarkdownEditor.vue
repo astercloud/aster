@@ -13,36 +13,22 @@
 
     <!-- 工具栏 (可选) -->
     <div v-if="showToolbar" class="editor-toolbar">
-      <button
-        v-for="tool in tools"
-        :key="tool.name"
-        @click="applyTool(tool)"
-        :title="tool.tooltip"
-        class="toolbar-button"
-        type="button"
-      >
+      <button v-for="tool in tools" :key="tool.name" @click="applyTool(tool)" :title="tool.tooltip" class="toolbar-button" type="button">
         <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path
-            stroke-linecap="round"
-            stroke-linejoin="round"
-            stroke-width="2"
-            :d="tool.icon"
-          />
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="tool.icon" />
         </svg>
       </button>
 
       <!-- 字数统计 -->
       <div class="toolbar-stats">
-        <span class="text-xs text-slate-500">
-          {{ wordCount }} 字 | {{ charCount }} 字符
-        </span>
+        <span class="text-xs text-slate-500"> {{ wordCount }} 字 | {{ charCount }} 字符 </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from 'vue';
+import { ref, computed, watch, onMounted } from "vue";
 
 interface ToolDefinition {
   name: string;
@@ -61,7 +47,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  placeholder: '输入 Markdown 文本...',
+  placeholder: "输入 Markdown 文本...",
   disabled: false,
   minHeight: 200,
   showToolbar: true,
@@ -69,7 +55,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  "update:modelValue": [value: string];
   change: [value: string];
 }>();
 
@@ -77,15 +63,18 @@ const textareaRef = ref<HTMLTextAreaElement>();
 const localValue = ref(props.modelValue);
 
 // 同步外部更新
-watch(() => props.modelValue, (newValue) => {
-  if (newValue !== localValue.value) {
-    localValue.value = newValue;
-  }
-});
+watch(
+  () => props.modelValue,
+  (newValue) => {
+    if (newValue !== localValue.value) {
+      localValue.value = newValue;
+    }
+  },
+);
 
 // 字数统计
 const wordCount = computed(() => {
-  return localValue.value.replace(/\s+/g, '').length;
+  return localValue.value.replace(/\s+/g, "").length;
 });
 
 const charCount = computed(() => {
@@ -95,47 +84,47 @@ const charCount = computed(() => {
 // 工具栏工具定义
 const tools = computed<ToolDefinition[]>(() => [
   {
-    name: 'bold',
-    tooltip: '粗体 (Ctrl+B)',
-    icon: 'M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z',
-    action: (editor) => wrapSelection(editor, '**', '**'),
+    name: "bold",
+    tooltip: "粗体 (Ctrl+B)",
+    icon: "M6 4h8a4 4 0 014 4 4 4 0 01-4 4H6z M6 12h9a4 4 0 014 4 4 4 0 01-4 4H6z",
+    action: (editor) => wrapSelection(editor, "**", "**"),
   },
   {
-    name: 'italic',
-    tooltip: '斜体 (Ctrl+I)',
-    icon: 'M19 4h-9M14 20H5M15 4L9 20',
-    action: (editor) => wrapSelection(editor, '*', '*'),
+    name: "italic",
+    tooltip: "斜体 (Ctrl+I)",
+    icon: "M19 4h-9M14 20H5M15 4L9 20",
+    action: (editor) => wrapSelection(editor, "*", "*"),
   },
   {
-    name: 'code',
-    tooltip: '代码 (Ctrl+`)',
-    icon: 'M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4',
-    action: (editor) => wrapSelection(editor, '`', '`'),
+    name: "code",
+    tooltip: "代码 (Ctrl+`)",
+    icon: "M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4",
+    action: (editor) => wrapSelection(editor, "`", "`"),
   },
   {
-    name: 'link',
-    tooltip: '链接 (Ctrl+K)',
-    icon: 'M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1',
+    name: "link",
+    tooltip: "链接 (Ctrl+K)",
+    icon: "M13.828 10.172a4 4 0 00-5.656 0l-4 4a4 4 0 105.656 5.656l1.102-1.101m-.758-4.899a4 4 0 005.656 0l4-4a4 4 0 00-5.656-5.656l-1.1 1.1",
     action: (editor) => insertLink(editor),
   },
   {
-    name: 'list',
-    tooltip: '列表',
-    icon: 'M4 6h16M4 12h16M4 18h16',
+    name: "list",
+    tooltip: "列表",
+    icon: "M4 6h16M4 12h16M4 18h16",
     action: (editor) => insertList(editor),
   },
   {
-    name: 'quote',
-    tooltip: '引用',
-    icon: 'M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z',
+    name: "quote",
+    tooltip: "引用",
+    icon: "M7 8h10M7 12h4m1 8l-4-4H5a2 2 0 01-2-2V6a2 2 0 012-2h14a2 2 0 012 2v8a2 2 0 01-2 2h-3l-4 4z",
     action: (editor) => insertQuote(editor),
   },
 ]);
 
 // 处理输入
 const handleInput = () => {
-  emit('update:modelValue', localValue.value);
-  emit('change', localValue.value);
+  emit("update:modelValue", localValue.value);
+  emit("change", localValue.value);
 };
 
 // 处理快捷键
@@ -146,19 +135,19 @@ const handleKeydown = (e: KeyboardEvent) => {
     const codeTool = tools.value[2];
     const linkTool = tools.value[3];
     switch (e.key) {
-      case 'b':
+      case "b":
         e.preventDefault();
         if (boldTool) applyTool(boldTool); // Bold
         break;
-      case 'i':
+      case "i":
         e.preventDefault();
         if (italicTool) applyTool(italicTool); // Italic
         break;
-      case '`':
+      case "`":
         e.preventDefault();
         if (codeTool) applyTool(codeTool); // Code
         break;
-      case 'k':
+      case "k":
         e.preventDefault();
         if (linkTool) applyTool(linkTool); // Link
         break;
@@ -166,9 +155,9 @@ const handleKeydown = (e: KeyboardEvent) => {
   }
 
   // Tab 键插入空格
-  if (e.key === 'Tab') {
+  if (e.key === "Tab") {
     e.preventDefault();
-    insertText(textareaRef.value!, '  ');
+    insertText(textareaRef.value!, "  ");
   }
 };
 
@@ -182,15 +171,12 @@ const applyTool = (tool: ToolDefinition) => {
 const wrapSelection = (editor: HTMLTextAreaElement, prefix: string, suffix: string) => {
   const start = editor.selectionStart;
   const end = editor.selectionEnd;
-  const selectedText = localValue.value.substring(start, end) || '文本';
+  const selectedText = localValue.value.substring(start, end) || "文本";
   const replacement = `${prefix}${selectedText}${suffix}`;
 
-  localValue.value =
-    localValue.value.substring(0, start) +
-    replacement +
-    localValue.value.substring(end);
+  localValue.value = localValue.value.substring(0, start) + replacement + localValue.value.substring(end);
 
-  emit('update:modelValue', localValue.value);
+  emit("update:modelValue", localValue.value);
 
   // 恢复光标位置
   editor.focus();
@@ -201,12 +187,9 @@ const wrapSelection = (editor: HTMLTextAreaElement, prefix: string, suffix: stri
 // 插入文本
 const insertText = (editor: HTMLTextAreaElement, text: string) => {
   const start = editor.selectionStart;
-  localValue.value =
-    localValue.value.substring(0, start) +
-    text +
-    localValue.value.substring(start);
+  localValue.value = localValue.value.substring(0, start) + text + localValue.value.substring(start);
 
-  emit('update:modelValue', localValue.value);
+  emit("update:modelValue", localValue.value);
 
   // 恢复光标位置
   editor.focus();
@@ -217,15 +200,12 @@ const insertText = (editor: HTMLTextAreaElement, text: string) => {
 const insertLink = (editor: HTMLTextAreaElement) => {
   const start = editor.selectionStart;
   const end = editor.selectionEnd;
-  const selectedText = localValue.value.substring(start, end) || '链接文字';
+  const selectedText = localValue.value.substring(start, end) || "链接文字";
   const replacement = `[${selectedText}](url)`;
 
-  localValue.value =
-    localValue.value.substring(0, start) +
-    replacement +
-    localValue.value.substring(end);
+  localValue.value = localValue.value.substring(0, start) + replacement + localValue.value.substring(end);
 
-  emit('update:modelValue', localValue.value);
+  emit("update:modelValue", localValue.value);
 
   // 选中 URL 部分
   editor.focus();
@@ -235,12 +215,12 @@ const insertLink = (editor: HTMLTextAreaElement) => {
 
 // 插入列表
 const insertList = (editor: HTMLTextAreaElement) => {
-  insertText(editor, '- ');
+  insertText(editor, "- ");
 };
 
 // 插入引用
 const insertQuote = (editor: HTMLTextAreaElement) => {
-  insertText(editor, '> ');
+  insertText(editor, "> ");
 };
 
 // 自动对焦

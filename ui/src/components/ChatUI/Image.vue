@@ -1,13 +1,6 @@
 <template>
   <div class="image-container">
-    <img
-      v-if="!error"
-      :src="src"
-      :alt="alt"
-      :class="['image', sizeClass, shapeClass]"
-      @load="handleLoad"
-      @error="handleError"
-    />
+    <img v-if="!error" :src="src" :alt="alt" :class="['image', sizeClass, shapeClass]" @load="handleLoad" @error="handleError" />
     <div v-if="loading" class="image-loading">
       <Icon type="loading" />
     </div>
@@ -19,20 +12,20 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import Icon from './Icon.vue';
+import { ref, computed } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   src: string;
   alt?: string;
-  size?: 'sm' | 'md' | 'lg' | 'full';
-  shape?: 'square' | 'rounded' | 'circle';
+  size?: "sm" | "md" | "lg" | "full";
+  shape?: "square" | "rounded" | "circle";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  alt: '',
-  size: 'md',
-  shape: 'rounded',
+  alt: "",
+  size: "md",
+  shape: "rounded",
 });
 
 const loading = ref(true);
@@ -40,19 +33,19 @@ const error = ref(false);
 
 const sizeClass = computed(() => {
   const map = {
-    sm: 'w-16 h-16',
-    md: 'w-32 h-32',
-    lg: 'w-48 h-48',
-    full: 'w-full h-auto',
+    sm: "w-16 h-16",
+    md: "w-32 h-32",
+    lg: "w-48 h-48",
+    full: "w-full h-auto",
   };
   return map[props.size];
 });
 
 const shapeClass = computed(() => {
   const map = {
-    square: 'rounded-none',
-    rounded: 'rounded-lg',
-    circle: 'rounded-full',
+    square: "rounded-none",
+    rounded: "rounded-lg",
+    circle: "rounded-full",
   };
   return map[props.shape];
 });

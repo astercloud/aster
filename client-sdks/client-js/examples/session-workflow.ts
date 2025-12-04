@@ -2,13 +2,7 @@
  * Session 和 Workflow 使用示例
  */
 
-import {
-  SessionResource,
-  WorkflowResource,
-  ParallelWorkflowDefinition,
-  SequentialWorkflowDefinition,
-  LoopWorkflowDefinition,
-} from "@aster/client-js";
+import { SessionResource, WorkflowResource, ParallelWorkflowDefinition, SequentialWorkflowDefinition, LoopWorkflowDefinition } from "@aster/client-js";
 
 async function main() {
   console.log("=".repeat(60));
@@ -55,8 +49,7 @@ async function main() {
 
   await session.addMessage(newSession.id, {
     role: "assistant",
-    content:
-      "Of course! I'd be happy to help. What do you need assistance with?",
+    content: "Of course! I'd be happy to help. What do you need assistance with?",
   });
   console.log("✅ 添加助手消息");
 
@@ -75,19 +68,14 @@ async function main() {
   console.log("-".repeat(60));
 
   // 创建手动 checkpoint
-  const checkpoint = await session.createCheckpoint(
-    newSession.id,
-    "before-important-action",
-  );
+  const checkpoint = await session.createCheckpoint(newSession.id, "before-important-action");
   console.log("✅ 创建 Checkpoint:", checkpoint.id);
 
   // 获取所有 checkpoints
   const checkpoints = await session.getCheckpoints(newSession.id);
   console.log(`📊 总共 ${checkpoints.length} 个 Checkpoints:`);
   checkpoints.forEach((cp, index) => {
-    console.log(
-      `  ${index + 1}. [${cp.type}] Sequence: ${cp.sequence}, Time: ${cp.timestamp}`,
-    );
+    console.log(`  ${index + 1}. [${cp.type}] Sequence: ${cp.sequence}, Time: ${cp.timestamp}`);
   });
 
   // 从 checkpoint 恢复
@@ -146,14 +134,10 @@ async function main() {
 
   // 等待完成（模拟）
   try {
-    const finalRun = await workflow.waitForCompletion(
-      parallelWf.id,
-      parallelRun.id,
-      {
-        pollInterval: 2000,
-        timeout: 60000,
-      },
-    );
+    const finalRun = await workflow.waitForCompletion(parallelWf.id, parallelRun.id, {
+      pollInterval: 2000,
+      timeout: 60000,
+    });
     console.log("✅ Workflow 完成:", finalRun.status);
   } catch (error: any) {
     console.log("⚠️  等待超时或失败:", error.message);
@@ -237,10 +221,7 @@ async function main() {
   console.log("-".repeat(60));
 
   // 获取执行详情
-  const runDetails = await workflow.getRunDetails(
-    parallelWf.id,
-    parallelRun.id,
-  );
+  const runDetails = await workflow.getRunDetails(parallelWf.id, parallelRun.id);
   console.log("📊 执行详情:");
   console.log(`  - 状态: ${runDetails.status}`);
   console.log(`  - 进度: ${runDetails.progress}%`);
@@ -275,9 +256,7 @@ async function main() {
   });
   console.log(`📋 执行历史: 共 ${runs.total} 次执行`);
   runs.items.forEach((run, index) => {
-    console.log(
-      `  ${index + 1}. [${run.status}] ${run.startedAt} - Progress: ${run.progress}%`,
-    );
+    console.log(`  ${index + 1}. [${run.status}] ${run.startedAt} - Progress: ${run.progress}%`);
   });
 
   // ========================================================================

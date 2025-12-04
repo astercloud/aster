@@ -2,54 +2,26 @@
   <div class="chatui-container">
     <!-- 消息列表 -->
     <div ref="messagesRef" class="chatui-messages">
-      <div
-        v-for="msg in messages"
-        :key="msg.id"
-        :class="['chatui-message', `chatui-message-${msg.position}`]"
-      >
+      <div v-for="msg in messages" :key="msg.id" :class="['chatui-message', `chatui-message-${msg.position}`]">
         <!-- 气泡消息 -->
-        <Bubble
-          v-if="msg.type === 'text'"
-          :content="msg.content ?? ''"
-          :position="msg.position"
-          :status="msg.status"
-          :avatar="msg.user?.avatar"
-        />
-        
+        <Bubble v-if="msg.type === 'text'" :content="msg.content ?? ''" :position="msg.position" :status="msg.status" :avatar="msg.user?.avatar" />
+
         <!-- 思考过程块 -->
-        <ThinkingBlock
-          v-else-if="msg.type === 'thinking' && msg.thinkingSteps?.length"
-          :message-id="msg.id"
-          :steps="msg.thinkingSteps"
-          :is-active="msg.isThinkingActive"
-        />
-        
+        <ThinkingBlock v-else-if="msg.type === 'thinking' && msg.thinkingSteps?.length" :message-id="msg.id" :steps="msg.thinkingSteps" :is-active="msg.isThinkingActive" />
+
         <!-- 简单思考气泡（无步骤时） -->
-        <ThinkBubble
-          v-else-if="msg.type === 'thinking'"
-        />
-        
+        <ThinkBubble v-else-if="msg.type === 'thinking'" />
+
         <!-- 打字中指示器 -->
-        <TypingBubble
-          v-else-if="msg.type === 'typing'"
-        />
-        
+        <TypingBubble v-else-if="msg.type === 'typing'" />
+
         <!-- 卡片消息 -->
-        <Card
-          v-else-if="msg.type === 'card'"
-          :title="msg.card?.title ?? ''"
-          :content="msg.card?.content ?? ''"
-          :actions="msg.card?.actions"
-          @action="handleCardAction"
-        />
-        
+        <Card v-else-if="msg.type === 'card'" :title="msg.card?.title ?? ''" :content="msg.card?.content ?? ''" :actions="msg.card?.actions" @action="handleCardAction" />
+
         <!-- 文件卡片 -->
-        <FileCard
-          v-else-if="msg.type === 'file' && msg.file"
-          :file="msg.file"
-        />
+        <FileCard v-else-if="msg.type === 'file' && msg.file" :file="msg.file" />
       </div>
-      
+
       <!-- 滚动锚点 -->
       <div ref="scrollAnchor" class="scroll-anchor"></div>
     </div>
@@ -59,44 +31,21 @@
       <div class="composer-input-wrapper">
         <!-- 工具栏 -->
         <div class="composer-toolbar">
-          <Button
-            v-for="tool in toolbar"
-            :key="tool.icon"
-            :icon="tool.icon"
-            variant="text"
-            @click="tool.onClick"
-          />
+          <Button v-for="tool in toolbar" :key="tool.icon" :icon="tool.icon" variant="text" @click="tool.onClick" />
         </div>
-        
+
         <!-- 输入框 -->
         <div class="composer-input">
-          <textarea
-            ref="inputRef"
-            v-model="inputValue"
-            :placeholder="placeholder"
-            :disabled="disabled"
-            class="composer-textarea"
-            @keydown="handleKeyDown"
-            @input="handleInput"
-          />
+          <textarea ref="inputRef" v-model="inputValue" :placeholder="placeholder" :disabled="disabled" class="composer-textarea" @keydown="handleKeyDown" @input="handleInput" />
         </div>
-        
+
         <!-- 发送按钮 -->
-        <Button
-          icon="send"
-          :disabled="!canSend"
-          @click="handleSend"
-        />
+        <Button icon="send" :disabled="!canSend" @click="handleSend" />
       </div>
-      
+
       <!-- 快捷回复 -->
       <div v-if="quickReplies.length > 0" class="quick-replies">
-        <button
-          v-for="reply in quickReplies"
-          :key="reply.name"
-          class="quick-reply-btn"
-          @click="handleQuickReply(reply)"
-        >
+        <button v-for="reply in quickReplies" :key="reply.name" class="quick-reply-btn" @click="handleQuickReply(reply)">
           {{ reply.name }}
         </button>
       </div>
@@ -105,18 +54,18 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick } from 'vue';
-import Bubble from './Bubble.vue';
-import ThinkBubble from './ThinkBubble.vue';
-import TypingBubble from './TypingBubble.vue';
-import Card from './Card.vue';
-import FileCard from './FileCard.vue';
-import Button from './Button.vue';
-import ThinkingBlock from '@/components/Thinking/ThinkingBlock.vue';
+import { ref, computed, watch, nextTick } from "vue";
+import Bubble from "./Bubble.vue";
+import ThinkBubble from "./ThinkBubble.vue";
+import TypingBubble from "./TypingBubble.vue";
+import Card from "./Card.vue";
+import FileCard from "./FileCard.vue";
+import Button from "./Button.vue";
+import ThinkingBlock from "@/components/Thinking/ThinkingBlock.vue";
 
 interface ThinkingStep {
   id?: string;
-  type: 'reasoning' | 'decision' | 'tool_call' | 'tool_result' | 'approval';
+  type: "reasoning" | "decision" | "tool_call" | "tool_result" | "approval";
   content?: string;
   tool?: { name: string; args: any };
   result?: any;
@@ -125,10 +74,10 @@ interface ThinkingStep {
 
 interface Message {
   id: string;
-  type: 'text' | 'thinking' | 'typing' | 'card' | 'file';
+  type: "text" | "thinking" | "typing" | "card" | "file";
   content?: string;
-  position: 'left' | 'right';
-  status?: 'pending' | 'sent' | 'error';
+  position: "left" | "right";
+  status?: "pending" | "sent" | "error";
   user?: {
     avatar?: string;
     name?: string;
@@ -164,7 +113,7 @@ interface Props {
 
 const props = withDefaults(defineProps<Props>(), {
   messages: () => [],
-  placeholder: '输入消息...',
+  placeholder: "输入消息...",
   disabled: false,
   quickReplies: () => [],
   toolbar: () => [],
@@ -177,7 +126,7 @@ const emit = defineEmits<{
   askUserSubmit: [payload: { requestId: string; answers: Record<string, any> }];
 }>();
 
-const inputValue = ref('');
+const inputValue = ref("");
 const inputRef = ref<HTMLTextAreaElement>();
 const messagesRef = ref<HTMLDivElement>();
 const scrollAnchor = ref<HTMLDivElement>();
@@ -188,20 +137,20 @@ const canSend = computed(() => {
 
 const handleSend = () => {
   if (!canSend.value) return;
-  
-  emit('send', {
-    type: 'text',
+
+  emit("send", {
+    type: "text",
     content: inputValue.value.trim(),
   });
-  
-  inputValue.value = '';
+
+  inputValue.value = "";
   nextTick(() => {
     inputRef.value?.focus();
   });
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     handleSend();
   }
@@ -210,25 +159,29 @@ const handleKeyDown = (e: KeyboardEvent) => {
 const handleInput = () => {
   // 自动调整输入框高度
   if (inputRef.value) {
-    inputRef.value.style.height = 'auto';
+    inputRef.value.style.height = "auto";
     inputRef.value.style.height = `${inputRef.value.scrollHeight}px`;
   }
 };
 
 const handleQuickReply = (reply: QuickReply) => {
-  emit('quickReply', reply);
+  emit("quickReply", reply);
 };
 
 const handleCardAction = (action: { value: string }) => {
-  emit('cardAction', action);
+  emit("cardAction", action);
 };
 
 // 自动滚动到底部
-watch(() => props.messages, () => {
-  nextTick(() => {
-    scrollAnchor.value?.scrollIntoView({ behavior: 'smooth' });
-  });
-}, { deep: true });
+watch(
+  () => props.messages,
+  () => {
+    nextTick(() => {
+      scrollAnchor.value?.scrollIntoView({ behavior: "smooth" });
+    });
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped>

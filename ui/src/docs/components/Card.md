@@ -8,10 +8,7 @@
 
 ```vue
 <template>
-  <Card
-    title="推荐文章"
-    content="这是一篇关于 AI Agent 的深度文章"
-  />
+  <Card title="推荐文章" content="这是一篇关于 AI Agent 的深度文章" />
 </template>
 ```
 
@@ -26,7 +23,7 @@
     content="这是内容描述..."
     :actions="[
       { text: '查看详情', value: 'view' },
-      { text: '分享', value: 'share' }
+      { text: '分享', value: 'share' },
     ]"
     @action="handleAction"
   />
@@ -34,7 +31,7 @@
 
 <script setup>
 const handleAction = (action) => {
-  console.log('Action:', action.value);
+  console.log("Action:", action.value);
 };
 </script>
 ```
@@ -45,10 +42,7 @@ const handleAction = (action) => {
 
 ```vue
 <template>
-  <Card
-    content="这是一段纯文本内容，没有标题"
-    :actions="[{ text: '确定', value: 'ok' }]"
-  />
+  <Card content="这是一段纯文本内容，没有标题" :actions="[{ text: '确定', value: 'ok' }]" />
 </template>
 ```
 
@@ -58,10 +52,7 @@ const handleAction = (action) => {
 
 ```vue
 <template>
-  <Card
-    title="格式化内容"
-    content="<p>这是<strong>粗体</strong>文本</p><p>这是<em>斜体</em>文本</p>"
-  />
+  <Card title="格式化内容" content="<p>这是<strong>粗体</strong>文本</p><p>这是<em>斜体</em>文本</p>" />
 </template>
 ```
 
@@ -76,25 +67,25 @@ const handleAction = (action) => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| title | 卡片标题 | `string` | - |
-| content | 卡片内容 | `string` | - |
-| actions | 操作按钮列表 | `Action[]` | `[]` |
+| 参数    | 说明         | 类型       | 默认值 |
+| ------- | ------------ | ---------- | ------ |
+| title   | 卡片标题     | `string`   | -      |
+| content | 卡片内容     | `string`   | -      |
+| actions | 操作按钮列表 | `Action[]` | `[]`   |
 
 ### Action 类型
 
 ```typescript
 interface Action {
-  text: string;    // 按钮文本
-  value: string;   // 按钮值
+  text: string; // 按钮文本
+  value: string; // 按钮值
 }
 ```
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名 | 说明               | 回调参数         |
+| ------ | ------------------ | ---------------- |
 | action | 点击操作按钮时触发 | `action: Action` |
 
 ## 示例
@@ -108,7 +99,7 @@ interface Action {
     content="确定要删除这条消息吗？此操作无法撤销。"
     :actions="[
       { text: '取消', value: 'cancel' },
-      { text: '删除', value: 'delete' }
+      { text: '删除', value: 'delete' },
     ]"
     @action="handleConfirm"
   />
@@ -116,8 +107,8 @@ interface Action {
 
 <script setup>
 const handleConfirm = (action) => {
-  if (action.value === 'delete') {
-    console.log('Deleting...');
+  if (action.value === "delete") {
+    console.log("Deleting...");
   }
 };
 </script>
@@ -133,7 +124,7 @@ const handleConfirm = (action) => {
     :actions="[
       { text: '生成文章', value: 'write' },
       { text: '分析代码', value: 'analyze' },
-      { text: '创建工作流', value: 'workflow' }
+      { text: '创建工作流', value: 'workflow' },
     ]"
     @action="handleSelect"
   />

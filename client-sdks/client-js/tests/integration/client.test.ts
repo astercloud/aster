@@ -120,10 +120,7 @@ describe("AsterClient Client Integration", () => {
         }),
       );
 
-      const results = await client.memory.semantic.search(
-        "What is the user preference?",
-        { limit: 5 },
-      );
+      const results = await client.memory.semantic.search("What is the user preference?", { limit: 5 });
 
       expect(results.length).toBeGreaterThan(0);
       expect(global.fetch).toHaveBeenCalledTimes(2);

@@ -19,7 +19,12 @@
       <div class="stat-card">
         <div class="stat-icon bg-blue-100 dark:bg-blue-900/30 text-blue-600 dark:text-blue-400">
           <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+            ></path>
           </svg>
         </div>
         <div class="stat-content">
@@ -54,27 +59,15 @@
     </div>
 
     <!-- Agent List -->
-    <AgentList
-      :agents="agents"
-      :loading="loading"
-      @create="showCreateForm = true"
-      @chat="handleChat"
-      @edit="handleEdit"
-      @delete="handleDelete"
-    />
+    <AgentList :agents="agents" :loading="loading" @create="showCreateForm = true" @chat="handleChat" @edit="handleEdit" @delete="handleDelete" />
 
     <!-- Create/Edit Modal -->
     <Modal v-if="showCreateForm" @close="showCreateForm = false">
       <template #header>
-        {{ editingAgent ? '编辑 Agent' : '创建新 Agent' }}
+        {{ editingAgent ? "编辑 Agent" : "创建新 Agent" }}
       </template>
       <template #default>
-        <AgentForm
-          :agent="editingAgent ?? undefined"
-          :loading="formLoading"
-          @submit="handleSubmit"
-          @cancel="handleCancel"
-        />
+        <AgentForm :agent="editingAgent ?? undefined" :loading="formLoading" @submit="handleSubmit" @cancel="handleCancel" />
       </template>
     </Modal>
 
@@ -84,16 +77,13 @@
       <template #default>
         <div class="delete-confirm">
           <p class="delete-message">
-            确定要删除 Agent "<strong>{{ deletingAgent.name }}</strong>" 吗？
+            确定要删除 Agent "<strong>{{ deletingAgent.name }}</strong
+            >" 吗？
           </p>
           <p class="delete-warning">此操作无法撤销。</p>
           <div class="delete-actions">
-            <button @click="deletingAgent = null" class="btn-secondary">
-              取消
-            </button>
-            <button @click="confirmDelete" class="btn-danger">
-              删除
-            </button>
+            <button @click="deletingAgent = null" class="btn-secondary">取消</button>
+            <button @click="confirmDelete" class="btn-danger">删除</button>
           </div>
         </div>
       </template>
@@ -102,12 +92,12 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue';
-import AgentList from './AgentList.vue';
-import AgentForm from './AgentForm.vue';
-import Modal from '../Common/Modal.vue';
-import { useAsterClient } from '@/composables/useAsterClient';
-import type { Agent } from '@/types';
+import { ref, computed, onMounted } from "vue";
+import AgentList from "./AgentList.vue";
+import AgentForm from "./AgentForm.vue";
+import Modal from "../Common/Modal.vue";
+import { useAsterClient } from "@/composables/useAsterClient";
+import type { Agent } from "@/types";
 
 const emit = defineEmits<{
   chat: [agent: Agent];
@@ -122,13 +112,9 @@ const showCreateForm = ref(false);
 const editingAgent = ref<Agent | null>(null);
 const deletingAgent = ref<Agent | null>(null);
 
-const activeAgents = computed(() => 
-  agents.value.filter(a => a.status === 'idle' || a.status === 'thinking').length
-);
+const activeAgents = computed(() => agents.value.filter((a) => a.status === "idle" || a.status === "thinking").length);
 
-const totalSessions = computed(() => 
-  agents.value.reduce((sum, a) => sum + (a.metadata?.sessions || 0), 0)
-);
+const totalSessions = computed(() => agents.value.reduce((sum, a) => sum + (a.metadata?.sessions || 0), 0));
 
 const loadAgents = async () => {
   loading.value = true;
@@ -137,10 +123,10 @@ const loadAgents = async () => {
     if (response.success && response.data) {
       agents.value = response.data.map((record: any) => ({
         id: record.ID,
-        name: record.Metadata?.name || 'Unnamed Agent',
+        name: record.Metadata?.name || "Unnamed Agent",
         description: record.Metadata?.description,
         avatar: record.Metadata?.avatar,
-        status: record.Status || 'idle',
+        status: record.Status || "idle",
         metadata: {
           ...record.Metadata,
           template_id: record.Config?.TemplateID,
@@ -150,7 +136,7 @@ const loadAgents = async () => {
       }));
     }
   } catch (error) {
-    console.error('Failed to load agents:', error);
+    console.error("Failed to load agents:", error);
   } finally {
     loading.value = false;
   }
@@ -183,7 +169,7 @@ const handleSubmit = async (data: any) => {
     await loadAgents();
     handleCancel();
   } catch (error) {
-    console.error('Failed to save agent:', error);
+    console.error("Failed to save agent:", error);
   } finally {
     formLoading.value = false;
   }
@@ -195,7 +181,7 @@ const handleCancel = () => {
 };
 
 const handleChat = (agent: Agent) => {
-  emit('chat', agent);
+  emit("chat", agent);
 };
 
 const handleEdit = (agent: Agent) => {
@@ -209,13 +195,13 @@ const handleDelete = (agent: Agent) => {
 
 const confirmDelete = async () => {
   if (!deletingAgent.value) return;
-  
+
   try {
     await client.agents.delete(deletingAgent.value.id);
     await loadAgents();
     deletingAgent.value = null;
   } catch (error) {
-    console.error('Failed to delete agent:', error);
+    console.error("Failed to delete agent:", error);
   }
 };
 
