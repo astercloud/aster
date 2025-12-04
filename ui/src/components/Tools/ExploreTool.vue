@@ -7,34 +7,16 @@
         <span>文件浏览器</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="刷新"
-          @click="refreshCurrentPath"
-        >
+        <button class="action-button" title="刷新" @click="refreshCurrentPath">
           <Icon type="refresh" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="返回上级"
-          :disabled="currentPath === '/'"
-          @click="goToParent"
-        >
+        <button class="action-button" title="返回上级" :disabled="currentPath === '/'" @click="goToParent">
           <Icon type="arrow-up" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="切换视图"
-          @click="toggleViewMode"
-        >
+        <button class="action-button" title="切换视图" @click="toggleViewMode">
           <Icon :type="viewMode === 'list' ? 'grid' : 'list'" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="显示隐藏文件"
-          :class="{ 'text-blue-500': showHiddenFiles }"
-          @click="toggleHiddenFiles"
-        >
+        <button class="action-button" title="显示隐藏文件" :class="{ 'text-blue-500': showHiddenFiles }" @click="toggleHiddenFiles">
           <Icon type="eye" size="sm" />
         </button>
       </div>
@@ -43,36 +25,19 @@
     <!-- 路径导航 -->
     <div class="path-navigation">
       <div class="breadcrumb">
-        <button
-          class="breadcrumb-item"
-          @click="navigateToPath('/')"
-        >
+        <button class="breadcrumb-item" @click="navigateToPath('/')">
           <Icon type="home" size="xs" />
         </button>
         <template v-for="(segment, index) in pathSegments" :key="index">
           <span class="breadcrumb-separator">/</span>
-          <button
-            class="breadcrumb-item"
-            @click="navigateToSegment(index)"
-          >
+          <button class="breadcrumb-item" @click="navigateToSegment(index)">
             {{ segment }}
           </button>
         </template>
       </div>
       <div class="path-actions">
-        <input
-          v-model="newFolderName"
-          type="text"
-          placeholder="新建文件夹名称..."
-          class="folder-input"
-          @keydown.enter="createFolder"
-          @keydown.esc="newFolderName = ''"
-        />
-        <button
-          class="create-folder-btn"
-          :disabled="!newFolderName.trim()"
-          @click="createFolder"
-        >
+        <input v-model="newFolderName" type="text" placeholder="新建文件夹名称..." class="folder-input" @keydown.enter="createFolder" @keydown.esc="newFolderName = ''" />
+        <button class="create-folder-btn" :disabled="!newFolderName.trim()" @click="createFolder">
           <Icon type="plus" size="sm" />
           新建文件夹
         </button>
@@ -88,29 +53,20 @@
           <option value="modified">按修改时间</option>
           <option value="type">按类型</option>
         </select>
-        <button
-          class="sort-order-btn"
-          @click="toggleSortOrder"
-        >
+        <button class="sort-order-btn" @click="toggleSortOrder">
           <Icon :type="sortOrder === 'asc' ? 'arrow-up' : 'arrow-down'" size="sm" />
         </button>
       </div>
       <div class="header-info">
         <span class="item-count">{{ sortedItems.length }} 项</span>
-        <span v-if="selectedItems.length > 0" class="selected-count">
-          已选择 {{ selectedItems.length }} 项
-        </span>
+        <span v-if="selectedItems.length > 0" class="selected-count"> 已选择 {{ selectedItems.length }} 项 </span>
       </div>
     </div>
 
     <!-- 文件列表 -->
     <div class="file-list" ref="fileListRef">
       <!-- 父级目录链接 -->
-      <div
-        v-if="currentPath !== '/'"
-        class="file-item directory-item"
-        @click="goToParent"
-      >
+      <div v-if="currentPath !== '/'" class="file-item directory-item" @click="goToParent">
         <div class="file-icon">
           <Icon type="arrow-left" size="sm" />
         </div>
@@ -130,26 +86,18 @@
           'file-item',
           {
             'directory-item': item.isDirectory,
-            'file-selected': selectedItems.includes(item.path)
-          }
+            'file-selected': selectedItems.includes(item.path),
+          },
         ]"
         @click="handleItemClick(item)"
         @contextmenu.prevent="showContextMenu(item, $event)"
       >
         <div class="file-checkbox" v-if="selectionMode">
-          <input
-            type="checkbox"
-            :checked="selectedItems.includes(item.path)"
-            @change.stop="toggleSelection(item.path)"
-          />
+          <input type="checkbox" :checked="selectedItems.includes(item.path)" @change.stop="toggleSelection(item.path)" />
         </div>
 
         <div class="file-icon">
-          <Icon
-            :type="getIconForItem(item)"
-            :size="item.isDirectory ? 'sm' : 'xs'"
-            :class="getIconClassForItem(item)"
-          />
+          <Icon :type="getIconForItem(item)" :size="item.isDirectory ? 'sm' : 'xs'" :class="getIconClassForItem(item)" />
         </div>
 
         <div class="file-info">
@@ -158,14 +106,12 @@
             <span v-if="!item.isDirectory" class="file-extension">
               {{ getFileExtension(item.name) }}
             </span>
-            <span v-if="item.isDirectory" class="file-count">
-              {{ item.children?.length || 0 }} 项
-            </span>
+            <span v-if="item.isDirectory" class="file-count"> {{ item.children?.length || 0 }} 项 </span>
           </div>
         </div>
 
         <div class="file-size">
-          {{ item.isDirectory ? '-' : formatFileSize(item.size) }}
+          {{ item.isDirectory ? "-" : formatFileSize(item.size) }}
         </div>
 
         <div class="file-modified">
@@ -173,34 +119,16 @@
         </div>
 
         <div class="file-actions">
-          <button
-            v-if="!item.isDirectory"
-            class="action-btn view-btn"
-            title="查看文件"
-            @click.stop="viewFile(item)"
-          >
+          <button v-if="!item.isDirectory" class="action-btn view-btn" title="查看文件" @click.stop="viewFile(item)">
             <Icon type="eye" size="xs" />
           </button>
-          <button
-            v-if="!item.isDirectory"
-            class="action-btn edit-btn"
-            title="编辑文件"
-            @click.stop="editFile(item)"
-          >
+          <button v-if="!item.isDirectory" class="action-btn edit-btn" title="编辑文件" @click.stop="editFile(item)">
             <Icon type="edit" size="xs" />
           </button>
-          <button
-            class="action-btn download-btn"
-            :title="item.isDirectory ? '下载文件夹' : '下载文件'"
-            @click.stop="downloadItem(item)"
-          >
+          <button class="action-btn download-btn" :title="item.isDirectory ? '下载文件夹' : '下载文件'" @click.stop="downloadItem(item)">
             <Icon type="download" size="xs" />
           </button>
-          <button
-            class="action-btn delete-btn"
-            title="删除"
-            @click.stop="deleteItem(item)"
-          >
+          <button class="action-btn delete-btn" title="删除" @click.stop="deleteItem(item)">
             <Icon type="trash" size="xs" />
           </button>
         </div>
@@ -220,31 +148,16 @@
         <span class="total-size">总大小: {{ formatTotalSize() }}</span>
       </div>
       <div class="status-actions">
-        <button
-          class="selection-toggle-btn"
-          :class="{ active: selectionMode }"
-          @click="toggleSelectionMode"
-        >
+        <button class="selection-toggle-btn" :class="{ active: selectionMode }" @click="toggleSelectionMode">
           <Icon type="check-square" size="sm" />
           选择模式
         </button>
-        <button
-          v-if="selectedItems.length > 0"
-          class="clear-selection-btn"
-          @click="clearSelection"
-        >
-          清除选择
-        </button>
+        <button v-if="selectedItems.length > 0" class="clear-selection-btn" @click="clearSelection">清除选择</button>
       </div>
     </div>
 
     <!-- 右键菜单 -->
-    <div
-      v-if="contextMenu.visible"
-      class="context-menu"
-      :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }"
-      @click="hideContextMenu"
-    >
+    <div v-if="contextMenu.visible" class="context-menu" :style="{ left: contextMenu.x + 'px', top: contextMenu.y + 'px' }" @click="hideContextMenu">
       <div class="context-menu-item" @click="copyItem(contextMenu.item!)">
         <Icon type="copy" size="xs" />
         复制
@@ -258,11 +171,7 @@
         粘贴
       </div>
       <div class="context-menu-divider"></div>
-      <div
-        v-if="contextMenu.item?.isDirectory"
-        class="context-menu-item"
-        @click="renameItem(contextMenu.item!)"
-      >
+      <div v-if="contextMenu.item?.isDirectory" class="context-menu-item" @click="renameItem(contextMenu.item!)">
         <Icon type="edit" size="xs" />
         重命名
       </div>
@@ -284,18 +193,10 @@
         <div class="modal-body">
           <div v-if="previewFile" class="file-preview">
             <!-- 图片预览 -->
-            <img
-              v-if="isImageFile(previewFile)"
-              :src="previewUrl"
-              :alt="previewFile.name"
-              class="preview-image"
-            />
+            <img v-if="isImageFile(previewFile)" :src="previewUrl" :alt="previewFile.name" class="preview-image" />
 
             <!-- 文本预览 -->
-            <pre
-              v-else-if="isTextFile(previewFile)"
-              class="preview-text"
-            >{{ previewContent }}</pre>
+            <pre v-else-if="isTextFile(previewFile)" class="preview-text">{{ previewContent }}</pre>
 
             <!-- 其他文件类型 -->
             <div v-else class="preview-info">
@@ -312,8 +213,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface FileItem {
   name: string;
@@ -332,8 +233,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -342,19 +243,19 @@ const emit = defineEmits<{
 }>();
 
 // 响应式数据
-const currentPath = ref('/');
+const currentPath = ref("/");
 const items = ref<FileItem[]>([]);
-const sortBy = ref('name');
-const sortOrder = ref<'asc' | 'desc'>('asc');
-const viewMode = ref<'list' | 'grid'>('list');
+const sortBy = ref("name");
+const sortOrder = ref<"asc" | "desc">("asc");
+const viewMode = ref<"list" | "grid">("list");
 const showHiddenFiles = ref(false);
 const selectionMode = ref(false);
 const selectedItems = ref<string[]>([]);
 const showPreviewModal = ref(false);
 const previewFile = ref<FileItem | null>(null);
-const previewContent = ref('');
-const previewUrl = ref('');
-const newFolderName = ref('');
+const previewContent = ref("");
+const previewUrl = ref("");
+const newFolderName = ref("");
 
 // 右键菜单
 const contextMenu = ref({
@@ -366,7 +267,7 @@ const contextMenu = ref({
 
 // 剪贴板
 const clipboard = ref({
-  action: 'copy' as 'copy' | 'cut',
+  action: "copy" as "copy" | "cut",
   item: null as FileItem | null,
 });
 
@@ -375,7 +276,7 @@ const websocket = ref<WebSocket | null>(null);
 
 // 计算属性
 const pathSegments = computed(() => {
-  return currentPath.value.split('/').filter(segment => segment.length > 0);
+  return currentPath.value.split("/").filter((segment) => segment.length > 0);
 });
 
 const sortedItems = computed(() => {
@@ -383,7 +284,7 @@ const sortedItems = computed(() => {
 
   // 过滤隐藏文件
   if (!showHiddenFiles.value) {
-    filtered = filtered.filter(item => !item.name.startsWith('.'));
+    filtered = filtered.filter((item) => !item.name.startsWith("."));
   }
 
   // 目录优先排序
@@ -398,12 +299,12 @@ const sortedItems = computed(() => {
     let aValue: any = a[sortBy.value as keyof FileItem];
     let bValue: any = b[sortBy.value as keyof FileItem];
 
-    if (typeof aValue === 'string') {
+    if (typeof aValue === "string") {
       aValue = aValue.toLowerCase();
       bValue = (bValue as string).toLowerCase();
     }
 
-    if (sortOrder.value === 'asc') {
+    if (sortOrder.value === "asc") {
       return aValue > bValue ? 1 : -1;
     } else {
       return aValue < bValue ? 1 : -1;
@@ -417,7 +318,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('ExploreTool WebSocket connected');
+      console.log("ExploreTool WebSocket connected");
       loadDirectory(currentPath.value);
     };
 
@@ -426,39 +327,39 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('ExploreTool WebSocket disconnected');
+      console.log("ExploreTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('ExploreTool WebSocket error:', error);
+      console.error("ExploreTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'directory_response':
+    case "directory_response":
       items.value = message.items || [];
       break;
-    case 'file_content_response':
+    case "file_content_response":
       if (previewFile.value) {
-        previewContent.value = message.content || '';
+        previewContent.value = message.content || "";
       }
       break;
-    case 'file_preview_response':
+    case "file_preview_response":
       if (message.url) {
         previewUrl.value = message.url;
       }
       break;
-    case 'operation_completed':
+    case "operation_completed":
       loadDirectory(currentPath.value);
       break;
   }
@@ -474,7 +375,7 @@ const sendWebSocketMessage = (message: any) => {
 const loadDirectory = (path: string) => {
   currentPath.value = path;
   sendWebSocketMessage({
-    type: 'directory_request',
+    type: "directory_request",
     path,
   });
 };
@@ -484,7 +385,7 @@ const refreshCurrentPath = () => {
 };
 
 const goToParent = () => {
-  const parentPath = currentPath.value.split('/').slice(0, -1).join('/') || '/';
+  const parentPath = currentPath.value.split("/").slice(0, -1).join("/") || "/";
   loadDirectory(parentPath);
 };
 
@@ -494,7 +395,7 @@ const navigateToPath = (path: string) => {
 
 const navigateToSegment = (index: number) => {
   const segments = pathSegments.value.slice(0, index + 1);
-  const path = '/' + segments.join('/');
+  const path = "/" + segments.join("/");
   loadDirectory(path);
 };
 
@@ -502,7 +403,7 @@ const handleItemClick = (item: FileItem) => {
   if (item.isDirectory) {
     loadDirectory(item.path);
   } else {
-    emit('fileSelected', item);
+    emit("fileSelected", item);
     viewFile(item);
   }
 };
@@ -514,33 +415,33 @@ const viewFile = (file: FileItem) => {
   // 请求文件内容或预览
   if (isImageFile(file)) {
     sendWebSocketMessage({
-      type: 'file_preview_request',
+      type: "file_preview_request",
       path: file.path,
     });
   } else if (isTextFile(file)) {
     sendWebSocketMessage({
-      type: 'file_content_request',
+      type: "file_content_request",
       path: file.path,
     });
   }
 };
 
 const editFile = (file: FileItem) => {
-  emit('fileOpened', file);
+  emit("fileOpened", file);
 };
 
 const downloadItem = (item: FileItem) => {
   sendWebSocketMessage({
-    type: 'download_request',
+    type: "download_request",
     path: item.path,
     isDirectory: item.isDirectory,
   });
 };
 
 const deleteItem = (item: FileItem) => {
-  if (confirm(`确定要${item.isDirectory ? '删除文件夹' : '删除文件'} "${item.name}" 吗？`)) {
+  if (confirm(`确定要${item.isDirectory ? "删除文件夹" : "删除文件"} "${item.name}" 吗？`)) {
     sendWebSocketMessage({
-      type: 'delete_request',
+      type: "delete_request",
       path: item.path,
       isDirectory: item.isDirectory,
     });
@@ -550,21 +451,21 @@ const deleteItem = (item: FileItem) => {
 const createFolder = () => {
   if (!newFolderName.value.trim()) return;
 
-  const folderPath = currentPath.value + '/' + newFolderName.value.trim();
+  const folderPath = currentPath.value + "/" + newFolderName.value.trim();
 
   sendWebSocketMessage({
-    type: 'create_folder_request',
+    type: "create_folder_request",
     path: folderPath,
   });
 
-  newFolderName.value = '';
+  newFolderName.value = "";
 };
 
 const renameItem = (item: FileItem) => {
-  const newName = prompt('请输入新名称:', item.name);
+  const newName = prompt("请输入新名称:", item.name);
   if (newName && newName.trim() && newName.trim() !== item.name) {
     sendWebSocketMessage({
-      type: 'rename_request',
+      type: "rename_request",
       oldPath: item.path,
       newName: newName.trim(),
     });
@@ -594,27 +495,27 @@ const clearSelection = () => {
 
 // 剪贴板操作
 const copyItem = (item: FileItem) => {
-  clipboard.value = { action: 'copy', item };
+  clipboard.value = { action: "copy", item };
   hideContextMenu();
 };
 
 const cutItem = (item: FileItem) => {
-  clipboard.value = { action: 'cut', item };
+  clipboard.value = { action: "cut", item };
   hideContextMenu();
 };
 
 const pasteItem = () => {
   if (!clipboard.value.item) return;
 
-  const targetPath = currentPath.value + '/' + clipboard.value.item.name;
+  const targetPath = currentPath.value + "/" + clipboard.value.item.name;
 
   sendWebSocketMessage({
-    type: clipboard.value.action === 'copy' ? 'copy_request' : 'move_request',
+    type: clipboard.value.action === "copy" ? "copy_request" : "move_request",
     sourcePath: clipboard.value.item.path,
     targetPath,
   });
 
-  if (clipboard.value.action === 'cut') {
+  if (clipboard.value.action === "cut") {
     clipboard.value.item = null;
   }
   hideContextMenu();
@@ -622,11 +523,11 @@ const pasteItem = () => {
 
 // UI 相关方法
 const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'list' ? 'grid' : 'list';
+  viewMode.value = viewMode.value === "list" ? "grid" : "list";
 };
 
 const toggleSortOrder = () => {
-  sortOrder.value = sortOrder.value === 'asc' ? 'desc' : 'asc';
+  sortOrder.value = sortOrder.value === "asc" ? "desc" : "asc";
 };
 
 const toggleHiddenFiles = () => {
@@ -636,8 +537,8 @@ const toggleHiddenFiles = () => {
 const closePreview = () => {
   showPreviewModal.value = false;
   previewFile.value = null;
-  previewContent.value = '';
-  previewUrl.value = '';
+  previewContent.value = "";
+  previewUrl.value = "";
 };
 
 // 右键菜单
@@ -651,7 +552,7 @@ const showContextMenu = (item: FileItem, event: MouseEvent) => {
 
   // 监听点击事件来隐藏菜单
   nextTick(() => {
-    document.addEventListener('click', hideContextMenu, { once: true });
+    document.addEventListener("click", hideContextMenu, { once: true });
   });
 };
 
@@ -661,66 +562,64 @@ const hideContextMenu = () => {
 
 // 工具方法
 const getIconForItem = (item: FileItem) => {
-  if (item.isDirectory) return 'folder';
-  if (isImageFile(item)) return 'image';
-  if (isTextFile(item)) return 'file-text';
-  if (item.extension === 'pdf') return 'file-pdf';
-  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(item.extension || '')) return 'archive';
-  return 'file';
+  if (item.isDirectory) return "folder";
+  if (isImageFile(item)) return "image";
+  if (isTextFile(item)) return "file-text";
+  if (item.extension === "pdf") return "file-pdf";
+  if (["zip", "rar", "7z", "tar", "gz"].includes(item.extension || "")) return "archive";
+  return "file";
 };
 
 const getIconClassForItem = (item: FileItem) => {
-  if (item.isDirectory) return 'text-blue-500';
-  if (isImageFile(item)) return 'text-green-500';
-  if (isTextFile(item)) return 'text-gray-500';
-  return 'text-gray-400';
+  if (item.isDirectory) return "text-blue-500";
+  if (isImageFile(item)) return "text-green-500";
+  if (isTextFile(item)) return "text-gray-500";
+  return "text-gray-400";
 };
 
 const getFileExtension = (filename: string) => {
-  const parts = filename.split('.');
-  return parts.length > 1 ? (parts[parts.length - 1] ?? '').toLowerCase() : '';
+  const parts = filename.split(".");
+  return parts.length > 1 ? (parts[parts.length - 1] ?? "").toLowerCase() : "";
 };
 
 const isImageFile = (item: FileItem) => {
-  const imageExtensions = ['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'];
-  return imageExtensions.includes(item.extension || '');
+  const imageExtensions = ["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"];
+  return imageExtensions.includes(item.extension || "");
 };
 
 const isTextFile = (item: FileItem) => {
-  const textExtensions = ['txt', 'md', 'json', 'js', 'ts', 'html', 'css', 'py', 'java', 'cpp', 'c', 'go', 'rs', 'sql', 'xml', 'yaml', 'yml'];
-  return textExtensions.includes(item.extension || '');
+  const textExtensions = ["txt", "md", "json", "js", "ts", "html", "css", "py", "java", "cpp", "c", "go", "rs", "sql", "xml", "yaml", "yml"];
+  return textExtensions.includes(item.extension || "");
 };
 
 const getFileTypeText = (item: FileItem) => {
-  if (item.isDirectory) return '文件夹';
-  if (isImageFile(item)) return '图片文件';
-  if (isTextFile(item)) return '文本文件';
-  return getFileExtension(item.name).toUpperCase() + ' 文件';
+  if (item.isDirectory) return "文件夹";
+  if (isImageFile(item)) return "图片文件";
+  if (isTextFile(item)) return "文本文件";
+  return getFileExtension(item.name).toUpperCase() + " 文件";
 };
 
 const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatTotalSize = () => {
-  const totalSize = items.value
-    .filter(item => !item.isDirectory)
-    .reduce((sum, item) => sum + item.size, 0);
+  const totalSize = items.value.filter((item) => !item.isDirectory).reduce((sum, item) => sum + item.size, 0);
   return formatFileSize(totalSize);
 };
 
 const formatDate = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('zh-CN', {
-    year: 'numeric',
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return date.toLocaleDateString("zh-CN", {
+    year: "numeric",
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -730,7 +629,7 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', hideContextMenu);
+  document.removeEventListener("click", hideContextMenu);
 });
 </script>
 

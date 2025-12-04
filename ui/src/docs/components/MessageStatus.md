@@ -29,7 +29,7 @@
 </template>
 
 <script setup>
-import { MessageStatus, Flex } from '@/components/ChatUI';
+import { MessageStatus, Flex } from "@/components/ChatUI";
 </script>
 ```
 
@@ -41,29 +41,21 @@ import { MessageStatus, Flex } from '@/components/ChatUI';
 <template>
   <div class="space-y-4">
     <!-- 发送中的消息 -->
-    <Bubble position="right" status="pending">
-      这条消息正在发送中...
-    </Bubble>
+    <Bubble position="right" status="pending"> 这条消息正在发送中... </Bubble>
 
     <!-- 已发送的消息 -->
-    <Bubble position="right" status="sent">
-      消息已成功发送
-    </Bubble>
+    <Bubble position="right" status="sent"> 消息已成功发送 </Bubble>
 
     <!-- 已读的消息 -->
-    <Bubble position="right" status="read">
-      对方已阅读此消息
-    </Bubble>
+    <Bubble position="right" status="read"> 对方已阅读此消息 </Bubble>
 
     <!-- 发送失败的消息 -->
-    <Bubble position="right" status="error">
-      消息发送失败，请重试
-    </Bubble>
+    <Bubble position="right" status="error"> 消息发送失败，请重试 </Bubble>
   </div>
 </template>
 
 <script setup>
-import { Bubble } from '@/components/ChatUI';
+import { Bubble } from "@/components/ChatUI";
 </script>
 ```
 
@@ -85,7 +77,7 @@ import { Bubble } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { Bubble, MessageStatus } from '@/components/ChatUI';
+import { Bubble, MessageStatus } from "@/components/ChatUI";
 </script>
 ```
 
@@ -97,10 +89,7 @@ import { Bubble, MessageStatus } from '@/components/ChatUI';
 <template>
   <div class="space-y-4">
     <div v-for="message in messages" :key="message.id">
-      <Bubble
-        :position="message.sender === 'user' ? 'right' : 'left'"
-        :status="message.status"
-      >
+      <Bubble :position="message.sender === 'user' ? 'right' : 'left'" :status="message.status">
         {{ message.content }}
         <template v-if="message.sender === 'user'" #footer>
           <div class="flex items-center justify-between mt-2">
@@ -114,37 +103,37 @@ import { Bubble, MessageStatus } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Bubble, MessageStatus } from '@/components/ChatUI';
+import { ref } from "vue";
+import { Bubble, MessageStatus } from "@/components/ChatUI";
 
 const messages = ref([
   {
     id: 1,
-    content: '你好！',
-    sender: 'user',
-    status: 'read',
-    timestamp: new Date(Date.now() - 60000)
+    content: "你好！",
+    sender: "user",
+    status: "read",
+    timestamp: new Date(Date.now() - 60000),
   },
   {
     id: 2,
-    content: '你好！很高兴认识你',
-    sender: 'bot',
-    status: 'read',
-    timestamp: new Date(Date.now() - 50000)
+    content: "你好！很高兴认识你",
+    sender: "bot",
+    status: "read",
+    timestamp: new Date(Date.now() - 50000),
   },
   {
     id: 3,
-    content: '这是一条正在发送的消息...',
-    sender: 'user',
-    status: 'pending',
-    timestamp: new Date()
-  }
+    content: "这是一条正在发送的消息...",
+    sender: "user",
+    status: "pending",
+    timestamp: new Date(),
+  },
 ]);
 
 const formatTime = (date) => {
-  return date.toLocaleTimeString('en-US', {
-    hour: 'numeric',
-    minute: '2-digit'
+  return date.toLocaleTimeString("en-US", {
+    hour: "numeric",
+    minute: "2-digit",
   });
 };
 </script>
@@ -154,22 +143,23 @@ const formatTime = (date) => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 必填 |
-| --- | --- | --- | --- |
-| status | 消息状态 | `'pending' \| 'sent' \| 'read' \| 'error'` | ✓ |
+| 参数   | 说明     | 类型                                       | 必填 |
+| ------ | -------- | ------------------------------------------ | ---- |
+| status | 消息状态 | `'pending' \| 'sent' \| 'read' \| 'error'` | ✓    |
 
 ### Status 类型说明
 
-| 状态值 | 说明 | 图标颜色 | 语义 |
-| --- | --- | --- | --- |
-| `pending` | 发送中 | 灰色 | 消息正在处理中 |
-| `sent` | 已发送 | 蓝色 | 消息已成功发送到服务器 |
-| `read` | 已读 | 蓝色 | 接收方已查看消息 |
-| `error` | 发送失败 | 红色 | 消息发送失败，需要重试 |
+| 状态值    | 说明     | 图标颜色 | 语义                   |
+| --------- | -------- | -------- | ---------------------- |
+| `pending` | 发送中   | 灰色     | 消息正在处理中         |
+| `sent`    | 已发送   | 蓝色     | 消息已成功发送到服务器 |
+| `read`    | 已读     | 蓝色     | 接收方已查看消息       |
+| `error`   | 发送失败 | 红色     | 消息发送失败，需要重试 |
 
 ### 图标说明
 
 每个状态都有对应的 SVG 图标：
+
 - **pending**: 时钟图标，表示处理中
 - **sent**: 单个勾号，表示发送成功
 - **read**: 双勾信封图标，表示已读
@@ -186,16 +176,20 @@ const formatTime = (date) => {
 ## 最佳实践
 
 ### 状态转换
+
 建议按照以下顺序进行状态转换：
+
 1. `pending` → `sent` → `read`
 2. `pending` → `error` → `pending` → `sent` → `read`
 
 ### 用户体验
+
 - 对于发送失败的消息，建议提供重试功能
 - 发送中的状态不应持续时间过长，避免用户焦虑
 - 已读状态只在确认对方确实已查看时显示
 
 ### 样式定制
+
 组件使用 Tailwind CSS 类名，可以通过 CSS 覆盖来自定义样式：
 
 ```css

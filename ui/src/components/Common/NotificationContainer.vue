@@ -2,11 +2,7 @@
   <Teleport to="body">
     <div class="notification-container">
       <TransitionGroup name="notification">
-        <div
-          v-for="notification in notifications"
-          :key="notification.id"
-          :class="['notification', `notification-${notification.type}`]"
-        >
+        <div v-for="notification in notifications" :key="notification.id" :class="['notification', `notification-${notification.type}`]">
           <div class="notification-icon">
             <svg v-if="notification.type === 'success'" class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z"></path>
@@ -29,11 +25,7 @@
             <p class="notification-message">{{ notification.message }}</p>
           </div>
 
-          <button
-            v-if="notification.closable"
-            @click="handleClose(notification.id)"
-            class="notification-close"
-          >
+          <button v-if="notification.closable" @click="handleClose(notification.id)" class="notification-close">
             <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
             </svg>
@@ -45,11 +37,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import { useNotification } from '@/composables/useNotification';
+import { defineComponent } from "vue";
+import { useNotification } from "@/composables/useNotification";
 
 export default defineComponent({
-  name: 'NotificationContainer',
+  name: "NotificationContainer",
 
   setup() {
     const { notifications, remove } = useNotification();

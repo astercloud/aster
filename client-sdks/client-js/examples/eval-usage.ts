@@ -36,16 +36,14 @@ async function main() {
         id: "test-2",
         name: "Technical Question",
         input: "What is the difference between HTTP and HTTPS?",
-        expectedOutput:
-          "HTTPS is the secure version of HTTP. It uses SSL/TLS encryption to protect data in transit.",
+        expectedOutput: "HTTPS is the secure version of HTTP. It uses SSL/TLS encryption to protect data in transit.",
         tags: ["technical", "security"],
       },
       {
         id: "test-3",
         name: "Complex Query",
         input: "Explain how machine learning models are trained",
-        expectedOutput:
-          "Machine learning models are trained by feeding them data and adjusting their parameters to minimize prediction errors.",
+        expectedOutput: "Machine learning models are trained by feeding them data and adjusting their parameters to minimize prediction errors.",
         tags: ["ml", "complex"],
       },
     ],
@@ -71,16 +69,11 @@ async function main() {
   console.log("✅ 测试 Agent 已创建:", agent.id);
 
   // 执行快速评估
-  const quickResult = await client.evals.quickEval(
-    agent.id,
-    "What is AI?",
-    "Artificial Intelligence (AI) refers to computer systems that can perform tasks requiring human intelligence.",
-    [
-      { type: "semantic_similarity", weight: 0.5, params: { threshold: 0.7 } },
-      { type: "keyword_coverage", weight: 0.3 },
-      { type: "coherence", weight: 0.2 },
-    ],
-  );
+  const quickResult = await client.evals.quickEval(agent.id, "What is AI?", "Artificial Intelligence (AI) refers to computer systems that can perform tasks requiring human intelligence.", [
+    { type: "semantic_similarity", weight: 0.5, params: { threshold: 0.7 } },
+    { type: "keyword_coverage", weight: 0.3 },
+    { type: "coherence", weight: 0.2 },
+  ]);
 
   console.log("\n📊 快速评估结果:");
   console.log(`   状态: ${quickResult.status}`);
@@ -122,40 +115,28 @@ async function main() {
 
   console.log("\n📊 批量评估结果:");
   console.log(`   总测试用例: ${batchResult.summary.totalTestCases}`);
-  console.log(
-    `   通过: ${batchResult.summary.passed} | 失败: ${batchResult.summary.failed}`,
-  );
+  console.log(`   通过: ${batchResult.summary.passed} | 失败: ${batchResult.summary.failed}`);
   console.log(`   通过率: ${(batchResult.summary.passRate * 100).toFixed(1)}%`);
   console.log(`   平均分数: ${batchResult.summary.avgScore.toFixed(2)}`);
-  console.log(
-    `   平均执行时间: ${batchResult.summary.avgExecutionTime.toFixed(0)}ms`,
-  );
+  console.log(`   平均执行时间: ${batchResult.summary.avgExecutionTime.toFixed(0)}ms`);
 
   if (batchResult.summary.totalTokenUsage) {
-    console.log(
-      `   总 Tokens: ${batchResult.summary.totalTokenUsage.totalTokens.toLocaleString()}`,
-    );
+    console.log(`   总 Tokens: ${batchResult.summary.totalTokenUsage.totalTokens.toLocaleString()}`);
   }
 
   if (batchResult.summary.totalCost) {
-    console.log(
-      `   总成本: ${batchResult.summary.totalCost.currency} ${batchResult.summary.totalCost.amount.toFixed(4)}`,
-    );
+    console.log(`   总成本: ${batchResult.summary.totalCost.currency} ${batchResult.summary.totalCost.amount.toFixed(4)}`);
   }
 
   console.log("\n   各 Scorer 平均分:");
-  Object.entries(batchResult.summary.avgScoresByScorer).forEach(
-    ([scorer, score]) => {
-      console.log(`     ${scorer}: ${score.toFixed(2)}`);
-    },
-  );
+  Object.entries(batchResult.summary.avgScoresByScorer).forEach(([scorer, score]) => {
+    console.log(`     ${scorer}: ${score.toFixed(2)}`);
+  });
 
   console.log("\n   各测试用例结果:");
   batchResult.testCaseResults.forEach((result, i) => {
     const icon = result.passed ? "✅" : "❌";
-    console.log(
-      `     ${icon} ${result.testCaseName}: ${result.overallScore.toFixed(2)}`,
-    );
+    console.log(`     ${icon} ${result.testCaseName}: ${result.overallScore.toFixed(2)}`);
   });
 
   // ========================================================================
@@ -188,9 +169,7 @@ async function main() {
   });
 
   // 等待 Benchmark 完成
-  const benchmarkResult = await client.evals.waitForBenchmarkCompletion(
-    benchmark.id,
-  );
+  const benchmarkResult = await client.evals.waitForBenchmarkCompletion(benchmark.id);
 
   console.log("\n📊 Benchmark 结果:");
   console.log(`   状态: ${benchmarkResult.status}`);
@@ -210,15 +189,10 @@ async function main() {
   console.log("-".repeat(70));
 
   console.log("开始 A/B 测试...");
-  const abTestResult = await client.evals.compareAgents(
-    agent.id,
-    agent2.id,
-    testCaseSet.id,
-    [
-      { type: "semantic_similarity", weight: 0.5 },
-      { type: "keyword_coverage", weight: 0.5 },
-    ],
-  );
+  const abTestResult = await client.evals.compareAgents(agent.id, agent2.id, testCaseSet.id, [
+    { type: "semantic_similarity", weight: 0.5 },
+    { type: "keyword_coverage", weight: 0.5 },
+  ]);
 
   console.log("\n📊 A/B 测试结果:");
   console.log(`   状态: ${abTestResult.status}`);
@@ -227,15 +201,12 @@ async function main() {
   console.log("\n   统计分析:");
   console.log(`     Agent A 平均分: ${stats.agentAAvgScore.toFixed(2)}`);
   console.log(`     Agent B 平均分: ${stats.agentBAvgScore.toFixed(2)}`);
-  console.log(
-    `     差异: ${stats.difference > 0 ? "+" : ""}${stats.difference.toFixed(2)} (${stats.differencePercent > 0 ? "+" : ""}${stats.differencePercent.toFixed(1)}%)`,
-  );
+  console.log(`     差异: ${stats.difference > 0 ? "+" : ""}${stats.difference.toFixed(2)} (${stats.differencePercent > 0 ? "+" : ""}${stats.differencePercent.toFixed(1)}%)`);
   console.log(`     p-value: ${stats.pValue.toFixed(4)}`);
   console.log(`     显著性: ${stats.isSignificant ? "✅ 显著" : "❌ 不显著"}`);
 
   if (stats.winner) {
-    const winnerIcon =
-      stats.winner === "A" ? "🏆" : stats.winner === "B" ? "🏆" : "🤝";
+    const winnerIcon = stats.winner === "A" ? "🏆" : stats.winner === "B" ? "🏆" : "🤝";
     console.log(`     胜者: ${winnerIcon} Agent ${stats.winner}`);
   }
 
@@ -268,10 +239,7 @@ async function main() {
   console.log(mdReport.content.substring(0, 200) + "...");
 
   // 导出 JSON
-  const jsonExport = await client.evals.exportResult(
-    batchResult.evalId,
-    "json",
-  );
+  const jsonExport = await client.evals.exportResult(batchResult.evalId, "json");
   console.log("\n✅ JSON 导出已完成");
   console.log(`   大小: ${jsonExport.length} 字符`);
 
@@ -291,15 +259,11 @@ async function main() {
     sortOrder: "desc",
   });
 
-  console.log(
-    `📋 找到 ${evals.total} 个 Evals (显示 ${evals.items.length} 个):`,
-  );
+  console.log(`📋 找到 ${evals.total} 个 Evals (显示 ${evals.items.length} 个):`);
   evals.items.forEach((evalInfo, i) => {
     console.log(`   ${i + 1}. ${evalInfo.name} (${evalInfo.type})`);
     console.log(`      状态: ${evalInfo.status} | 进度: ${evalInfo.progress}%`);
-    console.log(
-      `      测试用例: ${evalInfo.completedTestCases}/${evalInfo.totalTestCases}`,
-    );
+    console.log(`      测试用例: ${evalInfo.completedTestCases}/${evalInfo.totalTestCases}`);
   });
 
   // 获取 Eval 详情

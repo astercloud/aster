@@ -58,9 +58,7 @@ export class WorkflowResource extends BaseResource {
    * @param filter 过滤条件
    * @returns Workflow 列表
    */
-  async list(
-    filter?: WorkflowFilter,
-  ): Promise<PaginatedResponse<WorkflowInfo>> {
+  async list(filter?: WorkflowFilter): Promise<PaginatedResponse<WorkflowInfo>> {
     return this.request<PaginatedResponse<WorkflowInfo>>("/v1/workflows", {
       params: filter,
     });
@@ -72,10 +70,7 @@ export class WorkflowResource extends BaseResource {
    * @param updates 更新内容
    * @returns 更新后的 Workflow
    */
-  async update(
-    workflowId: string,
-    updates: UpdateWorkflowRequest,
-  ): Promise<WorkflowInfo> {
+  async update(workflowId: string, updates: UpdateWorkflowRequest): Promise<WorkflowInfo> {
     return this.request<WorkflowInfo>(`/v1/workflows/${workflowId}`, {
       method: "PATCH",
       body: updates,
@@ -102,10 +97,7 @@ export class WorkflowResource extends BaseResource {
    * @param request 执行请求
    * @returns Workflow 执行记录
    */
-  async execute(
-    workflowId: string,
-    request: ExecuteWorkflowRequest,
-  ): Promise<WorkflowRun> {
+  async execute(workflowId: string, request: ExecuteWorkflowRequest): Promise<WorkflowRun> {
     return this.request<WorkflowRun>(`/v1/workflows/${workflowId}/execute`, {
       method: "POST",
       body: request,
@@ -117,10 +109,7 @@ export class WorkflowResource extends BaseResource {
    * @param workflowId Workflow ID
    * @param request 暂停请求
    */
-  async suspend(
-    workflowId: string,
-    request: SuspendWorkflowRequest,
-  ): Promise<void> {
+  async suspend(workflowId: string, request: SuspendWorkflowRequest): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/suspend`, {
       method: "POST",
       body: request,
@@ -132,10 +121,7 @@ export class WorkflowResource extends BaseResource {
    * @param workflowId Workflow ID
    * @param request 恢复请求
    */
-  async resume(
-    workflowId: string,
-    request: ResumeWorkflowRequest,
-  ): Promise<void> {
+  async resume(workflowId: string, request: ResumeWorkflowRequest): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/resume`, {
       method: "POST",
       body: request,
@@ -147,10 +133,7 @@ export class WorkflowResource extends BaseResource {
    * @param workflowId Workflow ID
    * @param request 取消请求
    */
-  async cancel(
-    workflowId: string,
-    request: CancelWorkflowRequest,
-  ): Promise<void> {
+  async cancel(workflowId: string, request: CancelWorkflowRequest): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/cancel`, {
       method: "POST",
       body: request,
@@ -167,14 +150,8 @@ export class WorkflowResource extends BaseResource {
    * @param filter 过滤条件
    * @returns 执行记录列表
    */
-  async getRuns(
-    workflowId: string,
-    filter?: WorkflowRunFilter,
-  ): Promise<PaginatedResponse<WorkflowRun>> {
-    return this.request<PaginatedResponse<WorkflowRun>>(
-      `/v1/workflows/${workflowId}/executions`,
-      { params: filter },
-    );
+  async getRuns(workflowId: string, filter?: WorkflowRunFilter): Promise<PaginatedResponse<WorkflowRun>> {
+    return this.request<PaginatedResponse<WorkflowRun>>(`/v1/workflows/${workflowId}/executions`, { params: filter });
   }
 
   /**
@@ -183,10 +160,7 @@ export class WorkflowResource extends BaseResource {
    * @param filter 过滤条件
    * @returns 执行记录数组
    */
-  async listExecutions(
-    workflowId: string,
-    filter?: WorkflowRunFilter,
-  ): Promise<WorkflowRun[]> {
+  async listExecutions(workflowId: string, filter?: WorkflowRunFilter): Promise<WorkflowRun[]> {
     const result = await this.getRuns(workflowId, filter);
     return result.items || [];
   }
@@ -198,9 +172,7 @@ export class WorkflowResource extends BaseResource {
    * @returns 执行详情
    */
   async getRunDetails(workflowId: string, runId: string): Promise<RunDetails> {
-    return this.request<RunDetails>(
-      `/v1/workflows/${workflowId}/runs/${runId}`,
-    );
+    return this.request<RunDetails>(`/v1/workflows/${workflowId}/runs/${runId}`);
   }
 
   /**
@@ -210,9 +182,7 @@ export class WorkflowResource extends BaseResource {
    * @returns 执行状态
    */
   async getRunStatus(workflowId: string, runId: string): Promise<WorkflowRun> {
-    return this.request<WorkflowRun>(
-      `/v1/workflows/${workflowId}/runs/${runId}/status`,
-    );
+    return this.request<WorkflowRun>(`/v1/workflows/${workflowId}/runs/${runId}/status`);
   }
 
   // ==========================================================================
@@ -224,9 +194,7 @@ export class WorkflowResource extends BaseResource {
    * @param definition Workflow 定义
    * @returns 验证结果
    */
-  async validate(
-    definition: WorkflowDefinition,
-  ): Promise<WorkflowValidationResult> {
+  async validate(definition: WorkflowDefinition): Promise<WorkflowValidationResult> {
     return this.request<WorkflowValidationResult>("/v1/workflows/validate", {
       method: "POST",
       body: definition,
@@ -286,19 +254,13 @@ export class WorkflowResource extends BaseResource {
       const run = await this.getRunStatus(workflowId, runId);
 
       // 检查是否完成
-      if (
-        run.status === "completed" ||
-        run.status === "failed" ||
-        run.status === "cancelled"
-      ) {
+      if (run.status === "completed" || run.status === "failed" || run.status === "cancelled") {
         return run;
       }
 
       // 检查超时
       if (Date.now() - startTime > timeout) {
-        throw new Error(
-          `Workflow execution timeout after ${timeout}ms. Current status: ${run.status}`,
-        );
+        throw new Error(`Workflow execution timeout after ${timeout}ms. Current status: ${run.status}`);
       }
 
       // 等待后继续轮询

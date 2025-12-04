@@ -2,12 +2,7 @@
   <div v-if="hasError" class="error-boundary">
     <div class="error-content">
       <svg class="error-icon" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-        <path
-          stroke-linecap="round"
-          stroke-linejoin="round"
-          stroke-width="2"
-          d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"
-        />
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
       </svg>
 
       <h3 class="error-title">{{ errorTitle }}</h3>
@@ -22,19 +17,12 @@
       <div class="error-actions">
         <button @click="handleRetry" class="error-button error-button-primary">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path
-              stroke-linecap="round"
-              stroke-linejoin="round"
-              stroke-width="2"
-              d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"
-            />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15" />
           </svg>
           重试
         </button>
 
-        <button v-if="onReset" @click="handleReset" class="error-button error-button-secondary">
-          重置
-        </button>
+        <button v-if="onReset" @click="handleReset" class="error-button error-button-secondary">重置</button>
       </div>
     </div>
   </div>
@@ -44,19 +32,19 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref, onErrorCaptured, provide } from 'vue';
+import { defineComponent, ref, onErrorCaptured, provide } from "vue";
 
 export default defineComponent({
-  name: 'ErrorBoundary',
+  name: "ErrorBoundary",
 
   props: {
     errorTitle: {
       type: String,
-      default: '出错了',
+      default: "出错了",
     },
     errorMessage: {
       type: String,
-      default: '渲染组件时发生错误',
+      default: "渲染组件时发生错误",
     },
     showDetails: {
       type: Boolean,
@@ -82,7 +70,7 @@ export default defineComponent({
 
     // 捕获子组件错误
     onErrorCaptured((err: Error) => {
-      console.error('ErrorBoundary caught error:', err);
+      console.error("ErrorBoundary caught error:", err);
 
       hasError.value = true;
       error.value = err;
@@ -97,7 +85,7 @@ export default defineComponent({
     });
 
     // 提供重置错误状态的方法给子组件
-    provide('resetError', () => {
+    provide("resetError", () => {
       hasError.value = false;
       error.value = null;
     });

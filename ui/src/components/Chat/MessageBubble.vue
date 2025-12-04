@@ -1,16 +1,15 @@
 <template>
-  <div
-    :class="[
-      'message-bubble',
-      `message-${message.role}`,
-      message.status === 'error' && 'message-error'
-    ]"
-  >
+  <div :class="['message-bubble', `message-${message.role}`, message.status === 'error' && 'message-error']">
     <!-- Avatar -->
     <div v-if="showAvatar && message.role === 'assistant'" class="message-avatar">
       <div class="w-8 h-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0">
         <svg class="w-4 h-4 text-primary" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+          ></path>
         </svg>
       </div>
     </div>
@@ -18,27 +17,13 @@
     <!-- Content -->
     <div class="message-content-wrapper">
       <!-- Bubble -->
-      <div
-        :class="[
-          'message-bubble-content',
-          message.role === 'user' ? 'bg-primary text-white' : 'bg-surface dark:bg-surface-dark text-text dark:text-text-dark border border-border dark:border-border-dark'
-        ]"
-      >
+      <div :class="['message-bubble-content', message.role === 'user' ? 'bg-primary text-white' : 'bg-surface dark:bg-surface-dark text-text dark:text-text-dark border border-border dark:border-border-dark']">
         <!-- Text Content -->
-        <div
-          v-if="message.type === 'text'"
-          class="message-text"
-          v-html="renderedContent"
-        ></div>
+        <div v-if="message.type === 'text'" class="message-text" v-html="renderedContent"></div>
 
         <!-- Image Content -->
         <div v-else-if="message.type === 'image'" class="message-image">
-          <img
-            :src="message.content.url"
-            :alt="message.content.alt"
-            class="max-w-full rounded"
-            loading="lazy"
-          />
+          <img :src="message.content.url" :alt="message.content.alt" class="max-w-full rounded" loading="lazy" />
         </div>
 
         <!-- System Message -->
@@ -61,23 +46,10 @@
       </div>
 
       <!-- ThinkingBlock (仅显示助手消息) -->
-      <ThinkingBlock
-        v-if="message.role === 'assistant' && thinkingSteps.length > 0"
-        :message-id="message.id"
-        :steps="thinkingSteps"
-        :is-active="isThinking"
-        :summary="thinkingSummary"
-      />
+      <ThinkingBlock v-if="message.role === 'assistant' && thinkingSteps.length > 0" :message-id="message.id" :steps="thinkingSteps" :is-active="isThinking" :summary="thinkingSummary" />
 
       <!-- WorkflowProgressView (仅当有激活工作流时显示) -->
-      <WorkflowProgressView
-        v-if="showWorkflow"
-        :steps="workflowSteps"
-        title="工作流进度"
-        :show-progress="true"
-        :show-steps="true"
-        :max-visible-steps="3"
-      />
+      <WorkflowProgressView v-if="showWorkflow" :steps="workflowSteps" title="工作流进度" :show-progress="true" :show-steps="true" :max-visible-steps="3" />
 
       <!-- Timestamp -->
       <div v-if="showTimestamp" class="message-timestamp">
@@ -86,30 +58,17 @@
 
       <!-- Actions (on hover) -->
       <div v-if="showActions" class="message-actions">
-        <button
-          @click="$emit('copy', message)"
-          class="action-button"
-          title="复制"
-        >
+        <button @click="$emit('copy', message)" class="action-button" title="复制">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 16H6a2 2 0 01-2-2V6a2 2 0 012-2h8a2 2 0 012 2v2m-6 12h8a2 2 0 002-2v-8a2 2 0 00-2-2h-8a2 2 0 00-2 2v8a2 2 0 002 2z"></path>
           </svg>
         </button>
-        <button
-          v-if="message.status === 'error'"
-          @click="$emit('retry', message)"
-          class="action-button"
-          title="重试"
-        >
+        <button v-if="message.status === 'error'" @click="$emit('retry', message)" class="action-button" title="重试">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15"></path>
           </svg>
         </button>
-        <button
-          @click="$emit('delete', message)"
-          class="action-button"
-          title="删除"
-        >
+        <button @click="$emit('delete', message)" class="action-button" title="删除">
           <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 7l-.867 12.142A2 2 0 0116.138 21H7.862a2 2 0 01-1.995-1.858L5 7m5 4v6m4-6v6m1-10V4a1 1 0 00-1-1h-4a1 1 0 00-1 1v3M4 7h16"></path>
           </svg>
@@ -120,17 +79,17 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
-import { renderMarkdown } from '@/utils/markdown';
-import { formatTime } from '@/utils/format';
-import { useThinkingStore } from '@/stores/thinking';
-import { useWorkflowStore } from '@/stores/workflow';
-import { ThinkingBlock } from '@/components/Thinking';
-import { WorkflowProgressView } from '@/components/Workflow';
-import type { Message, TextMessage } from '@/types';
+import { defineComponent, computed } from "vue";
+import { renderMarkdown } from "@/utils/markdown";
+import { formatTime } from "@/utils/format";
+import { useThinkingStore } from "@/stores/thinking";
+import { useWorkflowStore } from "@/stores/workflow";
+import { ThinkingBlock } from "@/components/Thinking";
+import { WorkflowProgressView } from "@/components/Workflow";
+import type { Message, TextMessage } from "@/types";
 
 export default defineComponent({
-  name: 'MessageBubble',
+  name: "MessageBubble",
 
   components: {
     ThinkingBlock,
@@ -167,11 +126,11 @@ export default defineComponent({
     const workflowStore = useWorkflowStore();
 
     const renderedContent = computed(() => {
-      if (props.message.type === 'text') {
+      if (props.message.type === "text") {
         const textMessage = props.message as TextMessage;
         return renderMarkdown(textMessage.content.text);
       }
-      return '';
+      return "";
     });
 
     // 获取该消息的思维步骤
@@ -188,17 +147,17 @@ export default defineComponent({
     const thinkingSummary = computed(() => {
       // 可以根据步骤生成摘要
       if (thinkingSteps.value.length > 0 && !isThinking.value) {
-        const toolCalls = thinkingSteps.value.filter(s => s.type === 'tool_call');
+        const toolCalls = thinkingSteps.value.filter((s) => s.type === "tool_call");
         if (toolCalls.length > 0) {
           return `执行了 ${toolCalls.length} 个工具调用`;
         }
       }
-      return '';
+      return "";
     });
 
     // 是否显示工作流进度（仅当有激活的工作流时）
     const showWorkflow = computed(() => {
-      return props.message.role === 'assistant' && workflowStore.hasActiveWorkflow;
+      return props.message.role === "assistant" && workflowStore.hasActiveWorkflow;
     });
 
     // 工作流步骤

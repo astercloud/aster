@@ -2,12 +2,7 @@
   <div class="chatui-components-page">
     <Navbar title="ChatUI 组件库">
       <template #menu>
-        <a
-          v-for="section in sections"
-          :key="section.id"
-          :href="`#${section.id}`"
-          class="nav-link"
-        >
+        <a v-for="section in sections" :key="section.id" :href="`#${section.id}`" class="nav-link">
           {{ section.name }}
         </a>
       </template>
@@ -34,9 +29,7 @@
         <!-- Hero -->
         <section class="hero-section">
           <h1 class="hero-title">ChatUI 组件库</h1>
-          <p class="hero-subtitle">
-            参考 ChatUI 设计的完整对话界面组件库，专为 Aster Agent 打造
-          </p>
+          <p class="hero-subtitle">参考 ChatUI 设计的完整对话界面组件库，专为 Aster Agent 打造</p>
           <Flex justify="center" gap="md">
             <Button variant="primary" size="lg">快速开始</Button>
             <Button variant="secondary" size="lg">查看文档</Button>
@@ -48,12 +41,12 @@
         <!-- 对话组件 -->
         <section id="chat" class="component-section">
           <h2 class="section-title">对话组件</h2>
-          
+
           <div id="demo-bubble" class="demo-card" @click="showComponentDoc('bubble')">
             <div class="demo-header">
               <h3 class="demo-title">Bubble - 消息气泡</h3>
               <p v-if="hasDoc('bubble')" class="demo-description">
-                {{ getDocDescription('bubble') }}
+                {{ getDocDescription("bubble") }}
               </p>
             </div>
             <div class="demo-content" @click.stop>
@@ -63,9 +56,7 @@
               </Flex>
             </div>
             <div v-if="hasDoc('bubble')" class="demo-footer">
-              <button class="view-docs-link" @click.stop="showComponentDoc('bubble')">
-                查看完整文档 →
-              </button>
+              <button class="view-docs-link" @click.stop="showComponentDoc('bubble')">查看完整文档 →</button>
             </div>
           </div>
 
@@ -84,7 +75,7 @@
                 content="这是一篇关于 AI Agent 的深度文章"
                 :actions="[
                   { text: '查看详情', value: 'view' },
-                  { text: '分享', value: 'share' }
+                  { text: '分享', value: 'share' },
                 ]"
               />
             </div>
@@ -102,14 +93,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Chat - 聊天容器</h3>
               <p v-if="hasDoc('chat')" class="demo-description">
-                {{ getDocDescription('chat') }}
+                {{ getDocDescription("chat") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">完整的聊天容器组件，包含消息列表、输入框等功能</p>
-              <router-link v-if="hasDoc('chat')" :to="`/docs/chat`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('chat')" :to="`/docs/chat`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -121,9 +110,7 @@
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">Demo 开发中</p>
-              <router-link :to="`/docs/typing-bubble`" class="view-docs-button">
-                查看文档 →
-              </router-link>
+              <router-link :to="`/docs/typing-bubble`" class="view-docs-button"> 查看文档 → </router-link>
             </div>
           </div>
 
@@ -135,9 +122,7 @@
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">Demo 开发中</p>
-              <router-link :to="`/docs/file-card`" class="view-docs-button">
-                查看文档 →
-              </router-link>
+              <router-link :to="`/docs/file-card`" class="view-docs-button"> 查看文档 → </router-link>
             </div>
           </div>
 
@@ -149,9 +134,7 @@
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">Demo 开发中</p>
-              <router-link :to="`/docs/message-status`" class="view-docs-button">
-                查看文档 →
-              </router-link>
+              <router-link :to="`/docs/message-status`" class="view-docs-button"> 查看文档 → </router-link>
             </div>
           </div>
         </section>
@@ -159,12 +142,12 @@
         <!-- 基础组件 -->
         <section id="basic" class="component-section">
           <h2 class="section-title">基础组件</h2>
-          
+
           <div id="demo-button" class="demo-card" @click="showComponentDoc('button')">
             <div class="demo-header">
               <h3 class="demo-title">Button - 按钮</h3>
               <p v-if="hasDoc('button')" class="demo-description">
-                {{ getDocDescription('button') }}
+                {{ getDocDescription("button") }}
               </p>
             </div>
             <div class="demo-content" @click.stop>
@@ -176,9 +159,7 @@
               </Flex>
             </div>
             <div v-if="hasDoc('button')" class="demo-footer">
-              <button class="view-docs-link" @click.stop="showComponentDoc('button')">
-                查看完整文档 →
-              </button>
+              <button class="view-docs-link" @click.stop="showComponentDoc('button')">查看完整文档 →</button>
             </div>
           </div>
 
@@ -186,7 +167,7 @@
             <div class="demo-header">
               <h3 class="demo-title">Avatar - 头像</h3>
               <p v-if="hasDoc('avatar')" class="demo-description">
-                {{ getDocDescription('avatar') }}
+                {{ getDocDescription("avatar") }}
               </p>
             </div>
             <div class="demo-content" @click.stop>
@@ -199,9 +180,7 @@
               </Flex>
             </div>
             <div v-if="hasDoc('avatar')" class="demo-footer">
-              <button class="view-docs-link" @click.stop="showComponentDoc('avatar')">
-                查看完整文档 →
-              </button>
+              <button class="view-docs-link" @click.stop="showComponentDoc('avatar')">查看完整文档 →</button>
             </div>
           </div>
 
@@ -224,14 +203,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Icon - 图标</h3>
               <p v-if="hasDoc('icon')" class="demo-description">
-                {{ getDocDescription('icon') }}
+                {{ getDocDescription("icon") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">内置常用图标组件</p>
-              <router-link v-if="hasDoc('icon')" :to="`/docs/icon`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('icon')" :to="`/docs/icon`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -240,14 +217,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Image - 图片</h3>
               <p v-if="hasDoc('image')" class="demo-description">
-                {{ getDocDescription('image') }}
+                {{ getDocDescription("image") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">支持懒加载、预览的图片组件</p>
-              <router-link v-if="hasDoc('image')" :to="`/docs/image`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('image')" :to="`/docs/image`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
         </section>
@@ -255,36 +230,26 @@
         <!-- 表单组件 -->
         <section id="form" class="component-section">
           <h2 class="section-title">表单组件</h2>
-          
+
           <div id="demo-input" class="demo-card">
             <div class="demo-header">
               <h3 class="demo-title">Input - 输入框</h3>
               <p v-if="hasDoc('input')" class="demo-description">
-                {{ getDocDescription('input') }}
+                {{ getDocDescription("input") }}
               </p>
             </div>
             <div class="demo-content">
-              <Input
-                v-model="inputValue"
-                label="用户名"
-                placeholder="请输入用户名"
-              />
+              <Input v-model="inputValue" label="用户名" placeholder="请输入用户名" />
             </div>
             <div v-if="hasDoc('input')" class="demo-footer">
-              <router-link :to="`/docs/input`" class="view-docs-link">
-                查看完整文档 →
-              </router-link>
+              <router-link :to="`/docs/input`" class="view-docs-link"> 查看完整文档 → </router-link>
             </div>
           </div>
 
           <div id="demo-search" class="demo-card">
             <h3 class="demo-title">Search - 搜索框</h3>
             <div class="demo-content">
-              <Search
-                v-model="searchValue"
-                placeholder="搜索组件..."
-                @search="handleSearch"
-              />
+              <Search v-model="searchValue" placeholder="搜索组件..." @search="handleSearch" />
             </div>
           </div>
 
@@ -306,14 +271,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Radio - 单选框</h3>
               <p v-if="hasDoc('radio')" class="demo-description">
-                {{ getDocDescription('radio') }}
+                {{ getDocDescription("radio") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">单选框组件，支持分组</p>
-              <router-link v-if="hasDoc('radio')" :to="`/docs/radio`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('radio')" :to="`/docs/radio`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -322,14 +285,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Dropdown - 下拉菜单</h3>
               <p v-if="hasDoc('dropdown')" class="demo-description">
-                {{ getDocDescription('dropdown') }}
+                {{ getDocDescription("dropdown") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">下拉菜单组件，支持多级菜单</p>
-              <router-link v-if="hasDoc('dropdown')" :to="`/docs/dropdown`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('dropdown')" :to="`/docs/dropdown`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -348,12 +309,12 @@
         <!-- 反馈组件 -->
         <section id="feedback" class="component-section">
           <h2 class="section-title">反馈组件</h2>
-          
+
           <div id="demo-notice" class="demo-card">
             <div class="demo-header">
               <h3 class="demo-title">Notice - 通知提示</h3>
               <p v-if="hasDoc('notice')" class="demo-description">
-                {{ getDocDescription('notice') }}
+                {{ getDocDescription("notice") }}
               </p>
             </div>
             <div class="demo-content">
@@ -365,9 +326,7 @@
               </Flex>
             </div>
             <div v-if="hasDoc('notice')" class="demo-footer">
-              <router-link :to="`/docs/notice`" class="view-docs-link">
-                查看完整文档 →
-              </router-link>
+              <router-link :to="`/docs/notice`" class="view-docs-link"> 查看完整文档 → </router-link>
             </div>
           </div>
 
@@ -407,14 +366,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Modal - 对话框</h3>
               <p v-if="hasDoc('modal')" class="demo-description">
-                {{ getDocDescription('modal') }}
+                {{ getDocDescription("modal") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">对话框组件，支持自定义内容</p>
-              <router-link v-if="hasDoc('modal')" :to="`/docs/modal`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('modal')" :to="`/docs/modal`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -444,12 +401,12 @@
         <!-- 布局组件 -->
         <section id="layout" class="component-section">
           <h2 class="section-title">布局组件</h2>
-          
+
           <div id="demo-tabs" class="demo-card">
             <div class="demo-header">
               <h3 class="demo-title">Tabs - 标签页</h3>
               <p v-if="hasDoc('tabs')" class="demo-description">
-                {{ getDocDescription('tabs') }}
+                {{ getDocDescription("tabs") }}
               </p>
             </div>
             <div class="demo-content">
@@ -457,7 +414,7 @@
                 :tabs="[
                   { key: 'tab1', label: '标签一' },
                   { key: 'tab2', label: '标签二' },
-                  { key: 'tab3', label: '标签三' }
+                  { key: 'tab3', label: '标签三' },
                 ]"
                 v-model="activeTab"
               >
@@ -467,9 +424,7 @@
               </Tabs>
             </div>
             <div v-if="hasDoc('tabs')" class="demo-footer">
-              <router-link :to="`/docs/tabs`" class="view-docs-link">
-                查看完整文档 →
-              </router-link>
+              <router-link :to="`/docs/tabs`" class="view-docs-link"> 查看完整文档 → </router-link>
             </div>
           </div>
 
@@ -491,14 +446,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Flex - 弹性布局</h3>
               <p v-if="hasDoc('flex')" class="demo-description">
-                {{ getDocDescription('flex') }}
+                {{ getDocDescription("flex") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">弹性布局组件，快速实现 Flexbox 布局</p>
-              <router-link v-if="hasDoc('flex')" :to="`/docs/flex`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('flex')" :to="`/docs/flex`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -507,14 +460,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Navbar - 导航栏</h3>
               <p v-if="hasDoc('navbar')" class="demo-description">
-                {{ getDocDescription('navbar') }}
+                {{ getDocDescription("navbar") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">导航栏组件，顶部导航</p>
-              <router-link v-if="hasDoc('navbar')" :to="`/docs/navbar`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('navbar')" :to="`/docs/navbar`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -523,14 +474,12 @@
             <div class="demo-header">
               <h3 class="demo-title">Sidebar - 侧边栏</h3>
               <p v-if="hasDoc('sidebar')" class="demo-description">
-                {{ getDocDescription('sidebar') }}
+                {{ getDocDescription("sidebar") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">侧边栏组件，支持折叠</p>
-              <router-link v-if="hasDoc('sidebar')" :to="`/docs/sidebar`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('sidebar')" :to="`/docs/sidebar`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -566,14 +515,12 @@
             <div class="demo-header">
               <h3 class="demo-title">List - 列表</h3>
               <p v-if="hasDoc('list')" class="demo-description">
-                {{ getDocDescription('list') }}
+                {{ getDocDescription("list") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">列表组件，支持虚拟滚动</p>
-              <router-link v-if="hasDoc('list')" :to="`/docs/list`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('list')" :to="`/docs/list`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -582,14 +529,12 @@
             <div class="demo-header">
               <h3 class="demo-title">RichText - 富文本</h3>
               <p v-if="hasDoc('rich-text')" class="demo-description">
-                {{ getDocDescription('rich-text') }}
+                {{ getDocDescription("rich-text") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">富文本组件，支持 HTML 渲染</p>
-              <router-link v-if="hasDoc('rich-text')" :to="`/docs/rich-text`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('rich-text')" :to="`/docs/rich-text`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
         </section>
@@ -603,14 +548,12 @@
             <div class="demo-header">
               <h3 class="demo-title">AgentCard - Agent卡片</h3>
               <p v-if="hasDoc('agent-card')" class="demo-description">
-                {{ getDocDescription('agent-card') }}
+                {{ getDocDescription("agent-card") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">Agent 卡片组件，显示 Agent 信息</p>
-              <router-link v-if="hasDoc('agent-card')" :to="`/docs/agent-card`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('agent-card')" :to="`/docs/agent-card`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -619,14 +562,12 @@
             <div class="demo-header">
               <h3 class="demo-title">ThinkingBlock - 思考块</h3>
               <p v-if="hasDoc('thinking-block')" class="demo-description">
-                {{ getDocDescription('thinking-block') }}
+                {{ getDocDescription("thinking-block") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">思考块组件，可视化 AI 推理过程</p>
-              <router-link v-if="hasDoc('thinking-block')" :to="`/docs/thinking-block`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('thinking-block')" :to="`/docs/thinking-block`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -635,14 +576,12 @@
             <div class="demo-header">
               <h3 class="demo-title">WorkflowTimeline - 工作流时间线</h3>
               <p v-if="hasDoc('workflow-timeline')" class="demo-description">
-                {{ getDocDescription('workflow-timeline') }}
+                {{ getDocDescription("workflow-timeline") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">工作流时间线组件，显示执行步骤</p>
-              <router-link v-if="hasDoc('workflow-timeline')" :to="`/docs/workflow-timeline`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('workflow-timeline')" :to="`/docs/workflow-timeline`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -651,14 +590,12 @@
             <div class="demo-header">
               <h3 class="demo-title">ProjectCard - 项目卡片</h3>
               <p v-if="hasDoc('project-card')" class="demo-description">
-                {{ getDocDescription('project-card') }}
+                {{ getDocDescription("project-card") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">项目卡片组件，项目管理</p>
-              <router-link v-if="hasDoc('project-card')" :to="`/docs/project-card`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('project-card')" :to="`/docs/project-card`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -667,14 +604,12 @@
             <div class="demo-header">
               <h3 class="demo-title">RoomCard - 房间卡片</h3>
               <p v-if="hasDoc('room-card')" class="demo-description">
-                {{ getDocDescription('room-card') }}
+                {{ getDocDescription("room-card") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">房间卡片组件，协作房间</p>
-              <router-link v-if="hasDoc('room-card')" :to="`/docs/room-card`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('room-card')" :to="`/docs/room-card`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -683,14 +618,12 @@
             <div class="demo-header">
               <h3 class="demo-title">WorkflowCard - 工作流卡片</h3>
               <p v-if="hasDoc('workflow-card')" class="demo-description">
-                {{ getDocDescription('workflow-card') }}
+                {{ getDocDescription("workflow-card") }}
               </p>
             </div>
             <div class="placeholder-content">
               <p class="placeholder-text">工作流卡片组件，工作流管理</p>
-              <router-link v-if="hasDoc('workflow-card')" :to="`/docs/workflow-card`" class="view-docs-button">
-                查看完整文档和示例 →
-              </router-link>
+              <router-link v-if="hasDoc('workflow-card')" :to="`/docs/workflow-card`" class="view-docs-button"> 查看完整文档和示例 → </router-link>
             </div>
           </div>
 
@@ -714,23 +647,10 @@
                 <h2 class="doc-title">
                   {{ getComponent(selectedComponent)?.name || selectedComponent }}
                 </h2>
-                <button
-                  @click="selectedComponent = null"
-                  class="close-doc-btn"
-                  aria-label="关闭文档"
-                >
-                  ✕
-                </button>
+                <button @click="selectedComponent = null" class="close-doc-btn" aria-label="关闭文档">✕</button>
               </div>
               <div class="doc-actions">
-                <router-link
-                  v-if="hasDoc(selectedComponent)"
-                  :to="`/docs/${selectedComponent}`"
-                  class="external-doc-link"
-                  target="_blank"
-                >
-                  在新窗口打开文档 ↗
-                </router-link>
+                <router-link v-if="hasDoc(selectedComponent)" :to="`/docs/${selectedComponent}`" class="external-doc-link" target="_blank"> 在新窗口打开文档 ↗ </router-link>
               </div>
             </div>
 
@@ -760,109 +680,104 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import {
-  Navbar, Sidebar, ScrollView, Tabs, Divider, Flex, List,
-  Button, Avatar, Tag, Input, Search, Checkbox, Radio,
-  Bubble, ThinkBubble, Card, SystemMessage,
-  Notice, Progress, Tooltip
-} from '@/components/ChatUI';
+import { ref, computed } from "vue";
+import { Navbar, Sidebar, ScrollView, Tabs, Divider, Flex, List, Button, Avatar, Tag, Input, Search, Checkbox, Radio, Bubble, ThinkBubble, Card, SystemMessage, Notice, Progress, Tooltip } from "@/components/ChatUI";
 
 // 批量导入所有 Markdown 文档
-const docModules = import.meta.glob('@/src/docs/components/*.md', {
-  query: '?raw',
-  import: 'default',
-  eager: true
+const docModules = import.meta.glob("@/src/docs/components/*.md", {
+  query: "?raw",
+  import: "default",
+  eager: true,
 });
 
 // 将文档转换为 key-value 映射
 const docs: Record<string, string> = {};
-Object.keys(docModules).forEach(path => {
+Object.keys(docModules).forEach((path) => {
   // 从路径中提取文件名（不含扩展名）
   const match = path.match(/\/([^/]+)\.md$/);
   if (match && match[1]) {
     const filename = match[1];
     // 转换为 kebab-case (例如: Button -> button, AgentCard -> agent-card)
     const key = filename
-      .replace(/([A-Z])/g, '-$1')
+      .replace(/([A-Z])/g, "-$1")
       .toLowerCase()
-      .replace(/^-/, '');
+      .replace(/^-/, "");
     docs[key] = docModules[path] as string;
   }
 });
 
 const sections = [
-  { id: 'chat', name: '对话组件' },
-  { id: 'basic', name: '基础组件' },
-  { id: 'form', name: '表单组件' },
-  { id: 'feedback', name: '反馈组件' },
-  { id: 'layout', name: '布局组件' },
-  { id: 'data', name: '数据展示' },
-  { id: 'agent', name: 'Agent 组件' },
+  { id: "chat", name: "对话组件" },
+  { id: "basic", name: "基础组件" },
+  { id: "form", name: "表单组件" },
+  { id: "feedback", name: "反馈组件" },
+  { id: "layout", name: "布局组件" },
+  { id: "data", name: "数据展示" },
+  { id: "agent", name: "Agent 组件" },
 ];
 
 const allComponents = [
   // Chat 对话组件
-  { key: 'chat', name: 'Chat 聊天容器', category: 'chat' },
-  { key: 'bubble', name: 'Bubble 消息气泡', category: 'chat' },
-  { key: 'think-bubble', name: 'ThinkBubble 思考气泡', category: 'chat' },
-  { key: 'typing-bubble', name: 'TypingBubble 输入中', category: 'chat' },
-  { key: 'card', name: 'Card 卡片', category: 'chat' },
-  { key: 'file-card', name: 'FileCard 文件卡片', category: 'chat' },
-  { key: 'message-status', name: 'MessageStatus 消息状态', category: 'chat' },
-  { key: 'system-message', name: 'SystemMessage 系统消息', category: 'chat' },
+  { key: "chat", name: "Chat 聊天容器", category: "chat" },
+  { key: "bubble", name: "Bubble 消息气泡", category: "chat" },
+  { key: "think-bubble", name: "ThinkBubble 思考气泡", category: "chat" },
+  { key: "typing-bubble", name: "TypingBubble 输入中", category: "chat" },
+  { key: "card", name: "Card 卡片", category: "chat" },
+  { key: "file-card", name: "FileCard 文件卡片", category: "chat" },
+  { key: "message-status", name: "MessageStatus 消息状态", category: "chat" },
+  { key: "system-message", name: "SystemMessage 系统消息", category: "chat" },
 
   // Basic 基础组件
-  { key: 'button', name: 'Button 按钮', category: 'basic' },
-  { key: 'icon', name: 'Icon 图标', category: 'basic' },
-  { key: 'avatar', name: 'Avatar 头像', category: 'basic' },
-  { key: 'tag', name: 'Tag 标签', category: 'basic' },
-  { key: 'image', name: 'Image 图片', category: 'basic' },
-  { key: 'divider', name: 'Divider 分割线', category: 'basic' },
+  { key: "button", name: "Button 按钮", category: "basic" },
+  { key: "icon", name: "Icon 图标", category: "basic" },
+  { key: "avatar", name: "Avatar 头像", category: "basic" },
+  { key: "tag", name: "Tag 标签", category: "basic" },
+  { key: "image", name: "Image 图片", category: "basic" },
+  { key: "divider", name: "Divider 分割线", category: "basic" },
 
   // Form 表单组件
-  { key: 'input', name: 'Input 输入框', category: 'form' },
-  { key: 'search', name: 'Search 搜索框', category: 'form' },
-  { key: 'checkbox', name: 'Checkbox 复选框', category: 'form' },
-  { key: 'radio', name: 'Radio 单选框', category: 'form' },
-  { key: 'dropdown', name: 'Dropdown 下拉菜单', category: 'form' },
-  { key: 'multimodal-input', name: 'MultimodalInput 多模态输入', category: 'form' },
+  { key: "input", name: "Input 输入框", category: "form" },
+  { key: "search", name: "Search 搜索框", category: "form" },
+  { key: "checkbox", name: "Checkbox 复选框", category: "form" },
+  { key: "radio", name: "Radio 单选框", category: "form" },
+  { key: "dropdown", name: "Dropdown 下拉菜单", category: "form" },
+  { key: "multimodal-input", name: "MultimodalInput 多模态输入", category: "form" },
 
   // Feedback 反馈组件
-  { key: 'modal', name: 'Modal 对话框', category: 'feedback' },
-  { key: 'notice', name: 'Notice 通知', category: 'feedback' },
-  { key: 'tooltip', name: 'Tooltip 提示', category: 'feedback' },
-  { key: 'popover', name: 'Popover 气泡卡片', category: 'feedback' },
-  { key: 'progress', name: 'Progress 进度条', category: 'feedback' },
-  { key: 'typing', name: 'Typing 打字效果', category: 'feedback' },
+  { key: "modal", name: "Modal 对话框", category: "feedback" },
+  { key: "notice", name: "Notice 通知", category: "feedback" },
+  { key: "tooltip", name: "Tooltip 提示", category: "feedback" },
+  { key: "popover", name: "Popover 气泡卡片", category: "feedback" },
+  { key: "progress", name: "Progress 进度条", category: "feedback" },
+  { key: "typing", name: "Typing 打字效果", category: "feedback" },
 
   // Layout 布局组件
-  { key: 'flex', name: 'Flex 弹性布局', category: 'layout' },
-  { key: 'navbar', name: 'Navbar 导航栏', category: 'layout' },
-  { key: 'sidebar', name: 'Sidebar 侧边栏', category: 'layout' },
-  { key: 'scroll-view', name: 'ScrollView 滚动视图', category: 'layout' },
-  { key: 'tabs', name: 'Tabs 标签页', category: 'layout' },
-  { key: 'carousel', name: 'Carousel 轮播图', category: 'layout' },
+  { key: "flex", name: "Flex 弹性布局", category: "layout" },
+  { key: "navbar", name: "Navbar 导航栏", category: "layout" },
+  { key: "sidebar", name: "Sidebar 侧边栏", category: "layout" },
+  { key: "scroll-view", name: "ScrollView 滚动视图", category: "layout" },
+  { key: "tabs", name: "Tabs 标签页", category: "layout" },
+  { key: "carousel", name: "Carousel 轮播图", category: "layout" },
 
   // Data 数据展示
-  { key: 'list', name: 'List 列表', category: 'data' },
-  { key: 'rich-text', name: 'RichText 富文本', category: 'data' },
+  { key: "list", name: "List 列表", category: "data" },
+  { key: "rich-text", name: "RichText 富文本", category: "data" },
 
   // Agent 专属组件
-  { key: 'agent-card', name: 'AgentCard Agent卡片', category: 'agent' },
-  { key: 'thinking-block', name: 'ThinkingBlock 思考块', category: 'agent' },
-  { key: 'workflow-timeline', name: 'WorkflowTimeline 工作流', category: 'agent' },
-  { key: 'editor-panel', name: 'EditorPanel 编辑器', category: 'agent' },
-  { key: 'project-card', name: 'ProjectCard 项目卡片', category: 'agent' },
-  { key: 'room-card', name: 'RoomCard 房间卡片', category: 'agent' },
-  { key: 'workflow-card', name: 'WorkflowCard 工作流卡片', category: 'agent' },
+  { key: "agent-card", name: "AgentCard Agent卡片", category: "agent" },
+  { key: "thinking-block", name: "ThinkingBlock 思考块", category: "agent" },
+  { key: "workflow-timeline", name: "WorkflowTimeline 工作流", category: "agent" },
+  { key: "editor-panel", name: "EditorPanel 编辑器", category: "agent" },
+  { key: "project-card", name: "ProjectCard 项目卡片", category: "agent" },
+  { key: "room-card", name: "RoomCard 房间卡片", category: "agent" },
+  { key: "workflow-card", name: "WorkflowCard 工作流卡片", category: "agent" },
 ];
 
-const inputValue = ref('');
-const searchValue = ref('');
+const inputValue = ref("");
+const searchValue = ref("");
 const checked = ref(false);
-const radioValue = ref('a');
-const activeTab = ref('tab1');
+const radioValue = ref("a");
+const activeTab = ref("tab1");
 
 const scrollToComponent = (item: any) => {
   const key = item.key;
@@ -876,44 +791,44 @@ const scrollToComponent = (item: any) => {
 
     window.scrollTo({
       top: offsetPosition,
-      behavior: 'smooth'
+      behavior: "smooth",
     });
 
     // 添加高亮效果
-    element.classList.add('highlight');
+    element.classList.add("highlight");
     setTimeout(() => {
-      element.classList.remove('highlight');
+      element.classList.remove("highlight");
     }, 2000);
   } else {
     // 如果没有对应的 demo，滚动到对应的分类区域
     const categoryElement = document.getElementById(item.category);
     if (categoryElement) {
-      categoryElement.scrollIntoView({ behavior: 'smooth', block: 'start' });
+      categoryElement.scrollIntoView({ behavior: "smooth", block: "start" });
     }
   }
 };
 
 const handleSearch = (value: string) => {
-  console.log('Search:', value);
+  console.log("Search:", value);
 };
 
 // 从 Markdown 文档中提取描述（第一段文字）
 const getDocDescription = (key: string): string => {
   const doc = docs[key];
-  if (!doc) return '';
+  if (!doc) return "";
 
   // 提取第一个标题后的第一段文字
-  const lines = doc.split('\n');
+  const lines = doc.split("\n");
   for (let i = 0; i < lines.length; i++) {
-    const line = lines[i]?.trim() ?? '';
+    const line = lines[i]?.trim() ?? "";
     // 跳过标题行
-    if (line.startsWith('#')) continue;
+    if (line.startsWith("#")) continue;
     // 跳过空行
-    if (line === '') continue;
+    if (line === "") continue;
     // 返回第一个非空非标题行
     return line;
   }
-  return '';
+  return "";
 };
 
 // 检查组件是否有文档
@@ -923,7 +838,7 @@ const hasDoc = (key: string): boolean => {
 
 // 获取完整的文档内容
 const getFullDoc = (key: string): string => {
-  return docs[key] || '';
+  return docs[key] || "";
 };
 
 // 当前选中的组件（用于显示文档）
@@ -936,46 +851,49 @@ const showComponentDoc = (key: string) => {
 
 // 获取组件对象
 const getComponent = (key: string) => {
-  return allComponents.find(comp => comp.key === key) || null;
+  return allComponents.find((comp) => comp.key === key) || null;
 };
 
 // 简单的 Markdown 渲染函数
 const renderMarkdown = (markdown: string): string => {
-  if (!markdown) return '';
+  if (!markdown) return "";
 
-  return markdown
-    // 处理标题
-    .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">$1</h3>')
-    .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">$1</h2>')
-    .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-6">$1</h1>')
-    // 处理粗体和斜体
-    .replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
-    .replace(/\*(.+?)\*/g, '<em>$1</em>')
-    // 处理行内代码
-    .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono text-gray-800 dark:text-gray-200">$1</code>')
-    // 处理代码块
-    .replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-x-auto my-4"><code>$2</code></pre>')
-    // 处理段落
-    .split('\n\n')
-    .map(paragraph => {
-      const trimmed = paragraph.trim();
-      if (trimmed.startsWith('<h') || trimmed.startsWith('<pre') || trimmed.startsWith('<code>')) {
-        return trimmed;
-      }
-      if (trimmed.startsWith('- ')) {
-        // 处理列表
-        const items = trimmed.split('\n').map(item =>
-          item.replace(/^- (.+)$/, '<li class="ml-4">$1</li>')
-        ).join('');
-        return `<ul class="list-disc space-y-1 my-3">${items}</ul>`;
-      }
-      if (trimmed) {
-        return `<p class="text-gray-700 dark:text-gray-300 my-3 leading-relaxed">${trimmed}</p>`;
-      }
-      return '';
-    })
-    .filter(Boolean)
-    .join('\n');
+  return (
+    markdown
+      // 处理标题
+      .replace(/^### (.+)$/gm, '<h3 class="text-xl font-semibold text-gray-900 dark:text-white mt-6 mb-3">$1</h3>')
+      .replace(/^## (.+)$/gm, '<h2 class="text-2xl font-bold text-gray-900 dark:text-white mt-8 mb-4">$1</h2>')
+      .replace(/^# (.+)$/gm, '<h1 class="text-3xl font-bold text-gray-900 dark:text-white mt-8 mb-6">$1</h1>')
+      // 处理粗体和斜体
+      .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
+      .replace(/\*(.+?)\*/g, "<em>$1</em>")
+      // 处理行内代码
+      .replace(/`([^`]+)`/g, '<code class="bg-gray-100 dark:bg-gray-800 px-2 py-1 rounded text-sm font-mono text-gray-800 dark:text-gray-200">$1</code>')
+      // 处理代码块
+      .replace(/```(\w+)?\n([\s\S]+?)```/g, '<pre class="bg-gray-900 dark:bg-gray-950 text-gray-100 p-4 rounded-lg overflow-x-auto my-4"><code>$2</code></pre>')
+      // 处理段落
+      .split("\n\n")
+      .map((paragraph) => {
+        const trimmed = paragraph.trim();
+        if (trimmed.startsWith("<h") || trimmed.startsWith("<pre") || trimmed.startsWith("<code>")) {
+          return trimmed;
+        }
+        if (trimmed.startsWith("- ")) {
+          // 处理列表
+          const items = trimmed
+            .split("\n")
+            .map((item) => item.replace(/^- (.+)$/, '<li class="ml-4">$1</li>'))
+            .join("");
+          return `<ul class="list-disc space-y-1 my-3">${items}</ul>`;
+        }
+        if (trimmed) {
+          return `<p class="text-gray-700 dark:text-gray-300 my-3 leading-relaxed">${trimmed}</p>`;
+        }
+        return "";
+      })
+      .filter(Boolean)
+      .join("\n")
+  );
 };
 </script>
 
@@ -1072,7 +990,8 @@ const renderMarkdown = (markdown: string): string => {
 }
 
 @keyframes highlight-pulse {
-  0%, 100% {
+  0%,
+  100% {
     @apply ring-opacity-0;
   }
   50% {

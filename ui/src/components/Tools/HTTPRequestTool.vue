@@ -7,33 +7,16 @@
         <span>HTTP请求工具</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="新建请求"
-          @click="createNewRequest"
-        >
+        <button class="action-button" title="新建请求" @click="createNewRequest">
           <Icon type="plus" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="导入请求"
-          @click="importRequest"
-        >
+        <button class="action-button" title="导入请求" @click="importRequest">
           <Icon type="upload" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="导出请求"
-          :disabled="!currentRequest"
-          @click="exportRequest"
-        >
+        <button class="action-button" title="导出请求" :disabled="!currentRequest" @click="exportRequest">
           <Icon type="download" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
       </div>
@@ -45,51 +28,27 @@
         <h4>请求设置</h4>
         <div class="setting-group">
           <label>默认超时时间 (秒)</label>
-          <input
-            v-model.number="requestSettings.timeout"
-            type="number"
-            min="1"
-            max="300"
-            class="setting-input"
-          />
+          <input v-model.number="requestSettings.timeout" type="number" min="1" max="300" class="setting-input" />
         </div>
         <div class="setting-group">
           <label>重试次数</label>
-          <input
-            v-model.number="requestSettings.retryCount"
-            type="number"
-            min="0"
-            max="10"
-            class="setting-input"
-          />
+          <input v-model.number="requestSettings.retryCount" type="number" min="0" max="10" class="setting-input" />
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="requestSettings.followRedirects"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="requestSettings.followRedirects" type="checkbox" class="setting-checkbox" />
             跟随重定向
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="requestSettings.verifySSL"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="requestSettings.verifySSL" type="checkbox" class="setting-checkbox" />
             验证SSL证书
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="requestSettings.saveToHistory"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="requestSettings.saveToHistory" type="checkbox" class="setting-checkbox" />
             保存到历史记录
           </label>
         </div>
@@ -116,34 +75,19 @@
           </select>
         </div>
         <div class="url-input-group">
-          <input
-            v-model="currentRequest.url"
-            type="text"
-            placeholder="输入请求URL (如: https://api.example.com/users)"
-            class="url-input"
-            @keydown.enter="sendRequest"
-          />
-          <button
-            class="send-button"
-            :disabled="!currentRequest.url.trim() || isSending"
-            @click="sendRequest"
-          >
+          <input v-model="currentRequest.url" type="text" placeholder="输入请求URL (如: https://api.example.com/users)" class="url-input" @keydown.enter="sendRequest" />
+          <button class="send-button" :disabled="!currentRequest.url.trim() || isSending" @click="sendRequest">
             <Icon v-if="isSending" type="spinner" size="sm" class="animate-spin" />
             <Icon v-else type="send" size="sm" />
-            {{ isSending ? '发送中...' : '发送' }}
+            {{ isSending ? "发送中..." : "发送" }}
           </button>
         </div>
       </div>
 
       <!-- 选项卡 -->
       <div class="request-tabs">
-        <button
-          v-for="tab in requestTabs"
-          :key="tab.key"
-          :class="['tab-button', { active: activeTab === tab.key }]"
-          @click="activeTab = tab.key"
-        >
-          <Icon :type="(tab.icon as any)" size="xs" />
+        <button v-for="tab in requestTabs" :key="tab.key" :class="['tab-button', { active: activeTab === tab.key }]" @click="activeTab = tab.key">
+          <Icon :type="tab.icon as any" size="xs" />
           {{ tab.label }}
           <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
         </button>
@@ -160,41 +104,18 @@
               <div class="header-cell param-desc">描述</div>
               <div class="header-cell param-actions">操作</div>
             </div>
-            <div
-              v-for="(param, index) in currentRequest.params"
-              :key="index"
-              class="table-row"
-            >
+            <div v-for="(param, index) in currentRequest.params" :key="index" class="table-row">
               <div class="table-cell">
-                <input
-                  v-model="param.key"
-                  type="text"
-                  placeholder="参数名"
-                  class="param-input"
-                />
+                <input v-model="param.key" type="text" placeholder="参数名" class="param-input" />
               </div>
               <div class="table-cell">
-                <input
-                  v-model="param.value"
-                  type="text"
-                  placeholder="参数值"
-                  class="param-input"
-                />
+                <input v-model="param.value" type="text" placeholder="参数值" class="param-input" />
               </div>
               <div class="table-cell">
-                <input
-                  v-model="param.description"
-                  type="text"
-                  placeholder="描述"
-                  class="param-input"
-                />
+                <input v-model="param.description" type="text" placeholder="描述" class="param-input" />
               </div>
               <div class="table-cell">
-                <button
-                  class="row-action-btn delete-btn"
-                  title="删除"
-                  @click="removeParam(index)"
-                >
+                <button class="row-action-btn delete-btn" title="删除" @click="removeParam(index)">
                   <Icon type="close" size="xs" />
                 </button>
               </div>
@@ -215,11 +136,7 @@
               <div class="header-cell header-desc">描述</div>
               <div class="header-cell header-actions">操作</div>
             </div>
-            <div
-              v-for="(header, index) in currentRequest.headers"
-              :key="index"
-              class="table-row"
-            >
+            <div v-for="(header, index) in currentRequest.headers" :key="index" class="table-row">
               <div class="table-cell">
                 <select v-model="header.key" class="header-select">
                   <option value="">自定义头部</option>
@@ -233,27 +150,13 @@
                 </select>
               </div>
               <div class="table-cell">
-                <input
-                  v-model="header.value"
-                  type="text"
-                  placeholder="头部值"
-                  class="header-input"
-                />
+                <input v-model="header.value" type="text" placeholder="头部值" class="header-input" />
               </div>
               <div class="table-cell">
-                <input
-                  v-model="header.description"
-                  type="text"
-                  placeholder="描述"
-                  class="header-input"
-                />
+                <input v-model="header.description" type="text" placeholder="描述" class="header-input" />
               </div>
               <div class="table-cell">
-                <button
-                  class="row-action-btn delete-btn"
-                  title="删除"
-                  @click="removeHeader(index)"
-                >
+                <button class="row-action-btn delete-btn" title="删除" @click="removeHeader(index)">
                   <Icon type="close" size="xs" />
                 </button>
               </div>
@@ -276,11 +179,7 @@
               <option value="raw">raw</option>
               <option value="binary">binary</option>
             </select>
-            <select
-              v-if="currentRequest.bodyType === 'raw'"
-              v-model="currentRequest.bodyLanguage"
-              class="body-language-select"
-            >
+            <select v-if="currentRequest.bodyType === 'raw'" v-model="currentRequest.bodyLanguage" class="body-language-select">
               <option value="text">Text</option>
               <option value="json">JSON</option>
               <option value="xml">XML</option>
@@ -297,38 +196,15 @@
                 <div class="header-cell form-type">类型</div>
                 <div class="header-cell form-actions">操作</div>
               </div>
-              <div
-                v-for="(item, index) in currentRequest.formData"
-                :key="index"
-                class="table-row"
-              >
+              <div v-for="(item, index) in currentRequest.formData" :key="index" class="table-row">
                 <div class="table-cell">
-                  <input
-                    v-model="item.key"
-                    type="text"
-                    placeholder="键名"
-                    class="form-input"
-                  />
+                  <input v-model="item.key" type="text" placeholder="键名" class="form-input" />
                 </div>
                 <div class="table-cell">
-                  <input
-                    v-if="item.type === 'text'"
-                    v-model="item.value"
-                    type="text"
-                    placeholder="值"
-                    class="form-input"
-                  />
+                  <input v-if="item.type === 'text'" v-model="item.value" type="text" placeholder="值" class="form-input" />
                   <div v-else class="file-input-wrapper">
-                    <input
-                      type="file"
-                      :ref="`fileInput-${index}`"
-                      class="file-input"
-                      @change="handleFileSelect(index, $event)"
-                    />
-                    <button
-                      class="file-select-btn"
-                      @click="($refs[`fileInput-${index}`] as HTMLInputElement[])?.[0]?.click()"
-                    >
+                    <input type="file" :ref="`fileInput-${index}`" class="file-input" @change="handleFileSelect(index, $event)" />
+                    <button class="file-select-btn" @click="($refs[`fileInput-${index}`] as HTMLInputElement[])?.[0]?.click()">
                       <Icon type="file" size="xs" />
                       选择文件
                     </button>
@@ -342,11 +218,7 @@
                   </select>
                 </div>
                 <div class="table-cell">
-                  <button
-                    class="row-action-btn delete-btn"
-                    title="删除"
-                    @click="removeFormDataItem(index)"
-                  >
+                  <button class="row-action-btn delete-btn" title="删除" @click="removeFormDataItem(index)">
                     <Icon type="close" size="xs" />
                   </button>
                 </div>
@@ -366,33 +238,15 @@
                 <div class="header-cell url-value">值</div>
                 <div class="header-cell url-actions">操作</div>
               </div>
-              <div
-                v-for="(item, index) in currentRequest.urlencoded"
-                :key="index"
-                class="table-row"
-              >
+              <div v-for="(item, index) in currentRequest.urlencoded" :key="index" class="table-row">
                 <div class="table-cell">
-                  <input
-                    v-model="item.key"
-                    type="text"
-                    placeholder="键名"
-                    class="url-input"
-                  />
+                  <input v-model="item.key" type="text" placeholder="键名" class="url-input" />
                 </div>
                 <div class="table-cell">
-                  <input
-                    v-model="item.value"
-                    type="text"
-                    placeholder="值"
-                    class="url-input"
-                  />
+                  <input v-model="item.value" type="text" placeholder="值" class="url-input" />
                 </div>
                 <div class="table-cell">
-                  <button
-                    class="row-action-btn delete-btn"
-                    title="删除"
-                    @click="removeUrlencodedItem(index)"
-                  >
+                  <button class="row-action-btn delete-btn" title="删除" @click="removeUrlencodedItem(index)">
                     <Icon type="close" size="xs" />
                   </button>
                 </div>
@@ -407,27 +261,14 @@
           <!-- raw -->
           <div v-if="currentRequest.bodyType === 'raw'" class="raw-content">
             <div class="raw-editor">
-              <textarea
-                v-model="currentRequest.bodyRaw"
-                :placeholder="getBodyPlaceholder()"
-                class="raw-textarea"
-                :class="`language-${currentRequest.bodyLanguage}`"
-              ></textarea>
+              <textarea v-model="currentRequest.bodyRaw" :placeholder="getBodyPlaceholder()" class="raw-textarea" :class="`language-${currentRequest.bodyLanguage}`"></textarea>
             </div>
             <div class="raw-actions">
-              <button
-                class="raw-action-btn"
-                title="格式化JSON"
-                @click="formatRawBody"
-              >
+              <button class="raw-action-btn" title="格式化JSON" @click="formatRawBody">
                 <Icon type="align-left" size="xs" />
                 格式化
               </button>
-              <button
-                class="raw-action-btn"
-                title="验证JSON"
-                @click="validateRawBody"
-              >
+              <button class="raw-action-btn" title="验证JSON" @click="validateRawBody">
                 <Icon type="check" size="xs" />
                 验证
               </button>
@@ -437,16 +278,8 @@
           <!-- binary -->
           <div v-if="currentRequest.bodyType === 'binary'" class="binary-content">
             <div class="binary-input-wrapper">
-              <input
-                ref="binaryFileInput"
-                type="file"
-                class="binary-input"
-                @change="handleBinaryFileSelect"
-              />
-              <button
-                class="binary-select-btn"
-                @click="(binaryFileInput as HTMLInputElement)?.click()"
-              >
+              <input ref="binaryFileInput" type="file" class="binary-input" @change="handleBinaryFileSelect" />
+              <button class="binary-select-btn" @click="(binaryFileInput as HTMLInputElement)?.click()">
                 <Icon type="file" size="xs" />
                 选择文件
               </button>
@@ -472,48 +305,23 @@
           <!-- Bearer Token -->
           <div v-if="currentRequest.authType === 'bearer'" class="bearer-auth">
             <label class="auth-label">Token:</label>
-            <input
-              v-model="currentRequest.bearerToken"
-              type="text"
-              placeholder="输入Bearer Token"
-              class="auth-input"
-            />
+            <input v-model="currentRequest.bearerToken" type="text" placeholder="输入Bearer Token" class="auth-input" />
           </div>
 
           <!-- Basic Auth -->
           <div v-if="currentRequest.authType === 'basic'" class="basic-auth">
             <label class="auth-label">用户名:</label>
-            <input
-              v-model="currentRequest.basicUsername"
-              type="text"
-              placeholder="输入用户名"
-              class="auth-input"
-            />
+            <input v-model="currentRequest.basicUsername" type="text" placeholder="输入用户名" class="auth-input" />
             <label class="auth-label">密码:</label>
-            <input
-              v-model="currentRequest.basicPassword"
-              type="password"
-              placeholder="输入密码"
-              class="auth-input"
-            />
+            <input v-model="currentRequest.basicPassword" type="password" placeholder="输入密码" class="auth-input" />
           </div>
 
           <!-- API Key -->
           <div v-if="currentRequest.authType === 'api-key'" class="api-key-auth">
             <label class="auth-label">Key:</label>
-            <input
-              v-model="currentRequest.apiKey"
-              type="text"
-              placeholder="输入API Key"
-              class="auth-input"
-            />
+            <input v-model="currentRequest.apiKey" type="text" placeholder="输入API Key" class="auth-input" />
             <label class="auth-label">Value:</label>
-            <input
-              v-model="currentRequest.apiValue"
-              type="text"
-              placeholder="输入API Value"
-              class="auth-input"
-            />
+            <input v-model="currentRequest.apiValue" type="text" placeholder="输入API Value" class="auth-input" />
             <label class="auth-label">添加到:</label>
             <select v-model="currentRequest.apiAddTo" class="auth-select">
               <option value="header">Header</option>
@@ -541,11 +349,7 @@ pm.test('响应时间小于200ms', function () {
             ></textarea>
           </div>
           <div class="tests-actions">
-            <button
-              class="test-action-btn"
-              title="运行测试"
-              @click="runTests"
-            >
+            <button class="test-action-btn" title="运行测试" @click="runTests">
               <Icon type="play" size="xs" />
               运行测试
             </button>
@@ -571,32 +375,16 @@ pm.test('响应时间小于200ms', function () {
           </div>
         </div>
         <div class="response-actions">
-          <button
-            class="response-action-btn"
-            title="保存响应"
-            @click="saveResponse"
-          >
+          <button class="response-action-btn" title="保存响应" @click="saveResponse">
             <Icon type="save" size="xs" />
           </button>
-          <button
-            class="response-action-btn"
-            title="复制响应"
-            @click="copyResponse"
-          >
+          <button class="response-action-btn" title="复制响应" @click="copyResponse">
             <Icon type="copy" size="xs" />
           </button>
-          <button
-            class="response-action-btn"
-            title="下载响应"
-            @click="downloadResponse"
-          >
+          <button class="response-action-btn" title="下载响应" @click="downloadResponse">
             <Icon type="download" size="xs" />
           </button>
-          <button
-            class="response-action-btn"
-            title="清空响应"
-            @click="clearResponse"
-          >
+          <button class="response-action-btn" title="清空响应" @click="clearResponse">
             <Icon type="trash" size="xs" />
           </button>
         </div>
@@ -604,12 +392,7 @@ pm.test('响应时间小于200ms', function () {
 
       <!-- 响应选项卡 -->
       <div class="response-tabs">
-        <button
-          v-for="tab in responseTabs"
-          :key="tab.key"
-          :class="['response-tab-button', { active: activeResponseTab === tab.key }]"
-          @click="activeResponseTab = tab.key"
-        >
+        <button v-for="tab in responseTabs" :key="tab.key" :class="['response-tab-button', { active: activeResponseTab === tab.key }]" @click="activeResponseTab = tab.key">
           {{ tab.label }}
           <span v-if="tab.badge" class="tab-badge">{{ tab.badge }}</span>
         </button>
@@ -619,16 +402,10 @@ pm.test('响应时间小于200ms', function () {
       <div class="response-content">
         <!-- 响应体 -->
         <div v-if="activeResponseTab === 'body'" class="response-body">
-          <div
-            v-if="isJsonResponse(response)"
-            class="json-viewer"
-          >
+          <div v-if="isJsonResponse(response)" class="json-viewer">
             <pre>{{ formatJson(response.data) }}</pre>
           </div>
-          <div
-            v-else
-            class="raw-viewer"
-          >
+          <div v-else class="raw-viewer">
             <pre>{{ response.data }}</pre>
           </div>
         </div>
@@ -636,11 +413,7 @@ pm.test('响应时间小于200ms', function () {
         <!-- 响应头部 -->
         <div v-if="activeResponseTab === 'headers'" class="response-headers">
           <div class="headers-list">
-            <div
-              v-for="(value, key) in response.headers"
-              :key="key"
-              class="header-item"
-            >
+            <div v-for="(value, key) in response.headers" :key="key" class="header-item">
               <div class="header-name">{{ key }}:</div>
               <div class="header-value">{{ value }}</div>
             </div>
@@ -650,11 +423,7 @@ pm.test('响应时间小于200ms', function () {
         <!-- Cookies -->
         <div v-if="activeResponseTab === 'cookies'" class="response-cookies">
           <div class="cookies-list">
-            <div
-              v-for="(cookie, index) in response.cookies"
-              :key="index"
-              class="cookie-item"
-            >
+            <div v-for="(cookie, index) in response.cookies" :key="index" class="cookie-item">
               <div class="cookie-name">{{ cookie.name }}</div>
               <div class="cookie-value">{{ cookie.value }}</div>
               <div class="cookie-details">
@@ -676,11 +445,7 @@ pm.test('响应时间小于200ms', function () {
             </button>
           </div>
           <div v-else class="test-list">
-            <div
-              v-for="(test, index) in testResults"
-              :key="index"
-              :class="['test-item', { passed: test.passed, failed: !test.passed }]"
-            >
+            <div v-for="(test, index) in testResults" :key="index" :class="['test-item', { passed: test.passed, failed: !test.passed }]">
               <Icon :type="test.passed ? 'check-circle' : 'x-circle'" size="sm" />
               <span class="test-name">{{ test.name }}</span>
               <span v-if="!test.passed" class="test-error">{{ test.error }}</span>
@@ -694,20 +459,12 @@ pm.test('响应时间小于200ms', function () {
     <div v-if="showHistory" class="history-panel">
       <div class="history-header">
         <h4>请求历史</h4>
-        <button
-          class="history-close-btn"
-          @click="showHistory = false"
-        >
+        <button class="history-close-btn" @click="showHistory = false">
           <Icon type="close" size="xs" />
         </button>
       </div>
       <div class="history-list">
-        <div
-          v-for="(item, index) in requestHistory"
-          :key="index"
-          class="history-item"
-          @click="loadHistoryRequest(item)"
-        >
+        <div v-for="(item, index) in requestHistory" :key="index" class="history-item" @click="loadHistoryRequest(item)">
           <div class="history-method">{{ item.method }}</div>
           <div class="history-url">{{ item.url }}</div>
           <div class="history-time">{{ formatTime(item.timestamp) }}</div>
@@ -722,10 +479,7 @@ pm.test('响应时间小于200ms', function () {
 
     <!-- 历史按钮 -->
     <div v-if="requestHistory.length > 0" class="history-toggle">
-      <button
-        class="history-button"
-        @click="showHistory = !showHistory"
-      >
+      <button class="history-button" @click="showHistory = !showHistory">
         <Icon type="clock" size="xs" />
         历史 ({{ requestHistory.length }})
       </button>
@@ -734,8 +488,8 @@ pm.test('响应时间小于200ms', function () {
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface RequestParam {
   key: string;
@@ -752,7 +506,7 @@ interface RequestHeader {
 interface FormDataItem {
   key: string;
   value: string;
-  type: 'text' | 'file';
+  type: "text" | "file";
   filename?: string;
 }
 
@@ -797,8 +551,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -807,32 +561,32 @@ const emit = defineEmits<{
 
 // 响应式数据
 const currentRequest = ref({
-  method: 'GET',
-  url: '',
+  method: "GET",
+  url: "",
   params: [] as RequestParam[],
   headers: [] as RequestHeader[],
-  bodyType: 'none',
-  bodyLanguage: 'json',
-  bodyRaw: '',
+  bodyType: "none",
+  bodyLanguage: "json",
+  bodyRaw: "",
   formData: [] as FormDataItem[],
   urlencoded: [] as UrlencodedItem[],
   binaryFile: null as File | null,
-  authType: 'none',
-  bearerToken: '',
-  basicUsername: '',
-  basicPassword: '',
-  apiKey: '',
-  apiValue: '',
-  apiAddTo: 'header',
-  tests: '',
+  authType: "none",
+  bearerToken: "",
+  basicUsername: "",
+  basicPassword: "",
+  apiKey: "",
+  apiValue: "",
+  apiAddTo: "header",
+  tests: "",
 });
 
 const response = ref<Response | null>(null);
 const isSending = ref(false);
 const showSettings = ref(false);
 const showHistory = ref(false);
-const activeTab = ref('params');
-const activeResponseTab = ref('body');
+const activeTab = ref("params");
+const activeResponseTab = ref("body");
 const testResults = ref<TestResult[]>([]);
 const requestHistory = ref<HistoryItem[]>([]);
 
@@ -847,18 +601,18 @@ const requestSettings = ref({
 
 // 选项卡配置
 const requestTabs = ref<Array<{ key: string; label: string; icon: string; badge?: number }>>([
-  { key: 'params', label: '参数', icon: 'hash' },
-  { key: 'headers', label: '头部', icon: 'list' },
-  { key: 'body', label: '请求体', icon: 'file-text' },
-  { key: 'auth', label: '认证', icon: 'lock' },
-  { key: 'tests', label: '测试', icon: 'check' },
+  { key: "params", label: "参数", icon: "hash" },
+  { key: "headers", label: "头部", icon: "list" },
+  { key: "body", label: "请求体", icon: "file-text" },
+  { key: "auth", label: "认证", icon: "lock" },
+  { key: "tests", label: "测试", icon: "check" },
 ]);
 
 const responseTabs = ref<Array<{ key: string; label: string; icon: string; badge?: number }>>([
-  { key: 'body', label: '响应体', icon: 'file-text' },
-  { key: 'headers', label: '头部', icon: 'list' },
-  { key: 'cookies', label: 'Cookies', icon: 'disc' },
-  { key: 'tests', label: '测试', icon: 'check' },
+  { key: "body", label: "响应体", icon: "file-text" },
+  { key: "headers", label: "头部", icon: "list" },
+  { key: "cookies", label: "Cookies", icon: "disc" },
+  { key: "tests", label: "测试", icon: "check" },
 ]);
 
 const binaryFileInput = ref<HTMLInputElement>();
@@ -868,23 +622,31 @@ const hasParams = computed(() => currentRequest.value.params.length > 0);
 const hasHeaders = computed(() => currentRequest.value.headers.length > 0);
 
 // 动态更新选项卡徽章
-watch(() => currentRequest.value.params, (params) => {
-  const tab = requestTabs.value.find(t => t.key === 'params');
-  if (tab) {
-    tab.badge = params.length > 0 ? params.length : undefined;
-  }
-}, { deep: true });
+watch(
+  () => currentRequest.value.params,
+  (params) => {
+    const tab = requestTabs.value.find((t) => t.key === "params");
+    if (tab) {
+      tab.badge = params.length > 0 ? params.length : undefined;
+    }
+  },
+  { deep: true },
+);
 
-watch(() => currentRequest.value.headers, (headers) => {
-  const tab = requestTabs.value.find(t => t.key === 'headers');
-  if (tab) {
-    tab.badge = headers.length > 0 ? headers.length : undefined;
-  }
-}, { deep: true });
+watch(
+  () => currentRequest.value.headers,
+  (headers) => {
+    const tab = requestTabs.value.find((t) => t.key === "headers");
+    if (tab) {
+      tab.badge = headers.length > 0 ? headers.length : undefined;
+    }
+  },
+  { deep: true },
+);
 
 // 参数管理
 const addParam = () => {
-  currentRequest.value.params.push({ key: '', value: '', description: '' });
+  currentRequest.value.params.push({ key: "", value: "", description: "" });
 };
 
 const removeParam = (index: number) => {
@@ -893,7 +655,7 @@ const removeParam = (index: number) => {
 
 // 头部管理
 const addHeader = () => {
-  currentRequest.value.headers.push({ key: '', value: '', description: '' });
+  currentRequest.value.headers.push({ key: "", value: "", description: "" });
 };
 
 const removeHeader = (index: number) => {
@@ -902,7 +664,7 @@ const removeHeader = (index: number) => {
 
 // 表单数据管理
 const addFormDataItem = () => {
-  currentRequest.value.formData.push({ key: '', value: '', type: 'text' });
+  currentRequest.value.formData.push({ key: "", value: "", type: "text" });
 };
 
 const removeFormDataItem = (index: number) => {
@@ -920,7 +682,7 @@ const handleFileSelect = (index: number, event: Event) => {
 
 // URL编码数据管理
 const addUrlencodedItem = () => {
-  currentRequest.value.urlencoded.push({ key: '', value: '' });
+  currentRequest.value.urlencoded.push({ key: "", value: "" });
 };
 
 const removeUrlencodedItem = (index: number) => {
@@ -954,7 +716,7 @@ const sendRequest = async () => {
     const responseTime = Date.now() - startTime;
     response.value = {
       status: mockResponse.status ?? 0,
-      statusText: mockResponse.statusText ?? '',
+      statusText: mockResponse.statusText ?? "",
       headers: mockResponse.headers ?? {},
       data: mockResponse.data,
       cookies: mockResponse.cookies ?? [],
@@ -973,13 +735,13 @@ const sendRequest = async () => {
     }
 
     if (response.value) {
-      emit('requestSent', requestConfig, response.value);
+      emit("requestSent", requestConfig, response.value);
     }
   } catch (error: unknown) {
-    console.error('Request failed:', error);
+    console.error("Request failed:", error);
     response.value = {
       status: 0,
-      statusText: 'Request Failed',
+      statusText: "Request Failed",
       headers: {},
       data: error instanceof Error ? error.message : String(error),
       responseTime: Date.now() - startTime,
@@ -1002,52 +764,52 @@ const buildRequestConfig = () => {
   // 构建查询参数
   if (currentRequest.value.params.length > 0) {
     const params = new URLSearchParams();
-    currentRequest.value.params.forEach(param => {
+    currentRequest.value.params.forEach((param) => {
       if (param.key && param.value) {
         params.append(param.key, param.value);
       }
     });
     const paramString = params.toString();
     if (paramString) {
-      config.url += (config.url.includes('?') ? '&' : '?') + paramString;
+      config.url += (config.url.includes("?") ? "&" : "?") + paramString;
     }
   }
 
   // 添加头部
-  currentRequest.value.headers.forEach(header => {
+  currentRequest.value.headers.forEach((header) => {
     if (header.key && header.value) {
       config.headers[header.key] = header.value;
     }
   });
 
   // 添加认证
-  if (currentRequest.value.authType === 'bearer' && currentRequest.value.bearerToken) {
+  if (currentRequest.value.authType === "bearer" && currentRequest.value.bearerToken) {
     config.headers.Authorization = `Bearer ${currentRequest.value.bearerToken}`;
-  } else if (currentRequest.value.authType === 'basic' && currentRequest.value.basicUsername) {
+  } else if (currentRequest.value.authType === "basic" && currentRequest.value.basicUsername) {
     const credentials = btoa(`${currentRequest.value.basicUsername}:${currentRequest.value.basicPassword}`);
     config.headers.Authorization = `Basic ${credentials}`;
-  } else if (currentRequest.value.authType === 'api-key') {
-    if (currentRequest.value.apiAddTo === 'header') {
+  } else if (currentRequest.value.authType === "api-key") {
+    if (currentRequest.value.apiAddTo === "header") {
       config.headers[currentRequest.value.apiKey] = currentRequest.value.apiValue;
     }
   }
 
   // 构建请求体
-  if (['POST', 'PUT', 'PATCH'].includes(currentRequest.value.method)) {
-    if (currentRequest.value.bodyType === 'raw' && currentRequest.value.bodyRaw) {
+  if (["POST", "PUT", "PATCH"].includes(currentRequest.value.method)) {
+    if (currentRequest.value.bodyType === "raw" && currentRequest.value.bodyRaw) {
       config.body = currentRequest.value.bodyRaw;
-      if (currentRequest.value.bodyLanguage === 'json') {
-        config.headers['Content-Type'] = 'application/json';
+      if (currentRequest.value.bodyLanguage === "json") {
+        config.headers["Content-Type"] = "application/json";
       }
-    } else if (currentRequest.value.bodyType === 'x-www-form-urlencoded') {
+    } else if (currentRequest.value.bodyType === "x-www-form-urlencoded") {
       const formData = new URLSearchParams();
-      currentRequest.value.urlencoded.forEach(item => {
+      currentRequest.value.urlencoded.forEach((item) => {
         if (item.key && item.value) {
           formData.append(item.key, item.value);
         }
       });
       config.body = formData.toString();
-      config.headers['Content-Type'] = 'application/x-www-form-urlencoded';
+      config.headers["Content-Type"] = "application/x-www-form-urlencoded";
     }
     // form-data 和 binary 需要特殊处理
   }
@@ -1057,47 +819,47 @@ const buildRequestConfig = () => {
 
 const mockHttpRequest = async (config: any): Promise<Partial<Response>> => {
   // 模拟HTTP请求延迟
-  await new Promise(resolve => setTimeout(resolve, 500 + Math.random() * 1000));
+  await new Promise((resolve) => setTimeout(resolve, 500 + Math.random() * 1000));
 
   // 简单的模拟响应
   try {
     const url = new URL(config.url);
 
-    if (url.pathname.includes('/users')) {
+    if (url.pathname.includes("/users")) {
       return {
         status: 200,
-        statusText: 'OK',
+        statusText: "OK",
         headers: {
-          'Content-Type': 'application/json',
-          'X-Powered-By': 'AsterCloud',
+          "Content-Type": "application/json",
+          "X-Powered-By": "AsterCloud",
         },
         data: {
           users: [
-            { id: 1, name: 'John Doe', email: 'john@example.com' },
-            { id: 2, name: 'Jane Smith', email: 'jane@example.com' },
-          ]
+            { id: 1, name: "John Doe", email: "john@example.com" },
+            { id: 2, name: "Jane Smith", email: "jane@example.com" },
+          ],
         },
         cookies: [],
       };
     } else {
       return {
         status: 404,
-        statusText: 'Not Found',
+        statusText: "Not Found",
         headers: {
-          'Content-Type': 'application/json',
+          "Content-Type": "application/json",
         },
-        data: { error: 'Not Found' },
+        data: { error: "Not Found" },
         cookies: [],
       };
     }
   } catch (error) {
     return {
       status: 400,
-      statusText: 'Bad Request',
+      statusText: "Bad Request",
       headers: {
-        'Content-Type': 'application/json',
+        "Content-Type": "application/json",
       },
-      data: { error: 'Invalid URL' },
+      data: { error: "Invalid URL" },
       cookies: [],
     };
   }
@@ -1114,30 +876,30 @@ const runTests = () => {
 
   try {
     // 简化的测试执行器
-    const tests = currentRequest.value.tests.split('\n').filter(line => line.trim());
+    const tests = currentRequest.value.tests.split("\n").filter((line) => line.trim());
 
-    tests.forEach(testLine => {
+    tests.forEach((testLine) => {
       const match = testLine.match(/pm\.test\(['"`]([^'"`]+)['"`],/);
       if (match) {
-        const testName = match[1] ?? '';
+        const testName = match[1] ?? "";
         let passed = false;
-        let errorMsg = '';
+        let errorMsg = "";
 
         try {
           // 简单的状态码测试
-          if (testName.includes('状态码')) {
+          if (testName.includes("状态码")) {
             const statusMatch = testName.match(/(\d+)/);
             if (statusMatch) {
-              const expectedStatus = parseInt(statusMatch[1] ?? '0');
+              const expectedStatus = parseInt(statusMatch[1] ?? "0");
               passed = response.value?.status === expectedStatus;
             }
           }
 
           // 简单的响应时间测试
-          if (testName.includes('响应时间')) {
+          if (testName.includes("响应时间")) {
             const timeMatch = testName.match(/(\d+)ms/);
             if (timeMatch) {
-              const maxTime = parseInt(timeMatch[1] ?? '0');
+              const maxTime = parseInt(timeMatch[1] ?? "0");
               passed = (response.value?.responseTime ?? 0) < maxTime;
             }
           }
@@ -1154,7 +916,7 @@ const runTests = () => {
     });
   } catch (error: unknown) {
     testResults.value.push({
-      name: '测试执行错误',
+      name: "测试执行错误",
       passed: false,
       error: error instanceof Error ? error.message : String(error),
     });
@@ -1164,24 +926,24 @@ const runTests = () => {
 // 工具方法
 const createNewRequest = () => {
   currentRequest.value = {
-    method: 'GET',
-    url: '',
+    method: "GET",
+    url: "",
     params: [],
     headers: [],
-    bodyType: 'none',
-    bodyLanguage: 'json',
-    bodyRaw: '',
+    bodyType: "none",
+    bodyLanguage: "json",
+    bodyRaw: "",
     formData: [],
     urlencoded: [],
     binaryFile: null,
-    authType: 'none',
-    bearerToken: '',
-    basicUsername: '',
-    basicPassword: '',
-    apiKey: '',
-    apiValue: '',
-    apiAddTo: 'header',
-    tests: '',
+    authType: "none",
+    bearerToken: "",
+    basicUsername: "",
+    basicPassword: "",
+    apiKey: "",
+    apiValue: "",
+    apiAddTo: "header",
+    tests: "",
   };
   response.value = null;
   testResults.value = [];
@@ -1189,9 +951,9 @@ const createNewRequest = () => {
 
 const importRequest = () => {
   // 实现导入功能
-  const input = document.createElement('input');
-  input.type = 'file';
-  input.accept = '.json';
+  const input = document.createElement("input");
+  input.type = "file";
+  input.accept = ".json";
   input.onchange = (e) => {
     const file = (e.target as HTMLInputElement).files?.[0];
     if (file) {
@@ -1201,7 +963,7 @@ const importRequest = () => {
           const data = JSON.parse(e.target?.result as string);
           currentRequest.value = { ...currentRequest.value, ...data };
         } catch (error) {
-          console.error('Failed to import request:', error);
+          console.error("Failed to import request:", error);
         }
       };
       reader.readAsText(file);
@@ -1214,9 +976,9 @@ const exportRequest = () => {
   if (!currentRequest.value) return;
 
   const dataStr = JSON.stringify(currentRequest.value, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
+  const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `request-${Date.now()}.json`;
   a.click();
@@ -1225,48 +987,48 @@ const exportRequest = () => {
 
 const getBodyPlaceholder = () => {
   const placeholders: Record<string, string> = {
-    text: '输入纯文本内容',
+    text: "输入纯文本内容",
     json: '{\n  "key": "value"\n}',
     xml: '<?xml version="1.0" encoding="UTF-8"?>\n<root></root>',
-    html: '<!DOCTYPE html>\n<html><head></head><body></body></html>',
+    html: "<!DOCTYPE html>\n<html><head></head><body></body></html>",
   };
-  return placeholders[currentRequest.value.bodyLanguage] || '输入内容';
+  return placeholders[currentRequest.value.bodyLanguage] || "输入内容";
 };
 
 const formatRawBody = () => {
-  if (currentRequest.value.bodyLanguage === 'json') {
+  if (currentRequest.value.bodyLanguage === "json") {
     try {
       const parsed = JSON.parse(currentRequest.value.bodyRaw);
       currentRequest.value.bodyRaw = JSON.stringify(parsed, null, 2);
     } catch (error) {
-      alert('JSON格式错误');
+      alert("JSON格式错误");
     }
   }
 };
 
 const validateRawBody = () => {
-  if (currentRequest.value.bodyLanguage === 'json') {
+  if (currentRequest.value.bodyLanguage === "json") {
     try {
       JSON.parse(currentRequest.value.bodyRaw);
-      alert('JSON格式正确');
+      alert("JSON格式正确");
     } catch (error: unknown) {
-      alert('JSON格式错误: ' + (error instanceof Error ? error.message : String(error)));
+      alert("JSON格式错误: " + (error instanceof Error ? error.message : String(error)));
     }
   }
 };
 
 const getStatusClass = (status: number) => {
-  if (status >= 200 && status < 300) return 'success';
-  if (status >= 300 && status < 400) return 'redirect';
-  if (status >= 400 && status < 500) return 'client-error';
-  if (status >= 500) return 'server-error';
-  return 'default';
+  if (status >= 200 && status < 300) return "success";
+  if (status >= 300 && status < 400) return "redirect";
+  if (status >= 400 && status < 500) return "client-error";
+  if (status >= 500) return "server-error";
+  return "default";
 };
 
 const isJsonResponse = (response: Response | null) => {
   if (!response) return false;
-  const contentType = response.headers['content-type'] || '';
-  return contentType.includes('application/json');
+  const contentType = response.headers["content-type"] || "";
+  return contentType.includes("application/json");
 };
 
 const formatJson = (data: any) => {
@@ -1278,25 +1040,25 @@ const formatJson = (data: any) => {
 };
 
 const formatSize = (bytes: number) => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleString('zh-CN');
+  return date.toLocaleString("zh-CN");
 };
 
 const saveResponse = () => {
   if (!response.value) return;
 
   const data = JSON.stringify(response.value, null, 2);
-  const blob = new Blob([data], { type: 'application/json' });
+  const blob = new Blob([data], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `response-${Date.now()}.json`;
   a.click();
@@ -1306,9 +1068,7 @@ const saveResponse = () => {
 const copyResponse = () => {
   if (!response.value) return;
 
-  const text = typeof response.value.data === 'string'
-    ? response.value.data
-    : JSON.stringify(response.value.data, null, 2);
+  const text = typeof response.value.data === "string" ? response.value.data : JSON.stringify(response.value.data, null, 2);
 
   navigator.clipboard.writeText(text);
 };
@@ -1316,10 +1076,10 @@ const copyResponse = () => {
 const downloadResponse = () => {
   if (!response.value) return;
 
-  const contentType = response.value.headers['content-type'] || 'text/plain';
+  const contentType = response.value.headers["content-type"] || "text/plain";
   const blob = new Blob([response.value.data], { type: contentType });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `response-${Date.now()}`;
   a.click();
@@ -1348,9 +1108,9 @@ const addToHistory = (method: string, url: string, status: number) => {
 
   // 保存到本地存储
   try {
-    localStorage.setItem('http-request-history', JSON.stringify(requestHistory.value));
+    localStorage.setItem("http-request-history", JSON.stringify(requestHistory.value));
   } catch (error) {
-    console.warn('Failed to save history:', error);
+    console.warn("Failed to save history:", error);
   }
 };
 
@@ -1365,7 +1125,7 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('http-request-settings', JSON.stringify(requestSettings.value));
+  localStorage.setItem("http-request-settings", JSON.stringify(requestSettings.value));
   showSettings.value = false;
 };
 
@@ -1383,22 +1143,22 @@ const resetSettings = () => {
 onMounted(() => {
   // 加载设置
   try {
-    const saved = localStorage.getItem('http-request-settings');
+    const saved = localStorage.getItem("http-request-settings");
     if (saved) {
       requestSettings.value = { ...requestSettings.value, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load request settings:', error);
+    console.warn("Failed to load request settings:", error);
   }
 
   // 加载历史记录
   try {
-    const saved = localStorage.getItem('http-request-history');
+    const saved = localStorage.getItem("http-request-history");
     if (saved) {
       requestHistory.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load request history:', error);
+    console.warn("Failed to load request history:", error);
   }
 });
 </script>
@@ -1505,11 +1265,15 @@ onMounted(() => {
 }
 
 /* 参数表格 */
-.params-content, .headers-content {
+.params-content,
+.headers-content {
   @apply space-y-3;
 }
 
-.params-table, .headers-table, .form-data-table, .urlencoded-table {
+.params-table,
+.headers-table,
+.form-data-table,
+.urlencoded-table {
   @apply border border-gray-200 dark:border-gray-600 rounded-lg overflow-hidden;
 }
 
@@ -1529,11 +1293,15 @@ onMounted(() => {
   @apply flex-1 px-3 py-2;
 }
 
-.param-input, .header-input, .form-input, .url-input {
+.param-input,
+.header-input,
+.form-input,
+.url-input {
   @apply w-full px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
-.header-select, .form-type-select {
+.header-select,
+.form-type-select {
   @apply w-full px-2 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
@@ -1541,24 +1309,32 @@ onMounted(() => {
   @apply p-1 text-gray-400 dark:text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded transition-colors;
 }
 
-.add-param-btn, .add-header-btn, .add-form-data-btn, .add-urlencoded-btn {
+.add-param-btn,
+.add-header-btn,
+.add-form-data-btn,
+.add-urlencoded-btn {
   @apply flex items-center gap-2 px-3 py-2 text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors;
 }
 
 /* 请求体 */
-.body-type-selector, .auth-type-selector {
+.body-type-selector,
+.auth-type-selector {
   @apply flex items-center gap-3 mb-4;
 }
 
-.body-type-label, .auth-type-label {
+.body-type-label,
+.auth-type-label {
   @apply text-sm font-medium text-gray-700 dark:text-gray-300;
 }
 
-.body-type-select, .body-language-select, .auth-type-select {
+.body-type-select,
+.body-language-select,
+.auth-type-select {
   @apply px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
-.raw-content, .binary-content {
+.raw-content,
+.binary-content {
   @apply space-y-3;
 }
 
@@ -1574,19 +1350,23 @@ onMounted(() => {
   @apply flex gap-2;
 }
 
-.raw-action-btn, .test-action-btn {
+.raw-action-btn,
+.test-action-btn {
   @apply flex items-center gap-1 px-3 py-1 text-sm text-gray-600 dark:text-gray-400 border border-gray-200 dark:border-gray-600 rounded hover:bg-gray-50 dark:hover:bg-gray-600 transition-colors;
 }
 
-.file-input-wrapper, .binary-input-wrapper {
+.file-input-wrapper,
+.binary-input-wrapper {
   @apply flex items-center gap-3 p-4 border border-gray-200 dark:border-gray-600 rounded-lg;
 }
 
-.file-input, .binary-input {
+.file-input,
+.binary-input {
   @apply hidden;
 }
 
-.file-select-btn, .binary-select-btn {
+.file-select-btn,
+.binary-select-btn {
   @apply flex items-center gap-2 px-3 py-1 text-sm text-blue-600 dark:text-blue-400 border border-blue-200 dark:border-blue-600 rounded hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-colors;
 }
 
@@ -1603,7 +1383,8 @@ onMounted(() => {
   @apply block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1;
 }
 
-.auth-input, .auth-select {
+.auth-input,
+.auth-select {
   @apply w-full px-3 py-2 text-sm border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
@@ -1697,11 +1478,13 @@ onMounted(() => {
   @apply h-full;
 }
 
-.json-viewer, .raw-viewer {
+.json-viewer,
+.raw-viewer {
   @apply h-full;
 }
 
-.json-viewer pre, .raw-viewer pre {
+.json-viewer pre,
+.raw-viewer pre {
   @apply text-sm font-mono text-gray-800 dark:text-gray-200 whitespace-pre-wrap break-all;
 }
 

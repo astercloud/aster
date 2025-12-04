@@ -1,4 +1,4 @@
-import { ref, onMounted, onUnmounted } from 'vue';
+import { ref, onMounted, onUnmounted } from "vue";
 
 /**
  * useScroll
@@ -18,25 +18,25 @@ export function useScroll<T extends HTMLElement>() {
 
   const scrollToTop = (smooth = true) => {
     if (!target.value) return;
-    target.value.scrollTo({ top: 0, behavior: smooth ? 'smooth' : 'auto' });
+    target.value.scrollTo({ top: 0, behavior: smooth ? "smooth" : "auto" });
   };
 
   const scrollToBottom = (smooth = true) => {
     if (!target.value) return;
     target.value.scrollTo({
       top: target.value.scrollHeight,
-      behavior: smooth ? 'smooth' : 'auto',
+      behavior: smooth ? "smooth" : "auto",
     });
   };
 
   onMounted(() => {
     if (!target.value) return;
-    target.value.addEventListener('scroll', updateState);
+    target.value.addEventListener("scroll", updateState);
   });
 
   onUnmounted(() => {
     if (!target.value) return;
-    target.value.removeEventListener('scroll', updateState);
+    target.value.removeEventListener("scroll", updateState);
   });
 
   return {

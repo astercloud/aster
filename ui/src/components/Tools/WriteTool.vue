@@ -7,26 +7,13 @@
         <span>文件写入工具</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="新建文件"
-          @click="createNewFile"
-        >
+        <button class="action-button" title="新建文件" @click="createNewFile">
           <Icon type="plus" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="清空内容"
-          :disabled="!currentFile || !fileContent"
-          @click="clearContent"
-        >
+        <button class="action-button" title="清空内容" :disabled="!currentFile || !fileContent" @click="clearContent">
           <Icon type="trash" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
       </div>
@@ -62,34 +49,19 @@
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="writeSettings.backup"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="writeSettings.backup" type="checkbox" class="setting-checkbox" />
             写入前备份
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="writeSettings.autoSave"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="writeSettings.autoSave" type="checkbox" class="setting-checkbox" />
             自动保存
           </label>
         </div>
         <div class="setting-group">
           <label>自动保存间隔 (秒)</label>
-          <input
-            v-model.number="writeSettings.autoSaveInterval"
-            type="number"
-            min="1"
-            max="300"
-            class="setting-input"
-            :disabled="!writeSettings.autoSave"
-          />
+          <input v-model.number="writeSettings.autoSaveInterval" type="number" min="1" max="300" class="setting-input" :disabled="!writeSettings.autoSave" />
         </div>
         <div class="setting-actions">
           <button class="setting-btn" @click="resetSettings">重置</button>
@@ -111,18 +83,8 @@
         <h4>文件路径</h4>
         <div class="path-input-group">
           <Icon type="folder" size="sm" class="input-icon" />
-          <input
-            v-model="filePath"
-            type="text"
-            placeholder="输入文件路径 (如: /path/to/file.txt)"
-            class="path-input"
-            @keydown.enter="createFileAtPath"
-          />
-          <button
-            class="browse-btn"
-            title="浏览文件"
-            @click="browseFiles"
-          >
+          <input v-model="filePath" type="text" placeholder="输入文件路径 (如: /path/to/file.txt)" class="path-input" @keydown.enter="createFileAtPath" />
+          <button class="browse-btn" title="浏览文件" @click="browseFiles">
             <Icon type="folder-open" size="sm" />
           </button>
         </div>
@@ -132,14 +94,9 @@
       <div class="template-section">
         <h4>文件模板</h4>
         <div class="template-grid">
-          <div
-            v-for="template in fileTemplates"
-            :key="template.name"
-            class="template-card"
-            @click="selectTemplate(template)"
-          >
+          <div v-for="template in fileTemplates" :key="template.name" class="template-card" @click="selectTemplate(template)">
             <div class="template-icon">
-              <Icon :type="(template.icon as any)" size="sm" />
+              <Icon :type="template.icon as any" size="sm" />
             </div>
             <div class="template-info">
               <div class="template-name">{{ template.name }}</div>
@@ -153,14 +110,9 @@
       <div v-if="recentFiles.length > 0" class="recent-files">
         <h4>最近写入</h4>
         <div class="recent-list">
-          <div
-            v-for="(file, index) in recentFiles"
-            :key="index"
-            class="recent-item"
-            @click="openRecentFile(file)"
-          >
+          <div v-for="(file, index) in recentFiles" :key="index" class="recent-item" @click="openRecentFile(file)">
             <div class="file-icon">
-              <Icon :type="(getIconForFile(file) as any)" size="sm" />
+              <Icon :type="getIconForFile(file) as any" size="sm" />
             </div>
             <div class="file-info">
               <div class="file-name">{{ file.name }}</div>
@@ -175,23 +127,11 @@
       </div>
 
       <!-- 拖拽区域 -->
-      <div
-        class="drop-zone"
-        :class="{ 'drag-over': isDragOver }"
-        @dragover.prevent="handleDragOver"
-        @dragleave.prevent="handleDragLeave"
-        @drop.prevent="handleDrop"
-      >
+      <div class="drop-zone" :class="{ 'drag-over': isDragOver }" @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop">
         <Icon type="upload" size="lg" />
         <p>拖拽文件到此处</p>
         <p class="drop-hint">或点击下方按钮选择文件</p>
-        <input
-          type="file"
-          ref="fileInput"
-          class="file-input"
-          @change="handleFileSelect"
-          multiple
-        />
+        <input type="file" ref="fileInput" class="file-input" @change="handleFileSelect" multiple />
       </div>
     </div>
 
@@ -201,7 +141,7 @@
       <div class="file-info-bar">
         <div class="file-info">
           <div class="file-icon">
-            <Icon :type="(getIconForFile(currentFile) as any)" size="sm" />
+            <Icon :type="getIconForFile(currentFile) as any" size="sm" />
           </div>
           <div class="file-details">
             <div class="file-name">{{ currentFile.name }}</div>
@@ -213,29 +153,16 @@
           </div>
         </div>
         <div class="file-actions">
-          <button
-            class="action-btn preview-btn"
-            title="预览"
-            @click="togglePreview"
-          >
+          <button class="action-btn preview-btn" title="预览" @click="togglePreview">
             <Icon type="eye" size="xs" />
             预览
           </button>
-          <button
-            class="action-btn save-btn"
-            title="保存文件"
-            :disabled="isSaving || !hasUnsavedChanges"
-            @click="saveFile"
-          >
+          <button class="action-btn save-btn" title="保存文件" :disabled="isSaving || !hasUnsavedChanges" @click="saveFile">
             <Icon v-if="isSaving" type="spinner" size="xs" class="animate-spin" />
             <Icon v-else type="save" size="xs" />
             保存
           </button>
-          <button
-            class="action-btn close-btn"
-            title="关闭文件"
-            @click="closeFile"
-          >
+          <button class="action-btn close-btn" title="关闭文件" @click="closeFile">
             <Icon type="close" size="xs" />
           </button>
         </div>
@@ -245,54 +172,28 @@
       <div class="editor-toolbar">
         <div class="toolbar-left">
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="撤销"
-              :disabled="!canUndo"
-              @click="undo"
-            >
+            <button class="toolbar-btn" title="撤销" :disabled="!canUndo" @click="undo">
               <Icon type="undo" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="重做"
-              :disabled="!canRedo"
-              @click="redo"
-            >
+            <button class="toolbar-btn" title="重做" :disabled="!canRedo" @click="redo">
               <Icon type="redo" size="xs" />
             </button>
           </div>
           <div class="toolbar-separator"></div>
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="查找替换"
-              @click="toggleFindReplace"
-            >
+            <button class="toolbar-btn" title="查找替换" @click="toggleFindReplace">
               <Icon type="search" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="格式化"
-              @click="formatContent"
-            >
+            <button class="toolbar-btn" title="格式化" @click="formatContent">
               <Icon type="align-left" size="xs" />
             </button>
           </div>
           <div class="toolbar-separator"></div>
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="插入时间戳"
-              @click="insertTimestamp"
-            >
+            <button class="toolbar-btn" title="插入时间戳" @click="insertTimestamp">
               <Icon type="clock" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="插入路径"
-              @click="insertFilePath"
-            >
+            <button class="toolbar-btn" title="插入路径" @click="insertFilePath">
               <Icon type="folder" size="xs" />
             </button>
           </div>
@@ -312,79 +213,29 @@
       <div v-if="showFindReplace" class="find-replace-bar">
         <div class="find-input-group">
           <Icon type="search" size="sm" class="input-icon" />
-          <input
-            v-model="findQuery"
-            ref="findInput"
-            type="text"
-            placeholder="查找..."
-            class="find-input"
-            @keydown.enter="findNext"
-            @keydown.shift.enter="findPrevious"
-          />
+          <input v-model="findQuery" ref="findInput" type="text" placeholder="查找..." class="find-input" @keydown.enter="findNext" @keydown.shift.enter="findPrevious" />
           <div class="find-controls">
-            <span v-if="findResults.current > 0" class="find-results">
-              {{ findResults.current }} / {{ findResults.total }}
-            </span>
-            <button
-              class="find-btn"
-              title="上一个"
-              :disabled="findResults.total === 0"
-              @click="findPrevious"
-            >
+            <span v-if="findResults.current > 0" class="find-results"> {{ findResults.current }} / {{ findResults.total }} </span>
+            <button class="find-btn" title="上一个" :disabled="findResults.total === 0" @click="findPrevious">
               <Icon type="chevron-up" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="下一个"
-              :disabled="findResults.total === 0"
-              @click="findNext"
-            >
+            <button class="find-btn" title="下一个" :disabled="findResults.total === 0" @click="findNext">
               <Icon type="chevron-down" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="区分大小写"
-              :class="{ active: findOptions.caseSensitive }"
-              @click="findOptions.caseSensitive = !findOptions.caseSensitive"
-            >
+            <button class="find-btn" title="区分大小写" :class="{ active: findOptions.caseSensitive }" @click="findOptions.caseSensitive = !findOptions.caseSensitive">
               <Icon type="case-sensitive" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="全词匹配"
-              :class="{ active: findOptions.wholeWord }"
-              @click="findOptions.wholeWord = !findOptions.wholeWord"
-            >
+            <button class="find-btn" title="全词匹配" :class="{ active: findOptions.wholeWord }" @click="findOptions.wholeWord = !findOptions.wholeWord">
               <Icon type="whole-word" size="xs" />
             </button>
           </div>
         </div>
         <div class="replace-input-group">
           <Icon type="replace" size="sm" class="input-icon" />
-          <input
-            v-model="replaceQuery"
-            type="text"
-            placeholder="替换为..."
-            class="replace-input"
-            @keydown.enter="replaceNext"
-          />
+          <input v-model="replaceQuery" type="text" placeholder="替换为..." class="replace-input" @keydown.enter="replaceNext" />
           <div class="replace-controls">
-            <button
-              class="replace-btn"
-              title="替换"
-              :disabled="findResults.total === 0"
-              @click="replaceNext"
-            >
-              替换
-            </button>
-            <button
-              class="replace-btn"
-              title="全部替换"
-              :disabled="findResults.total === 0"
-              @click="replaceAll"
-            >
-              全部替换
-            </button>
+            <button class="replace-btn" title="替换" :disabled="findResults.total === 0" @click="replaceNext">替换</button>
+            <button class="replace-btn" title="全部替换" :disabled="findResults.total === 0" @click="replaceAll">全部替换</button>
           </div>
         </div>
       </div>
@@ -392,11 +243,7 @@
       <!-- 编辑器主体 -->
       <div class="editor-container">
         <div v-if="writeSettings.showLineNumbers" class="line-numbers">
-          <div
-            v-for="(line, index) in contentLines"
-            :key="index"
-            :class="['line-number', { 'current-line': index === cursorPosition.line - 1 }]"
-          >
+          <div v-for="(line, index) in contentLines" :key="index" :class="['line-number', { 'current-line': index === cursorPosition.line - 1 }]">
             {{ index + 1 }}
           </div>
         </div>
@@ -407,7 +254,7 @@
             :class="['editor-textarea', writeSettings.fontSize, { 'word-wrap': writeSettings.wordWrap }]"
             :style="{
               fontFamily: writeSettings.fontFamily,
-              tabSize: writeSettings.tabSize
+              tabSize: writeSettings.tabSize,
             }"
             spellcheck="false"
             @input="handleInput"
@@ -421,10 +268,7 @@
           <div v-if="showPreview" class="preview-panel">
             <div class="preview-header">
               <h4>预览</h4>
-              <button
-                class="preview-close"
-                @click="showPreview = false"
-              >
+              <button class="preview-close" @click="showPreview = false">
                 <Icon type="close" size="xs" />
               </button>
             </div>
@@ -438,7 +282,7 @@
     <div v-if="currentFile" class="status-bar">
       <div class="status-left">
         <span class="encoding">{{ writeSettings.encoding.toUpperCase() }}</span>
-        <span class="mode">{{ writeSettings.mode === 'write' ? '覆盖' : '追加' }}</span>
+        <span class="mode">{{ writeSettings.mode === "write" ? "覆盖" : "追加" }}</span>
         <span v-if="writeSettings.autoSave" class="auto-save">自动保存</span>
       </div>
       <div class="status-right">
@@ -446,17 +290,15 @@
           <Icon type="spinner" size="xs" class="animate-spin" />
           保存中...
         </span>
-        <span v-else-if="lastSaveTime" class="last-save">
-          最后保存: {{ formatSaveTime(lastSaveTime) }}
-        </span>
+        <span v-else-if="lastSaveTime" class="last-save"> 最后保存: {{ formatSaveTime(lastSaveTime) }} </span>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface WriteFile {
   name: string;
@@ -487,8 +329,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -498,8 +340,8 @@ const emit = defineEmits<{
 
 // 响应式数据
 const currentFile = ref<WriteFile | null>(null);
-const fileContent = ref('');
-const filePath = ref('');
+const fileContent = ref("");
+const filePath = ref("");
 const recentFiles = ref<WriteFile[]>([]);
 const isSaving = ref(false);
 const showSettings = ref(false);
@@ -508,8 +350,8 @@ const showFindReplace = ref(false);
 const isDragOver = ref(false);
 
 // 查找替换
-const findQuery = ref('');
-const replaceQuery = ref('');
+const findQuery = ref("");
+const replaceQuery = ref("");
 const findResults = ref({ current: 0, total: 0 });
 const findOptions = ref({
   caseSensitive: false,
@@ -534,14 +376,14 @@ const lastSaveTime = ref<number | null>(null);
 
 // 写入设置
 const writeSettings = ref({
-  fontSize: 'text-sm',
+  fontSize: "text-sm",
   fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
   tabSize: 2,
   wordWrap: true,
   showLineNumbers: true,
-  encoding: 'utf-8',
-  lineEnding: '\n',
-  mode: 'write',
+  encoding: "utf-8",
+  lineEnding: "\n",
+  mode: "write",
   backup: false,
   autoSave: false,
   autoSaveInterval: 30,
@@ -558,16 +400,16 @@ const websocket = ref<WebSocket | null>(null);
 // 文件模板
 const fileTemplates: FileTemplate[] = [
   {
-    name: '文本文件',
-    description: '纯文本文档',
-    icon: 'file-text',
-    content: '',
-    extension: '.txt',
+    name: "文本文件",
+    description: "纯文本文档",
+    icon: "file-text",
+    content: "",
+    extension: ".txt",
   },
   {
-    name: 'Markdown',
-    description: 'Markdown文档',
-    icon: 'file-text',
+    name: "Markdown",
+    description: "Markdown文档",
+    icon: "file-text",
     content: `# 文档标题
 
 ## 章节
@@ -575,19 +417,19 @@ const fileTemplates: FileTemplate[] = [
 ### 子章节
 
 内容...`,
-    extension: '.md',
+    extension: ".md",
   },
   {
-    name: 'JSON',
-    description: 'JSON配置文件',
-    icon: 'file-code',
+    name: "JSON",
+    description: "JSON配置文件",
+    icon: "file-code",
     content: `{\n  "name": "",\n  "version": "1.0.0",\n  "description": ""\n}`,
-    extension: '.json',
+    extension: ".json",
   },
   {
-    name: 'HTML',
-    description: 'HTML网页文件',
-    icon: 'file-code',
+    name: "HTML",
+    description: "HTML网页文件",
+    icon: "file-code",
     content: `<!DOCTYPE html>
 <html lang="zh-CN">
 <head>
@@ -599,12 +441,12 @@ const fileTemplates: FileTemplate[] = [
   <h1>Hello World</h1>
 </body>
 </html>`,
-    extension: '.html',
+    extension: ".html",
   },
   {
-    name: 'CSS',
-    description: 'CSS样式文件',
-    icon: 'file-code',
+    name: "CSS",
+    description: "CSS样式文件",
+    icon: "file-code",
     content: `/* CSS 样式 */
 body {
   font-family: Arial, sans-serif;
@@ -616,12 +458,12 @@ body {
   max-width: 1200px;
   margin: 0 auto;
 }`,
-    extension: '.css',
+    extension: ".css",
   },
   {
-    name: 'JavaScript',
-    description: 'JavaScript脚本文件',
-    icon: 'file-code',
+    name: "JavaScript",
+    description: "JavaScript脚本文件",
+    icon: "file-code",
     content: `// JavaScript 脚本
 function main() {
   console.log('Hello World!');
@@ -631,12 +473,12 @@ function main() {
 
 // 执行主函数
 main();`,
-    extension: '.js',
+    extension: ".js",
   },
   {
-    name: 'YAML',
-    description: 'YAML配置文件',
-    icon: 'file-code',
+    name: "YAML",
+    description: "YAML配置文件",
+    icon: "file-code",
     content: `# YAML 配置
 app:
   name: ""
@@ -647,23 +489,23 @@ database:
   host: localhost
   port: 5432
   name: ""`,
-    extension: '.yml',
+    extension: ".yml",
   },
   {
-    name: '环境变量',
-    description: '.env环境变量文件',
-    icon: 'file-code',
+    name: "环境变量",
+    description: ".env环境变量文件",
+    icon: "file-code",
     content: `# 环境变量配置
 NODE_ENV=development
 PORT=3000
 API_URL=http://localhost:8080`,
-    extension: '.env',
+    extension: ".env",
   },
 ];
 
 // 计算属性
 const contentLines = computed(() => {
-  return fileContent.value.split('\n');
+  return fileContent.value.split("\n");
 });
 
 const hasUnsavedChanges = computed(() => {
@@ -676,7 +518,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('WriteTool WebSocket connected');
+      console.log("WriteTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -684,37 +526,37 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('WriteTool WebSocket disconnected');
+      console.log("WriteTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('WriteTool WebSocket error:', error);
+      console.error("WriteTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'file_written':
+    case "file_written":
       if (message.file && currentFile.value) {
         currentFile.value.originalContent = currentFile.value.content;
         currentFile.value.lastWrite = Date.now();
         currentFile.value.size = new Blob([currentFile.value.content]).size;
         isSaving.value = false;
         addToRecentFiles(currentFile.value);
-        emit('fileWritten', currentFile.value);
+        emit("fileWritten", currentFile.value);
       }
       break;
-    case 'write_error':
-      error.value = message.error || '文件写入失败';
+    case "write_error":
+      error.value = message.error || "文件写入失败";
       isSaving.value = false;
       break;
   }
@@ -729,10 +571,10 @@ const sendWebSocketMessage = (message: any) => {
 // 文件操作方法
 const createNewFile = () => {
   const newFile: WriteFile = {
-    name: 'untitled.txt',
-    path: '/untitled.txt',
-    content: '',
-    originalContent: '',
+    name: "untitled.txt",
+    path: "/untitled.txt",
+    content: "",
+    originalContent: "",
     lastWrite: Date.now(),
     size: 0,
     encoding: writeSettings.value.encoding,
@@ -744,20 +586,20 @@ const createFileAtPath = () => {
   if (!filePath.value.trim()) return;
 
   const path = filePath.value.trim();
-  const name = path.split('/').pop() || 'untitled.txt';
+  const name = path.split("/").pop() || "untitled.txt";
 
   const newFile: WriteFile = {
     name,
     path,
-    content: '',
-    originalContent: '',
+    content: "",
+    originalContent: "",
     lastWrite: Date.now(),
     size: 0,
     encoding: writeSettings.value.encoding,
   };
 
   openFile(newFile);
-  filePath.value = '';
+  filePath.value = "";
 };
 
 const openFile = (file: WriteFile) => {
@@ -782,7 +624,7 @@ const openRecentFile = (file: WriteFile) => {
 };
 
 const selectTemplate = (template: FileTemplate) => {
-  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, '');
+  const timestamp = new Date().toISOString().slice(0, 19).replace(/[:-]/g, "");
   const fileName = `template_${timestamp}${template.extension}`;
 
   const newFile: WriteFile = {
@@ -806,7 +648,7 @@ const saveFile = async () => {
   currentFile.value.lastWrite = Date.now();
 
   sendWebSocketMessage({
-    type: 'write_file',
+    type: "write_file",
     file: {
       ...currentFile.value,
       content: fileContent.value,
@@ -817,24 +659,24 @@ const saveFile = async () => {
 
 const closeFile = () => {
   if (currentFile.value && hasUnsavedChanges.value) {
-    if (!confirm('文件有未保存的更改，确定要关闭吗？')) {
+    if (!confirm("文件有未保存的更改，确定要关闭吗？")) {
       return;
     }
   }
 
   if (currentFile.value) {
-    emit('fileClosed', currentFile.value);
+    emit("fileClosed", currentFile.value);
     currentFile.value = null;
-    fileContent.value = '';
+    fileContent.value = "";
     resetFindReplace();
     clearAutoSave();
   }
 };
 
 const clearContent = () => {
-  if (currentFile.value && confirm('确定要清空文件内容吗？')) {
-    fileContent.value = '';
-    handleInput({ target: { value: '' } } as any);
+  if (currentFile.value && confirm("确定要清空文件内容吗？")) {
+    fileContent.value = "";
+    handleInput({ target: { value: "" } } as any);
   }
 };
 
@@ -859,7 +701,7 @@ const findNext = () => {
 
   let match;
   if (writeSettings.value.regex) {
-    const regex = new RegExp(findQuery.value, writeSettings.value.caseSensitive ? 'g' : 'gi');
+    const regex = new RegExp(findQuery.value, writeSettings.value.caseSensitive ? "g" : "gi");
     regex.lastIndex = start;
     match = regex.exec(text);
   } else {
@@ -889,9 +731,9 @@ const findPrevious = () => {
 
   let match;
   if (writeSettings.value.regex) {
-    const regex = new RegExp(findQuery.value, writeSettings.value.caseSensitive ? 'g' : 'gi');
+    const regex = new RegExp(findQuery.value, writeSettings.value.caseSensitive ? "g" : "gi");
     const matches = [...text.matchAll(regex)];
-    const currentIndex = matches.findIndex(m => m.index >= textarea.selectionStart);
+    const currentIndex = matches.findIndex((m) => m.index >= textarea.selectionStart);
     if (currentIndex > 0) {
       match = matches[currentIndex - 1];
     } else if (matches.length > 0) {
@@ -947,23 +789,19 @@ const createSearchQuery = () => {
 };
 
 const createReplaceRegex = () => {
-  const flags = writeSettings.value.caseSensitive ? 'g' : 'gi';
+  const flags = writeSettings.value.caseSensitive ? "g" : "gi";
   let pattern = findQuery.value;
   if (findOptions.value.wholeWord) {
     pattern = `\\b${pattern}\\b`;
   }
-  return new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+  return new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), flags);
 };
 
 const isMatch = (text: string): boolean => {
   if (findOptions.value.caseSensitive) {
-    return findOptions.value.wholeWord
-      ? new RegExp(`\\b${findQuery.value}\\b`).test(text)
-      : text.includes(findQuery.value);
+    return findOptions.value.wholeWord ? new RegExp(`\\b${findQuery.value}\\b`).test(text) : text.includes(findQuery.value);
   } else {
-    return findOptions.value.wholeWord
-      ? new RegExp(`\\b${findQuery.value}\\b`, 'i').test(text)
-      : text.toLowerCase().includes(findQuery.value.toLowerCase());
+    return findOptions.value.wholeWord ? new RegExp(`\\b${findQuery.value}\\b`, "i").test(text) : text.toLowerCase().includes(findQuery.value.toLowerCase());
   }
 };
 
@@ -979,8 +817,8 @@ const updateFindResults = () => {
 };
 
 const resetFindReplace = () => {
-  findQuery.value = '';
-  replaceQuery.value = '';
+  findQuery.value = "";
+  replaceQuery.value = "";
   findResults.value = { current: 0, total: 0 };
   showFindReplace.value = false;
 };
@@ -1012,19 +850,19 @@ const handleKeydown = (event: KeyboardEvent) => {
   // 快捷键
   if (event.ctrlKey || event.metaKey) {
     switch (event.key) {
-      case 's':
+      case "s":
         event.preventDefault();
         saveFile();
         break;
-      case 'f':
+      case "f":
         event.preventDefault();
         toggleFindReplace();
         break;
-      case 'h':
+      case "h":
         event.preventDefault();
         toggleFindReplace();
         break;
-      case 'z':
+      case "z":
         if (event.shiftKey) {
           event.preventDefault();
           redo();
@@ -1033,7 +871,7 @@ const handleKeydown = (event: KeyboardEvent) => {
           undo();
         }
         break;
-      case 'y':
+      case "y":
         event.preventDefault();
         redo();
         break;
@@ -1041,7 +879,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 
   // Tab支持
-  if (event.key === 'Tab') {
+  if (event.key === "Tab") {
     event.preventDefault();
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -1049,11 +887,11 @@ const handleKeydown = (event: KeyboardEvent) => {
 
     if (event.shiftKey) {
       // Shift+Tab: 减少缩进
-      const lineStart = value.lastIndexOf('\n', start - 1) + 1;
-      const lineEnd = value.indexOf('\n', end);
+      const lineStart = value.lastIndexOf("\n", start - 1) + 1;
+      const lineEnd = value.indexOf("\n", end);
       const line = value.substring(lineStart, lineEnd === -1 ? value.length : lineEnd);
 
-      if (line.startsWith('  ')) {
+      if (line.startsWith("  ")) {
         const newLine = line.substring(2);
         fileContent.value = value.substring(0, lineStart) + newLine + value.substring(lineEnd === -1 ? value.length : lineEnd);
         nextTick(() => {
@@ -1064,7 +902,7 @@ const handleKeydown = (event: KeyboardEvent) => {
     } else {
       // Tab: 增加缩进
       const tabSize = writeSettings.value.tabSize;
-      const tabString = ' '.repeat(tabSize);
+      const tabString = " ".repeat(tabSize);
       fileContent.value = value.substring(0, start) + tabString + value.substring(end);
       nextTick(() => {
         textarea.selectionStart = textarea.selectionEnd = start + tabSize;
@@ -1084,7 +922,7 @@ const updateCursorPosition = () => {
   let column = 1;
 
   for (let i = 0; i < position; i++) {
-    if (text[i] === '\n') {
+    if (text[i] === "\n") {
       line++;
       column = 1;
     } else {
@@ -1102,7 +940,7 @@ const syncScroll = (event: Event) => {
 const undo = () => {
   if (historyIndex.value > 0) {
     historyIndex.value--;
-    fileContent.value = editHistory.value[historyIndex.value] ?? '';
+    fileContent.value = editHistory.value[historyIndex.value] ?? "";
     canUndo.value = historyIndex.value > 0;
     canRedo.value = true;
   }
@@ -1111,7 +949,7 @@ const undo = () => {
 const redo = () => {
   if (historyIndex.value < editHistory.value.length - 1) {
     historyIndex.value++;
-    fileContent.value = editHistory.value[historyIndex.value] ?? '';
+    fileContent.value = editHistory.value[historyIndex.value] ?? "";
     canUndo.value = true;
     canRedo.value = historyIndex.value < editHistory.value.length - 1;
   }
@@ -1121,14 +959,14 @@ const redo = () => {
 const formatContent = () => {
   if (!currentFile.value) return;
 
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
 
-  if (extension === 'json') {
+  if (extension === "json") {
     try {
       const parsed = JSON.parse(fileContent.value);
       fileContent.value = JSON.stringify(parsed, null, 2);
     } catch (error) {
-      console.warn('JSON formatting failed:', error);
+      console.warn("JSON formatting failed:", error);
     }
   }
 };
@@ -1165,20 +1003,20 @@ const togglePreview = () => {
 };
 
 const formatPreview = () => {
-  if (!currentFile.value) return '';
+  if (!currentFile.value) return "";
 
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
 
-  if (extension === 'md') {
+  if (extension === "md") {
     // 简单的Markdown预览
     return fileContent.value
-      .replace(/^# (.*$)/gim, '<h1>$1</h1>')
-      .replace(/^## (.*$)/gim, '<h2>$1</h2>')
-      .replace(/^### (.*$)/gim, '<h3>$1</h3>')
-      .replace(/\*\*(.*)\*\*/gim, '<strong>$1</strong>')
-      .replace(/\*(.*)\*/gim, '<em>$1</em>')
-      .replace(/`([^`]*)`/gim, '<code>$1</code>')
-      .replace(/\n/gim, '<br>');
+      .replace(/^# (.*$)/gim, "<h1>$1</h1>")
+      .replace(/^## (.*$)/gim, "<h2>$1</h2>")
+      .replace(/^### (.*$)/gim, "<h3>$1</h3>")
+      .replace(/\*\*(.*)\*\*/gim, "<strong>$1</strong>")
+      .replace(/\*(.*)\*/gim, "<em>$1</em>")
+      .replace(/`([^`]*)`/gim, "<code>$1</code>")
+      .replace(/\n/gim, "<br>");
   }
 
   return `<pre>${fileContent.value}</pre>`;
@@ -1230,7 +1068,7 @@ const handleFileSelect = (event: Event) => {
 };
 
 const handleFiles = (files: FileList) => {
-  Array.from(files).forEach(file => {
+  Array.from(files).forEach((file) => {
     const reader = new FileReader();
     reader.onload = (e) => {
       const result = e.target?.result as string;
@@ -1260,21 +1098,21 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('write-settings', JSON.stringify(writeSettings.value));
+  localStorage.setItem("write-settings", JSON.stringify(writeSettings.value));
   showSettings.value = false;
   setupAutoSave();
 };
 
 const resetSettings = () => {
   writeSettings.value = {
-    fontSize: 'text-sm',
+    fontSize: "text-sm",
     fontFamily: 'Monaco, Menlo, "Ubuntu Mono", monospace',
     tabSize: 2,
     wordWrap: true,
     showLineNumbers: true,
-    encoding: 'utf-8',
-    lineEnding: '\n',
-    mode: 'write',
+    encoding: "utf-8",
+    lineEnding: "\n",
+    mode: "write",
     backup: false,
     autoSave: false,
     autoSaveInterval: 30,
@@ -1286,36 +1124,36 @@ const resetSettings = () => {
 
 // 工具方法
 const getIconForFile = (file: WriteFile) => {
-  const extension = file.name.split('.').pop()?.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase();
   const iconMap: { [key: string]: string } = {
-    txt: 'file-text',
-    md: 'file-text',
-    json: 'file-code',
-    html: 'file-code',
-    css: 'file-code',
-    js: 'file-code',
-    ts: 'file-code',
-    yml: 'file-code',
-    yaml: 'file-code',
-    env: 'file-code',
-    xml: 'file-code',
-    csv: 'file-spreadsheet',
-    log: 'file-text',
+    txt: "file-text",
+    md: "file-text",
+    json: "file-code",
+    html: "file-code",
+    css: "file-code",
+    js: "file-code",
+    ts: "file-code",
+    yml: "file-code",
+    yaml: "file-code",
+    env: "file-code",
+    xml: "file-code",
+    csv: "file-spreadsheet",
+    log: "file-text",
   };
-  return iconMap[extension || ''] || 'file';
+  return iconMap[extension || ""] || "file";
 };
 
 const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatWriteTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleString('zh-CN');
+  return date.toLocaleString("zh-CN");
 };
 
 const formatSaveTime = (timestamp: number) => {
@@ -1325,11 +1163,11 @@ const formatSaveTime = (timestamp: number) => {
   const minutes = Math.floor(diff / (1000 * 60));
 
   if (minutes < 1) {
-    return '刚刚';
+    return "刚刚";
   } else if (minutes < 60) {
     return `${minutes}分钟前`;
   } else {
-    return date.toLocaleTimeString('zh-CN');
+    return date.toLocaleTimeString("zh-CN");
   }
 };
 
@@ -1338,11 +1176,11 @@ const getContentSize = () => {
 };
 
 const getContentLines = () => {
-  return fileContent.value.split('\n').length;
+  return fileContent.value.split("\n").length;
 };
 
 const addToRecentFiles = (file: WriteFile) => {
-  const existingIndex = recentFiles.value.findIndex(f => f.path === file.path);
+  const existingIndex = recentFiles.value.findIndex((f) => f.path === file.path);
   if (existingIndex !== -1) {
     recentFiles.value[existingIndex] = file;
   } else {
@@ -1354,9 +1192,9 @@ const addToRecentFiles = (file: WriteFile) => {
 
   // 保存到本地存储
   try {
-    localStorage.setItem('write-recent-files', JSON.stringify(recentFiles.value));
+    localStorage.setItem("write-recent-files", JSON.stringify(recentFiles.value));
   } catch (error) {
-    console.warn('Failed to save recent files:', error);
+    console.warn("Failed to save recent files:", error);
   }
 };
 
@@ -1366,26 +1204,26 @@ onMounted(() => {
 
   // 加载设置
   try {
-    const saved = localStorage.getItem('write-settings');
+    const saved = localStorage.getItem("write-settings");
     if (saved) {
       writeSettings.value = { ...writeSettings.value, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load write settings:', error);
+    console.warn("Failed to load write settings:", error);
   }
 
   // 加载最近文件
   try {
-    const saved = localStorage.getItem('write-recent-files');
+    const saved = localStorage.getItem("write-recent-files");
     if (saved) {
       recentFiles.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load recent files:', error);
+    console.warn("Failed to load recent files:", error);
   }
 
   // 初始化编辑历史
-  editHistory.value = [''];
+  editHistory.value = [""];
   historyIndex.value = 0;
 });
 
@@ -1394,9 +1232,13 @@ onUnmounted(() => {
 });
 
 // 监听设置变化
-watch(writeSettings, () => {
-  setupAutoSave();
-}, { deep: true });
+watch(
+  writeSettings,
+  () => {
+    setupAutoSave();
+  },
+  { deep: true },
+);
 
 // 监听自动保存设置变化
 watch([() => writeSettings.value.autoSave, () => writeSettings.value.autoSaveInterval], () => {
@@ -1445,7 +1287,8 @@ watch([() => writeSettings.value.autoSave, () => writeSettings.value.autoSaveInt
   @apply text-sm text-gray-700 dark:text-gray-300;
 }
 
-.setting-select, .setting-input {
+.setting-select,
+.setting-input {
   @apply ml-2;
 }
 
@@ -1685,19 +1528,23 @@ watch([() => writeSettings.value.autoSave, () => writeSettings.value.autoSaveInt
   @apply border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800;
 }
 
-.find-input-group, .replace-input-group {
+.find-input-group,
+.replace-input-group {
   @apply flex items-center gap-2 px-4 py-2;
 }
 
-.find-input, .replace-input {
+.find-input,
+.replace-input {
   @apply flex-1 px-3 py-1.5 border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
-.find-controls, .replace-controls {
+.find-controls,
+.replace-controls {
   @apply flex items-center gap-1;
 }
 
-.find-btn, .replace-btn {
+.find-btn,
+.replace-btn {
   @apply p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
@@ -1765,11 +1612,13 @@ watch([() => writeSettings.value.autoSave, () => writeSettings.value.autoSaveInt
   @apply flex items-center justify-between px-4 py-1 border-t border-border dark:border-border-dark bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400;
 }
 
-.status-left, .status-right {
+.status-left,
+.status-right {
   @apply flex items-center gap-3;
 }
 
-.encoding, .mode {
+.encoding,
+.mode {
   @apply px-2 py-0.5 bg-gray-200 dark:bg-gray-700 rounded;
 }
 

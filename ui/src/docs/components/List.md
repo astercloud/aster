@@ -12,7 +12,7 @@
 </template>
 
 <script setup>
-const items = ['项目 1', '项目 2', '项目 3'];
+const items = ["项目 1", "项目 2", "项目 3"];
 </script>
 ```
 
@@ -37,13 +37,13 @@ const items = ['项目 1', '项目 2', '项目 3'];
 
 <script setup>
 const users = [
-  { id: 1, name: '张三', email: 'zhang@example.com' },
-  { id: 2, name: '李四', email: 'li@example.com' },
-  { id: 3, name: '王五', email: 'wang@example.com' },
+  { id: 1, name: "张三", email: "zhang@example.com" },
+  { id: 2, name: "李四", email: "li@example.com" },
+  { id: 3, name: "王五", email: "wang@example.com" },
 ];
 
 const handleSelect = (user) => {
-  console.log('Selected:', user);
+  console.log("Selected:", user);
 };
 </script>
 ```
@@ -66,9 +66,9 @@ const handleSelect = (user) => {
 
 <script setup>
 const menuItems = [
-  { icon: 'home', label: '首页' },
-  { icon: 'settings', label: '设置' },
-  { icon: 'user', label: '个人中心' },
+  { icon: "home", label: "首页" },
+  { icon: "settings", label: "设置" },
+  { icon: "user", label: "个人中心" },
 ];
 </script>
 ```
@@ -77,20 +77,20 @@ const menuItems = [
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| items | 列表数据 | `any[]` | `[]` |
+| 参数  | 说明     | 类型    | 默认值 |
+| ----- | -------- | ------- | ------ |
+| items | 列表数据 | `any[]` | `[]`   |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名 | 说明             | 回调参数    |
+| ------ | ---------------- | ----------- |
 | select | 选择列表项时触发 | `item: any` |
 
 ### Slots
 
-| 名称 | 说明 | 参数 |
-| --- | --- | --- |
+| 名称    | 说明         | 参数              |
+| ------- | ------------ | ----------------- |
 | default | 自定义列表项 | `{ item, index }` |
 
 ## 示例
@@ -121,10 +121,10 @@ const menuItems = [
 const contacts = [
   {
     id: 1,
-    name: '张三',
-    status: 'online',
-    lastMessage: '你好',
-    time: '10:30',
+    name: "张三",
+    status: "online",
+    lastMessage: "你好",
+    time: "10:30",
   },
   // ...
 ];
@@ -150,9 +150,9 @@ const contacts = [
 
 <script setup>
 const settings = [
-  { key: 'account', label: '账号设置', icon: 'user' },
-  { key: 'privacy', label: '隐私设置', icon: 'lock' },
-  { key: 'notification', label: '通知设置', icon: 'bell' },
+  { key: "account", label: "账号设置", icon: "user" },
+  { key: "privacy", label: "隐私设置", icon: "lock" },
+  { key: "notification", label: "通知设置", icon: "bell" },
 ];
 </script>
 ```

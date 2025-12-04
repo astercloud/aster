@@ -12,18 +12,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Icon from './Icon.vue';
+import { computed } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
-  type?: 'info' | 'success' | 'warning' | 'error';
+  type?: "info" | "success" | "warning" | "error";
   title?: string;
   content: string;
   closable?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  type: 'info',
+  type: "info",
   closable: false,
 });
 
@@ -33,20 +33,20 @@ defineEmits<{
 
 const typeClass = computed(() => {
   const map = {
-    info: 'notice-info',
-    success: 'notice-success',
-    warning: 'notice-warning',
-    error: 'notice-error',
+    info: "notice-info",
+    success: "notice-success",
+    warning: "notice-warning",
+    error: "notice-error",
   };
   return map[props.type];
 });
 
 const iconType = computed(() => {
   const map = {
-    info: 'info',
-    success: 'check',
-    warning: 'warning',
-    error: 'error',
+    info: "info",
+    success: "check",
+    warning: "warning",
+    error: "error",
   };
   return map[props.type] as any;
 });

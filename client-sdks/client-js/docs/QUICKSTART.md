@@ -67,10 +67,7 @@ console.log(item?.value); // { theme: 'dark', language: 'zh-CN' }
 
 ```typescript
 // 存储
-await client.memory.semantic.store(
-  "aster is a powerful framework for building AI agents",
-  { category: "introduction" },
-);
+await client.memory.semantic.store("aster is a powerful framework for building AI agents", { category: "introduction" });
 
 // 搜索
 const results = await client.memory.semantic.search("What is aster?", {

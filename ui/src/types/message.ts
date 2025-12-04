@@ -3,34 +3,19 @@
  * 参考阿里云 ChatUI 设计
  */
 
-export type MessageType = 
-  | 'text'
-  | 'image'
-  | 'card'
-  | 'list'
-  | 'system'
-  | 'thinking'
-  | 'tool-call'
-  | 'tool-result'
-  | 'ask-user';
+export type MessageType = "text" | "image" | "card" | "list" | "system" | "thinking" | "tool-call" | "tool-result" | "ask-user";
 
-export type MessageRole = 'user' | 'assistant' | 'system';
+export type MessageRole = "user" | "assistant" | "system";
 
-export type MessageStatus = 'pending' | 'sent' | 'delivered' | 'read' | 'error';
+export type MessageStatus = "pending" | "sent" | "delivered" | "read" | "error";
 
 // ==================
 // Agent Event Types (对应后端 pkg/types/events.go)
 // ==================
 
-export type AgentChannel = 'progress' | 'control' | 'monitor';
+export type AgentChannel = "progress" | "control" | "monitor";
 
-export type ToolCallState = 
-  | 'pending'
-  | 'executing'
-  | 'paused'
-  | 'completed'
-  | 'failed'
-  | 'cancelled';
+export type ToolCallState = "pending" | "executing" | "paused" | "completed" | "failed" | "cancelled";
 
 // ToolCallSnapshot 工具调用快照 (对应后端 ToolCallSnapshot)
 export interface ToolCallSnapshot {
@@ -56,7 +41,7 @@ export interface AgentEventEnvelope {
 }
 
 // Agent 事件类型
-export type AgentEvent = 
+export type AgentEvent =
   | ProgressThinkChunkStartEvent
   | ProgressThinkChunkEvent
   | ProgressThinkChunkEndEvent
@@ -81,50 +66,50 @@ export type AgentEvent =
 
 // Progress Channel Events
 export interface ProgressThinkChunkStartEvent {
-  type: 'think_chunk_start';
+  type: "think_chunk_start";
   step: number;
 }
 
 export interface ProgressThinkChunkEvent {
-  type: 'think_chunk';
+  type: "think_chunk";
   step: number;
   delta: string;
 }
 
 export interface ProgressThinkChunkEndEvent {
-  type: 'think_chunk_end';
+  type: "think_chunk_end";
   step: number;
 }
 
 export interface ProgressTextChunkStartEvent {
-  type: 'text_chunk_start';
+  type: "text_chunk_start";
   step: number;
 }
 
 export interface ProgressTextChunkEvent {
-  type: 'text_chunk';
+  type: "text_chunk";
   step: number;
   delta: string;
 }
 
 export interface ProgressTextChunkEndEvent {
-  type: 'text_chunk_end';
+  type: "text_chunk_end";
   step: number;
   text: string;
 }
 
 export interface ProgressToolStartEvent {
-  type: 'tool:start';
+  type: "tool:start";
   call: ToolCallSnapshot;
 }
 
 export interface ProgressToolEndEvent {
-  type: 'tool:end';
+  type: "tool:end";
   call: ToolCallSnapshot;
 }
 
 export interface ProgressToolProgressEvent {
-  type: 'tool:progress';
+  type: "tool:progress";
   call: ToolCallSnapshot;
   progress: number;
   message?: string;
@@ -135,28 +120,28 @@ export interface ProgressToolProgressEvent {
 }
 
 export interface ProgressToolIntermediateEvent {
-  type: 'tool:intermediate';
+  type: "tool:intermediate";
   call: ToolCallSnapshot;
   label?: string;
   data?: any;
 }
 
 export interface ProgressToolCancelledEvent {
-  type: 'tool:cancelled';
+  type: "tool:cancelled";
   call: ToolCallSnapshot;
   reason?: string;
 }
 
 export interface ProgressToolErrorEvent {
-  type: 'tool:error';
+  type: "tool:error";
   call: ToolCallSnapshot;
   error: string;
 }
 
 export interface ProgressDoneEvent {
-  type: 'done';
+  type: "done";
   step: number;
-  reason: 'completed' | 'interrupted';
+  reason: "completed" | "interrupted";
 }
 
 // Todo Events
@@ -164,27 +149,27 @@ export interface TodoItemData {
   id: string;
   content: string;
   active_form: string;
-  status: 'pending' | 'in_progress' | 'completed';
+  status: "pending" | "in_progress" | "completed";
   priority?: number;
   created_at: string;
   updated_at: string;
 }
 
 export interface ProgressTodoUpdateEvent {
-  type: 'todo_update';
+  type: "todo_update";
   todos: TodoItemData[];
 }
 
 // Control Channel Events
 export interface ControlPermissionRequiredEvent {
-  type: 'permission_required';
+  type: "permission_required";
   call: ToolCallSnapshot;
 }
 
 export interface ControlPermissionDecidedEvent {
-  type: 'permission_decided';
+  type: "permission_decided";
   call_id: string;
-  decision: 'allow' | 'deny';
+  decision: "allow" | "deny";
   decided_by: string;
   note?: string;
 }
@@ -203,42 +188,35 @@ export interface Question {
 }
 
 export interface ControlAskUserEvent {
-  type: 'ask_user';
+  type: "ask_user";
   request_id: string;
   questions: Question[];
 }
 
 export interface ControlUserAnswerEvent {
-  type: 'user_answer';
+  type: "user_answer";
   request_id: string;
   answers: Record<string, any>;
 }
 
 // Monitor Channel Events
-export type AgentRuntimeState = 
-  | 'ready'
-  | 'working'
-  | 'idle'
-  | 'running'
-  | 'paused'
-  | 'completed'
-  | 'failed';
+export type AgentRuntimeState = "ready" | "working" | "idle" | "running" | "paused" | "completed" | "failed";
 
 export interface MonitorStateChangedEvent {
-  type: 'state_changed';
+  type: "state_changed";
   state: AgentRuntimeState;
 }
 
 export interface MonitorErrorEvent {
-  type: 'error';
-  severity: 'info' | 'warn' | 'error';
-  phase: 'model' | 'tool' | 'system' | 'lifecycle';
+  type: "error";
+  severity: "info" | "warn" | "error";
+  phase: "model" | "tool" | "system" | "lifecycle";
   message: string;
   detail?: Record<string, any>;
 }
 
 export interface MonitorTokenUsageEvent {
-  type: 'token_usage';
+  type: "token_usage";
   input_tokens: number;
   output_tokens: number;
   total_tokens: number;
@@ -249,7 +227,7 @@ export interface MonitorTokenUsageEvent {
  */
 export interface Attachment {
   id: string;
-  type: 'image' | 'file' | 'link';
+  type: "image" | "file" | "link";
   name?: string;
   url?: string;
   preview?: string;
@@ -282,7 +260,7 @@ export interface User {
  * 文本消息
  */
 export interface TextMessage extends BaseMessage {
-  type: 'text';
+  type: "text";
   content: {
     text: string;
   };
@@ -292,7 +270,7 @@ export interface TextMessage extends BaseMessage {
  * 图片消息
  */
 export interface ImageMessage extends BaseMessage {
-  type: 'image';
+  type: "image";
   content: {
     url: string;
     alt?: string;
@@ -311,7 +289,7 @@ export interface ImageMessage extends BaseMessage {
  * 卡片消息
  */
 export interface CardMessage extends BaseMessage {
-  type: 'card';
+  type: "card";
   content: {
     title?: string;
     subtitle?: string;
@@ -332,7 +310,7 @@ export interface CardMessage extends BaseMessage {
 export interface CardAction {
   label: string;
   action: string;
-  style?: 'primary' | 'secondary';
+  style?: "primary" | "secondary";
   icon?: string;
 }
 
@@ -340,7 +318,7 @@ export interface CardAction {
  * 列表消息
  */
 export interface ListMessage extends BaseMessage {
-  type: 'list';
+  type: "list";
   content: {
     title?: string;
     items: ListItem[];
@@ -364,11 +342,11 @@ export interface ListItem {
  * 系统消息
  */
 export interface SystemMessage extends BaseMessage {
-  type: 'system';
-  role: 'system';
+  type: "system";
+  role: "system";
   content: {
     text: string;
-    type?: 'info' | 'success' | 'warning' | 'error';
+    type?: "info" | "success" | "warning" | "error";
   };
 }
 
@@ -376,8 +354,8 @@ export interface SystemMessage extends BaseMessage {
  * 思考消息（Think-Aloud）
  */
 export interface ThinkingMessage extends BaseMessage {
-  type: 'thinking';
-  role: 'assistant';
+  type: "thinking";
+  role: "assistant";
   content: {
     steps: ThinkingStep[];
     isActive?: boolean;
@@ -387,7 +365,7 @@ export interface ThinkingMessage extends BaseMessage {
 
 export interface ThinkingStep {
   id?: string;
-  type: 'reasoning' | 'tool_call' | 'tool_result' | 'decision';
+  type: "reasoning" | "tool_call" | "tool_result" | "decision";
   content?: string;
   tool?: {
     name: string;
@@ -431,8 +409,8 @@ export interface ApprovalRequest {
  * AskUser 消息 (新增)
  */
 export interface AskUserMessage extends BaseMessage {
-  type: 'ask-user';
-  role: 'assistant';
+  type: "ask-user";
+  role: "assistant";
   content: {
     request_id: string;
     questions: Question[];
@@ -444,14 +422,7 @@ export interface AskUserMessage extends BaseMessage {
 /**
  * 消息联合类型
  */
-export type Message =
-  | TextMessage
-  | ImageMessage
-  | CardMessage
-  | ListMessage
-  | SystemMessage
-  | ThinkingMessage
-  | AskUserMessage;
+export type Message = TextMessage | ImageMessage | CardMessage | ListMessage | SystemMessage | ThinkingMessage | AskUserMessage;
 
 /**
  * 快捷回复

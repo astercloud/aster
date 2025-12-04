@@ -1,14 +1,6 @@
 <template>
   <label class="radio-container">
-    <input
-      type="radio"
-      :name="name"
-      :value="value"
-      :checked="modelValue === value"
-      :disabled="disabled"
-      class="radio-input"
-      @change="handleChange"
-    />
+    <input type="radio" :name="name" :value="value" :checked="modelValue === value" :disabled="disabled" class="radio-input" @change="handleChange" />
     <span class="radio-label">
       <slot></slot>
     </span>
@@ -26,11 +18,11 @@ interface Props {
 const props = defineProps<Props>();
 
 const emit = defineEmits<{
-  'update:modelValue': [value: any];
+  "update:modelValue": [value: any];
 }>();
 
 const handleChange = () => {
-  emit('update:modelValue', props.value);
+  emit("update:modelValue", props.value);
 };
 </script>
 

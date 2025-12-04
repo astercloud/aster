@@ -8,38 +8,34 @@
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    placeholder="输入消息..."
-    @send="handleSend"
-  />
+  <Chat :messages="messages" placeholder="输入消息..." @send="handleSend" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const messages = ref([
   {
-    id: '1',
-    type: 'text',
-    content: '你好！',
-    position: 'left',
+    id: "1",
+    type: "text",
+    content: "你好！",
+    position: "left",
   },
   {
-    id: '2',
-    type: 'text',
-    content: '很高兴认识你',
-    position: 'right',
-    status: 'sent',
+    id: "2",
+    type: "text",
+    content: "很高兴认识你",
+    position: "right",
+    status: "sent",
   },
 ]);
 
 const handleSend = (message) => {
   messages.value.push({
     id: Date.now().toString(),
-    type: 'text',
+    type: "text",
     content: message.content,
-    position: 'right',
+    position: "right",
   });
 };
 </script>
@@ -51,23 +47,18 @@ const handleSend = (message) => {
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    :quick-replies="quickReplies"
-    @send="handleSend"
-    @quick-reply="handleQuickReply"
-  />
+  <Chat :messages="messages" :quick-replies="quickReplies" @send="handleSend" @quick-reply="handleQuickReply" />
 </template>
 
 <script setup>
 const quickReplies = [
-  { name: '帮我写文章', value: 'write' },
-  { name: '分析代码', value: 'analyze' },
-  { name: '生成工作流', value: 'workflow' },
+  { name: "帮我写文章", value: "write" },
+  { name: "分析代码", value: "analyze" },
+  { name: "生成工作流", value: "workflow" },
 ];
 
 const handleQuickReply = (reply) => {
-  console.log('Quick reply:', reply);
+  console.log("Quick reply:", reply);
 };
 </script>
 ```
@@ -78,18 +69,14 @@ const handleQuickReply = (reply) => {
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    :toolbar="toolbar"
-    @send="handleSend"
-  />
+  <Chat :messages="messages" :toolbar="toolbar" @send="handleSend" />
 </template>
 
 <script setup>
 const toolbar = [
-  { icon: 'image', onClick: () => console.log('上传图片') },
-  { icon: 'attach', onClick: () => console.log('上传文件') },
-  { icon: 'mic', onClick: () => console.log('语音输入') },
+  { icon: "image", onClick: () => console.log("上传图片") },
+  { icon: "attach", onClick: () => console.log("上传文件") },
+  { icon: "mic", onClick: () => console.log("语音输入") },
 ];
 </script>
 ```
@@ -107,47 +94,47 @@ const toolbar = [
 const messages = [
   // 文本消息
   {
-    id: '1',
-    type: 'text',
-    content: '这是文本消息',
-    position: 'left',
+    id: "1",
+    type: "text",
+    content: "这是文本消息",
+    position: "left",
   },
   // 思考消息
   {
-    id: '2',
-    type: 'thinking',
-    content: '正在思考...',
-    position: 'left',
+    id: "2",
+    type: "thinking",
+    content: "正在思考...",
+    position: "left",
   },
   // 打字中
   {
-    id: '3',
-    type: 'typing',
-    position: 'left',
+    id: "3",
+    type: "typing",
+    position: "left",
   },
   // 卡片消息
   {
-    id: '4',
-    type: 'card',
-    position: 'left',
+    id: "4",
+    type: "card",
+    position: "left",
     card: {
-      title: '推荐内容',
-      content: '这是内容...',
+      title: "推荐内容",
+      content: "这是内容...",
       actions: [
-        { text: '查看', value: 'view' },
-        { text: '分享', value: 'share' },
+        { text: "查看", value: "view" },
+        { text: "分享", value: "share" },
       ],
     },
   },
   // 文件消息
   {
-    id: '5',
-    type: 'file',
-    position: 'left',
+    id: "5",
+    type: "file",
+    position: "left",
     file: {
-      name: 'document.pdf',
+      name: "document.pdf",
       size: 1024000,
-      url: 'https://example.com/file.pdf',
+      url: "https://example.com/file.pdf",
     },
   },
 ];
@@ -158,31 +145,31 @@ const messages = [
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| messages | 消息列表 | `Message[]` | `[]` |
-| placeholder | 输入框占位符 | `string` | `'输入消息...'` |
-| disabled | 是否禁用输入 | `boolean` | `false` |
-| quickReplies | 快捷回复列表 | `QuickReply[]` | `[]` |
-| toolbar | 工具栏按钮 | `ToolbarItem[]` | `[]` |
+| 参数         | 说明         | 类型            | 默认值          |
+| ------------ | ------------ | --------------- | --------------- |
+| messages     | 消息列表     | `Message[]`     | `[]`            |
+| placeholder  | 输入框占位符 | `string`        | `'输入消息...'` |
+| disabled     | 是否禁用输入 | `boolean`       | `false`         |
+| quickReplies | 快捷回复列表 | `QuickReply[]`  | `[]`            |
+| toolbar      | 工具栏按钮   | `ToolbarItem[]` | `[]`            |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| send | 发送消息时触发 | `{ type: string, content: string }` |
-| quickReply | 点击快捷回复时触发 | `QuickReply` |
-| cardAction | 点击卡片操作时触发 | `{ value: string }` |
+| 事件名     | 说明               | 回调参数                            |
+| ---------- | ------------------ | ----------------------------------- |
+| send       | 发送消息时触发     | `{ type: string, content: string }` |
+| quickReply | 点击快捷回复时触发 | `QuickReply`                        |
+| cardAction | 点击卡片操作时触发 | `{ value: string }`                 |
 
 ### Message 类型
 
 ```typescript
 interface Message {
   id: string;
-  type: 'text' | 'thinking' | 'typing' | 'card' | 'file';
+  type: "text" | "thinking" | "typing" | "card" | "file";
   content?: string;
-  position: 'left' | 'right';
-  status?: 'pending' | 'sent' | 'error';
+  position: "left" | "right";
+  status?: "pending" | "sent" | "error";
   user?: {
     avatar?: string;
     name?: string;

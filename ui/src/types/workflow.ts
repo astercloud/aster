@@ -5,9 +5,9 @@
  * 与 types/index.ts 中的 Workflow/WorkflowStep 类型不同 - 那些用于专门的工作流执行
  */
 
-export type WorkflowStepStatus = 'pending' | 'active' | 'completed' | 'failed';
+export type WorkflowStepStatus = "pending" | "active" | "completed" | "failed";
 
-export type WorkflowActionType = 'primary' | 'secondary' | 'danger';
+export type WorkflowActionType = "primary" | "secondary" | "danger";
 
 export interface WorkflowAction {
   type: WorkflowActionType;
@@ -29,7 +29,7 @@ export interface WorkflowConfig {
   id: string;
   name: string;
   title?: string;
-  steps: Omit<WorkflowStep, 'status'>[];
+  steps: Omit<WorkflowStep, "status">[];
 }
 
 export interface WorkflowState {

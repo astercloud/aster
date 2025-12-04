@@ -7,6 +7,7 @@
 ### 1. 多模型支持
 
 支持任何 LLM 模型，包括：
+
 - ✅ Claude (Anthropic)
 - ✅ GPT-4 (OpenAI)
 - ✅ 通义千问 (Qwen)
@@ -25,6 +26,7 @@ agent.Send(ctx, "/plan")
 ```
 
 **工作流程：**
+
 1. 检测到 `/` 开头的消息
 2. 从 `commands/` 目录加载命令定义（.md 文件）
 3. 执行前置脚本（如果有）
@@ -42,6 +44,7 @@ agent.Send(ctx, "帮我检查一致性问题")
 ```
 
 **工作流程：**
+
 1. Agent 根据配置加载 `workspace/skills/**/SKILL.md`，解析其中 YAML frontmatter
 2. 所有启用的 skills 只将 **元数据**（`name` + `description` + SKILL.md 路径）注入 SystemPrompt / UserMessage
 3. 当模型认为某个 skill 相关时，会先用 `Read` 或 `Bash` 工具主动打开对应的 `SKILL.md`

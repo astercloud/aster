@@ -7,11 +7,7 @@
         <span>文件匹配</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="清除结果"
-          @click="clearResults"
-        >
+        <button class="action-button" title="清除结果" @click="clearResults">
           <Icon type="trash" size="sm" />
         </button>
       </div>
@@ -20,49 +16,17 @@
     <!-- 搜索表单 -->
     <div class="search-form">
       <div class="pattern-input-wrapper">
-        <input
-          v-model="pattern"
-          ref="patternInput"
-          type="text"
-          placeholder="输入文件模式 (如: *.js, **/*.ts, src/**/*.vue)"
-          class="pattern-input"
-          @keydown.enter="performGlob"
-          @keydown.esc="pattern = ''"
-        />
+        <input v-model="pattern" ref="patternInput" type="text" placeholder="输入文件模式 (如: *.js, **/*.ts, src/**/*.vue)" class="pattern-input" @keydown.enter="performGlob" @keydown.esc="pattern = ''" />
         <div class="pattern-hints">
           <span class="hint-text">提示:</span>
-          <button
-            class="hint-btn"
-            @click="setPattern('*.js')"
-          >
-            *.js
-          </button>
-          <button
-            class="hint-btn"
-            @click="setPattern('**/*.vue')"
-          >
-            **/*.vue
-          </button>
-          <button
-            class="hint-btn"
-            @click="setPattern('src/**/*.{js,ts,jsx,tsx}')"
-          >
-            源代码
-          </button>
-          <button
-            class="hint-btn"
-            @click="setPattern('test/**/*.spec.js')"
-          >
-            测试文件
-          </button>
+          <button class="hint-btn" @click="setPattern('*.js')">*.js</button>
+          <button class="hint-btn" @click="setPattern('**/*.vue')">**/*.vue</button>
+          <button class="hint-btn" @click="setPattern('src/**/*.{js,ts,jsx,tsx}')">源代码</button>
+          <button class="hint-btn" @click="setPattern('test/**/*.spec.js')">测试文件</button>
         </div>
       </div>
       <div class="search-actions">
-        <button
-          class="search-button"
-          :disabled="!pattern.trim() || isSearching"
-          @click="performGlob"
-        >
+        <button class="search-button" :disabled="!pattern.trim() || isSearching" @click="performGlob">
           <Icon v-if="isSearching" type="spinner" size="sm" class="animate-spin" />
           <span v-else>匹配</span>
         </button>
@@ -73,20 +37,13 @@
     <div v-if="globResults.length > 0 || hasSearched" class="results-summary">
       <div class="summary-info">
         <span class="result-count">{{ globResults.length }} 个文件</span>
-        <span v-if="searchDuration" class="search-duration">
-          耗时 {{ searchDuration }}ms
-        </span>
+        <span v-if="searchDuration" class="search-duration"> 耗时 {{ searchDuration }}ms </span>
       </div>
     </div>
 
     <!-- 文件列表 -->
     <div class="file-list">
-      <div
-        v-for="(file, index) in globResults"
-        :key="index"
-        class="file-item"
-        @click="selectFile(file)"
-      >
+      <div v-for="(file, index) in globResults" :key="index" class="file-item" @click="selectFile(file)">
         <div class="file-icon">
           <Icon :type="getIconForFile(file)" size="sm" />
         </div>
@@ -99,18 +56,10 @@
           </div>
         </div>
         <div class="file-actions">
-          <button
-            class="action-btn view-btn"
-            title="查看文件"
-            @click.stop="viewFile(file)"
-          >
+          <button class="action-btn view-btn" title="查看文件" @click.stop="viewFile(file)">
             <Icon type="eye" size="xs" />
           </button>
-          <button
-            class="action-btn edit-btn"
-            title="编辑文件"
-            @click.stop="editFile(file)"
-          >
+          <button class="action-btn edit-btn" title="编辑文件" @click.stop="editFile(file)">
             <Icon type="edit" size="xs" />
           </button>
         </div>
@@ -133,8 +82,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface GlobFile {
   name: string;
@@ -149,8 +98,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -159,7 +108,7 @@ const emit = defineEmits<{
 }>();
 
 // 响应式数据
-const pattern = ref('');
+const pattern = ref("");
 const globResults = ref<GlobFile[]>([]);
 const isSearching = ref(false);
 const hasSearched = ref(false);
@@ -174,7 +123,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('GlobTool WebSocket connected');
+      console.log("GlobTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -182,36 +131,36 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('GlobTool WebSocket disconnected');
+      console.log("GlobTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('GlobTool WebSocket error:', error);
+      console.error("GlobTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'glob_started':
+    case "glob_started":
       isSearching.value = true;
       hasSearched.value = true;
       break;
-    case 'glob_result':
+    case "glob_result":
       if (message.file) {
         const file: GlobFile = message.file;
         globResults.value.push(file);
       }
       break;
-    case 'glob_completed':
+    case "glob_completed":
       isSearching.value = false;
       searchDuration.value = message.duration || 0;
       break;
@@ -235,7 +184,7 @@ const performGlob = () => {
 
   // 执行匹配
   sendWebSocketMessage({
-    type: 'glob_search',
+    type: "glob_search",
     pattern: pattern.value.trim(),
   });
 };
@@ -251,48 +200,48 @@ const setPattern = (newPattern: string) => {
 };
 
 const selectFile = (file: GlobFile) => {
-  emit('fileSelected', file);
+  emit("fileSelected", file);
 };
 
 const viewFile = (file: GlobFile) => {
-  emit('fileOpened', file);
+  emit("fileOpened", file);
 };
 
 const editFile = (file: GlobFile) => {
-  emit('fileOpened', file);
+  emit("fileOpened", file);
 };
 
 // 工具方法
 const getIconForFile = (file: GlobFile) => {
-  const extension = file.name.split('.').pop()?.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase();
 
-  if (['jpg', 'jpeg', 'png', 'gif', 'bmp', 'svg', 'webp'].includes(extension || '')) {
-    return 'image';
+  if (["jpg", "jpeg", "png", "gif", "bmp", "svg", "webp"].includes(extension || "")) {
+    return "image";
   }
-  if (['pdf'].includes(extension || '')) {
-    return 'file-pdf';
+  if (["pdf"].includes(extension || "")) {
+    return "file-pdf";
   }
-  if (['zip', 'rar', '7z', 'tar', 'gz'].includes(extension || '')) {
-    return 'archive';
+  if (["zip", "rar", "7z", "tar", "gz"].includes(extension || "")) {
+    return "archive";
   }
-  if (['txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'py', 'java', 'cpp', 'c', 'go', 'rs', 'sql'].includes(extension || '')) {
-    return 'file-text';
+  if (["txt", "md", "json", "js", "ts", "jsx", "tsx", "html", "css", "py", "java", "cpp", "c", "go", "rs", "sql"].includes(extension || "")) {
+    return "file-text";
   }
 
-  return 'file';
+  return "file";
 };
 
 const formatFileSize = (bytes: number) => {
-  if (bytes === 0) return '0 B';
+  if (bytes === 0) return "0 B";
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB', 'TB'];
+  const sizes = ["B", "KB", "MB", "GB", "TB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 };
 
 const formatDate = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('zh-CN');
+  return date.toLocaleDateString("zh-CN");
 };
 
 // 生命周期

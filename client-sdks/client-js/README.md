@@ -242,13 +242,10 @@ await client.skill.deleteVersion('my-skill', 'v1.0');
 
 ```typescript
 // 订阅事件（三通道）
-const subscription = await client.agent.subscribe(
-  ["progress", "control", "monitor"],
-  {
-    agentId: "agent-123",
-    eventTypes: ["thinking", "text_chunk", "tool_start"],
-  },
-);
+const subscription = await client.agent.subscribe(["progress", "control", "monitor"], {
+  agentId: "agent-123",
+  eventTypes: ["thinking", "text_chunk", "tool_start"],
+});
 
 // 处理事件
 for await (const event of subscription) {
@@ -367,23 +364,17 @@ await client.memory.working.delete("user_preference", "thread");
 
 ```typescript
 // 存储记忆
-const chunkId = await client.memory.semantic.store(
-  "Paris is the capital of France.",
-  {
-    source: "wikipedia",
-    category: "geography",
-  },
-);
+const chunkId = await client.memory.semantic.store("Paris is the capital of France.", {
+  source: "wikipedia",
+  category: "geography",
+});
 
 // 语义搜索
-const results = await client.memory.semantic.search(
-  "What is the capital of France?",
-  {
-    limit: 10,
-    threshold: 0.8,
-    filter: { category: "geography" },
-  },
-);
+const results = await client.memory.semantic.search("What is the capital of France?", {
+  limit: 10,
+  threshold: 0.8,
+  filter: { category: "geography" },
+});
 
 console.log(results);
 // [
@@ -495,10 +486,7 @@ await client.workflow.resume(parallelWorkflow.id, run.id);
 
 // 获取执行历史
 const runs = await client.workflow.getRuns(parallelWorkflow.id);
-const runDetails = await client.workflow.getRunDetails(
-  parallelWorkflow.id,
-  run.id,
-);
+const runDetails = await client.workflow.getRunDetails(parallelWorkflow.id, run.id);
 ```
 
 ---

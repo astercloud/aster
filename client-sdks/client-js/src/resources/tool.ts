@@ -4,15 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  ToolInfo,
-  ToolExecutionRequest,
-  ToolExecutionResponse,
-  AsyncToolExecutionResponse,
-  TaskProgress,
-  ToolStats,
-  ToolUsageReport,
-} from "../types/tool";
+import { ToolInfo, ToolExecutionRequest, ToolExecutionResponse, AsyncToolExecutionResponse, TaskProgress, ToolStats, ToolUsageReport } from "../types/tool";
 
 /**
  * Tool 资源类
@@ -31,12 +23,7 @@ export class ToolResource extends BaseResource {
    * @param tool 工具定义
    * @returns 工具信息
    */
-  async create(tool: {
-    name: string;
-    type: string;
-    schema: Record<string, any>;
-    description?: string;
-  }): Promise<ToolInfo> {
+  async create(tool: { name: string; type: string; schema: Record<string, any>; description?: string }): Promise<ToolInfo> {
     return this.request<ToolInfo>("/v1/tools", {
       method: "POST",
       body: tool,
@@ -48,11 +35,7 @@ export class ToolResource extends BaseResource {
    * @param filter 过滤条件
    * @returns 工具列表
    */
-  async list(filter?: {
-    type?: "builtin" | "custom" | "mcp";
-    category?: string;
-    enabled?: boolean;
-  }): Promise<ToolInfo[]> {
+  async list(filter?: { type?: "builtin" | "custom" | "mcp"; category?: string; enabled?: boolean }): Promise<ToolInfo[]> {
     const result = await this.request<{ tools: ToolInfo[] }>("/v1/tools", {
       params: filter,
     });
@@ -121,10 +104,7 @@ export class ToolResource extends BaseResource {
    * @param params 参数
    * @returns 任务信息
    */
-  async executeAsync(
-    toolName: string,
-    params: Record<string, any>,
-  ): Promise<AsyncToolExecutionResponse> {
+  async executeAsync(toolName: string, params: Record<string, any>): Promise<AsyncToolExecutionResponse> {
     return this.request<AsyncToolExecutionResponse>("/v1/tools/execute", {
       method: "POST",
       body: {
@@ -140,9 +120,7 @@ export class ToolResource extends BaseResource {
    * @param request 执行请求
    * @returns 执行结果或任务信息
    */
-  async executeWithOptions(
-    request: ToolExecutionRequest,
-  ): Promise<ToolExecutionResponse | AsyncToolExecutionResponse> {
+  async executeWithOptions(request: ToolExecutionRequest): Promise<ToolExecutionResponse | AsyncToolExecutionResponse> {
     return this.request("/v1/tools/execute", {
       method: "POST",
       body: request,
@@ -168,14 +146,8 @@ export class ToolResource extends BaseResource {
    * @param filter 过滤条件
    * @returns 任务列表
    */
-  async listTasks(filter?: {
-    status?: "pending" | "running" | "completed" | "failed" | "cancelled";
-    toolName?: string;
-  }): Promise<TaskProgress[]> {
-    const result = await this.request<{ tasks: TaskProgress[] }>(
-      "/v1/tools/tasks",
-      { params: filter },
-    );
+  async listTasks(filter?: { status?: "pending" | "running" | "completed" | "failed" | "cancelled"; toolName?: string }): Promise<TaskProgress[]> {
+    const result = await this.request<{ tasks: TaskProgress[] }>("/v1/tools/tasks", { params: filter });
     return result.tasks;
   }
 
@@ -210,19 +182,13 @@ export class ToolResource extends BaseResource {
       const task = await this.getTaskProgress(taskId);
 
       // 检查是否完成
-      if (
-        task.status === "completed" ||
-        task.status === "failed" ||
-        task.status === "cancelled"
-      ) {
+      if (task.status === "completed" || task.status === "failed" || task.status === "cancelled") {
         return task;
       }
 
       // 检查超时
       if (Date.now() - startTime > timeout) {
-        throw new Error(
-          `Task timeout after ${timeout}ms. Current status: ${task.status}`,
-        );
+        throw new Error(`Task timeout after ${timeout}ms. Current status: ${task.status}`);
       }
 
       // 等待后继续轮询
@@ -248,9 +214,7 @@ export class ToolResource extends BaseResource {
    * @returns 统计数据列表
    */
   async getAllStats(): Promise<ToolStats[]> {
-    const result = await this.request<{ stats: ToolStats[] }>(
-      "/v1/tools/stats",
-    );
+    const result = await this.request<{ stats: ToolStats[] }>("/v1/tools/stats");
     return result.stats;
   }
 
@@ -259,10 +223,7 @@ export class ToolResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 使用报告
    */
-  async getUsageReport(timeRange?: {
-    start: string;
-    end: string;
-  }): Promise<ToolUsageReport> {
+  async getUsageReport(timeRange?: { start: string; end: string }): Promise<ToolUsageReport> {
     return this.request<ToolUsageReport>("/v1/tools/usage-report", {
       params: timeRange,
     });

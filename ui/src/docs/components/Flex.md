@@ -29,7 +29,7 @@
       <div>项目 2</div>
       <div>项目 3</div>
     </Flex>
-    
+
     <h3 class="mt-4">垂直方向</h3>
     <Flex direction="column" gap="md">
       <div>项目 1</div>
@@ -53,7 +53,7 @@
     <Flex justify="end" gap="md">结束对齐</Flex>
     <Flex justify="between" gap="md">两端对齐</Flex>
     <Flex justify="around" gap="md">分散对齐</Flex>
-    
+
     <h3 class="mt-4">交叉轴对齐</h3>
     <Flex align="start" gap="md">开始对齐</Flex>
     <Flex align="center" gap="md">居中对齐</Flex>
@@ -84,9 +84,7 @@
 ```vue
 <template>
   <Flex wrap gap="md">
-    <div v-for="i in 10" :key="i">
-      项目 {{ i }}
-    </div>
+    <div v-for="i in 10" :key="i">项目 {{ i }}</div>
   </Flex>
 </template>
 ```
@@ -95,18 +93,18 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| direction | 主轴方向 | `'row' \| 'column'` | `'row'` |
-| wrap | 是否换行 | `boolean` | `false` |
-| justify | 主轴对齐方式 | `'start' \| 'end' \| 'center' \| 'between' \| 'around'` | `'start'` |
-| align | 交叉轴对齐方式 | `'start' \| 'end' \| 'center' \| 'stretch'` | `'start'` |
-| gap | 间距大小 | `'none' \| 'sm' \| 'md' \| 'lg'` | `'md'` |
+| 参数      | 说明           | 类型                                                    | 默认值    |
+| --------- | -------------- | ------------------------------------------------------- | --------- |
+| direction | 主轴方向       | `'row' \| 'column'`                                     | `'row'`   |
+| wrap      | 是否换行       | `boolean`                                               | `false`   |
+| justify   | 主轴对齐方式   | `'start' \| 'end' \| 'center' \| 'between' \| 'around'` | `'start'` |
+| align     | 交叉轴对齐方式 | `'start' \| 'end' \| 'center' \| 'stretch'`             | `'start'` |
+| gap       | 间距大小       | `'none' \| 'sm' \| 'md' \| 'lg'`                        | `'md'`    |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明         |
+| ------- | ------------ |
 | default | 弹性布局内容 |
 
 ## 示例
@@ -116,9 +114,7 @@
 ```vue
 <template>
   <Flex gap="md" wrap>
-    <div class="card" v-for="i in 6" :key="i">
-      卡片 {{ i }}
-    </div>
+    <div class="card" v-for="i in 6" :key="i">卡片 {{ i }}</div>
   </Flex>
 </template>
 

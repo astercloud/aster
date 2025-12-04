@@ -20,7 +20,7 @@
 </template>
 
 <script setup>
-import { Popover, Button } from '@/components/ChatUI';
+import { Popover, Button } from "@/components/ChatUI";
 </script>
 ```
 
@@ -78,7 +78,7 @@ import { Popover, Button } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { Popover, Button } from '@/components/ChatUI';
+import { Popover, Button } from "@/components/ChatUI";
 </script>
 ```
 
@@ -109,7 +109,7 @@ import { Popover, Button } from '@/components/ChatUI';
           <label class="text-sm font-medium text-gray-700 dark:text-gray-300">通知</label>
           <div class="mt-1">
             <label class="flex items-center">
-              <input type="checkbox" class="mr-2" checked>
+              <input type="checkbox" class="mr-2" checked />
               <span class="text-sm">启用桌面通知</span>
             </label>
           </div>
@@ -125,7 +125,7 @@ import { Popover, Button } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { Popover, Button } from '@/components/ChatUI';
+import { Popover, Button } from "@/components/ChatUI";
 </script>
 ```
 
@@ -140,22 +140,16 @@ import { Popover, Button } from '@/components/ChatUI';
       <Button icon="menu" variant="text">菜单</Button>
     </template>
     <div class="py-2 w-48">
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        个人资料
-      </a>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        设置
-      </a>
-      <hr class="my-1 border-gray-200 dark:border-gray-600">
-      <a href="#" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700">
-        退出登录
-      </a>
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 个人资料 </a>
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 设置 </a>
+      <hr class="my-1 border-gray-200 dark:border-gray-600" />
+      <a href="#" class="block px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-gray-100 dark:hover:bg-gray-700"> 退出登录 </a>
     </div>
   </Popover>
 </template>
 
 <script setup>
-import { Popover, Button } from '@/components/ChatUI';
+import { Popover, Button } from "@/components/ChatUI";
 </script>
 ```
 
@@ -174,25 +168,17 @@ import { Popover, Button } from '@/components/ChatUI';
         <p class="text-sm font-medium text-gray-900 dark:text-white">张三</p>
         <p class="text-sm text-gray-500 dark:text-gray-400">user@example.com</p>
       </div>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        查看资料
-      </a>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        账户设置
-      </a>
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        帮助中心
-      </a>
-      <hr class="my-1 border-gray-200 dark:border-gray-700">
-      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700">
-        退出登录
-      </a>
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 查看资料 </a>
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 账户设置 </a>
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 帮助中心 </a>
+      <hr class="my-1 border-gray-200 dark:border-gray-700" />
+      <a href="#" class="block px-4 py-2 text-sm text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700"> 退出登录 </a>
     </div>
   </Popover>
 </template>
 
 <script setup>
-import { Popover, Avatar } from '@/components/ChatUI';
+import { Popover, Avatar } from "@/components/ChatUI";
 </script>
 ```
 
@@ -200,30 +186,33 @@ import { Popover, Avatar } from '@/components/ChatUI';
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
+| 参数     | 说明             | 类型                                     | 默认值     |
+| -------- | ---------------- | ---------------------------------------- | ---------- |
 | position | 气泡卡片显示位置 | `'top' \| 'bottom' \| 'left' \| 'right'` | `'bottom'` |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明                   |
+| ------- | ---------------------- |
 | trigger | 触发气泡卡片显示的内容 |
-| default | 气泡卡片中的内容 |
+| default | 气泡卡片中的内容       |
 
 ### 使用说明
 
 #### 关闭行为
+
 - 点击气泡卡片外部区域会自动关闭
 - 点击气泡卡片内部不会关闭
 - 再次点击触发器会切换显示状态
 
 #### 定位系统
+
 - 使用 Teleport 将内容渲染到 body 下，避免 z-index 层级问题
 - 自动计算相对于触发器的位置
 - 支持动态位置切换
 
 #### 样式定制
+
 可以通过覆盖 CSS 类名来自定义样式：
 
 ```css

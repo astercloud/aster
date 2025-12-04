@@ -228,12 +228,7 @@ export interface MCPStats {
 /**
  * MCP 事件类型
  */
-export type MCPEventType =
-  | "server_connected"
-  | "server_disconnected"
-  | "tool_called"
-  | "tool_completed"
-  | "error";
+export type MCPEventType = "server_connected" | "server_disconnected" | "tool_called" | "tool_completed" | "error";
 
 /**
  * MCP 事件

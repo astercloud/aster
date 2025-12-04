@@ -15,61 +15,27 @@
       <!-- 工具栏 -->
       <div class="input-toolbar">
         <!-- 图片上传 -->
-        <input
-          v-if="enableImage"
-          ref="fileInputRef"
-          type="file"
-          accept="image/*"
-          class="hidden"
-          @change="handleImageUpload"
-        />
-        <button
-          v-if="enableImage"
-          class="toolbar-button"
-          title="上传图片"
-          @click="fileInputRef?.click()"
-        >
+        <input v-if="enableImage" ref="fileInputRef" type="file" accept="image/*" class="hidden" @change="handleImageUpload" />
+        <button v-if="enableImage" class="toolbar-button" title="上传图片" @click="fileInputRef?.click()">
           <Icon type="image" size="sm" />
         </button>
 
         <!-- 语音输入 -->
-        <button
-          v-if="enableVoice"
-          :class="['toolbar-button', { 'toolbar-button-active': isListening }]"
-          title="语音输入"
-          @click="toggleVoice"
-        >
+        <button v-if="enableVoice" :class="['toolbar-button', { 'toolbar-button-active': isListening }]" title="语音输入" @click="toggleVoice">
           <Icon type="mic" size="sm" />
         </button>
 
         <!-- 文件上传 -->
-        <button
-          v-if="enableFile"
-          class="toolbar-button"
-          title="上传文件"
-          @click="handleFileClick"
-        >
+        <button v-if="enableFile" class="toolbar-button" title="上传文件" @click="handleFileClick">
           <Icon type="attach" size="sm" />
         </button>
       </div>
 
       <!-- 输入框 -->
-      <textarea
-        ref="textareaRef"
-        v-model="inputValue"
-        :placeholder="placeholder"
-        :disabled="disabled"
-        class="input-textarea"
-        @keydown="handleKeyDown"
-        @input="handleInput"
-      />
+      <textarea ref="textareaRef" v-model="inputValue" :placeholder="placeholder" :disabled="disabled" class="input-textarea" @keydown="handleKeyDown" @input="handleInput" />
 
       <!-- 发送按钮 -->
-      <button
-        class="send-button"
-        :disabled="!canSend"
-        @click="handleSend"
-      >
+      <button class="send-button" :disabled="!canSend" @click="handleSend">
         <Icon type="send" size="sm" />
       </button>
     </div>
@@ -77,8 +43,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick } from 'vue';
-import Icon from './Icon.vue';
+import { ref, computed, nextTick } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   modelValue?: string;
@@ -90,8 +56,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-  placeholder: '输入消息...',
+  modelValue: "",
+  placeholder: "输入消息...",
   disabled: false,
   enableImage: true,
   enableVoice: true,
@@ -99,7 +65,7 @@ const props = withDefaults(defineProps<Props>(), {
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  "update:modelValue": [value: string];
   send: [data: { text: string; image?: { data: string; preview: string } }];
 }>();
 
@@ -114,17 +80,17 @@ const canSend = computed(() => {
 });
 
 const handleInput = () => {
-  emit('update:modelValue', inputValue.value);
-  
+  emit("update:modelValue", inputValue.value);
+
   // 自动调整高度
   if (textareaRef.value) {
-    textareaRef.value.style.height = 'auto';
+    textareaRef.value.style.height = "auto";
     textareaRef.value.style.height = `${textareaRef.value.scrollHeight}px`;
   }
 };
 
 const handleKeyDown = (e: KeyboardEvent) => {
-  if (e.key === 'Enter' && !e.shiftKey) {
+  if (e.key === "Enter" && !e.shiftKey) {
     e.preventDefault();
     handleSend();
   }
@@ -133,20 +99,20 @@ const handleKeyDown = (e: KeyboardEvent) => {
 const handleSend = () => {
   if (!canSend.value) return;
 
-  emit('send', {
+  emit("send", {
     text: inputValue.value.trim(),
     image: selectedImage.value || undefined,
   });
 
   // 清空输入
-  inputValue.value = '';
+  inputValue.value = "";
   selectedImage.value = null;
-  emit('update:modelValue', '');
+  emit("update:modelValue", "");
 
   // 重置高度
   nextTick(() => {
     if (textareaRef.value) {
-      textareaRef.value.style.height = 'auto';
+      textareaRef.value.style.height = "auto";
     }
   });
 };
@@ -159,16 +125,16 @@ const handleImageUpload = (e: Event) => {
   const reader = new FileReader();
   reader.onload = (e) => {
     const result = e.target?.result as string;
-    const base64Data = result?.split(',')[1] ?? '';
+    const base64Data = result?.split(",")[1] ?? "";
     selectedImage.value = {
-      preview: result ?? '',
+      preview: result ?? "",
       data: base64Data,
     };
   };
   reader.readAsDataURL(file);
 
   // 重置 input
-  target.value = '';
+  target.value = "";
 };
 
 const removeImage = () => {
@@ -183,12 +149,12 @@ const toggleVoice = () => {
 
   const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
   if (!SpeechRecognition) {
-    alert('您的浏览器不支持语音输入，请尝试 Chrome。');
+    alert("您的浏览器不支持语音输入，请尝试 Chrome。");
     return;
   }
 
   const recognition = new SpeechRecognition();
-  recognition.lang = 'zh-CN';
+  recognition.lang = "zh-CN";
   recognition.interimResults = false;
   recognition.maxAlternatives = 1;
 
@@ -197,12 +163,12 @@ const toggleVoice = () => {
   recognition.onresult = (event: any) => {
     const text = event.results[0][0].transcript;
     inputValue.value += text;
-    emit('update:modelValue', inputValue.value);
+    emit("update:modelValue", inputValue.value);
     isListening.value = false;
   };
 
   recognition.onerror = (event: any) => {
-    console.error('Voice Error', event.error);
+    console.error("Voice Error", event.error);
     isListening.value = false;
   };
 
@@ -214,7 +180,7 @@ const toggleVoice = () => {
 };
 
 const handleFileClick = () => {
-  console.log('File upload not implemented');
+  console.log("File upload not implemented");
 };
 </script>
 

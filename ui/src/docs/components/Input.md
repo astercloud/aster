@@ -12,8 +12,8 @@
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const value = ref('');
+import { ref } from "vue";
+const value = ref("");
 </script>
 ```
 
@@ -23,11 +23,7 @@ const value = ref('');
 
 ```vue
 <template>
-  <Input
-    v-model="username"
-    label="用户名"
-    placeholder="请输入用户名"
-  />
+  <Input v-model="username" label="用户名" placeholder="请输入用户名" />
 </template>
 ```
 
@@ -52,11 +48,7 @@ const value = ref('');
 
 ```vue
 <template>
-  <Input
-    v-model="value"
-    label="用户名"
-    error="用户名不能为空"
-  />
+  <Input v-model="value" label="用户名" error="用户名不能为空" />
 </template>
 ```
 
@@ -66,11 +58,7 @@ const value = ref('');
 
 ```vue
 <template>
-  <Input
-    v-model="value"
-    label="禁用输入框"
-    disabled
-  />
+  <Input v-model="value" label="禁用输入框" disabled />
 </template>
 ```
 
@@ -78,19 +66,19 @@ const value = ref('');
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 绑定值 | `string \| number` | - |
-| type | 输入框类型 | `'text' \| 'password' \| 'email' \| 'number'` | `'text'` |
-| label | 标签文本 | `string` | - |
-| placeholder | 占位符 | `string` | - |
-| disabled | 是否禁用 | `boolean` | `false` |
-| error | 错误信息 | `string` | - |
+| 参数        | 说明       | 类型                                          | 默认值   |
+| ----------- | ---------- | --------------------------------------------- | -------- |
+| modelValue  | 绑定值     | `string \| number`                            | -        |
+| type        | 输入框类型 | `'text' \| 'password' \| 'email' \| 'number'` | `'text'` |
+| label       | 标签文本   | `string`                                      | -        |
+| placeholder | 占位符     | `string`                                      | -        |
+| disabled    | 是否禁用   | `boolean`                                     | `false`  |
+| error       | 错误信息   | `string`                                      | -        |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| update:modelValue | 值改变时触发 | `value: string \| number` |
-| blur | 失去焦点时触发 | - |
-| focus | 获得焦点时触发 | - |
+| 事件名            | 说明           | 回调参数                  |
+| ----------------- | -------------- | ------------------------- |
+| update:modelValue | 值改变时触发   | `value: string \| number` |
+| blur              | 失去焦点时触发 | -                         |
+| focus             | 获得焦点时触发 | -                         |

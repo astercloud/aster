@@ -56,9 +56,9 @@ const emit = defineEmits<{
   close: [];
 }>();
 
-const handleApprove = () => emit('approve');
-const handleReject = () => emit('reject');
-const handleClose = () => emit('close');
+const handleApprove = () => emit("approve");
+const handleReject = () => emit("reject");
+const handleClose = () => emit("close");
 </script>
 
 <style scoped>

@@ -8,20 +8,16 @@
 
 ```vue
 <template>
-  <Search
-    v-model="searchValue"
-    placeholder="搜索..."
-    @search="handleSearch"
-  />
+  <Search v-model="searchValue" placeholder="搜索..." @search="handleSearch" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const searchValue = ref('');
+const searchValue = ref("");
 
 const handleSearch = (value) => {
-  console.log('Search:', value);
+  console.log("Search:", value);
 };
 </script>
 ```
@@ -32,11 +28,7 @@ const handleSearch = (value) => {
 
 ```vue
 <template>
-  <Search
-    v-model="value"
-    placeholder="搜索组件、文档..."
-    @search="handleSearch"
-  />
+  <Search v-model="value" placeholder="搜索组件、文档..." @search="handleSearch" />
 </template>
 ```
 
@@ -46,20 +38,17 @@ const handleSearch = (value) => {
 
 ```vue
 <template>
-  <Search
-    v-model="searchValue"
-    @update:modelValue="handleInput"
-  />
+  <Search v-model="searchValue" @update:modelValue="handleInput" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const searchValue = ref('');
+const searchValue = ref("");
 
 const handleInput = (value) => {
   // 实时搜索
-  console.log('Input:', value);
+  console.log("Input:", value);
 };
 </script>
 ```
@@ -79,17 +68,17 @@ const handleInput = (value) => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 绑定值 | `string` | `''` |
+| 参数        | 说明   | 类型     | 默认值      |
+| ----------- | ------ | -------- | ----------- |
+| modelValue  | 绑定值 | `string` | `''`        |
 | placeholder | 占位符 | `string` | `'搜索...'` |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| update:modelValue | 值改变时触发 | `value: string` |
-| search | 按下回车或点击搜索时触发 | `value: string` |
+| 事件名            | 说明                     | 回调参数        |
+| ----------------- | ------------------------ | --------------- |
+| update:modelValue | 值改变时触发             | `value: string` |
+| search            | 按下回车或点击搜索时触发 | `value: string` |
 
 ## 示例
 
@@ -98,12 +87,8 @@ const handleInput = (value) => {
 ```vue
 <template>
   <div>
-    <Search
-      v-model="query"
-      placeholder="搜索组件..."
-      @search="performSearch"
-    />
-    
+    <Search v-model="query" placeholder="搜索组件..." @search="performSearch" />
+
     <div v-if="results.length > 0" class="results">
       <div v-for="item in results" :key="item.id">
         {{ item.name }}
@@ -113,9 +98,9 @@ const handleInput = (value) => {
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
-const query = ref('');
+const query = ref("");
 const results = ref([]);
 
 const performSearch = (value) => {
@@ -134,20 +119,17 @@ const searchComponents = (query) => {
 
 ```vue
 <template>
-  <Search
-    v-model="searchValue"
-    @update:modelValue="debouncedSearch"
-  />
+  <Search v-model="searchValue" @update:modelValue="debouncedSearch" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { debounce } from 'lodash-es';
+import { ref } from "vue";
+import { debounce } from "lodash-es";
 
-const searchValue = ref('');
+const searchValue = ref("");
 
 const debouncedSearch = debounce((value) => {
-  console.log('Searching:', value);
+  console.log("Searching:", value);
   // 执行搜索
 }, 300);
 </script>

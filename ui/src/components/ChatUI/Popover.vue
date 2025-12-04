@@ -14,24 +14,24 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 interface Props {
-  position?: 'top' | 'bottom' | 'left' | 'right';
+  position?: "top" | "bottom" | "left" | "right";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  position: 'bottom',
+  position: "bottom",
 });
 
 const visible = ref(false);
 
 const positionClass = computed(() => {
   const map = {
-    top: 'popover-top',
-    bottom: 'popover-bottom',
-    left: 'popover-left',
-    right: 'popover-right',
+    top: "popover-top",
+    bottom: "popover-bottom",
+    left: "popover-left",
+    right: "popover-right",
   };
   return map[props.position];
 });

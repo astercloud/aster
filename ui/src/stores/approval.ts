@@ -4,12 +4,12 @@
  * 管理 HITL (Human-in-the-Loop) 审批流程
  */
 
-import { defineStore } from 'pinia';
-import { ref } from 'vue';
-import type { ApprovalRequest, ApprovalRecord } from '@/types/approval';
-import { useWebSocket } from '@/composables/useWebSocket';
+import { defineStore } from "pinia";
+import { ref } from "vue";
+import type { ApprovalRequest, ApprovalRecord } from "@/types/approval";
+import { useWebSocket } from "@/composables/useWebSocket";
 
-export const useApprovalStore = defineStore('approval', () => {
+export const useApprovalStore = defineStore("approval", () => {
   // ==================
   // State
   // ==================
@@ -44,7 +44,7 @@ export const useApprovalStore = defineStore('approval', () => {
     // 记录到历史
     approvalHistory.value.push({
       ...request,
-      decision: 'approved',
+      decision: "approved",
       decidedAt: Date.now(),
     });
 
@@ -53,14 +53,14 @@ export const useApprovalStore = defineStore('approval', () => {
     const ws = getInstance();
     if (ws) {
       ws.send({
-        type: 'permission_decision',
+        type: "permission_decision",
         payload: {
           request_id: requestId,
-          decision: 'approve',
+          decision: "approve",
         },
       });
     } else {
-      console.error('WebSocket not connected, cannot send approval decision');
+      console.error("WebSocket not connected, cannot send approval decision");
     }
 
     // 从待审批列表中移除
@@ -80,7 +80,7 @@ export const useApprovalStore = defineStore('approval', () => {
     // 记录到历史
     approvalHistory.value.push({
       ...request,
-      decision: 'rejected',
+      decision: "rejected",
       reason,
       decidedAt: Date.now(),
     });
@@ -90,15 +90,15 @@ export const useApprovalStore = defineStore('approval', () => {
     const ws = getInstance();
     if (ws) {
       ws.send({
-        type: 'permission_decision',
+        type: "permission_decision",
         payload: {
           request_id: requestId,
-          decision: 'reject',
+          decision: "reject",
           reason,
         },
       });
     } else {
-      console.error('WebSocket not connected, cannot send rejection decision');
+      console.error("WebSocket not connected, cannot send rejection decision");
     }
 
     // 从待审批列表中移除

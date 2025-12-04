@@ -10,11 +10,11 @@
             <Icon type="close" />
           </button>
         </div>
-        
+
         <div class="modal-body">
           <slot></slot>
         </div>
-        
+
         <div v-if="$slots.footer" class="modal-footer">
           <slot name="footer"></slot>
         </div>
@@ -24,40 +24,40 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import Icon from './Icon.vue';
+import { computed } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   visible: boolean;
   title?: string;
-  size?: 'sm' | 'md' | 'lg' | 'xl';
+  size?: "sm" | "md" | "lg" | "xl";
   closeOnOverlay?: boolean;
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: '',
-  size: 'md',
+  title: "",
+  size: "md",
   closeOnOverlay: true,
 });
 
 const emit = defineEmits<{
-  'update:visible': [value: boolean];
+  "update:visible": [value: boolean];
   close: [];
 }>();
 
 const sizeClass = computed(() => {
   const map = {
-    sm: 'max-w-sm',
-    md: 'max-w-md',
-    lg: 'max-w-lg',
-    xl: 'max-w-xl',
+    sm: "max-w-sm",
+    md: "max-w-md",
+    lg: "max-w-lg",
+    xl: "max-w-xl",
   };
   return map[props.size];
 });
 
 const close = () => {
-  emit('update:visible', false);
-  emit('close');
+  emit("update:visible", false);
+  emit("close");
 };
 
 const handleOverlayClick = () => {
@@ -99,8 +99,12 @@ const handleOverlayClick = () => {
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; }
-  to { opacity: 1; }
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 @keyframes slideUp {

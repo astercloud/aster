@@ -86,10 +86,7 @@ export class BaseResource {
    * 发送 HTTP 请求
    * 自动处理重试、超时、错误
    */
-  protected async request<T>(
-    path: string,
-    options: RequestOptions = {},
-  ): Promise<T> {
+  protected async request<T>(path: string, options: RequestOptions = {}): Promise<T> {
     const url = this.buildUrl(path, options.params);
     const timeout = options.timeout ?? this.options.timeout;
 
@@ -114,14 +111,8 @@ export class BaseResource {
           clearTimeout(timeoutId);
 
           // 检查是否需要重试
-          if (
-            !response.ok &&
-            this.shouldRetry(response.status) &&
-            attempt < maxRetries
-          ) {
-            lastError = new Error(
-              `HTTP ${response.status}: ${response.statusText}`,
-            );
+          if (!response.ok && this.shouldRetry(response.status) && attempt < maxRetries) {
+            lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
             await this.delay(this.getBackoffDelay(attempt));
             continue;
           }
@@ -177,9 +168,7 @@ export class BaseResource {
   /**
    * 构建请求 headers
    */
-  private buildHeaders(
-    customHeaders?: Record<string, string>,
-  ): Record<string, string> {
+  private buildHeaders(customHeaders?: Record<string, string>): Record<string, string> {
     const headers: Record<string, string> = {
       "Content-Type": "application/json",
       ...this.options.headers,
@@ -212,9 +201,7 @@ export class BaseResource {
     } catch (error) {
       // 不是有效的 JSON
       if (!response.ok) {
-        throw new Error(
-          `HTTP ${response.status}: ${text || response.statusText}`,
-        );
+        throw new Error(`HTTP ${response.status}: ${text || response.statusText}`);
       }
       return text as T;
     }
@@ -226,12 +213,7 @@ export class BaseResource {
     }
 
     // 解包 {success: true, data: {...}} 格式的响应
-    if (
-      data &&
-      typeof data === "object" &&
-      "success" in data &&
-      "data" in data
-    ) {
+    if (data && typeof data === "object" && "success" in data && "data" in data) {
       return data.data as T;
     }
 
@@ -250,13 +232,7 @@ export class BaseResource {
    */
   private isRetryableError(error: any): boolean {
     // 超时、网络错误等
-    return (
-      error.name === "AbortError" ||
-      error.name === "TimeoutError" ||
-      error.message?.includes("fetch failed") ||
-      error.message?.includes("network") ||
-      error.message?.includes("ECONNREFUSED")
-    );
+    return error.name === "AbortError" || error.name === "TimeoutError" || error.message?.includes("fetch failed") || error.message?.includes("network") || error.message?.includes("ECONNREFUSED");
   }
 
   /**
@@ -265,10 +241,7 @@ export class BaseResource {
    */
   private getBackoffDelay(attempt: number): number {
     const { backoffMultiplier, maxBackoffTime } = this.options.retry!;
-    const delay = Math.min(
-      1000 * Math.pow(backoffMultiplier!, attempt),
-      maxBackoffTime!,
-    );
+    const delay = Math.min(1000 * Math.pow(backoffMultiplier!, attempt), maxBackoffTime!);
     // 添加随机抖动（±25%）
     const jitter = delay * (0.75 + Math.random() * 0.5);
     return Math.floor(jitter);

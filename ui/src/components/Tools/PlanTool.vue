@@ -7,25 +7,13 @@
         <span>计划管理</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="创建计划"
-          @click="showCreateForm = !showCreateForm"
-        >
+        <button class="action-button" title="创建计划" @click="showCreateForm = !showCreateForm">
           <Icon type="plus" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="刷新计划"
-          @click="refreshPlans"
-        >
+        <button class="action-button" title="刷新计划" @click="refreshPlans">
           <Icon type="refresh" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="切换视图"
-          @click="toggleViewMode"
-        >
+        <button class="action-button" title="切换视图" @click="toggleViewMode">
           <Icon :type="viewMode === 'list' ? 'grid' : 'list'" size="sm" />
         </button>
       </div>
@@ -34,21 +22,8 @@
     <!-- 创建计划表单 -->
     <div v-if="showCreateForm" class="create-form">
       <div class="form-content">
-        <input
-          v-model="newPlan.title"
-          ref="titleInput"
-          type="text"
-          placeholder="计划标题..."
-          class="plan-input"
-          @keydown.enter="createPlan"
-          @keydown.esc="showCreateForm = false"
-        />
-        <textarea
-          v-model="newPlan.description"
-          placeholder="计划描述..."
-          class="plan-textarea"
-          rows="3"
-        ></textarea>
+        <input v-model="newPlan.title" ref="titleInput" type="text" placeholder="计划标题..." class="plan-input" @keydown.enter="createPlan" @keydown.esc="showCreateForm = false" />
+        <textarea v-model="newPlan.description" placeholder="计划描述..." class="plan-textarea" rows="3"></textarea>
         <div class="form-actions">
           <select v-model="newPlan.type" class="type-select">
             <option value="">计划类型</option>
@@ -64,22 +39,15 @@
             <option value="medium">中</option>
             <option value="high">高</option>
           </select>
-          <input
-            v-model="newPlan.dueDate"
-            type="date"
-            class="date-input"
-            title="截止日期"
-          />
-          <button
-            class="create-button"
-            :disabled="!newPlan.title.trim()"
-            @click="createPlan"
-          >
-            创建
-          </button>
+          <input v-model="newPlan.dueDate" type="date" class="date-input" title="截止日期" />
+          <button class="create-button" :disabled="!newPlan.title.trim()" @click="createPlan">创建</button>
           <button
             class="cancel-button"
-            @click="showCreateForm = false; newPlan.title = ''; newPlan.description = ''"
+            @click="
+              showCreateForm = false;
+              newPlan.title = '';
+              newPlan.description = '';
+            "
           >
             取消
           </button>
@@ -89,13 +57,8 @@
 
     <!-- 过滤器 -->
     <div class="plan-filters">
-      <button
-        v-for="filter in filters"
-        :key="filter.key"
-        :class="['filter-button', { active: currentFilter === filter.key }]"
-        @click="currentFilter = filter.key"
-      >
-        <Icon :type="(filter.icon as any)" size="sm" />
+      <button v-for="filter in filters" :key="filter.key" :class="['filter-button', { active: currentFilter === filter.key }]" @click="currentFilter = filter.key">
+        <Icon :type="filter.icon as any" size="sm" />
         {{ filter.label }}
         <span class="filter-count">{{ filter.count }}</span>
       </button>
@@ -106,11 +69,14 @@
       <div
         v-for="plan in filteredPlans"
         :key="plan.id"
-        :class="['plan-item', {
-          'plan-priority-high': plan.priority === 'high',
-          'plan-priority-medium': plan.priority === 'medium',
-          'plan-priority-low': plan.priority === 'low'
-        }]"
+        :class="[
+          'plan-item',
+          {
+            'plan-priority-high': plan.priority === 'high',
+            'plan-priority-medium': plan.priority === 'medium',
+            'plan-priority-low': plan.priority === 'low',
+          },
+        ]"
       >
         <!-- 计划头部 -->
         <div class="plan-header-item">
@@ -130,26 +96,13 @@
           </div>
 
           <div class="plan-actions">
-            <button
-              class="action-btn edit-btn"
-              title="编辑计划"
-              @click="editPlan(plan)"
-            >
+            <button class="action-btn edit-btn" title="编辑计划" @click="editPlan(plan)">
               <Icon type="edit" size="xs" />
             </button>
-            <button
-              v-if="plan.status === 'draft'"
-              class="action-btn approve-btn"
-              title="批准计划"
-              @click="approvePlan(plan.id)"
-            >
+            <button v-if="plan.status === 'draft'" class="action-btn approve-btn" title="批准计划" @click="approvePlan(plan.id)">
               <Icon type="check" size="xs" />
             </button>
-            <button
-              class="action-btn delete-btn"
-              title="删除计划"
-              @click="deletePlan(plan.id)"
-            >
+            <button class="action-btn delete-btn" title="删除计划" @click="deletePlan(plan.id)">
               <Icon type="trash" size="xs" />
             </button>
           </div>
@@ -166,10 +119,13 @@
               <div
                 v-for="(step, index) in plan.steps"
                 :key="index"
-                :class="['step-item', {
-                  'step-completed': step.completed,
-                  'step-current': index === getCurrentStep(plan)
-                }]"
+                :class="[
+                  'step-item',
+                  {
+                    'step-completed': step.completed,
+                    'step-current': index === getCurrentStep(plan),
+                  },
+                ]"
               >
                 <div class="step-number">{{ index + 1 }}</div>
                 <div class="step-content">
@@ -199,12 +155,8 @@
         <!-- 计划底部信息 -->
         <div class="plan-footer">
           <div class="plan-dates">
-            <span v-if="plan.createdAt" class="created-date">
-              创建于 {{ formatDate(plan.createdAt) }}
-            </span>
-            <span v-if="plan.dueDate" class="due-date" :class="{ 'overdue': isOverdue(plan.dueDate) }">
-              截止 {{ formatDate(plan.dueDate) }}
-            </span>
+            <span v-if="plan.createdAt" class="created-date"> 创建于 {{ formatDate(plan.createdAt) }} </span>
+            <span v-if="plan.dueDate" class="due-date" :class="{ overdue: isOverdue(plan.dueDate) }"> 截止 {{ formatDate(plan.dueDate) }} </span>
           </div>
           <div class="plan-tags" v-if="plan.tags && plan.tags.length > 0">
             <span v-for="tag in plan.tags" :key="tag" class="tag">{{ tag }}</span>
@@ -276,10 +228,13 @@
                 <div
                   v-for="(step, index) in selectedPlan.steps"
                   :key="index"
-                  :class="['detail-step-item', {
-                    'step-completed': step.completed,
-                    'step-current': index === getCurrentStep(selectedPlan)
-                  }]"
+                  :class="[
+                    'detail-step-item',
+                    {
+                      'step-completed': step.completed,
+                      'step-current': index === getCurrentStep(selectedPlan),
+                    },
+                  ]"
                 >
                   <div class="step-header">
                     <div class="step-number">{{ index + 1 }}</div>
@@ -288,11 +243,7 @@
                       <div v-if="step.description" class="step-description">{{ step.description }}</div>
                     </div>
                     <div class="step-actions">
-                      <button
-                        v-if="!step.completed"
-                        class="step-complete-btn"
-                        @click="completeStep(selectedPlan.id, index)"
-                      >
+                      <button v-if="!step.completed" class="step-complete-btn" @click="completeStep(selectedPlan.id, index)">
                         <Icon type="check" size="xs" />
                       </button>
                       <Icon v-else type="check" size="sm" class="text-green-500" />
@@ -309,8 +260,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface PlanStep {
   title: string;
@@ -323,9 +274,9 @@ interface Plan {
   id: string;
   title: string;
   description?: string;
-  type: 'project' | 'development' | 'research' | 'deployment' | 'maintenance' | '';
-  priority: 'low' | 'medium' | 'high' | '';
-  status: 'draft' | 'pending' | 'approved' | 'in_progress' | 'completed' | 'cancelled';
+  type: "project" | "development" | "research" | "deployment" | "maintenance" | "";
+  priority: "low" | "medium" | "high" | "";
+  status: "draft" | "pending" | "approved" | "in_progress" | "completed" | "cancelled";
   steps: PlanStep[];
   tags?: string[];
   createdAt: number;
@@ -341,8 +292,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -357,26 +308,26 @@ const plans = ref<Plan[]>([]);
 const showCreateForm = ref(false);
 const showDetailModal = ref(false);
 const selectedPlan = ref<Plan | null>(null);
-const currentFilter = ref('all');
-const viewMode = ref<'list' | 'grid'>('list');
+const currentFilter = ref("all");
+const viewMode = ref<"list" | "grid">("list");
 const titleInput = ref<HTMLInputElement>();
 const websocket = ref<WebSocket | null>(null);
 
 const newPlan = ref({
-  title: '',
-  description: '',
-  type: '' as 'project' | 'development' | 'research' | 'deployment' | 'maintenance' | '',
-  priority: '' as 'low' | 'medium' | 'high' | '',
-  dueDate: '',
+  title: "",
+  description: "",
+  type: "" as "project" | "development" | "research" | "deployment" | "maintenance" | "",
+  priority: "" as "low" | "medium" | "high" | "",
+  dueDate: "",
 });
 
 // 过滤器选项
 const filters = computed(() => [
-  { key: 'all', label: '全部', icon: 'list', count: plans.value.length },
-  { key: 'draft', label: '草稿', icon: 'edit', count: plans.value.filter(p => p.status === 'draft').length },
-  { key: 'approved', label: '已批准', icon: 'check', count: plans.value.filter(p => p.status === 'approved').length },
-  { key: 'in_progress', label: '进行中', icon: 'play', count: plans.value.filter(p => p.status === 'in_progress').length },
-  { key: 'completed', label: '已完成', icon: 'check-circle', count: plans.value.filter(p => p.status === 'completed').length },
+  { key: "all", label: "全部", icon: "list", count: plans.value.length },
+  { key: "draft", label: "草稿", icon: "edit", count: plans.value.filter((p) => p.status === "draft").length },
+  { key: "approved", label: "已批准", icon: "check", count: plans.value.filter((p) => p.status === "approved").length },
+  { key: "in_progress", label: "进行中", icon: "play", count: plans.value.filter((p) => p.status === "in_progress").length },
+  { key: "completed", label: "已完成", icon: "check-circle", count: plans.value.filter((p) => p.status === "completed").length },
 ]);
 
 // 计算属性
@@ -384,23 +335,23 @@ const filteredPlans = computed(() => {
   let filtered = plans.value;
 
   switch (currentFilter.value) {
-    case 'draft':
-      filtered = filtered.filter(p => p.status === 'draft');
+    case "draft":
+      filtered = filtered.filter((p) => p.status === "draft");
       break;
-    case 'approved':
-      filtered = filtered.filter(p => p.status === 'approved');
+    case "approved":
+      filtered = filtered.filter((p) => p.status === "approved");
       break;
-    case 'in_progress':
-      filtered = filtered.filter(p => p.status === 'in_progress');
+    case "in_progress":
+      filtered = filtered.filter((p) => p.status === "in_progress");
       break;
-    case 'completed':
-      filtered = filtered.filter(p => p.status === 'completed');
+    case "completed":
+      filtered = filtered.filter((p) => p.status === "completed");
       break;
   }
 
   return filtered.sort((a, b) => {
     // 优先级排序
-    const priorityOrder = { high: 0, medium: 1, low: 2, '': 3 };
+    const priorityOrder = { high: 0, medium: 1, low: 2, "": 3 };
     if (priorityOrder[a.priority] !== priorityOrder[b.priority]) {
       return priorityOrder[a.priority] - priorityOrder[b.priority];
     }
@@ -410,9 +361,9 @@ const filteredPlans = computed(() => {
   });
 });
 
-const draftCount = computed(() => plans.value.filter(p => p.status === 'draft').length);
-const approvedCount = computed(() => plans.value.filter(p => p.status === 'approved').length);
-const completedCount = computed(() => plans.value.filter(p => p.status === 'completed').length);
+const draftCount = computed(() => plans.value.filter((p) => p.status === "draft").length);
+const approvedCount = computed(() => plans.value.filter((p) => p.status === "approved").length);
+const completedCount = computed(() => plans.value.filter((p) => p.status === "completed").length);
 
 // WebSocket 连接
 const connectWebSocket = () => {
@@ -420,7 +371,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('PlanTool WebSocket connected');
+      console.log("PlanTool WebSocket connected");
       requestPlans();
     };
 
@@ -429,69 +380,69 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('PlanTool WebSocket disconnected');
+      console.log("PlanTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('PlanTool WebSocket error:', error);
+      console.error("PlanTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'plan_list_response':
+    case "plan_list_response":
       plans.value = message.plans || [];
       break;
-    case 'plan_created':
+    case "plan_created":
       const createdPlan = message.plan;
-      const existingIndex = plans.value.findIndex(p => p.id === createdPlan.id);
+      const existingIndex = plans.value.findIndex((p) => p.id === createdPlan.id);
       if (existingIndex === -1) {
         plans.value.push(createdPlan);
       }
-      emit('planCreated', createdPlan);
+      emit("planCreated", createdPlan);
       break;
-    case 'plan_updated':
+    case "plan_updated":
       const updatedPlan = message.plan;
-      const index = plans.value.findIndex(p => p.id === updatedPlan.id);
+      const index = plans.value.findIndex((p) => p.id === updatedPlan.id);
       if (index !== -1) {
         plans.value[index] = updatedPlan;
       }
-      emit('planUpdated', updatedPlan);
+      emit("planUpdated", updatedPlan);
       break;
-    case 'plan_approved': {
+    case "plan_approved": {
       const approvedPlanId = message.plan_id;
-      const approvedIndex = plans.value.findIndex(p => p.id === approvedPlanId);
+      const approvedIndex = plans.value.findIndex((p) => p.id === approvedPlanId);
       const approvedPlan = plans.value[approvedIndex];
       if (approvedIndex !== -1 && approvedPlan) {
-        approvedPlan.status = 'approved';
+        approvedPlan.status = "approved";
         approvedPlan.approvedAt = Date.now();
       }
-      emit('planApproved', approvedPlanId);
+      emit("planApproved", approvedPlanId);
       break;
     }
-    case 'plan_completed': {
+    case "plan_completed": {
       const completedPlanId = message.plan_id;
-      const completedIndex = plans.value.findIndex(p => p.id === completedPlanId);
+      const completedIndex = plans.value.findIndex((p) => p.id === completedPlanId);
       const completedPlan = plans.value[completedIndex];
       if (completedIndex !== -1 && completedPlan) {
-        completedPlan.status = 'completed';
+        completedPlan.status = "completed";
         completedPlan.completedAt = Date.now();
       }
-      emit('planCompleted', completedPlanId);
+      emit("planCompleted", completedPlanId);
       break;
     }
-    case 'plan_deleted':
+    case "plan_deleted":
       const deletedId = message.id;
-      plans.value = plans.value.filter(p => p.id !== deletedId);
+      plans.value = plans.value.filter((p) => p.id !== deletedId);
       break;
   }
 };
@@ -504,7 +455,7 @@ const sendWebSocketMessage = (message: any) => {
 
 // 计划操作方法
 const requestPlans = () => {
-  sendWebSocketMessage({ type: 'plan_list_request' });
+  sendWebSocketMessage({ type: "plan_list_request" });
 };
 
 const createPlan = () => {
@@ -515,7 +466,7 @@ const createPlan = () => {
     description: newPlan.value.description.trim(),
     type: newPlan.value.type,
     priority: newPlan.value.priority,
-    status: 'draft',
+    status: "draft",
     steps: [],
   };
 
@@ -524,12 +475,12 @@ const createPlan = () => {
   }
 
   sendWebSocketMessage({
-    type: 'plan_create',
+    type: "plan_create",
     plan,
   });
 
   // 重置表单
-  newPlan.value = { title: '', description: '', type: '', priority: '', dueDate: '' };
+  newPlan.value = { title: "", description: "", type: "", priority: "", dueDate: "" };
   showCreateForm.value = false;
 
   nextTick(() => {
@@ -543,18 +494,18 @@ const editPlan = (plan: Plan) => {
 };
 
 const approvePlan = (planId: string) => {
-  if (confirm('确定要批准这个计划吗？')) {
+  if (confirm("确定要批准这个计划吗？")) {
     sendWebSocketMessage({
-      type: 'plan_approve',
+      type: "plan_approve",
       id: planId,
     });
   }
 };
 
 const deletePlan = (planId: string) => {
-  if (confirm('确定要删除这个计划吗？')) {
+  if (confirm("确定要删除这个计划吗？")) {
     sendWebSocketMessage({
-      type: 'plan_delete',
+      type: "plan_delete",
       id: planId,
     });
   }
@@ -565,12 +516,12 @@ const refreshPlans = () => {
 };
 
 const toggleViewMode = () => {
-  viewMode.value = viewMode.value === 'list' ? 'grid' : 'list';
+  viewMode.value = viewMode.value === "list" ? "grid" : "list";
 };
 
 const completeStep = (planId: string, stepIndex: number) => {
   sendWebSocketMessage({
-    type: 'plan_step_complete',
+    type: "plan_step_complete",
     plan_id: planId,
     step_index: stepIndex,
   });
@@ -579,44 +530,44 @@ const completeStep = (planId: string, stepIndex: number) => {
 // 工具方法
 const getTypeText = (type: string) => {
   const map = {
-    project: '项目计划',
-    development: '开发计划',
-    research: '研究计划',
-    deployment: '部署计划',
-    maintenance: '维护计划'
+    project: "项目计划",
+    development: "开发计划",
+    research: "研究计划",
+    deployment: "部署计划",
+    maintenance: "维护计划",
   };
   return map[type as keyof typeof map] || type;
 };
 
 const getPriorityText = (priority: string) => {
-  const map = { high: '高', medium: '中', low: '低' };
+  const map = { high: "高", medium: "中", low: "低" };
   return map[priority as keyof typeof map] || priority;
 };
 
 const getStatusText = (status: string) => {
   const map = {
-    draft: '草稿',
-    pending: '待批准',
-    approved: '已批准',
-    in_progress: '进行中',
-    completed: '已完成',
-    cancelled: '已取消'
+    draft: "草稿",
+    pending: "待批准",
+    approved: "已批准",
+    in_progress: "进行中",
+    completed: "已完成",
+    cancelled: "已取消",
   };
   return map[status as keyof typeof map] || status;
 };
 
 const formatDate = (timestamp: number | string) => {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('zh-CN', { month: 'short', day: 'numeric' });
+  return date.toLocaleDateString("zh-CN", { month: "short", day: "numeric" });
 };
 
 const formatDateTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleDateString('zh-CN', {
-    month: 'short',
-    day: 'numeric',
-    hour: '2-digit',
-    minute: '2-digit'
+  return date.toLocaleDateString("zh-CN", {
+    month: "short",
+    day: "numeric",
+    hour: "2-digit",
+    minute: "2-digit",
   });
 };
 
@@ -626,13 +577,13 @@ const isOverdue = (dueDate: string) => {
 
 const getProgress = (plan: Plan) => {
   if (!plan.steps || plan.steps.length === 0) return 0;
-  const completedSteps = plan.steps.filter(step => step.completed).length;
+  const completedSteps = plan.steps.filter((step) => step.completed).length;
   return Math.round((completedSteps / plan.steps.length) * 100);
 };
 
 const getCompletedSteps = (plan: Plan) => {
   if (!plan.steps) return 0;
-  return plan.steps.filter(step => step.completed).length;
+  return plan.steps.filter((step) => step.completed).length;
 };
 
 const getCurrentStep = (plan: Plan) => {
@@ -648,11 +599,11 @@ const getCurrentStep = (plan: Plan) => {
 
 const getEmptyMessage = () => {
   const messages = {
-    all: '暂无计划，点击 + 创建第一个计划',
-    draft: '暂无草稿计划',
-    approved: '暂无已批准的计划',
-    in_progress: '暂无进行中的计划',
-    completed: '暂无已完成的计划',
+    all: "暂无计划，点击 + 创建第一个计划",
+    draft: "暂无草稿计划",
+    approved: "暂无已批准的计划",
+    in_progress: "暂无进行中的计划",
+    completed: "暂无已完成的计划",
   };
   return messages[currentFilter.value as keyof typeof messages];
 };
@@ -714,7 +665,9 @@ onMounted(() => {
   @apply flex gap-2 items-center;
 }
 
-.type-select, .priority-select, .date-input {
+.type-select,
+.priority-select,
+.date-input {
   @apply px-2 py-1 text-sm border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white;
 }
 
@@ -995,7 +948,8 @@ onMounted(() => {
   @apply flex items-center justify-between p-4 border-b border-gray-200 dark:border-gray-700;
 }
 
-.modal-header h3, .modal-header h2 {
+.modal-header h3,
+.modal-header h2 {
   @apply text-lg font-semibold text-gray-900 dark:text-white;
 }
 
@@ -1023,7 +977,8 @@ onMounted(() => {
   @apply space-y-2;
 }
 
-.detail-description h4, .detail-steps h4 {
+.detail-description h4,
+.detail-steps h4 {
   @apply text-sm font-semibold text-gray-900 dark:text-white;
 }
 

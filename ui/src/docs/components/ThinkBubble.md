@@ -47,9 +47,9 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| content | 思考内容 | `string` | - |
+| 参数    | 说明     | 类型     | 默认值 |
+| ------- | -------- | -------- | ------ |
+| content | 思考内容 | `string` | -      |
 
 ## 示例
 
@@ -72,17 +72,17 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted } from "vue";
 
-const thinkingText = ref('开始分析...');
+const thinkingText = ref("开始分析...");
 
 onMounted(() => {
   setTimeout(() => {
-    thinkingText.value = '正在搜索相关信息...';
+    thinkingText.value = "正在搜索相关信息...";
   }, 1000);
-  
+
   setTimeout(() => {
-    thinkingText.value = '正在生成回答...';
+    thinkingText.value = "正在生成回答...";
   }, 2000);
 });
 </script>

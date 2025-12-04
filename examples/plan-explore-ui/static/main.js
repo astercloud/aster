@@ -160,18 +160,12 @@
         case "tool:error":
           if (ev.payload && ev.payload.call) {
             uiState.textStarted = false; // 重置文本状态
-            appendPhaseLine(
-              `[Tool Error] ${ev.payload.call.name}: ${ev.payload.error || ""}`,
-              "error"
-            );
+            appendPhaseLine(`[Tool Error] ${ev.payload.call.name}: ${ev.payload.error || ""}`, "error");
           }
           break;
         case "done":
           uiState.textStarted = false; // 重置文本状态
-          appendPhaseLine(
-            `[Done] ${ev.payload && ev.payload.reason ? ev.payload.reason : ""}`,
-            "tool"
-          );
+          appendPhaseLine(`[Done] ${ev.payload && ev.payload.reason ? ev.payload.reason : ""}`, "tool");
           break;
       }
     } else if (ev.channel === "monitor") {
@@ -197,8 +191,7 @@
       const subType = getStringArgWeb(args, "subagent_type");
       const prompt = getStringArgWeb(args, "prompt") || "子代理任务";
       const labelType = subType || "Task";
-      const className =
-        labelType === "Explore" ? "explore" : labelType === "Plan" ? "plan" : "tool";
+      const className = labelType === "Explore" ? "explore" : labelType === "Plan" ? "plan" : "tool";
       appendPhaseLine(`${labelType}(${prompt})`, className);
       uiState.currentPhase = { kind: labelType, title: prompt, count: 0 };
       return;
@@ -278,4 +271,3 @@
     }
   }
 })();
-

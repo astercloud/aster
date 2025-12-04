@@ -5,34 +5,31 @@
       <span v-if="showPercent" class="progress-percent">{{ percent }}%</span>
     </div>
     <div class="progress-bar">
-      <div
-        :class="['progress-fill', statusClass]"
-        :style="{ width: `${percent}%` }"
-      ></div>
+      <div :class="['progress-fill', statusClass]" :style="{ width: `${percent}%` }"></div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
+import { computed } from "vue";
 
 interface Props {
   percent: number;
   label?: string;
   showPercent?: boolean;
-  status?: 'normal' | 'success' | 'error';
+  status?: "normal" | "success" | "error";
 }
 
 const props = withDefaults(defineProps<Props>(), {
   showPercent: true,
-  status: 'normal',
+  status: "normal",
 });
 
 const statusClass = computed(() => {
   const map = {
-    normal: 'progress-normal',
-    success: 'progress-success',
-    error: 'progress-error',
+    normal: "progress-normal",
+    success: "progress-success",
+    error: "progress-error",
   };
   return map[props.status];
 });

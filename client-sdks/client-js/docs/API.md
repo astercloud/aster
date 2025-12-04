@@ -123,14 +123,11 @@ const items = await client.memory.working.list({
 #### store() - 存储语义记忆
 
 ```typescript
-await client.memory.semantic.store(
-  "aster is a powerful framework for building AI agents",
-  {
-    source: "documentation",
-    category: "introduction",
-    timestamp: new Date().toISOString(),
-  },
-);
+await client.memory.semantic.store("aster is a powerful framework for building AI agents", {
+  source: "documentation",
+  category: "introduction",
+  timestamp: new Date().toISOString(),
+});
 ```
 
 #### search() - 语义搜索
@@ -249,10 +246,7 @@ const messages = await client.sessions.getMessages("session-id", {
 
 ```typescript
 // 创建手动断点
-const checkpoint = await client.sessions.createCheckpoint(
-  "session-id",
-  "before-important-action",
-);
+const checkpoint = await client.sessions.createCheckpoint("session-id", "before-important-action");
 
 // 获取所有断点
 const checkpoints = await client.sessions.getCheckpoints("session-id");
@@ -369,14 +363,10 @@ await client.workflows.cancel("workflow-id", {
 ### 等待完成
 
 ```typescript
-const result = await client.workflows.waitForCompletion(
-  "workflow-id",
-  "run-id",
-  {
-    pollInterval: 2000,
-    timeout: 60000,
-  },
-);
+const result = await client.workflows.waitForCompletion("workflow-id", "run-id", {
+  pollInterval: 2000,
+  timeout: 60000,
+});
 ```
 
 ---
@@ -435,9 +425,7 @@ await client.mcp.removeServer("server-id");
 const middlewares = await client.middleware.list();
 
 middlewares.forEach((mw) => {
-  console.log(
-    `[P${mw.priority}] ${mw.displayName} - ${mw.enabled ? "ON" : "OFF"}`,
-  );
+  console.log(`[P${mw.priority}] ${mw.displayName} - ${mw.enabled ? "ON" : "OFF"}`);
 });
 ```
 
@@ -490,13 +478,7 @@ await client.middleware.updateConfig("cost_tracker", {
 const order = await client.middleware.getExecutionOrder();
 
 // 设置执行顺序
-await client.middleware.setExecutionOrder([
-  "logging",
-  "telemetry",
-  "cost_tracker",
-  "token_limiter",
-  "summarization",
-]);
+await client.middleware.setExecutionOrder(["logging", "telemetry", "cost_tracker", "token_limiter", "summarization"]);
 
 // 重置为默认顺序
 await client.middleware.resetExecutionOrder();

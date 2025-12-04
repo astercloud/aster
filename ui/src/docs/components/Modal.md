@@ -9,17 +9,14 @@
 ```vue
 <template>
   <Button @click="visible = true">打开模态框</Button>
-  
-  <Modal
-    v-model:visible="visible"
-    title="提示"
-  >
+
+  <Modal v-model:visible="visible" title="提示">
     <p>这是模态框的内容</p>
   </Modal>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 const visible = ref(false);
 </script>
 ```
@@ -36,20 +33,16 @@ const visible = ref(false);
     <Button @click="showModal('lg')">大</Button>
     <Button @click="showModal('xl')">超大</Button>
   </Flex>
-  
-  <Modal
-    v-model:visible="visible"
-    :size="size"
-    title="模态框"
-  >
+
+  <Modal v-model:visible="visible" :size="size" title="模态框">
     <p>这是 {{ size }} 尺寸的模态框</p>
   </Modal>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 const visible = ref(false);
-const size = ref('md');
+const size = ref("md");
 
 const showModal = (s) => {
   size.value = s;
@@ -65,32 +58,25 @@ const showModal = (s) => {
 ```vue
 <template>
   <Button @click="visible = true">打开</Button>
-  
-  <Modal
-    v-model:visible="visible"
-    title="确认操作"
-  >
+
+  <Modal v-model:visible="visible" title="确认操作">
     <p>确定要执行此操作吗？</p>
-    
+
     <template #footer>
       <Flex justify="end" gap="md">
-        <Button variant="secondary" @click="visible = false">
-          取消
-        </Button>
-        <Button variant="primary" @click="handleConfirm">
-          确定
-        </Button>
+        <Button variant="secondary" @click="visible = false"> 取消 </Button>
+        <Button variant="primary" @click="handleConfirm"> 确定 </Button>
       </Flex>
     </template>
   </Modal>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 const visible = ref(false);
 
 const handleConfirm = () => {
-  console.log('Confirmed');
+  console.log("Confirmed");
   visible.value = false;
 };
 </script>
@@ -102,11 +88,7 @@ const handleConfirm = () => {
 
 ```vue
 <template>
-  <Modal
-    v-model:visible="visible"
-    title="重要提示"
-    :close-on-overlay="false"
-  >
+  <Modal v-model:visible="visible" title="重要提示" :close-on-overlay="false">
     <p>此模态框不能通过点击遮罩关闭</p>
   </Modal>
 </template>
@@ -116,24 +98,24 @@ const handleConfirm = () => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| visible | 是否显示 | `boolean` | `false` |
-| title | 标题 | `string` | `''` |
-| size | 尺寸 | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` |
-| closeOnOverlay | 点击遮罩是否关闭 | `boolean` | `true` |
+| 参数           | 说明             | 类型                           | 默认值  |
+| -------------- | ---------------- | ------------------------------ | ------- |
+| visible        | 是否显示         | `boolean`                      | `false` |
+| title          | 标题             | `string`                       | `''`    |
+| size           | 尺寸             | `'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`  |
+| closeOnOverlay | 点击遮罩是否关闭 | `boolean`                      | `true`  |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名         | 说明               | 回调参数         |
+| -------------- | ------------------ | ---------------- |
 | update:visible | 显示状态改变时触发 | `value: boolean` |
-| close | 关闭时触发 | - |
+| close          | 关闭时触发         | -                |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明       |
+| ------- | ---------- |
 | default | 模态框内容 |
-| title | 自定义标题 |
-| footer | 自定义页脚 |
+| title   | 自定义标题 |
+| footer  | 自定义页脚 |

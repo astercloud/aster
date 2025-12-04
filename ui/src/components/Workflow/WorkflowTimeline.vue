@@ -18,33 +18,11 @@
 
       <!-- 步骤列表 -->
       <div class="timeline-steps">
-        <div
-          v-for="(step, idx) in steps"
-          :key="step.id"
-          :data-active="idx === currentStep"
-          :class="[
-            'timeline-step',
-            { 'step-active': idx === currentStep },
-            { 'step-completed': idx < currentStep },
-            { 'step-pending': idx > currentStep }
-          ]"
-        >
+        <div v-for="(step, idx) in steps" :key="step.id" :data-active="idx === currentStep" :class="['timeline-step', { 'step-active': idx === currentStep }, { 'step-completed': idx < currentStep }, { 'step-pending': idx > currentStep }]">
           <!-- 步骤节点 -->
-          <button
-            class="step-node"
-            @click="handleStepClick(idx)"
-          >
-            <Icon
-              v-if="idx < currentStep"
-              type="check"
-              size="sm"
-            />
-            <Icon
-              v-else-if="idx === currentStep"
-              type="disc"
-              size="sm"
-              class="animate-pulse"
-            />
+          <button class="step-node" @click="handleStepClick(idx)">
+            <Icon v-if="idx < currentStep" type="check" size="sm" />
+            <Icon v-else-if="idx === currentStep" type="disc" size="sm" class="animate-pulse" />
             <span v-else class="step-number">{{ idx + 1 }}</span>
           </button>
 
@@ -59,39 +37,26 @@
                 </div>
                 <span class="step-icon">{{ step.icon }}</span>
               </div>
-              
+
               <p class="step-description">{{ step.description }}</p>
 
               <!-- 快捷操作 -->
               <div v-if="step.actions && step.actions.length > 0" class="step-actions">
-                <button
-                  v-for="action in step.actions"
-                  :key="action.id"
-                  :class="['action-button', action.variant || 'primary']"
-                  @click="$emit('action', action)"
-                >
-                  <Icon v-if="action.icon" :type="(action.icon as any)" size="sm" />
+                <button v-for="action in step.actions" :key="action.id" :class="['action-button', action.variant || 'primary']" @click="$emit('action', action)">
+                  <Icon v-if="action.icon" :type="action.icon as any" size="sm" />
                   {{ action.label }}
                 </button>
               </div>
 
               <!-- 下一步按钮 -->
-              <button
-                v-if="idx < steps.length - 1"
-                class="next-button"
-                @click="handleStepClick(idx + 1)"
-              >
+              <button v-if="idx < steps.length - 1" class="next-button" @click="handleStepClick(idx + 1)">
                 下一步
                 <Icon type="arrow-right" size="sm" />
               </button>
             </div>
 
             <!-- 非激活状态 -->
-            <button
-              v-else
-              class="step-title"
-              @click="handleStepClick(idx)"
-            >
+            <button v-else class="step-title" @click="handleStepClick(idx)">
               <span :class="{ 'step-title-completed': idx < currentStep }">
                 {{ step.name }}
               </span>
@@ -104,14 +69,14 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch, nextTick } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, watch, nextTick } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface StepAction {
   id: string;
   label: string;
   icon?: string;
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
 }
 
 interface WorkflowStep {
@@ -130,12 +95,12 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: '工作流',
+  title: "工作流",
   showBack: false,
 });
 
 const emit = defineEmits<{
-  'step-change': [step: number];
+  "step-change": [step: number];
   action: [action: StepAction];
   back: [];
 }>();
@@ -143,19 +108,22 @@ const emit = defineEmits<{
 const timelineRef = ref<HTMLDivElement>();
 
 const handleStepClick = (idx: number) => {
-  emit('step-change', idx);
+  emit("step-change", idx);
 };
 
 // 自动滚动到当前步骤
-watch(() => props.currentStep, async () => {
-  await nextTick();
-  if (timelineRef.value) {
-    const activeEl = timelineRef.value.querySelector('[data-active="true"]');
-    if (activeEl) {
-      activeEl.scrollIntoView({ behavior: 'smooth', block: 'center' });
+watch(
+  () => props.currentStep,
+  async () => {
+    await nextTick();
+    if (timelineRef.value) {
+      const activeEl = timelineRef.value.querySelector('[data-active="true"]');
+      if (activeEl) {
+        activeEl.scrollIntoView({ behavior: "smooth", block: "center" });
+      }
     }
-  }
-});
+  },
+);
 </script>
 
 <style scoped>

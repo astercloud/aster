@@ -45,9 +45,7 @@ export class TelemetryResource extends BaseResource {
    * @param config 配置更新
    * @returns 更新后的配置
    */
-  async updateConfig(
-    config: Partial<TelemetryConfig>,
-  ): Promise<TelemetryConfig> {
+  async updateConfig(config: Partial<TelemetryConfig>): Promise<TelemetryConfig> {
     return this.request<TelemetryConfig>("/v1/telemetry/config", {
       method: "PATCH",
       body: config,
@@ -63,9 +61,7 @@ export class TelemetryResource extends BaseResource {
    * @returns Metric 列表
    */
   async listMetrics(): Promise<MetricInfo[]> {
-    const result = await this.request<{ metrics: MetricInfo[] }>(
-      "/v1/telemetry/metrics",
-    );
+    const result = await this.request<{ metrics: MetricInfo[] }>("/v1/telemetry/metrics");
     return result.metrics;
   }
 
@@ -84,13 +80,10 @@ export class TelemetryResource extends BaseResource {
    * @returns 数据点列表
    */
   async queryMetrics(options: MetricQueryOptions): Promise<MetricDataPoint[]> {
-    const result = await this.request<{ dataPoints: MetricDataPoint[] }>(
-      "/v1/telemetry/metrics/query",
-      {
-        method: "POST",
-        body: options,
-      },
-    );
+    const result = await this.request<{ dataPoints: MetricDataPoint[] }>("/v1/telemetry/metrics/query", {
+      method: "POST",
+      body: options,
+    });
     return result.dataPoints;
   }
 
@@ -100,17 +93,8 @@ export class TelemetryResource extends BaseResource {
    * @param value 值
    * @param labels 标签（可选）
    */
-  async recordMetric(
-    name: string,
-    value: number,
-    labels?: Record<string, string>,
-  ): Promise<void>;
-  async recordMetric(data: {
-    name: string;
-    type?: string;
-    value: number;
-    labels?: Record<string, string>;
-  }): Promise<void>;
+  async recordMetric(name: string, value: number, labels?: Record<string, string>): Promise<void>;
+  async recordMetric(data: { name: string; type?: string; value: number; labels?: Record<string, string> }): Promise<void>;
   async recordMetric(
     nameOrData:
       | string
@@ -144,13 +128,7 @@ export class TelemetryResource extends BaseResource {
    * @param trace Trace 数据
    * @returns Trace 信息
    */
-  async recordTrace(trace: {
-    name: string;
-    span_id: string;
-    trace_id?: string;
-    parent_id?: string;
-    [key: string]: any;
-  }): Promise<TraceInfo> {
+  async recordTrace(trace: { name: string; span_id: string; trace_id?: string; parent_id?: string; [key: string]: any }): Promise<TraceInfo> {
     return this.request<TraceInfo>("/v1/telemetry/traces", {
       method: "POST",
       body: trace,
@@ -163,13 +141,10 @@ export class TelemetryResource extends BaseResource {
    * @returns Trace 列表
    */
   async queryTraces(options?: TraceQueryOptions): Promise<TraceInfo[]> {
-    const result = await this.request<{ traces: TraceInfo[] }>(
-      "/v1/telemetry/traces/query",
-      {
-        method: "POST",
-        body: options || {},
-      },
-    );
+    const result = await this.request<{ traces: TraceInfo[] }>("/v1/telemetry/traces/query", {
+      method: "POST",
+      body: options || {},
+    });
     return result.traces;
   }
 
@@ -197,9 +172,7 @@ export class TelemetryResource extends BaseResource {
    * @returns Span 列表
    */
   async getTraceSpans(traceId: string): Promise<TraceInfo[]> {
-    const result = await this.request<{ spans: TraceInfo[] }>(
-      `/v1/telemetry/traces/${traceId}/spans`,
-    );
+    const result = await this.request<{ spans: TraceInfo[] }>(`/v1/telemetry/traces/${traceId}/spans`);
     return result.spans;
   }
 
@@ -213,13 +186,10 @@ export class TelemetryResource extends BaseResource {
    * @returns 日志列表
    */
   async queryLogs(options: LogQueryOptions): Promise<LogEntry[]> {
-    const result = await this.request<{ logs: LogEntry[] }>(
-      "/v1/telemetry/logs/query",
-      {
-        method: "POST",
-        body: options,
-      },
-    );
+    const result = await this.request<{ logs: LogEntry[] }>("/v1/telemetry/logs/query", {
+      method: "POST",
+      body: options,
+    });
     return result.logs;
   }
 
@@ -240,9 +210,7 @@ export class TelemetryResource extends BaseResource {
    * @returns 日志列表
    */
   async getTraceLogs(traceId: string): Promise<LogEntry[]> {
-    const result = await this.request<{ logs: LogEntry[] }>(
-      `/v1/telemetry/traces/${traceId}/logs`,
-    );
+    const result = await this.request<{ logs: LogEntry[] }>(`/v1/telemetry/traces/${traceId}/logs`);
     return result.logs;
   }
 
@@ -280,10 +248,7 @@ export class TelemetryResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 性能指标
    */
-  async getPerformanceMetrics(timeRange?: {
-    start: string;
-    end: string;
-  }): Promise<PerformanceMetrics> {
+  async getPerformanceMetrics(timeRange?: { start: string; end: string }): Promise<PerformanceMetrics> {
     return this.request<PerformanceMetrics>("/v1/telemetry/performance", {
       params: timeRange,
     });
@@ -294,10 +259,7 @@ export class TelemetryResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 使用统计
    */
-  async getUsageStatistics(timeRange?: {
-    start: string;
-    end: string;
-  }): Promise<UsageStatistics> {
+  async getUsageStatistics(timeRange?: { start: string; end: string }): Promise<UsageStatistics> {
     return this.request<UsageStatistics>("/v1/telemetry/usage", {
       params: timeRange,
     });
@@ -312,9 +274,7 @@ export class TelemetryResource extends BaseResource {
    * @param request 导出请求
    * @returns 导出结果
    */
-  async export(
-    request: ExportTelemetryRequest,
-  ): Promise<ExportTelemetryResult> {
+  async export(request: ExportTelemetryRequest): Promise<ExportTelemetryResult> {
     return this.request<ExportTelemetryResult>("/v1/telemetry/export", {
       method: "POST",
       body: request,
@@ -327,10 +287,7 @@ export class TelemetryResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 导出结果
    */
-  async exportMetrics(
-    format: "json" | "csv" | "prometheus",
-    timeRange?: { start: string; end: string },
-  ): Promise<ExportTelemetryResult> {
+  async exportMetrics(format: "json" | "csv" | "prometheus", timeRange?: { start: string; end: string }): Promise<ExportTelemetryResult> {
     return this.export({
       type: "metrics",
       format,
@@ -344,10 +301,7 @@ export class TelemetryResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 导出结果
    */
-  async exportTraces(
-    format: "json" | "opentelemetry",
-    timeRange?: { start: string; end: string },
-  ): Promise<ExportTelemetryResult> {
+  async exportTraces(format: "json" | "opentelemetry", timeRange?: { start: string; end: string }): Promise<ExportTelemetryResult> {
     return this.export({
       type: "traces",
       format,
@@ -361,10 +315,7 @@ export class TelemetryResource extends BaseResource {
    * @param timeRange 时间范围
    * @returns 导出结果
    */
-  async exportLogs(
-    format: "json" | "csv",
-    timeRange?: { start: string; end: string },
-  ): Promise<ExportTelemetryResult> {
+  async exportLogs(format: "json" | "csv", timeRange?: { start: string; end: string }): Promise<ExportTelemetryResult> {
     return this.export({
       type: "logs",
       format,

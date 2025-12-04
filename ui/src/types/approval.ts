@@ -4,14 +4,14 @@
 
 export interface ApprovalRequest {
   id: string;
-  messageId?: string;         // 关联的消息 ID
+  messageId?: string; // 关联的消息 ID
   toolName: string;
   args: Record<string, any>;
   reason?: string;
   timestamp: number;
 }
 
-export type ApprovalDecision = 'approved' | 'rejected';
+export type ApprovalDecision = "approved" | "rejected";
 
 export interface ApprovalRecord extends ApprovalRequest {
   decision: ApprovalDecision;

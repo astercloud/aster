@@ -8,36 +8,31 @@
 
 ```vue
 <template>
-  <AgentCard
-    :agent="agent"
-    @chat="handleChat"
-    @edit="handleEdit"
-    @delete="handleDelete"
-  />
+  <AgentCard :agent="agent" @chat="handleChat" @edit="handleEdit" @delete="handleDelete" />
 </template>
 
 <script setup>
 const agent = {
-  id: '1',
-  name: '写作助手',
-  description: '帮助你创作优质内容',
-  status: 'idle',
+  id: "1",
+  name: "写作助手",
+  description: "帮助你创作优质内容",
+  status: "idle",
   metadata: {
-    model: 'claude-3-5-sonnet',
-    provider: 'anthropic',
+    model: "claude-3-5-sonnet",
+    provider: "anthropic",
   },
 };
 
 const handleChat = (agent) => {
-  console.log('Start chat with:', agent.name);
+  console.log("Start chat with:", agent.name);
 };
 
 const handleEdit = (agent) => {
-  console.log('Edit agent:', agent.id);
+  console.log("Edit agent:", agent.id);
 };
 
 const handleDelete = (agent) => {
-  console.log('Delete agent:', agent.id);
+  console.log("Delete agent:", agent.id);
 };
 </script>
 ```
@@ -66,7 +61,7 @@ Agent 可以显示自定义头像。
   <AgentCard
     :agent="{
       ...agent,
-      avatar: 'https://example.com/agent-avatar.jpg'
+      avatar: 'https://example.com/agent-avatar.jpg',
     }"
   />
 </template>
@@ -98,9 +93,9 @@ Agent 可以显示自定义头像。
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| agent | Agent 对象 | `Agent` | - |
+| 参数  | 说明       | 类型    | 默认值 |
+| ----- | ---------- | ------- | ------ |
+| agent | Agent 对象 | `Agent` | -      |
 
 ### Agent 类型
 
@@ -110,7 +105,7 @@ interface Agent {
   name: string;
   description?: string;
   avatar?: string;
-  status: 'idle' | 'thinking' | 'busy' | 'error';
+  status: "idle" | "thinking" | "busy" | "error";
   metadata?: {
     model?: string;
     provider?: string;
@@ -122,10 +117,10 @@ interface Agent {
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| chat | 点击对话按钮时触发 | `agent: Agent` |
-| edit | 点击编辑按钮时触发 | `agent: Agent` |
+| 事件名 | 说明               | 回调参数       |
+| ------ | ------------------ | -------------- |
+| chat   | 点击对话按钮时触发 | `agent: Agent` |
+| edit   | 点击编辑按钮时触发 | `agent: Agent` |
 | delete | 点击删除按钮时触发 | `agent: Agent` |
 
 ## 使用场景
@@ -142,44 +137,39 @@ interface Agent {
 ```vue
 <template>
   <div class="grid grid-cols-3 gap-4">
-    <AgentCard
-      v-for="agent in agents"
-      :key="agent.id"
-      :agent="agent"
-      @chat="startChat"
-    />
+    <AgentCard v-for="agent in agents" :key="agent.id" :agent="agent" @chat="startChat" />
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
+import { ref } from "vue";
 
 const agents = ref([
   {
-    id: '1',
-    name: '写作助手',
-    description: '帮助你创作优质内容',
-    status: 'idle',
-    metadata: { model: 'claude-3-5-sonnet', provider: 'anthropic' },
+    id: "1",
+    name: "写作助手",
+    description: "帮助你创作优质内容",
+    status: "idle",
+    metadata: { model: "claude-3-5-sonnet", provider: "anthropic" },
   },
   {
-    id: '2',
-    name: '代码助手',
-    description: '编程问题解答专家',
-    status: 'idle',
-    metadata: { model: 'gpt-4', provider: 'openai' },
+    id: "2",
+    name: "代码助手",
+    description: "编程问题解答专家",
+    status: "idle",
+    metadata: { model: "gpt-4", provider: "openai" },
   },
   {
-    id: '3',
-    name: '数据分析师',
-    description: '数据洞察与可视化',
-    status: 'thinking',
-    metadata: { model: 'deepseek-chat', provider: 'deepseek' },
+    id: "3",
+    name: "数据分析师",
+    description: "数据洞察与可视化",
+    status: "thinking",
+    metadata: { model: "deepseek-chat", provider: "deepseek" },
   },
 ]);
 
 const startChat = (agent) => {
-  console.log('Starting chat with:', agent.name);
+  console.log("Starting chat with:", agent.name);
 };
 </script>
 ```
@@ -191,22 +181,16 @@ const startChat = (agent) => {
   <div>
     <h3>运行中的 Agents</h3>
     <Flex direction="column" gap="md">
-      <AgentCard
-        v-for="agent in runningAgents"
-        :key="agent.id"
-        :agent="agent"
-      />
+      <AgentCard v-for="agent in runningAgents" :key="agent.id" :agent="agent" />
     </Flex>
   </div>
 </template>
 
 <script setup>
-import { computed } from 'vue';
+import { computed } from "vue";
 
 const runningAgents = computed(() => {
-  return agents.value.filter(a => 
-    a.status === 'thinking' || a.status === 'busy'
-  );
+  return agents.value.filter((a) => a.status === "thinking" || a.status === "busy");
 });
 </script>
 ```

@@ -55,12 +55,14 @@ main()
 ## 事件处理
 
 ### Progress Events
+
 - `ProgressTextChunkEvent` - 流式文本增量
 - `ProgressToolStartEvent` - 工具开始执行
 - `ProgressToolEndEvent` - 工具执行完成
 - `ProgressDoneEvent` - 步骤完成
 
 ### Monitor Events
+
 - `MonitorStateChangedEvent` - Agent状态变化
 - `MonitorBreakpointChangedEvent` - 断点状态变化
 - `MonitorTokenUsageEvent` - Token使用统计
@@ -69,6 +71,7 @@ main()
 ## 工作空间
 
 Agent 在 `./workspace` 目录下执行所有文件操作,该目录会:
+
 - 自动创建(如果不存在)
 - 作为沙箱边界
 - 隔离文件系统访问

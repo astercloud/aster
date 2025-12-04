@@ -60,8 +60,7 @@ async function main() {
     templateId: "researcher",
     llmProvider: "openai",
     llmModel: "gpt-4-turbo",
-    systemPrompt:
-      "You are an expert AI researcher. Provide detailed, accurate information.",
+    systemPrompt: "You are an expert AI researcher. Provide detailed, accurate information.",
     tools: ["http_request", "web_scraper"],
     middlewares: ["summarization", "cost_tracker"],
   });
@@ -81,14 +80,10 @@ async function main() {
     sortBy: "createdAt",
     sortOrder: "desc",
   });
-  console.log(
-    `📋 总共 ${agents.total} 个 Agents (显示 ${agents.items.length} 个):`,
-  );
+  console.log(`📋 总共 ${agents.total} 个 Agents (显示 ${agents.items.length} 个):`);
   agents.items.forEach((agent, i) => {
     console.log(`   ${i + 1}. ${agent.name} (${agent.id})`);
-    console.log(
-      `      状态: ${agent.status} | LLM: ${agent.llmProvider}/${agent.llmModel}`,
-    );
+    console.log(`      状态: ${agent.status} | LLM: ${agent.llmProvider}/${agent.llmModel}`);
   });
 
   // 获取 Agent 详情
@@ -133,9 +128,7 @@ async function main() {
   }
 
   if (chatResponse.cost) {
-    console.log(
-      `   成本: ${chatResponse.cost.currency} ${chatResponse.cost.amount.toFixed(4)}`,
-    );
+    console.log(`   成本: ${chatResponse.cost.currency} ${chatResponse.cost.amount.toFixed(4)}`);
   }
 
   console.log(`   执行时间: ${chatResponse.executionTime}ms`);
@@ -200,16 +193,10 @@ async function main() {
 
   console.log("Agent 统计（过去7天）:");
   console.log(`   总请求数: ${stats.totalRequests}`);
-  console.log(
-    `   成功率: ${((stats.successfulRequests / stats.totalRequests) * 100).toFixed(1)}%`,
-  );
+  console.log(`   成功率: ${((stats.successfulRequests / stats.totalRequests) * 100).toFixed(1)}%`);
   console.log(`   平均响应时间: ${stats.avgResponseTime.toFixed(2)}ms`);
-  console.log(
-    `   Token 使用: ${stats.tokenUsage.totalTokens.toLocaleString()}`,
-  );
-  console.log(
-    `   总成本: ${stats.cost.currency} ${stats.cost.total.toFixed(4)}`,
-  );
+  console.log(`   Token 使用: ${stats.tokenUsage.totalTokens.toLocaleString()}`);
+  console.log(`   总成本: ${stats.cost.currency} ${stats.cost.total.toFixed(4)}`);
 
   if (stats.toolCalls) {
     console.log(`   工具调用: ${stats.toolCalls.total} 次`);
@@ -230,14 +217,10 @@ async function main() {
     end: new Date().toISOString(),
   });
   console.log("\n📈 所有 Agents 汇总（过去24小时）:");
-  console.log(
-    `   总 Agents: ${aggregated.totalAgents} | 活跃: ${aggregated.activeAgents}`,
-  );
+  console.log(`   总 Agents: ${aggregated.totalAgents} | 活跃: ${aggregated.activeAgents}`);
   console.log(`   总请求数: ${aggregated.totalRequests.toLocaleString()}`);
   console.log(`   总 Tokens: ${aggregated.totalTokens.toLocaleString()}`);
-  console.log(
-    `   总成本: ${aggregated.currency} ${aggregated.totalCost.toFixed(2)}`,
-  );
+  console.log(`   总成本: ${aggregated.currency} ${aggregated.totalCost.toFixed(2)}`);
 
   // ========================================================================
   // 7. Agent 克隆
@@ -245,10 +228,7 @@ async function main() {
   console.log("\n📋 7. Agent 克隆");
   console.log("-".repeat(70));
 
-  const cloned = await client.agents.clone(
-    assistant.id,
-    "My Assistant (Clone)",
-  );
+  const cloned = await client.agents.clone(assistant.id, "My Assistant (Clone)");
   console.log("✅ Agent 已克隆:", cloned.id);
   console.log("   原始 Agent:", assistant.id);
   console.log("   克隆 Agent:", cloned.id);

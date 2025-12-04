@@ -1,45 +1,29 @@
 <template>
-  <div
-    :class="[
-      'thinking-block rounded-lg border overflow-hidden transition-all',
-      hasApproval ? 'border-amber-300 bg-amber-50' : 'border-border bg-surface/50'
-    ]"
-  >
+  <div :class="['thinking-block rounded-lg border overflow-hidden transition-all', hasApproval ? 'border-amber-300 bg-amber-50' : 'border-border bg-surface/50']">
     <!-- Header -->
-    <button
-      @click="isExpanded = !isExpanded"
-      class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-secondary hover:bg-background/50 transition-colors"
-    >
-      <svg
-        :class="['w-4 h-4 transition-transform', isExpanded ? 'rotate-90' : '']"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
+    <button @click="isExpanded = !isExpanded" class="w-full flex items-center gap-2 px-3 py-2 text-xs font-medium text-secondary hover:bg-background/50 transition-colors">
+      <svg :class="['w-4 h-4 transition-transform', isExpanded ? 'rotate-90' : '']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
       </svg>
-      
-      <svg
-        :class="[
-          'w-4 h-4',
-          hasApproval ? 'text-amber-500 animate-pulse' : isFinished ? 'text-secondary' : 'text-primary animate-pulse'
-        ]"
-        fill="none"
-        stroke="currentColor"
-        viewBox="0 0 24 24"
-      >
-        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+
+      <svg :class="['w-4 h-4', hasApproval ? 'text-amber-500 animate-pulse' : isFinished ? 'text-secondary' : 'text-primary animate-pulse']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+        <path
+          stroke-linecap="round"
+          stroke-linejoin="round"
+          stroke-width="2"
+          d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+        ></path>
       </svg>
-      
+
       <span>思考中...</span>
-      
+
       <span v-if="hasApproval" class="ml-auto flex items-center gap-1 text-amber-600 font-bold animate-pulse bg-amber-100 px-2 py-0.5 rounded-full border border-amber-200">
         <svg class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
         </svg>
         等待审批
       </span>
-      
+
       <span v-else-if="!isFinished" class="ml-auto flex items-center gap-1 text-primary text-[10px] bg-primary/5 px-2 py-0.5 rounded-full border border-primary/10">
         <span class="w-1.5 h-1.5 rounded-full bg-primary animate-pulse"></span>
         运行中
@@ -51,20 +35,14 @@
       <div
         v-for="(thought, idx) in thoughts"
         :key="thought.id || idx"
-        :class="[
-          'relative pl-4 border-l-2 ml-1 transition-all',
-          thought.approvalRequest ? 'border-amber-400' : thought.toolCall ? 'border-indigo-300' : thought.toolResult ? 'border-emerald-300' : 'border-border'
-        ]"
+        :class="['relative pl-4 border-l-2 ml-1 transition-all', thought.approvalRequest ? 'border-amber-400' : thought.toolCall ? 'border-indigo-300' : thought.toolResult ? 'border-emerald-300' : 'border-border']"
       >
         <!-- Stage Badge -->
         <div class="flex items-center justify-between mb-1">
           <span
             :class="[
               'text-[10px] font-bold px-1.5 py-0.5 rounded flex items-center gap-1',
-              thought.approvalRequest ? 'bg-amber-100 text-amber-700' :
-              thought.toolCall ? 'bg-indigo-100 text-indigo-700' :
-              thought.toolResult ? 'bg-emerald-100 text-emerald-700' :
-              'bg-stone-100 text-stone-600'
+              thought.approvalRequest ? 'bg-amber-100 text-amber-700' : thought.toolCall ? 'bg-indigo-100 text-indigo-700' : thought.toolResult ? 'bg-emerald-100 text-emerald-700' : 'bg-stone-100 text-stone-600',
             ]"
           >
             {{ thought.stage }}
@@ -121,17 +99,12 @@
           </div>
 
           <div class="bg-white border border-amber-200 rounded-md mb-3 overflow-hidden">
-            <div class="bg-amber-50/50 px-2 py-1.5 border-b border-amber-100 text-xs font-semibold text-amber-800">
-              参数详情
-            </div>
+            <div class="bg-amber-50/50 px-2 py-1.5 border-b border-amber-100 text-xs font-semibold text-amber-800">参数详情</div>
             <pre class="p-2 text-[10px] font-mono text-stone-600 overflow-x-auto">{{ JSON.stringify(thought.approvalRequest.args, null, 2) }}</pre>
           </div>
 
           <div class="flex gap-2">
-            <button
-              @click="$emit('approve', thought.approvalRequest.id)"
-              class="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-md transition-colors"
-            >
+            <button @click="$emit('approve', thought.approvalRequest.id)" class="flex-1 flex items-center justify-center gap-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold py-2 rounded-md transition-colors">
               <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 13l4 4L19 7"></path>
               </svg>
@@ -154,8 +127,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import type { ThinkingEvent } from '@/types';
+import { ref, computed, watch } from "vue";
+import type { ThinkingEvent } from "@/types";
 
 interface Props {
   thoughts: ThinkingEvent[];
@@ -172,14 +145,17 @@ defineEmits<{
 const isExpanded = ref(false);
 
 const hasApproval = computed(() => {
-  return props.thoughts.some(t => t.approvalRequest);
+  return props.thoughts.some((t) => t.approvalRequest);
 });
 
-watch(() => props.isFinished, (finished) => {
-  if (finished) {
-    isExpanded.value = false;
-  }
-});
+watch(
+  () => props.isFinished,
+  (finished) => {
+    if (finished) {
+      isExpanded.value = false;
+    }
+  },
+);
 
 watch(hasApproval, (has) => {
   if (has) {
@@ -189,10 +165,10 @@ watch(hasApproval, (has) => {
 
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  return date.toLocaleTimeString("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
 };
 </script>

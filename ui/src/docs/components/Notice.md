@@ -33,11 +33,7 @@
 
 ```vue
 <template>
-  <Notice
-    type="success"
-    title="成功"
-    content="操作已成功完成"
-  />
+  <Notice type="success" title="成功" content="操作已成功完成" />
 </template>
 ```
 
@@ -47,17 +43,12 @@
 
 ```vue
 <template>
-  <Notice
-    type="info"
-    content="这是一条可关闭的提示"
-    closable
-    @close="handleClose"
-  />
+  <Notice type="info" content="这是一条可关闭的提示" closable @close="handleClose" />
 </template>
 
 <script setup>
 const handleClose = () => {
-  console.log('Notice closed');
+  console.log("Notice closed");
 };
 </script>
 ```
@@ -66,15 +57,15 @@ const handleClose = () => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| type | 通知类型 | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` |
-| title | 标题 | `string` | - |
-| content | 内容 | `string` | - |
-| closable | 是否可关闭 | `boolean` | `false` |
+| 参数     | 说明       | 类型                                          | 默认值   |
+| -------- | ---------- | --------------------------------------------- | -------- |
+| type     | 通知类型   | `'info' \| 'success' \| 'warning' \| 'error'` | `'info'` |
+| title    | 标题       | `string`                                      | -        |
+| content  | 内容       | `string`                                      | -        |
+| closable | 是否可关闭 | `boolean`                                     | `false`  |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
-| close | 关闭时触发 | - |
+| 事件名 | 说明       | 回调参数 |
+| ------ | ---------- | -------- |
+| close  | 关闭时触发 | -        |

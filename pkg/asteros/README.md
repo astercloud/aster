@@ -5,18 +5,21 @@ AsterOS 是 Aster 框架的统一运行时系统，提供多智能体协作的�
 ## 🌟 核心特性
 
 ### **统一资源管理**
+
 - **Cosmos**: 智能体生命周期管理器，替代原有的 Pool 概念
 - **Stars**: 多智能体协作单元，替代原有的 Room 概念
 - **Workflows**: 工作流管理和执行
 - **自动发现**: 自动注册和发现所有资源
 
 ### **多接口支持**
+
 - **HTTP Interface**: RESTful API 接口
 - **A2A Interface**: Agent-to-Agent 通信接口
 - **AGUI Interface**: 控制平面 UI 集成接口
 - **插件化**: 支持自定义 Interface 扩展
 
 ### **自动 API 生成**
+
 - 为所有注册的 Agents 自动生成 REST 端点
 - 为所有 Stars 自动生成协作管理 API
 - 为所有 Workflows 自动生成执行 API
@@ -132,6 +135,7 @@ os.AddInterface(aguiIface)
 AsterOS 自动生成以下 REST API 端点：
 
 ### Agent 管理
+
 ```
 GET    /api/agents              # 列出所有 Agent
 POST   /api/agents/{id}/run     # 运行指定 Agent
@@ -139,6 +143,7 @@ GET    /api/agents/{id}/status  # 获取 Agent 状态
 ```
 
 ### Stars 协作
+
 ```
 GET    /api/stars                # 列出所有 Stars
 POST   /api/stars/{id}/run       # 运行 Stars 协作
@@ -148,12 +153,14 @@ GET    /api/stars/{id}/members   # 获取成员列表
 ```
 
 ### Workflow 执行
+
 ```
 GET    /api/workflows             # 列出所有 Workflow
 POST   /api/workflows/{id}/execute # 执行 Workflow
 ```
 
 ### 系统
+
 ```
 GET    /health                    # 健康检查
 GET    /metrics                   # Prometheus 指标
@@ -230,16 +237,19 @@ type Interface interface {
 ## 🌌 与 Cosmos 和 Stars 的关系
 
 ### Cosmos (宇宙)
+
 - **职责**: Agent 生命周期管理
 - **功能**: 创建、销毁、监控 Agent
 - **类似**: Kubernetes 的 Pod Manager
 
 ### Stars (星座)
+
 - **职责**: 多 Agent 协作管理
 - **功能**: 编组、通信、协作调度
 - **类似**: Kubernetes 的 Service/Deployment
 
 ### AsterOS (星系操作系统)
+
 - **职责**: 统一运行时和 API 网关
 - **功能**: 资源注册、API 生成、接口管理
 - **类似**: Kubernetes API Server + Ingress Controller
@@ -275,17 +285,21 @@ os.Router().Use(myMiddleware)
 ## 📊 监控和观测
 
 ### 健康检查
+
 ```bash
 curl http://localhost:8080/health
 ```
 
 ### Prometheus 指标
+
 ```bash
 curl http://localhost:8080/metrics
 ```
 
 ### 日志输出
+
 AsterOS 使用结构化日志，支持不同级别：
+
 ```
 🌟 AsterOS 'MyAsterOS' is running on http://localhost:8080
 [Agent Create] Total tools loaded: 5
@@ -295,6 +309,7 @@ AsterOS 使用结构化日志，支持不同级别：
 ## 🛡️ 安全特性
 
 ### 认证授权
+
 ```go
 // 启用认证
 os, err := asteros.New(&asteros.Options{
@@ -304,6 +319,7 @@ os, err := asteros.New(&asteros.Options{
 ```
 
 ### CORS 支持
+
 ```go
 // 启用 CORS (默认已启用)
 os, err := asteros.New(&asteros.Options{
@@ -315,7 +331,7 @@ os, err := asteros.New(&asteros.Options{
 
 ### 常见问题
 
-1. **"cosmos is required" 错误
+1. \*\*"cosmos is required" 错误
    - 确保在创建 AsterOS 时提供了有效的 Cosmos 实例
 
 2. **端口占用**
@@ -327,6 +343,7 @@ os, err := asteros.New(&asteros.Options{
    - 确保 Cosmos 中有足够的 Agent 容量
 
 ### 调试模式
+
 ```go
 os, err := asteros.New(&asteros.Options{
     LogLevel: "debug",  // 启用详细日志
@@ -336,6 +353,7 @@ os, err := asteros.New(&asteros.Options{
 ## 📚 示例项目
 
 查看 `examples/asteros/` 目录下的完整示例：
+
 - `basic/`: 基本 AsterOS 使用
 - `interfaces/`: 多种 Interface 使用示例
 - `collaboration/`: Stars 协作示例

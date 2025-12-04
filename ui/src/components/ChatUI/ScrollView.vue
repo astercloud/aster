@@ -1,24 +1,16 @@
 <template>
-  <div
-    ref="scrollRef"
-    class="scroll-view"
-    @scroll="handleScroll"
-  >
+  <div ref="scrollRef" class="scroll-view" @scroll="handleScroll">
     <slot></slot>
-    
-    <button
-      v-if="showBackTop && showButton"
-      class="back-top-btn"
-      @click="scrollToTop"
-    >
+
+    <button v-if="showBackTop && showButton" class="back-top-btn" @click="scrollToTop">
       <Icon type="arrow-up" />
     </button>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import Icon from './Icon.vue';
+import { ref, onMounted, onUnmounted } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   showBackTop?: boolean;
@@ -40,30 +32,30 @@ const showButton = ref(false);
 
 const handleScroll = (e: Event) => {
   const target = e.target as HTMLDivElement;
-  
+
   // 显示/隐藏回到顶部按钮
   showButton.value = target.scrollTop > props.threshold;
-  
+
   // 检测是否到达底部
   const isBottom = target.scrollHeight - target.scrollTop <= target.clientHeight + 50;
   if (isBottom) {
-    emit('reachBottom');
+    emit("reachBottom");
   }
-  
-  emit('scroll', e);
+
+  emit("scroll", e);
 };
 
 const scrollToTop = () => {
   scrollRef.value?.scrollTo({
     top: 0,
-    behavior: 'smooth',
+    behavior: "smooth",
   });
 };
 
 const scrollToBottom = () => {
   scrollRef.value?.scrollTo({
     top: scrollRef.value.scrollHeight,
-    behavior: 'smooth',
+    behavior: "smooth",
   });
 };
 

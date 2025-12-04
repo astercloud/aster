@@ -5,14 +5,7 @@
     </div>
 
     <div class="image-wrapper">
-      <img
-        :src="message.content.url"
-        :alt="message.content.alt || '图片'"
-        :class="['image-content', { 'loading': isLoading }]"
-        @load="handleLoad"
-        @error="handleError"
-        loading="lazy"
-      />
+      <img :src="message.content.url" :alt="message.content.alt || '图片'" :class="['image-content', { loading: isLoading }]" @load="handleLoad" @error="handleError" loading="lazy" />
 
       <!-- Loading State -->
       <div v-if="isLoading" class="image-loading">
@@ -30,12 +23,7 @@
       </div>
 
       <!-- Preview Button -->
-      <button
-        v-if="!isLoading && !hasError"
-        @click="openPreview"
-        class="image-preview-btn"
-        title="预览图片"
-      >
+      <button v-if="!isLoading && !hasError" @click="openPreview" class="image-preview-btn" title="预览图片">
         <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0zM10 7v3m0 0v3m0-3h3m-3 0H7"></path>
         </svg>
@@ -47,20 +35,18 @@
       <span v-if="message.content.metadata.size" class="metadata-item">
         {{ formatFileSize(message.content.metadata.size) }}
       </span>
-      <span v-if="message.content.metadata.dimensions" class="metadata-item">
-        {{ message.content.metadata.dimensions.width }} × {{ message.content.metadata.dimensions.height }}
-      </span>
+      <span v-if="message.content.metadata.dimensions" class="metadata-item"> {{ message.content.metadata.dimensions.width }} × {{ message.content.metadata.dimensions.height }} </span>
     </div>
   </div>
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
-import type { ImageMessage as ImageMessageType } from '@/types';
-import { formatFileSize } from '@/utils/format';
+import { defineComponent, ref } from "vue";
+import type { ImageMessage as ImageMessageType } from "@/types";
+import { formatFileSize } from "@/utils/format";
 
 export default defineComponent({
-  name: 'ImageMessage',
+  name: "ImageMessage",
 
   props: {
     message: {
@@ -87,7 +73,7 @@ export default defineComponent({
     }
 
     function openPreview() {
-      emit('preview', props.message.content.url);
+      emit("preview", props.message.content.url);
     }
 
     return {

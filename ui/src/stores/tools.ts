@@ -4,11 +4,11 @@
  * 管理所有工具的调用状态、进度、结果等
  */
 
-import { defineStore } from 'pinia';
-import { ref, computed } from 'vue';
-import type { ToolCallSnapshot } from '@/types/message';
+import { defineStore } from "pinia";
+import { ref, computed } from "vue";
+import type { ToolCallSnapshot } from "@/types/message";
 
-export const useToolsStore = defineStore('tools', () => {
+export const useToolsStore = defineStore("tools", () => {
   // ==================
   // State
   // ==================
@@ -25,9 +25,7 @@ export const useToolsStore = defineStore('tools', () => {
 
   // 运行中的工具数量
   const runningToolsCount = computed(() => {
-    return Array.from(toolRuns.value.values()).filter(
-      tool => tool.state === 'executing'
-    ).length;
+    return Array.from(toolRuns.value.values()).filter((tool) => tool.state === "executing").length;
   });
 
   // 是否有工具正在运行
@@ -41,11 +39,13 @@ export const useToolsStore = defineStore('tools', () => {
    * 更新工具状态（细粒度更新）
    */
   const updateTool = (id: string, updates: Partial<ToolCallSnapshot>) => {
-    const prev = toolRuns.value.get(id) || {
-      id,
-      name: '',
-      state: 'pending',
-    } as ToolCallSnapshot;
+    const prev =
+      toolRuns.value.get(id) ||
+      ({
+        id,
+        name: "",
+        state: "pending",
+      } as ToolCallSnapshot);
 
     toolRuns.value.set(id, {
       ...prev,
@@ -60,7 +60,7 @@ export const useToolsStore = defineStore('tools', () => {
   const handleToolStart = (call: ToolCallSnapshot) => {
     toolRuns.value.set(call.id, {
       ...call,
-      state: 'executing',
+      state: "executing",
       started_at: call.started_at || new Date().toISOString(),
       updated_at: new Date().toISOString(),
     });
@@ -69,15 +69,10 @@ export const useToolsStore = defineStore('tools', () => {
   /**
    * 处理工具进度事件
    */
-  const handleToolProgress = (
-    id: string,
-    progress: number,
-    message?: string,
-    metadata?: Record<string, any>
-  ) => {
+  const handleToolProgress = (id: string, progress: number, message?: string, metadata?: Record<string, any>) => {
     updateTool(id, {
       progress,
-      state: 'executing',
+      state: "executing",
       intermediate: metadata ? { ...metadata, message } : undefined,
     });
   };
@@ -85,11 +80,7 @@ export const useToolsStore = defineStore('tools', () => {
   /**
    * 处理工具中间结果事件
    */
-  const handleToolIntermediate = (
-    id: string,
-    label: string,
-    data: any
-  ) => {
+  const handleToolIntermediate = (id: string, label: string, data: any) => {
     const prev = toolRuns.value.get(id);
     if (prev) {
       updateTool(id, {
@@ -107,7 +98,7 @@ export const useToolsStore = defineStore('tools', () => {
   const handleToolEnd = (call: ToolCallSnapshot) => {
     toolRuns.value.set(call.id, {
       ...call,
-      state: 'completed',
+      state: "completed",
       progress: 1,
       updated_at: new Date().toISOString(),
     });
@@ -118,7 +109,7 @@ export const useToolsStore = defineStore('tools', () => {
    */
   const handleToolError = (id: string, error: string) => {
     updateTool(id, {
-      state: 'failed',
+      state: "failed",
       error,
     });
   };
@@ -128,7 +119,7 @@ export const useToolsStore = defineStore('tools', () => {
    */
   const handleToolCancelled = (id: string, reason?: string) => {
     updateTool(id, {
-      state: 'cancelled',
+      state: "cancelled",
       error: reason,
     });
   };
@@ -159,7 +150,7 @@ export const useToolsStore = defineStore('tools', () => {
    */
   const clearCompletedTools = () => {
     for (const [id, tool] of toolRuns.value) {
-      if (tool.state === 'completed' || tool.state === 'failed' || tool.state === 'cancelled') {
+      if (tool.state === "completed" || tool.state === "failed" || tool.state === "cancelled") {
         toolRuns.value.delete(id);
       }
     }

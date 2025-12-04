@@ -141,10 +141,7 @@ describe("MemoryResource", () => {
 
         await memory.working.get("global_config", "resource");
 
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8080/v1/memory/working/global_config?scope=resource",
-          expect.any(Object),
-        );
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/v1/memory/working/global_config?scope=resource", expect.any(Object));
       });
     });
 
@@ -175,10 +172,7 @@ describe("MemoryResource", () => {
 
         await memory.working.delete("global_config", "resource");
 
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8080/v1/memory/working/global_config?scope=resource",
-          expect.any(Object),
-        );
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/v1/memory/working/global_config?scope=resource", expect.any(Object));
       });
     });
 
@@ -233,10 +227,7 @@ describe("MemoryResource", () => {
 
         await memory.working.list("resource");
 
-        expect(mockFetch).toHaveBeenCalledWith(
-          "http://localhost:8080/v1/memory/working?scope=resource",
-          expect.any(Object),
-        );
+        expect(mockFetch).toHaveBeenCalledWith("http://localhost:8080/v1/memory/working?scope=resource", expect.any(Object));
       });
     });
 
@@ -316,10 +307,7 @@ describe("MemoryResource", () => {
           text: async () => JSON.stringify({ chunkId: "chunk-123" }),
         });
 
-        const chunkId = await memory.semantic.store(
-          "Paris is the capital of France",
-          { source: "wikipedia", category: "geography" },
-        );
+        const chunkId = await memory.semantic.store("Paris is the capital of France", { source: "wikipedia", category: "geography" });
 
         expect(chunkId).toBe("chunk-123");
 

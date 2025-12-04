@@ -8,21 +8,18 @@
 
 ```vue
 <template>
-  <Dropdown
-    :items="items"
-    @select="handleSelect"
-  />
+  <Dropdown :items="items" @select="handleSelect" />
 </template>
 
 <script setup>
 const items = [
-  { key: '1', label: '选项 1' },
-  { key: '2', label: '选项 2' },
-  { key: '3', label: '选项 3' },
+  { key: "1", label: "选项 1" },
+  { key: "2", label: "选项 2" },
+  { key: "3", label: "选项 3" },
 ];
 
 const handleSelect = (item) => {
-  console.log('Selected:', item);
+  console.log("Selected:", item);
 };
 </script>
 ```
@@ -55,9 +52,9 @@ const handleSelect = (item) => {
 
 <script setup>
 const items = [
-  { key: 'edit', label: '编辑', icon: 'edit' },
-  { key: 'copy', label: '复制', icon: 'copy' },
-  { key: 'delete', label: '删除', icon: 'delete' },
+  { key: "edit", label: "编辑", icon: "edit" },
+  { key: "copy", label: "复制", icon: "copy" },
+  { key: "delete", label: "删除", icon: "delete" },
 ];
 </script>
 ```
@@ -66,31 +63,31 @@ const items = [
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| items | 菜单项列表 | `DropdownItem[]` | `[]` |
-| label | 触发器文本 | `string` | `'选择'` |
+| 参数  | 说明       | 类型             | 默认值   |
+| ----- | ---------- | ---------------- | -------- |
+| items | 菜单项列表 | `DropdownItem[]` | `[]`     |
+| label | 触发器文本 | `string`         | `'选择'` |
 
 ### DropdownItem 类型
 
 ```typescript
 interface DropdownItem {
-  key: string;    // 唯一标识
-  label: string;  // 显示文本
-  icon?: string;  // 图标（可选）
+  key: string; // 唯一标识
+  label: string; // 显示文本
+  icon?: string; // 图标（可选）
 }
 ```
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名 | 说明             | 回调参数             |
+| ------ | ---------------- | -------------------- |
 | select | 选择菜单项时触发 | `item: DropdownItem` |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明         |
+| ------- | ------------ |
 | trigger | 自定义触发器 |
 
 ## 示例
@@ -110,13 +107,13 @@ interface DropdownItem {
 
 <script setup>
 const actions = [
-  { key: 'edit', label: '编辑', icon: 'edit' },
-  { key: 'share', label: '分享', icon: 'share' },
-  { key: 'delete', label: '删除', icon: 'delete' },
+  { key: "edit", label: "编辑", icon: "edit" },
+  { key: "share", label: "分享", icon: "share" },
+  { key: "delete", label: "删除", icon: "delete" },
 ];
 
 const handleAction = (action) => {
-  console.log('Action:', action.key);
+  console.log("Action:", action.key);
 };
 </script>
 ```
@@ -134,9 +131,9 @@ const handleAction = (action) => {
 
 <script setup>
 const userMenu = [
-  { key: 'profile', label: '个人资料' },
-  { key: 'settings', label: '设置' },
-  { key: 'logout', label: '退出登录' },
+  { key: "profile", label: "个人资料" },
+  { key: "settings", label: "设置" },
+  { key: "logout", label: "退出登录" },
 ];
 </script>
 ```

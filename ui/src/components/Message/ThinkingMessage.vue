@@ -1,19 +1,15 @@
 <template>
   <div class="thinking-message">
     <!-- Compact View -->
-    <button
-      v-if="!isExpanded"
-      @click="isExpanded = true"
-      class="thinking-compact"
-    >
+    <button v-if="!isExpanded" @click="isExpanded = true" class="thinking-compact">
       <div class="flex items-center gap-2">
-        <svg
-          :class="['w-4 h-4', isActive ? 'text-primary animate-pulse' : 'text-secondary']"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+        <svg :class="['w-4 h-4', isActive ? 'text-primary animate-pulse' : 'text-secondary']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+          <path
+            stroke-linecap="round"
+            stroke-linejoin="round"
+            stroke-width="2"
+            d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+          ></path>
         </svg>
         <span class="text-sm font-medium">思考过程</span>
         <span class="text-xs text-secondary">({{ steps.length }} 步)</span>
@@ -28,13 +24,13 @@
       <!-- Header -->
       <div class="thinking-header">
         <div class="flex items-center gap-2">
-          <svg
-            :class="['w-5 h-5', isActive ? 'text-primary animate-pulse' : 'text-secondary']"
-            fill="none"
-            stroke="currentColor"
-            viewBox="0 0 24 24"
-          >
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+          <svg :class="['w-5 h-5', isActive ? 'text-primary animate-pulse' : 'text-secondary']" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+            <path
+              stroke-linecap="round"
+              stroke-linejoin="round"
+              stroke-width="2"
+              d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+            ></path>
           </svg>
           <h3 class="text-base font-semibold">思考过程</h3>
           <span v-if="isActive" class="status-badge active">运行中</span>
@@ -49,16 +45,17 @@
 
       <!-- Timeline -->
       <div class="thinking-timeline">
-        <div
-          v-for="(step, index) in steps"
-          :key="step.id || index"
-          class="timeline-step"
-        >
+        <div v-for="(step, index) in steps" :key="step.id || index" class="timeline-step">
           <!-- Step Indicator -->
           <div class="step-indicator">
             <div :class="['step-dot', getStepClass(step)]">
               <svg v-if="step.type === 'reasoning'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"></path>
+                <path
+                  stroke-linecap="round"
+                  stroke-linejoin="round"
+                  stroke-width="2"
+                  d="M9.663 17h4.673M12 3v1m6.364 1.636l-.707.707M21 12h-1M4 12H3m3.343-5.657l-.707-.707m2.828 9.9a5 5 0 117.072 0l-.548.547A3.374 3.374 0 0014 18.469V19a2 2 0 11-4 0v-.531c0-.895-.356-1.754-.988-2.386l-.548-.547z"
+                ></path>
               </svg>
               <svg v-else-if="step.type === 'tool_call'" class="w-3 h-3" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 20l4-16m4 4l4 4-4 4M6 16l-4-4 4-4"></path>
@@ -128,11 +125,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, ref } from 'vue';
+import { defineComponent, ref } from "vue";
 
 interface ThinkingStep {
   id?: string;
-  type: 'reasoning' | 'tool_call' | 'tool_result' | 'decision';
+  type: "reasoning" | "tool_call" | "tool_result" | "decision";
   content?: string;
   tool?: {
     name: string;
@@ -143,7 +140,7 @@ interface ThinkingStep {
 }
 
 export default defineComponent({
-  name: 'ThinkingMessage',
+  name: "ThinkingMessage",
 
   props: {
     steps: {
@@ -165,30 +162,30 @@ export default defineComponent({
 
     function getStepClass(step: ThinkingStep): string {
       const classes: Record<string, string> = {
-        reasoning: 'step-reasoning',
-        tool_call: 'step-tool-call',
-        tool_result: 'step-tool-result',
-        decision: 'step-decision',
+        reasoning: "step-reasoning",
+        tool_call: "step-tool-call",
+        tool_result: "step-tool-result",
+        decision: "step-decision",
       };
-      return classes[step.type] || '';
+      return classes[step.type] || "";
     }
 
     function getStepLabel(type: string): string {
       const labels: Record<string, string> = {
-        reasoning: '推理',
-        tool_call: '工具调用',
-        tool_result: '执行结果',
-        decision: '决策',
+        reasoning: "推理",
+        tool_call: "工具调用",
+        tool_result: "执行结果",
+        decision: "决策",
       };
       return labels[type] || type;
     }
 
     function formatTime(timestamp: number): string {
       const date = new Date(timestamp);
-      return date.toLocaleTimeString('zh-CN', {
-        hour: '2-digit',
-        minute: '2-digit',
-        second: '2-digit',
+      return date.toLocaleTimeString("zh-CN", {
+        hour: "2-digit",
+        minute: "2-digit",
+        second: "2-digit",
       });
     }
 

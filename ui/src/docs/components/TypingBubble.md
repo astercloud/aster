@@ -19,7 +19,7 @@
 </template>
 
 <script setup>
-import { TypingBubble } from '@/components/ChatUI';
+import { TypingBubble } from "@/components/ChatUI";
 </script>
 ```
 
@@ -31,9 +31,7 @@ import { TypingBubble } from '@/components/ChatUI';
 <template>
   <div class="space-y-4">
     <!-- 用户消息 -->
-    <Bubble position="right">
-      你好，能帮我分析一下这个数据吗？
-    </Bubble>
+    <Bubble position="right"> 你好，能帮我分析一下这个数据吗？ </Bubble>
 
     <!-- 输入状态 -->
     <Bubble position="left">
@@ -41,9 +39,7 @@ import { TypingBubble } from '@/components/ChatUI';
     </Bubble>
 
     <!-- AI 回复 -->
-    <Bubble position="left">
-      当然可以！请提供您想要分析的数据...
-    </Bubble>
+    <Bubble position="left"> 当然可以！请提供您想要分析的数据... </Bubble>
 
     <!-- 再次输入状态 -->
     <Bubble position="left">
@@ -53,7 +49,7 @@ import { TypingBubble } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { TypingBubble, Bubble } from '@/components/ChatUI';
+import { TypingBubble, Bubble } from "@/components/ChatUI";
 </script>
 ```
 
@@ -92,7 +88,7 @@ import { TypingBubble, Bubble } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { TypingBubble } from '@/components/ChatUI';
+import { TypingBubble } from "@/components/ChatUI";
 </script>
 ```
 
@@ -126,7 +122,7 @@ import { TypingBubble } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { TypingBubble, Avatar } from '@/components/ChatUI';
+import { TypingBubble, Avatar } from "@/components/ChatUI";
 </script>
 ```
 
@@ -148,16 +144,14 @@ import { TypingBubble, Avatar } from '@/components/ChatUI';
         <TypingBubble v-if="isTyping" ref="typingRef" />
       </Bubble>
 
-      <Bubble position="right" v-if="!isTyping">
-        对方已停止输入
-      </Bubble>
+      <Bubble position="right" v-if="!isTyping"> 对方已停止输入 </Bubble>
     </div>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { TypingBubble, Bubble, Button } from '@/components/ChatUI';
+import { ref } from "vue";
+import { TypingBubble, Bubble, Button } from "@/components/ChatUI";
 
 const isTyping = ref(false);
 const typingRef = ref(null);
@@ -196,9 +190,7 @@ const toggleTyping = () => {
 
     <div class="space-y-4">
       <!-- 用户咨询 -->
-      <Bubble position="right">
-        你好，我想咨询一下产品的使用问题
-      </Bubble>
+      <Bubble position="right"> 你好，我想咨询一下产品的使用问题 </Bubble>
 
       <!-- 客服输入中 -->
       <Bubble position="left" v-if="step === 1">
@@ -206,14 +198,10 @@ const toggleTyping = () => {
       </Bubble>
 
       <!-- 客服回复 -->
-      <Bubble position="left" v-if="step === 2">
-        您好！我是客服小助手，很高兴为您服务。请问您遇到了什么问题？
-      </Bubble>
+      <Bubble position="left" v-if="step === 2"> 您好！我是客服小助手，很高兴为您服务。请问您遇到了什么问题？ </Bubble>
 
       <!-- 用户详细描述 -->
-      <Bubble position="right" v-if="step === 3">
-        我在使用文件上传功能时遇到了问题，文件大小限制是多少？
-      </Bubble>
+      <Bubble position="right" v-if="step === 3"> 我在使用文件上传功能时遇到了问题，文件大小限制是多少？ </Bubble>
 
       <!-- 客服思考中 -->
       <Bubble position="left" v-if="step === 4">
@@ -222,9 +210,9 @@ const toggleTyping = () => {
 
       <!-- 客服详细回答 -->
       <Bubble position="left" v-if="step === 5">
-        关于文件上传，我们的系统支持以下限制：<br>
-        • 单个文件最大 10MB<br>
-        • 支持 jpg、png、pdf、doc 等常见格式<br>
+        关于文件上传，我们的系统支持以下限制：<br />
+        • 单个文件最大 10MB<br />
+        • 支持 jpg、png、pdf、doc 等常见格式<br />
         • 如需上传更大文件，请联系客服
       </Bubble>
     </div>
@@ -238,8 +226,8 @@ const toggleTyping = () => {
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { TypingBubble, Bubble, Button } from '@/components/ChatUI';
+import { ref } from "vue";
+import { TypingBubble, Bubble, Button } from "@/components/ChatUI";
 
 const step = ref(1);
 
@@ -266,26 +254,29 @@ const reset = () => {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| position | 气泡位置 | `'left' \| 'right'` | `'left'` |
-| dots | 动画点数量 | `number` | `3` |
-| speed | 动画速度（秒） | `number` | `1` |
-| size | 气泡大小 | `'sm' \| 'md' \| 'lg'` | `'md'` |
+| 参数     | 说明           | 类型                   | 默认值   |
+| -------- | -------------- | ---------------------- | -------- |
+| position | 气泡位置       | `'left' \| 'right'`    | `'left'` |
+| dots     | 动画点数量     | `number`               | `3`      |
+| speed    | 动画速度（秒） | `number`               | `1`      |
+| size     | 气泡大小       | `'sm' \| 'md' \| 'lg'` | `'md'`   |
 
 ### 使用说明
 
 #### 动画效果
+
 - 使用 CSS 动画实现点的跳动效果
 - 支持自定义动画速度和点数
 - 动画循环播放，模拟真实的输入状态
 
 #### 视觉样式
+
 - 默认使用浅色背景和深色点
 - 支持不同尺寸的气泡
 - 与其他聊天组件保持一致的视觉风格
 
 #### 位置定位
+
 - 支持 left 和 right 两个位置
 - 可以与其他消息组件配合使用
 - 自动适应不同的聊天场景

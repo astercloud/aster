@@ -4,25 +4,25 @@
  */
 
 // Import ApprovalRequest for use in this file
-import type { ApprovalRequest } from './message';
+import type { ApprovalRequest } from "./message";
 
 // Message Types (includes ThinkingStep and ApprovalRequest)
-export * from './message';
+export * from "./message";
 
 // Chat Types
-export * from './chat';
+export * from "./chat";
 
 // Thinking Types (excluding ThinkingStep which is already exported from message)
-export type { ThinkingStepType, ThinkingState } from './thinking';
+export type { ThinkingStepType, ThinkingState } from "./thinking";
 
 // Approval Types (excluding ApprovalRequest which is already exported from message)
-export type { ApprovalDecision, ApprovalRecord } from './approval';
+export type { ApprovalDecision, ApprovalRecord } from "./approval";
 
 // Re-export ApprovalRequest for backward compatibility
-export type { ApprovalRequest } from './message';
+export type { ApprovalRequest } from "./message";
 
 // Workflow Types (new)
-export * from './workflow';
+export * from "./workflow";
 
 // Agent Types
 export interface Agent {
@@ -30,7 +30,7 @@ export interface Agent {
   name: string;
   description?: string;
   avatar?: string;
-  status: 'idle' | 'thinking' | 'busy' | 'error';
+  status: "idle" | "thinking" | "busy" | "error";
   metadata?: Record<string, any>;
 }
 
@@ -56,7 +56,7 @@ export interface Workflow {
   name: string;
   description?: string;
   steps: WorkflowStep[];
-  status: 'idle' | 'running' | 'paused' | 'completed' | 'error';
+  status: "idle" | "running" | "paused" | "completed" | "error";
   currentStep?: number;
 }
 
@@ -65,8 +65,8 @@ export interface WorkflowStep {
   name: string;
   icon: string;
   description: string;
-  type: 'agent' | 'tool' | 'condition' | 'loop';
-  status: 'pending' | 'running' | 'completed' | 'error' | 'skipped';
+  type: "agent" | "tool" | "condition" | "loop";
+  status: "pending" | "running" | "completed" | "error" | "skipped";
   config?: Record<string, any>;
   actions?: StepAction[];
 }
@@ -75,7 +75,7 @@ export interface StepAction {
   id: string;
   label: string;
   icon?: string;
-  variant?: 'primary' | 'secondary';
+  variant?: "primary" | "secondary";
 }
 
 // Think-Aloud Types
@@ -113,9 +113,9 @@ export interface Project {
   id: string;
   name: string;
   description?: string;
-  workspace: 'wechat' | 'video' | 'general';
+  workspace: "wechat" | "video" | "general";
   lastModified: string;
-  status: 'draft' | 'in_progress' | 'completed';
+  status: "draft" | "in_progress" | "completed";
   stats: {
     words: number;
     materials: number;
@@ -125,7 +125,7 @@ export interface Project {
 // Material Types
 export interface Material {
   id: string;
-  type: 'text' | 'image' | 'video' | 'link' | 'template';
+  type: "text" | "image" | "video" | "link" | "template";
   category: string;
   content: string;
   title?: string;

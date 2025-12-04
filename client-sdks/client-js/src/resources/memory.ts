@@ -4,19 +4,7 @@
  */
 
 import { BaseResource, ClientOptions } from "./base";
-import {
-  WorkingMemoryScope,
-  WorkingMemorySetOptions,
-  WorkingMemoryItem,
-  MemoryChunk,
-  SearchOptions,
-  SearchResult,
-  Provenance,
-  ProvenanceResponse,
-  ConsolidateOptions,
-  ConsolidationResult,
-  JobStatus,
-} from "../types/memory";
+import { WorkingMemoryScope, WorkingMemorySetOptions, WorkingMemoryItem, MemoryChunk, SearchOptions, SearchResult, Provenance, ProvenanceResponse, ConsolidateOptions, ConsolidationResult, JobStatus } from "../types/memory";
 
 /**
  * Memory 资源类
@@ -57,11 +45,7 @@ export class MemoryResource extends BaseResource {
      * @param value 值
      * @param options 选项（作用域、TTL、Schema）
      */
-    set: async (
-      key: string,
-      value: any,
-      options?: WorkingMemorySetOptions,
-    ): Promise<void> => {
+    set: async (key: string, value: any, options?: WorkingMemorySetOptions): Promise<void> => {
       await this.request("/v1/memory/working", {
         method: "POST",
         body: {
@@ -94,10 +78,7 @@ export class MemoryResource extends BaseResource {
      */
     list: async (scope?: WorkingMemoryScope): Promise<Record<string, any>> => {
       const params = scope ? { scope } : undefined;
-      const result = await this.request<WorkingMemoryItem[]>(
-        "/v1/memory/working",
-        { params },
-      );
+      const result = await this.request<WorkingMemoryItem[]>("/v1/memory/working", { params });
 
       // 转换为键值对对象
       const items: Record<string, any> = {};
@@ -137,22 +118,16 @@ export class MemoryResource extends BaseResource {
      * @param options 搜索选项
      * @returns 搜索结果
      */
-    search: async (
-      query: string,
-      options?: SearchOptions,
-    ): Promise<MemoryChunk[]> => {
-      const result = await this.request<SearchResult>(
-        "/v1/memory/semantic/search",
-        {
-          method: "POST",
-          body: {
-            query,
-            limit: options?.limit ?? 10,
-            threshold: options?.threshold,
-            filter: options?.filter,
-          },
+    search: async (query: string, options?: SearchOptions): Promise<MemoryChunk[]> => {
+      const result = await this.request<SearchResult>("/v1/memory/semantic/search", {
+        method: "POST",
+        body: {
+          query,
+          limit: options?.limit ?? 10,
+          threshold: options?.threshold,
+          filter: options?.filter,
         },
-      );
+      });
       return result.chunks;
     },
 
@@ -162,10 +137,7 @@ export class MemoryResource extends BaseResource {
      * @param metadata 元数据（可选）
      * @returns 记忆块 ID
      */
-    store: async (
-      content: string,
-      metadata?: Record<string, any>,
-    ): Promise<string> => {
+    store: async (content: string, metadata?: Record<string, any>): Promise<string> => {
       const result = await this.request<{ id: string }>("/v1/memory/semantic", {
         method: "POST",
         body: { content, ...metadata },
@@ -178,11 +150,7 @@ export class MemoryResource extends BaseResource {
      * @param data 记忆数据
      * @returns 记忆信息
      */
-    create: async (data: {
-      content: string;
-      tags?: string[];
-      metadata?: Record<string, any>;
-    }): Promise<{ id: string; content: string; [key: string]: any }> => {
+    create: async (data: { content: string; tags?: string[]; metadata?: Record<string, any> }): Promise<{ id: string; content: string; [key: string]: any }> => {
       const chunkId = await this.semantic.store(data.content, {
         ...data.metadata,
         tags: data.tags,
@@ -195,10 +163,7 @@ export class MemoryResource extends BaseResource {
      * @param options 查询选项
      * @returns 记忆列表
      */
-    list: async (options?: {
-      limit?: number;
-      filter?: Record<string, any>;
-    }): Promise<MemoryChunk[]> => {
+    list: async (options?: { limit?: number; filter?: Record<string, any> }): Promise<MemoryChunk[]> => {
       // 使用空查询返回所有记忆
       return this.semantic.search("", options);
     },
@@ -237,9 +202,7 @@ export class MemoryResource extends BaseResource {
    * @returns 溯源信息
    */
   async getProvenance(memoryId: string): Promise<ProvenanceResponse> {
-    return this.request<ProvenanceResponse>(
-      `/v1/memory/provenance/${memoryId}`,
-    );
+    return this.request<ProvenanceResponse>(`/v1/memory/provenance/${memoryId}`);
   }
 
   /**
@@ -250,9 +213,7 @@ export class MemoryResource extends BaseResource {
    * @returns 谱系链
    */
   async getLineage(memoryId: string): Promise<Provenance[]> {
-    const result = await this.request<{ lineage: Provenance[] }>(
-      `/v1/memory/lineage/${memoryId}`,
-    );
+    const result = await this.request<{ lineage: Provenance[] }>(`/v1/memory/lineage/${memoryId}`);
     return result.lineage;
   }
 
@@ -267,9 +228,7 @@ export class MemoryResource extends BaseResource {
    * @param options 合并选项
    * @returns 合并任务结果
    */
-  async consolidate(
-    options?: ConsolidateOptions,
-  ): Promise<ConsolidationResult> {
+  async consolidate(options?: ConsolidateOptions): Promise<ConsolidationResult> {
     return this.request<ConsolidationResult>("/v1/memory/consolidate", {
       method: "POST",
       body: options,

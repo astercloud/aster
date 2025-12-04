@@ -13,15 +13,13 @@
     <Radio v-model="value" value="b" name="demo">选项 B</Radio>
     <Radio v-model="value" value="c" name="demo">选项 C</Radio>
   </Flex>
-  
-  <div class="mt-4">
-    已选择: {{ value }}
-  </div>
+
+  <div class="mt-4">已选择: {{ value }}</div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const value = ref('a');
+import { ref } from "vue";
+const value = ref("a");
 </script>
 ```
 
@@ -33,9 +31,7 @@ const value = ref('a');
 <template>
   <Flex gap="md">
     <Radio v-model="value" value="a" name="demo2">正常</Radio>
-    <Radio v-model="value" value="b" name="demo2" disabled>
-      禁用
-    </Radio>
+    <Radio v-model="value" value="b" name="demo2" disabled> 禁用 </Radio>
   </Flex>
 </template>
 ```
@@ -58,23 +54,23 @@ const value = ref('a');
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| modelValue | 绑定值 | `any` | - |
-| value | 单选框的值 | `any` | - |
-| name | 原生 name 属性 | `string` | - |
-| disabled | 是否禁用 | `boolean` | `false` |
+| 参数       | 说明           | 类型      | 默认值  |
+| ---------- | -------------- | --------- | ------- |
+| modelValue | 绑定值         | `any`     | -       |
+| value      | 单选框的值     | `any`     | -       |
+| name       | 原生 name 属性 | `string`  | -       |
+| disabled   | 是否禁用       | `boolean` | `false` |
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名            | 说明         | 回调参数     |
+| ----------------- | ------------ | ------------ |
 | update:modelValue | 值改变时触发 | `value: any` |
 
 ### Slots
 
-| 名称 | 说明 |
-| --- | --- |
+| 名称    | 说明           |
+| ------- | -------------- |
 | default | 单选框标签内容 |
 
 ## 示例
@@ -86,22 +82,16 @@ const value = ref('a');
   <div>
     <h3>选择主题</h3>
     <Flex direction="column" gap="md">
-      <Radio v-model="theme" value="light" name="theme">
-        浅色主题
-      </Radio>
-      <Radio v-model="theme" value="dark" name="theme">
-        深色主题
-      </Radio>
-      <Radio v-model="theme" value="auto" name="theme">
-        跟随系统
-      </Radio>
+      <Radio v-model="theme" value="light" name="theme"> 浅色主题 </Radio>
+      <Radio v-model="theme" value="dark" name="theme"> 深色主题 </Radio>
+      <Radio v-model="theme" value="auto" name="theme"> 跟随系统 </Radio>
     </Flex>
   </div>
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const theme = ref('auto');
+import { ref } from "vue";
+const theme = ref("auto");
 </script>
 ```
 
@@ -116,7 +106,7 @@ const theme = ref('auto');
         <div class="text-sm text-gray-500">基础功能</div>
       </div>
     </Radio>
-    
+
     <Radio v-model="plan" value="pro" name="plan">
       <div>
         <div class="font-semibold">专业版</div>
@@ -127,7 +117,7 @@ const theme = ref('auto');
 </template>
 
 <script setup>
-import { ref } from 'vue';
-const plan = ref('free');
+import { ref } from "vue";
+const plan = ref("free");
 </script>
 ```

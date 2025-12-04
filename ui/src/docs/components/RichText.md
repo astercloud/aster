@@ -83,9 +83,9 @@ const linkMarkdown = `
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| content | Markdown 内容 | `string` | - |
+| 参数    | 说明          | 类型     | 默认值 |
+| ------- | ------------- | -------- | ------ |
+| content | Markdown 内容 | `string` | -      |
 
 ## 支持的 Markdown 语法
 

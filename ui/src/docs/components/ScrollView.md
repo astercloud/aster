@@ -12,16 +12,14 @@
     <div class="p-4">
       <h3 class="font-semibold mb-2">可滚动内容</h3>
       <div class="space-y-4">
-        <div v-for="i in 20" :key="i" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">
-          内容项 {{ i }}
-        </div>
+        <div v-for="i in 20" :key="i" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">内容项 {{ i }}</div>
       </div>
     </div>
   </ScrollView>
 </template>
 
 <script setup>
-import { ScrollView } from '@/components/ChatUI';
+import { ScrollView } from "@/components/ChatUI";
 </script>
 ```
 
@@ -38,7 +36,7 @@ import { ScrollView } from '@/components/ChatUI';
         <div v-for="i in 50" :key="i" class="flex items-start gap-3">
           <Avatar :alt="`User${i}`" size="sm" />
           <div class="flex-1">
-            <p class="font-medium">用户{{ i}}</p>
+            <p class="font-medium">用户{{ i }}</p>
             <p class="text-gray-600 dark:text-gray-400 text-sm">这是第 {{ i }} 条消息内容</p>
           </div>
         </div>
@@ -48,7 +46,7 @@ import { ScrollView } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { ScrollView, Avatar } from '@/components/ChatUI';
+import { ScrollView, Avatar } from "@/components/ChatUI";
 </script>
 ```
 
@@ -60,15 +58,13 @@ import { ScrollView, Avatar } from '@/components/ChatUI';
 <template>
   <ScrollView class="h-32 w-full">
     <div class="flex gap-4 p-4">
-      <div v-for="i in 10" :key="i" class="flex-shrink-0 w-48 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">
-        卡片 {{ i }}
-      </div>
+      <div v-for="i in 10" :key="i" class="flex-shrink-0 w-48 h-24 bg-gradient-to-br from-blue-500 to-purple-600 rounded-lg flex items-center justify-center text-white font-bold">卡片 {{ i }}</div>
     </div>
   </ScrollView>
 </template>
 
 <script setup>
-import { ScrollView } from '@/components/ChatUI';
+import { ScrollView } from "@/components/ChatUI";
 </script>
 ```
 
@@ -97,23 +93,23 @@ import { ScrollView } from '@/components/ChatUI';
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { ScrollView, Button } from '@/components/ChatUI';
+import { ref } from "vue";
+import { ScrollView, Button } from "@/components/ChatUI";
 
 const scrollViewRef = ref(null);
 
 const scrollToTop = () => {
-  scrollViewRef.value?.scrollTo({ top: 0, behavior: 'smooth' });
+  scrollViewRef.value?.scrollTo({ top: 0, behavior: "smooth" });
 };
 
 const scrollToBottom = () => {
-  scrollViewRef.value?.scrollTo({ top: scrollViewRef.value.scrollHeight, behavior: 'smooth' });
+  scrollViewRef.value?.scrollTo({ top: scrollViewRef.value.scrollHeight, behavior: "smooth" });
 };
 
 const scrollToIndex = (index) => {
   const element = scrollViewRef.value?.querySelector(`[ref="item-${index}"]`);
   if (element) {
-    element.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    element.scrollIntoView({ behavior: "smooth", block: "center" });
   }
 };
 </script>
@@ -143,10 +139,7 @@ const scrollToIndex = (index) => {
       </div>
     </div>
 
-    <ScrollView
-      class="h-64"
-      @scroll="handleScroll"
-    >
+    <ScrollView class="h-64" @scroll="handleScroll">
       <div class="p-4">
         <div v-for="i in 100" :key="i" class="p-4 mb-2 bg-gray-100 dark:bg-gray-800 rounded">
           <p class="font-medium">项目 {{ i }}</p>
@@ -158,18 +151,18 @@ const scrollToIndex = (index) => {
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { ScrollView } from '@/components/ChatUI';
+import { ref } from "vue";
+import { ScrollView } from "@/components/ChatUI";
 
 const scrollPosition = ref({ top: 0, left: 0 });
 const scrollProgress = ref(0);
-const scrollDirection = ref('');
+const scrollDirection = ref("");
 
 const handleScroll = (event) => {
   const element = event.target;
   scrollPosition.value = {
     top: element.scrollTop,
-    left: element.scrollLeft
+    left: element.scrollLeft,
   };
 
   scrollProgress.value = (element.scrollTop / (element.scrollHeight - element.clientHeight)) * 100;
@@ -177,9 +170,9 @@ const handleScroll = (event) => {
   // 简单的方向检测
   const currentScrollTop = element.scrollTop;
   if (currentScrollTop > scrollPosition.value.top) {
-    scrollDirection.value = '向下';
+    scrollDirection.value = "向下";
   } else if (currentScrollTop < scrollPosition.value.top) {
-    scrollDirection.value = '向上';
+    scrollDirection.value = "向上";
   }
 };
 </script>
@@ -195,23 +188,21 @@ const handleScroll = (event) => {
     <div class="p-4">
       <h3 class="font-semibold mb-2">自定义滚动条</h3>
       <div class="space-y-4">
-        <div v-for="i in 25" :key="i" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">
-          内容项 {{ i }} - 自定义样式的滚动条
-        </div>
+        <div v-for="i in 25" :key="i" class="p-4 bg-gray-100 dark:bg-gray-800 rounded">内容项 {{ i }} - 自定义样式的滚动条</div>
       </div>
     </div>
   </ScrollView>
 </template>
 
 <script setup>
-import { ScrollView } from '@/components/ChatUI';
+import { ScrollView } from "@/components/ChatUI";
 </script>
 
 <style scoped>
 .custom-scrollbar {
   /* Webkit 浏览器 */
   scrollbar-width: thin;
-  scrollbar-color: #3B82F6 transparent;
+  scrollbar-color: #3b82f6 transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar {
@@ -224,13 +215,13 @@ import { ScrollView } from '@/components/ChatUI';
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb {
-  background-color: #3B82F6;
+  background-color: #3b82f6;
   border-radius: 4px;
   border: 2px solid transparent;
 }
 
 .custom-scrollbar::-webkit-scrollbar-thumb:hover {
-  background-color: #2563EB;
+  background-color: #2563eb;
 }
 </style>
 ```
@@ -243,34 +234,38 @@ ScrollView 是一个无状态的容器组件，没有特殊的 props。
 
 ### Events
 
-| 事件名 | 说明 | 回调参数 |
-| --- | --- | --- |
+| 事件名 | 说明       | 回调参数       |
+| ------ | ---------- | -------------- |
 | scroll | 滚动时触发 | `event: Event` |
 
 ### 方法
 
 通过 ref 可以访问原生的滚动方法：
 
-| 方法 | 说明 | 参数 |
-| --- | --- | --- |
-| scrollTo | 滚动到指定位置 | `options: ScrollToOptions` |
-| scrollBy | 滚动指定距离 | `options: ScrollToOptions` |
+| 方法           | 说明           | 参数                             |
+| -------------- | -------------- | -------------------------------- |
+| scrollTo       | 滚动到指定位置 | `options: ScrollToOptions`       |
+| scrollBy       | 滚动指定距离   | `options: ScrollToOptions`       |
 | scrollIntoView | 滚动到指定元素 | `options: ScrollIntoViewOptions` |
 
 ### 使用说明
 
 #### 性能优化
+
 - 使用 CSS transform 而非 top/left 属性
 - 启用硬件加速和合成层
 - 避免在滚动事件中进行重计算
 
 #### 滚动条定制
+
 支持完全自定义滚动条样式：
-- 使用 CSS scrollbar-* 属性
+
+- 使用 CSS scrollbar-\* 属性
 - 使用 ::-webkit-scrollbar 伪元素
 - 可以隐藏原生滚动条并实现自定义滚动
 
 #### 响应式设计
+
 - 自动适应容器尺寸
 - 支持触摸设备的滚动惯性
 - 在移动设备上优化滚动体验

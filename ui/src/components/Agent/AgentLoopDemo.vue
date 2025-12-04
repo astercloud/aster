@@ -1,7 +1,7 @@
 <script setup lang="ts">
 /**
  * AgentLoopDemo - 演示完整 Agent Loop + HITL 集成
- * 
+ *
  * 功能:
  * - 重试逻辑 (通过后端 ModelFallbackManager)
  * - Human-in-the-Loop 审批流程
@@ -9,9 +9,9 @@
  * - 流式响应
  */
 
-import { ref, computed } from 'vue';
-import { useAgentLoop } from '@/composables/useAgentLoop';
-import type { ThinkAloudEvent, ApprovalRequest } from '@/composables/useAgentLoop';
+import { ref, computed } from "vue";
+import { useAgentLoop } from "@/composables/useAgentLoop";
+import type { ThinkAloudEvent, ApprovalRequest } from "@/composables/useAgentLoop";
 
 // Props
 const props = defineProps<{
@@ -25,56 +25,46 @@ const props = defineProps<{
 const thinkEvents = ref<ThinkAloudEvent[]>([]);
 
 // Agent Loop
-const {
-  isRunning,
-  isPaused,
-  currentOutput,
-  pendingApproval,
-  isConnected,
-  execute,
-  approveAndResume,
-  rejectTool,
-  cancel,
-} = useAgentLoop({
+const { isRunning, isPaused, currentOutput, pendingApproval, isConnected, execute, approveAndResume, rejectTool, cancel } = useAgentLoop({
   modelConfig: props.modelConfig,
-  sensitiveTools: ['Edit', 'Write', 'bash', 'fs_write'],
+  sensitiveTools: ["Edit", "Write", "bash", "fs_write"],
   maxRetries: 3,
   maxLoops: 10,
   onThink: (event) => {
     thinkEvents.value.push(event);
   },
   onApprovalRequired: (request) => {
-    console.log('Approval required:', request);
+    console.log("Approval required:", request);
   },
   onToolStart: (toolName, args) => {
-    console.log('Tool started:', toolName, args);
+    console.log("Tool started:", toolName, args);
   },
   onToolEnd: (toolName, result) => {
-    console.log('Tool ended:', toolName, result);
+    console.log("Tool ended:", toolName, result);
   },
   onTextDelta: (delta) => {
     // 已通过 currentOutput 响应式更新
   },
   onComplete: (result) => {
-    console.log('Execution complete:', result.status);
+    console.log("Execution complete:", result.status);
   },
   onError: (error) => {
-    console.error('Execution error:', error);
+    console.error("Execution error:", error);
   },
 });
 
 // 用户输入
-const userInput = ref('');
-const rejectReason = ref('');
+const userInput = ref("");
+const rejectReason = ref("");
 
 // 发送消息
 const sendMessage = async () => {
   if (!userInput.value.trim() || isRunning.value) return;
-  
+
   thinkEvents.value = [];
   const input = userInput.value;
-  userInput.value = '';
-  
+  userInput.value = "";
+
   await execute(input);
 };
 
@@ -87,8 +77,8 @@ const handleApprove = async () => {
 // 拒绝工具
 const handleReject = () => {
   if (!pendingApproval.value) return;
-  rejectTool(pendingApproval.value.id, rejectReason.value || '用户拒绝');
-  rejectReason.value = '';
+  rejectTool(pendingApproval.value.id, rejectReason.value || "用户拒绝");
+  rejectReason.value = "";
 };
 
 // 取消执行
@@ -107,20 +97,20 @@ const formatArgs = (args: Record<string, any>): string => {
     <!-- 连接状态 -->
     <div class="connection-status" :class="{ connected: isConnected }">
       <span class="status-dot"></span>
-      {{ isConnected ? '已连接' : '未连接' }}
+      {{ isConnected ? "已连接" : "未连接" }}
     </div>
 
     <!-- 思考过程 -->
     <div class="thinking-panel" v-if="thinkEvents.length > 0">
       <h3>🧠 思考过程</h3>
       <div class="think-events">
-        <div 
-          v-for="event in thinkEvents" 
-          :key="event.id" 
+        <div
+          v-for="event in thinkEvents"
+          :key="event.id"
           class="think-event"
-          :class="{ 
+          :class="{
             'is-approval': event.approvalRequest,
-            'is-tool': event.toolCall || event.toolResult 
+            'is-tool': event.toolCall || event.toolResult,
           }"
         >
           <div class="event-header">
@@ -129,12 +119,12 @@ const formatArgs = (args: Record<string, any>): string => {
           </div>
           <div class="event-reasoning">{{ event.reasoning }}</div>
           <div class="event-decision">→ {{ event.decision }}</div>
-          
+
           <!-- 工具调用详情 -->
           <div v-if="event.toolCall" class="tool-details">
             <code>{{ event.toolCall.toolName }}({{ formatArgs(event.toolCall.args) }})</code>
           </div>
-          
+
           <!-- 工具结果 -->
           <div v-if="event.toolResult" class="tool-result">
             <pre>{{ formatArgs(event.toolResult.result) }}</pre>
@@ -150,23 +140,17 @@ const formatArgs = (args: Record<string, any>): string => {
         <h3>需要人工审批</h3>
       </div>
       <div class="approval-content">
-        <p>工具 <strong>{{ pendingApproval.toolName }}</strong> 被标记为敏感操作</p>
+        <p>
+          工具 <strong>{{ pendingApproval.toolName }}</strong> 被标记为敏感操作
+        </p>
         <div class="approval-args">
           <h4>参数:</h4>
           <pre>{{ formatArgs(pendingApproval.args) }}</pre>
         </div>
         <div class="approval-actions">
-          <input 
-            v-model="rejectReason" 
-            placeholder="拒绝原因 (可选)"
-            class="reject-reason-input"
-          />
-          <button class="btn btn-approve" @click="handleApprove" :disabled="isRunning && !isPaused">
-            ✓ 批准
-          </button>
-          <button class="btn btn-reject" @click="handleReject" :disabled="isRunning && !isPaused">
-            ✗ 拒绝
-          </button>
+          <input v-model="rejectReason" placeholder="拒绝原因 (可选)" class="reject-reason-input" />
+          <button class="btn btn-approve" @click="handleApprove" :disabled="isRunning && !isPaused">✓ 批准</button>
+          <button class="btn btn-reject" @click="handleReject" :disabled="isRunning && !isPaused">✗ 拒绝</button>
         </div>
       </div>
     </div>
@@ -179,28 +163,12 @@ const formatArgs = (args: Record<string, any>): string => {
 
     <!-- 输入面板 -->
     <div class="input-panel">
-      <textarea
-        v-model="userInput"
-        placeholder="输入你的请求..."
-        :disabled="isRunning"
-        @keydown.enter.ctrl="sendMessage"
-        rows="3"
-      ></textarea>
+      <textarea v-model="userInput" placeholder="输入你的请求..." :disabled="isRunning" @keydown.enter.ctrl="sendMessage" rows="3"></textarea>
       <div class="input-actions">
-        <button 
-          class="btn btn-primary" 
-          @click="sendMessage" 
-          :disabled="!userInput.trim() || isRunning"
-        >
-          {{ isRunning ? (isPaused ? '等待审批...' : '执行中...') : '发送' }}
+        <button class="btn btn-primary" @click="sendMessage" :disabled="!userInput.trim() || isRunning">
+          {{ isRunning ? (isPaused ? "等待审批..." : "执行中...") : "发送" }}
         </button>
-        <button 
-          class="btn btn-secondary" 
-          @click="handleCancel" 
-          :disabled="!isRunning"
-        >
-          取消
-        </button>
+        <button class="btn btn-secondary" @click="handleCancel" :disabled="!isRunning">取消</button>
       </div>
     </div>
   </div>

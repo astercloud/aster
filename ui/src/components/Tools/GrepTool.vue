@@ -7,19 +7,10 @@
         <span>文本搜索</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="清除结果"
-          @click="clearResults"
-        >
+        <button class="action-button" title="清除结果" @click="clearResults">
           <Icon type="trash" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="导出结果"
-          :disabled="searchResults.length === 0"
-          @click="exportResults"
-        >
+        <button class="action-button" title="导出结果" :disabled="searchResults.length === 0" @click="exportResults">
           <Icon type="download" size="sm" />
         </button>
       </div>
@@ -28,15 +19,7 @@
     <!-- 搜索表单 -->
     <div class="search-form">
       <div class="search-input-wrapper">
-        <input
-          v-model="searchQuery"
-          ref="searchInput"
-          type="text"
-          placeholder="输入搜索文本..."
-          class="search-input"
-          @keydown.enter="performSearch"
-          @keydown.esc="searchQuery = ''"
-        />
+        <input v-model="searchQuery" ref="searchInput" type="text" placeholder="输入搜索文本..." class="search-input" @keydown.enter="performSearch" @keydown.esc="searchQuery = ''" />
         <div class="search-options">
           <select v-model="searchOptions.caseSensitive" class="option-select">
             <option :value="false">忽略大小写</option>
@@ -51,21 +34,11 @@
             <option value="code">代码文件</option>
             <option value="text">文本文件</option>
           </select>
-          <input
-            v-model="searchOptions.extension"
-            type="text"
-            placeholder="文件扩展名"
-            class="extension-input"
-            title="用逗号分隔多个扩展名，如: .js,.ts,.jsx"
-          />
+          <input v-model="searchOptions.extension" type="text" placeholder="文件扩展名" class="extension-input" title="用逗号分隔多个扩展名，如: .js,.ts,.jsx" />
         </div>
       </div>
       <div class="search-actions">
-        <button
-          class="search-button"
-          :disabled="!searchQuery.trim() || isSearching"
-          @click="performSearch"
-        >
+        <button class="search-button" :disabled="!searchQuery.trim() || isSearching" @click="performSearch">
           <Icon v-if="isSearching" type="spinner" size="sm" class="animate-spin" />
           <span v-else>搜索</span>
         </button>
@@ -76,31 +49,19 @@
     <div v-if="searchResults.length > 0 || hasSearched" class="results-summary">
       <div class="summary-info">
         <span class="result-count">{{ searchResults.length }} 个结果</span>
-        <span v-if="searchDuration" class="search-duration">
-          耗时 {{ searchDuration }}ms
-        </span>
-        <span v-if="searchedFiles" class="searched-files">
-          扫描 {{ searchedFiles }} 个文件
-        </span>
+        <span v-if="searchDuration" class="search-duration"> 耗时 {{ searchDuration }}ms </span>
+        <span v-if="searchedFiles" class="searched-files"> 扫描 {{ searchedFiles }} 个文件 </span>
       </div>
       <div class="summary-actions">
-        <button
-          v-if="searchResults.length > 0"
-          class="expand-all-btn"
-          @click="toggleAllExpanded"
-        >
-          {{ allExpanded ? '收起全部' : '展开全部' }}
+        <button v-if="searchResults.length > 0" class="expand-all-btn" @click="toggleAllExpanded">
+          {{ allExpanded ? "收起全部" : "展开全部" }}
         </button>
       </div>
     </div>
 
     <!-- 搜索结果列表 -->
     <div class="results-list" ref="resultsListRef">
-      <div
-        v-for="(result, index) in searchResults"
-        :key="index"
-        :class="['result-item', { 'result-expanded': result.expanded }]"
-      >
+      <div v-for="(result, index) in searchResults" :key="index" :class="['result-item', { 'result-expanded': result.expanded }]">
         <div class="result-header" @click="toggleResultExpanded(index)">
           <div class="result-file">
             <Icon type="file" size="xs" />
@@ -108,18 +69,10 @@
             <span class="line-number">{{ result.lineNumber }}</span>
           </div>
           <div class="result-actions">
-            <button
-              class="action-btn open-btn"
-              title="打开文件"
-              @click.stop="openFile(result)"
-            >
+            <button class="action-btn open-btn" title="打开文件" @click.stop="openFile(result)">
               <Icon type="external-link" size="xs" />
             </button>
-            <button
-              class="action-btn copy-btn"
-              title="复制行"
-              @click.stop="copyLine(result)"
-            >
+            <button class="action-btn copy-btn" title="复制行" @click.stop="copyLine(result)">
               <Icon type="copy" size="xs" />
             </button>
           </div>
@@ -132,11 +85,7 @@
               <span class="line-info">第 {{ result.lineNumber }} 行</span>
             </div>
             <div class="code-lines">
-              <div
-                v-for="(line, lineIndex) in result.contextLines"
-                :key="lineIndex"
-                :class="['code-line', { 'line-highlight': lineIndex === result.contextLines.length - 2 }]"
-              >
+              <div v-for="(line, lineIndex) in result.contextLines" :key="lineIndex" :class="['code-line', { 'line-highlight': lineIndex === result.contextLines.length - 2 }]">
                 <span class="line-number">{{ lineIndex + result.lineNumber - result.contextLines.length + 1 }}</span>
                 <span class="line-content">{{ line }}</span>
               </div>
@@ -163,26 +112,13 @@
     <div class="search-history" v-if="searchHistory.length > 0">
       <div class="history-header">
         <h4>搜索历史</h4>
-        <button
-          class="clear-history-btn"
-          @click="clearHistory"
-        >
-          清除历史
-        </button>
+        <button class="clear-history-btn" @click="clearHistory">清除历史</button>
       </div>
       <div class="history-list">
-        <div
-          v-for="(history, index) in searchHistory"
-          :key="index"
-          class="history-item"
-          @click="loadFromHistory(history)"
-        >
+        <div v-for="(history, index) in searchHistory" :key="index" class="history-item" @click="loadFromHistory(history)">
           <span class="history-query">{{ history.query }}</span>
           <span class="history-time">{{ formatTime(history.timestamp) }}</span>
-          <button
-            class="remove-history-btn"
-            @click.stop="removeFromHistory(index)"
-          >
+          <button class="remove-history-btn" @click.stop="removeFromHistory(index)">
             <Icon type="close" size="xs" />
           </button>
         </div>
@@ -192,8 +128,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface SearchResult {
   file: string;
@@ -215,8 +151,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -224,7 +160,7 @@ const emit = defineEmits<{
 }>();
 
 // 响应式数据
-const searchQuery = ref('');
+const searchQuery = ref("");
 const searchResults = ref<SearchResult[]>([]);
 const searchHistory = ref<SearchHistory[]>([]);
 const isSearching = ref(false);
@@ -236,8 +172,8 @@ const allExpanded = ref(false);
 const searchOptions = ref({
   caseSensitive: false,
   useRegex: false,
-  include: 'all',
-  extension: '',
+  include: "all",
+  extension: "",
 });
 
 const searchInput = ref<HTMLInputElement>();
@@ -250,7 +186,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('GrepTool WebSocket connected');
+      console.log("GrepTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -258,30 +194,30 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('GrepTool WebSocket disconnected');
+      console.log("GrepTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('GrepTool WebSocket error:', error);
+      console.error("GrepTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'grep_started':
+    case "grep_started":
       isSearching.value = true;
       hasSearched.value = true;
       break;
-    case 'grep_result':
+    case "grep_result":
       if (message.result) {
         const result: SearchResult = {
           file: message.result.file,
@@ -293,7 +229,7 @@ const handleWebSocketMessage = (message: any) => {
         searchResults.value.push(result);
       }
       break;
-    case 'grep_completed':
+    case "grep_completed":
       isSearching.value = false;
       searchDuration.value = message.duration || 0;
       searchedFiles.value = message.searchedFiles || 0;
@@ -323,7 +259,7 @@ const performSearch = () => {
     timestamp: Date.now(),
   };
 
-  const existingIndex = searchHistory.value.findIndex(h => h.query === historyEntry.query);
+  const existingIndex = searchHistory.value.findIndex((h) => h.query === historyEntry.query);
   if (existingIndex !== -1) {
     searchHistory.value[existingIndex] = historyEntry;
   } else {
@@ -335,7 +271,7 @@ const performSearch = () => {
 
   // 执行搜索
   sendWebSocketMessage({
-    type: 'grep_search',
+    type: "grep_search",
     query: searchQuery.value.trim(),
     options: searchOptions.value,
   });
@@ -351,16 +287,11 @@ const clearResults = () => {
 const exportResults = () => {
   if (searchResults.value.length === 0) return;
 
-  const csvContent = [
-    '文件路径,行号,匹配内容',
-    ...searchResults.value.map(result =>
-      `"${result.file}","${result.lineNumber}","${result.content.replace(/"/g, '""')}"`
-    )
-  ].join('\n');
+  const csvContent = ["文件路径,行号,匹配内容", ...searchResults.value.map((result) => `"${result.file}","${result.lineNumber}","${result.content.replace(/"/g, '""')}"`)].join("\n");
 
-  const blob = new Blob([csvContent], { type: 'text/csv' });
+  const blob = new Blob([csvContent], { type: "text/csv" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `grep_results_${Date.now()}.csv`;
   a.click();
@@ -377,14 +308,14 @@ const toggleResultExpanded = (index: number) => {
 
 const toggleAllExpanded = () => {
   const newExpanded = !allExpanded.value;
-  searchResults.value.forEach(result => {
+  searchResults.value.forEach((result) => {
     result.expanded = newExpanded;
   });
   allExpanded.value = newExpanded;
 };
 
 const openFile = (result: SearchResult) => {
-  emit('fileOpened', result.file, result.lineNumber);
+  emit("fileOpened", result.file, result.lineNumber);
 };
 
 const copyLine = (result: SearchResult) => {
@@ -409,7 +340,7 @@ const clearHistory = () => {
 // 工具方法
 const formatTime = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleString('zh-CN');
+  return date.toLocaleString("zh-CN");
 };
 
 // 生命周期
@@ -464,7 +395,8 @@ onMounted(() => {
   @apply flex flex-wrap gap-2;
 }
 
-.option-select, .extension-input {
+.option-select,
+.extension-input {
   @apply px-2 py-1 text-sm border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-800 dark:text-white;
 }
 

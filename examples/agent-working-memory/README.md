@@ -5,6 +5,7 @@
 ## 什么是 Working Memory？
 
 Working Memory 是一个持久化的、结构化的状态管理系统，它能够：
+
 - **自动加载**：每轮对话开始时自动加载到 system prompt
 - **LLM 控制**：Agent 可以通过 `update_working_memory` 工具主动更新
 - **作用域隔离**：支持 thread 和 resource 两种作用域
@@ -12,17 +13,18 @@ Working Memory 是一个持久化的、结构化的状态管理系统，它能�
 
 ## 与普通记忆的区别
 
-| 特性 | Working Memory | 文本记忆 (agent_memory) |
-|------|---------------|------------------------|
-| **自动加载** | ✅ 每轮对话自动加载 | ❌ 需要 LLM 主动读取 |
-| **更新方式** | 完全覆盖 | 追加或覆盖 |
-| **大小** | 小（< 500 words）| 大（无限制）|
-| **结构** | 结构化（可选 Schema）| 自由文本 |
-| **用途** | 会话状态管理 | 长期知识库 |
+| 特性         | Working Memory        | 文本记忆 (agent_memory) |
+| ------------ | --------------------- | ----------------------- |
+| **自动加载** | ✅ 每轮对话自动加载   | ❌ 需要 LLM 主动读取    |
+| **更新方式** | 完全覆盖              | 追加或覆盖              |
+| **大小**     | 小（< 500 words）     | 大（无限制）            |
+| **结构**     | 结构化（可选 Schema） | 自由文本                |
+| **用途**     | 会话状态管理          | 长期知识库              |
 
 ## 示例场景
 
 本示例模拟一个**任务助手 Agent**，它能够：
+
 1. 记住用户的偏好和设置
 2. 跟踪当前任务的进度
 3. 在多轮对话间保持状态
@@ -44,7 +46,7 @@ examples/agent-working-memory/
 memory:
   working_memory:
     enabled: true
-    scope: "thread"  # 每个会话独立的状态
+    scope: "thread" # 每个会话独立的状态
     base_path: "/working_memory/"
 
     # 可选：定义 Schema 确保数据一致性
@@ -56,14 +58,14 @@ memory:
         preferences:
           type: object
           properties:
-            language: {type: string}
-            verbosity: {type: string}
+            language: { type: string }
+            verbosity: { type: string }
         current_task:
           type: object
           properties:
-            name: {type: string}
-            status: {type: string}
-            progress: {type: integer}
+            name: { type: string }
+            status: { type: string }
+            progress: { type: integer }
       required: ["user_name"]
 ```
 
@@ -249,7 +251,7 @@ working_memory:
   schema:
     type: object
     properties:
-      user_name: {type: string}
+      user_name: { type: string }
       task_status:
         type: string
         enum: ["pending", "in_progress", "completed"]
@@ -278,6 +280,7 @@ manager.Update(ctx, threadID, resourceID, `{
    - 只存储当前会话相关的状态
 
 2. **使用清晰的结构**
+
    ```json
    {
      "user_info": {...},
@@ -331,6 +334,7 @@ Working Memory（当前状态）:
 ```
 
 **策略：**
+
 - **Working Memory**：存储当前会话需要的最小状态
 - **文本记忆**：存储详细的历史记录和知识
 - **定期归档**：将 Working Memory 中完成的任务归档到文本记忆
@@ -342,6 +346,7 @@ Working Memory（当前状态）:
 **症状**：Agent 没有记住之前的信息
 
 **解决**：
+
 1. 检查 `agentsdk.yaml` 中 `working_memory.enabled` 是否为 `true`
 2. 确认 Middlewares 包含 `"working_memory"`
 3. 检查 threadID/resourceID 是否正确传递
@@ -351,6 +356,7 @@ Working Memory（当前状态）:
 **症状**：更新 Working Memory 时报错
 
 **解决**：
+
 1. 确保内容是有效的 JSON
 2. 检查是否包含所有 `required` 字段
 3. 验证字段类型是否匹配
@@ -362,6 +368,7 @@ Working Memory（当前状态）:
 **原因**：`update_working_memory` 是完全覆盖模式
 
 **解决**：
+
 ```json
 // ❌ 错误：只更新部分，其他内容会丢失
 {"user_name": "Alice"}

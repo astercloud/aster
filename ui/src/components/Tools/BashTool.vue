@@ -13,18 +13,10 @@
         </div>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="新建终端"
-          @click="createNewTab"
-        >
+        <button class="action-button" title="新建终端" @click="createNewTab">
           <Icon type="plus" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
       </div>
@@ -63,21 +55,13 @@
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="terminalSettings.bell"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="terminalSettings.bell" type="checkbox" class="setting-checkbox" />
             响铃声
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="terminalSettings.autoScroll"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="terminalSettings.autoScroll" type="checkbox" class="setting-checkbox" />
             自动滚动
           </label>
         </div>
@@ -91,18 +75,9 @@
     <!-- 标签页 -->
     <div class="tabs-container">
       <div class="tabs">
-        <div
-          v-for="(tab, index) in tabs"
-          :key="tab.id"
-          :class="['tab', { 'active': activeTabId === tab.id, 'running': tab.isRunning }]"
-          @click="switchTab(tab.id)"
-        >
+        <div v-for="(tab, index) in tabs" :key="tab.id" :class="['tab', { active: activeTabId === tab.id, running: tab.isRunning }]" @click="switchTab(tab.id)">
           <span class="tab-title">{{ tab.title }}</span>
-          <button
-            class="tab-close"
-            title="关闭标签"
-            @click.stop="closeTab(tab.id)"
-          >
+          <button class="tab-close" title="关闭标签" @click.stop="closeTab(tab.id)">
             <Icon type="close" size="xs" />
           </button>
         </div>
@@ -111,25 +86,10 @@
 
     <!-- 终端内容 -->
     <div class="terminal-container">
-      <div
-        v-for="tab in tabs"
-        :key="tab.id"
-        v-show="activeTabId === tab.id"
-        class="terminal-content"
-      >
+      <div v-for="tab in tabs" :key="tab.id" v-show="activeTabId === tab.id" class="terminal-content">
         <!-- 输出区域 -->
-        <div
-          ref="outputContainer"
-          class="output-container"
-          :class="[terminalSettings.fontSize, `theme-${terminalSettings.theme}`]"
-          @scroll="handleScroll"
-        >
-          <div
-            v-for="(line, index) in tab.output"
-            :key="index"
-            :class="['output-line', line.type]"
-            v-html="formatOutputLine(line)"
-          ></div>
+        <div ref="outputContainer" class="output-container" :class="[terminalSettings.fontSize, `theme-${terminalSettings.theme}`]" @scroll="handleScroll">
+          <div v-for="(line, index) in tab.output" :key="index" :class="['output-line', line.type]" v-html="formatOutputLine(line)"></div>
 
           <!-- 当前命令行 -->
           <div v-if="!tab.isRunning" class="input-line">
@@ -161,13 +121,7 @@
         <div class="quick-commands">
           <div class="quick-commands-title">快捷命令:</div>
           <div class="quick-commands-list">
-            <button
-              v-for="cmd in quickCommands"
-              :key="cmd.command"
-              class="quick-cmd-btn"
-              :title="cmd.description"
-              @click="executeQuickCommand(cmd.command)"
-            >
+            <button v-for="cmd in quickCommands" :key="cmd.command" class="quick-cmd-btn" :title="cmd.description" @click="executeQuickCommand(cmd.command)">
               {{ cmd.command }}
             </button>
           </div>
@@ -180,7 +134,7 @@
       <div class="status-left">
         <span v-if="currentTab" class="process-info">
           <Icon type="terminal" size="xs" />
-          进程: {{ currentTab.processId || 'N/A' }}
+          进程: {{ currentTab.processId || "N/A" }}
         </span>
         <span v-if="currentTab?.isRunning" class="running-status">
           <Icon type="spinner" size="xs" class="animate-spin" />
@@ -196,11 +150,11 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface OutputLine {
-  type: 'input' | 'output' | 'error' | 'success' | 'warning';
+  type: "input" | "output" | "error" | "success" | "warning";
   content: string;
   timestamp: number;
 }
@@ -229,8 +183,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -240,17 +194,17 @@ const emit = defineEmits<{
 
 // 响应式数据
 const tabs = ref<Tab[]>([]);
-const activeTabId = ref('');
+const activeTabId = ref("");
 const commandHistory = ref<string[]>([]);
 const historyIndex = ref(-1);
 const showSettings = ref(false);
-const currentDirectory = ref('');
+const currentDirectory = ref("");
 
 // 终端设置
 const terminalSettings = ref({
-  fontSize: 'text-sm',
-  theme: 'dark',
-  cursorStyle: 'block',
+  fontSize: "text-sm",
+  theme: "dark",
+  cursorStyle: "block",
   bell: false,
   autoScroll: true,
   maxHistory: 1000,
@@ -259,14 +213,14 @@ const terminalSettings = ref({
 
 // 快捷命令
 const quickCommands = ref<QuickCommand[]>([
-  { command: 'ls -la', description: '详细列表' },
-  { command: 'pwd', description: '当前目录' },
-  { command: 'cd ..', description: '上级目录' },
-  { command: 'git status', description: 'Git状态' },
-  { command: 'npm run dev', description: '启动开发服务器' },
-  { command: 'ps aux', description: '进程列表' },
-  { command: 'top', description: '系统监控' },
-  { command: 'clear', description: '清屏' },
+  { command: "ls -la", description: "详细列表" },
+  { command: "pwd", description: "当前目录" },
+  { command: "cd ..", description: "上级目录" },
+  { command: "git status", description: "Git状态" },
+  { command: "npm run dev", description: "启动开发服务器" },
+  { command: "ps aux", description: "进程列表" },
+  { command: "top", description: "系统监控" },
+  { command: "clear", description: "清屏" },
 ]);
 
 const outputContainer = ref<HTMLElement[]>([]);
@@ -275,7 +229,7 @@ const websocket = ref<WebSocket | null>(null);
 
 // 计算属性
 const currentTab = computed(() => {
-  return tabs.value.find(tab => tab.id === activeTabId.value);
+  return tabs.value.find((tab) => tab.id === activeTabId.value);
 });
 
 // WebSocket 连接
@@ -284,7 +238,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('BashTool WebSocket connected');
+      console.log("BashTool WebSocket connected");
       initializeTerminal();
     };
 
@@ -293,36 +247,36 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('BashTool WebSocket disconnected');
+      console.log("BashTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('BashTool WebSocket error:', error);
+      console.error("BashTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'bash_output':
+    case "bash_output":
       if (message.tabId && message.output) {
         handleBashOutput(message.tabId, message.output);
       }
       break;
-    case 'bash_complete':
+    case "bash_complete":
       if (message.tabId) {
         handleBashComplete(message.tabId, message.exitCode, message.processId);
       }
       break;
-    case 'directory_changed':
+    case "directory_changed":
       if (message.directory) {
         currentDirectory.value = message.directory;
         updateTabPrompt(message.directory);
@@ -347,7 +301,7 @@ const initializeTerminal = () => {
 
   // 获取当前目录
   sendWebSocketMessage({
-    type: 'get_current_directory',
+    type: "get_current_directory",
   });
 };
 
@@ -357,11 +311,11 @@ const createNewTab = () => {
   const newTab: Tab = {
     id: tabId,
     title: `终端 ${tabs.value.length + 1}`,
-    prompt: '$ ',
-    currentCommand: '',
+    prompt: "$ ",
+    currentCommand: "",
     output: [],
     isRunning: false,
-    workingDirectory: currentDirectory.value || '~',
+    workingDirectory: currentDirectory.value || "~",
     history: [],
     historyIndex: -1,
   };
@@ -382,7 +336,7 @@ const switchTab = (tabId: string) => {
 };
 
 const closeTab = (tabId: string) => {
-  const tabIndex = tabs.value.findIndex(tab => tab.id === tabId);
+  const tabIndex = tabs.value.findIndex((tab) => tab.id === tabId);
   if (tabIndex === -1) return;
 
   const tab = tabs.value[tabIndex];
@@ -391,7 +345,7 @@ const closeTab = (tabId: string) => {
   // 如果进程正在运行，先终止
   if (tab.isRunning && tab.processId) {
     sendWebSocketMessage({
-      type: 'kill_process',
+      type: "kill_process",
       processId: tab.processId,
     });
   }
@@ -403,7 +357,7 @@ const closeTab = (tabId: string) => {
   if (activeTabId.value === tabId) {
     if (tabs.value.length > 0) {
       const newTab = tabs.value[Math.max(0, tabIndex - 1)];
-      activeTabId.value = newTab?.id ?? '';
+      activeTabId.value = newTab?.id ?? "";
     } else {
       createNewTab();
     }
@@ -412,12 +366,12 @@ const closeTab = (tabId: string) => {
 
 // 命令执行
 const executeCommand = (command: string, tabId: string) => {
-  const tab = tabs.value.find(t => t.id === tabId);
+  const tab = tabs.value.find((t) => t.id === tabId);
   if (!tab || tab.isRunning || !command.trim()) return;
 
   // 添加到输出历史
   tab.output.push({
-    type: 'input',
+    type: "input",
     content: `${tab.prompt}${command}`,
     timestamp: Date.now(),
   });
@@ -433,7 +387,7 @@ const executeCommand = (command: string, tabId: string) => {
 
   // 发送到服务器执行
   sendWebSocketMessage({
-    type: 'execute_command',
+    type: "execute_command",
     command: command,
     tabId: tabId,
     workingDirectory: tab.workingDirectory,
@@ -444,7 +398,7 @@ const executeCommand = (command: string, tabId: string) => {
     scrollToBottom();
   });
 
-  emit('commandExecuted', command, tab.output);
+  emit("commandExecuted", command, tab.output);
 };
 
 const executeQuickCommand = (command: string) => {
@@ -462,50 +416,50 @@ const handleCommandKeydown = (event: KeyboardEvent) => {
   const input = event.target as HTMLInputElement;
 
   switch (event.key) {
-    case 'Enter':
+    case "Enter":
       event.preventDefault();
       const command = input.value.trim();
       if (command) {
         executeCommand(command, tab.id);
-        input.value = '';
+        input.value = "";
       }
       break;
 
-    case 'ArrowUp':
+    case "ArrowUp":
       event.preventDefault();
       navigateHistory(-1);
       break;
 
-    case 'ArrowDown':
+    case "ArrowDown":
       event.preventDefault();
       navigateHistory(1);
       break;
 
-    case 'Tab':
+    case "Tab":
       event.preventDefault();
       // 简单的自动补全逻辑
       handleAutocomplete(input);
       break;
 
-    case 'c':
+    case "c":
       // 处理 Ctrl+C
       if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
         if (tab.isRunning && tab.processId) {
           // 发送中断信号
           sendWebSocketMessage({
-            type: 'interrupt_process',
+            type: "interrupt_process",
             processId: tab.processId,
             tabId: tab.id,
           });
         } else {
           // 清空当前输入
-          input.value = '';
+          input.value = "";
         }
       }
       break;
 
-    case 'l':
+    case "l":
       if (event.ctrlKey || event.metaKey) {
         event.preventDefault();
         // 清屏
@@ -535,17 +489,17 @@ const navigateHistory = (direction: number) => {
 
   if (newIndex >= 0 && newIndex < tab.history.length) {
     tab.historyIndex = newIndex;
-    const input = commandInput.value[tabs.value.findIndex(t => t.id === tab.id)];
+    const input = commandInput.value[tabs.value.findIndex((t) => t.id === tab.id)];
     if (input) {
-      input.value = tab.history[newIndex] ?? '';
+      input.value = tab.history[newIndex] ?? "";
       moveCursorToEnd();
     }
   } else if (newIndex === tab.history.length) {
     // 回到空输入
     tab.historyIndex = tab.history.length;
-    const input = commandInput.value[tabs.value.findIndex(t => t.id === tab.id)];
+    const input = commandInput.value[tabs.value.findIndex((t) => t.id === tab.id)];
     if (input) {
-      input.value = '';
+      input.value = "";
     }
   }
 };
@@ -556,23 +510,19 @@ const handleAutocomplete = (input: HTMLInputElement) => {
   if (!command) return;
 
   // 常用命令补全
-  const commonCommands = [
-    'ls', 'cd', 'pwd', 'mkdir', 'rm', 'cp', 'mv', 'cat', 'less', 'more',
-    'grep', 'find', 'ps', 'kill', 'top', 'df', 'du', 'chmod', 'chown',
-    'git', 'npm', 'yarn', 'node', 'python', 'python3', 'pip', 'pip3'
-  ];
+  const commonCommands = ["ls", "cd", "pwd", "mkdir", "rm", "cp", "mv", "cat", "less", "more", "grep", "find", "ps", "kill", "top", "df", "du", "chmod", "chown", "git", "npm", "yarn", "node", "python", "python3", "pip", "pip3"];
 
-  const matches = commonCommands.filter(cmd => cmd.startsWith(command));
+  const matches = commonCommands.filter((cmd) => cmd.startsWith(command));
 
   if (matches.length === 1) {
-    input.value = matches[0] + ' ';
+    input.value = matches[0] + " ";
   } else if (matches.length > 1) {
     // 显示所有匹配的命令
     const tab = currentTab.value;
     if (tab) {
       tab.output.push({
-        type: 'output',
-        content: matches.join('  '),
+        type: "output",
+        content: matches.join("  "),
         timestamp: Date.now(),
       });
       scrollToBottom();
@@ -582,14 +532,14 @@ const handleAutocomplete = (input: HTMLInputElement) => {
 
 // 输出处理
 const handleBashOutput = (tabId: string, output: string) => {
-  const tab = tabs.value.find(t => t.id === tabId);
+  const tab = tabs.value.find((t) => t.id === tabId);
   if (!tab) return;
 
   // 解析ANSI颜色代码
   const formattedOutput = parseAnsiColors(output);
 
   tab.output.push({
-    type: 'output',
+    type: "output",
     content: formattedOutput,
     timestamp: Date.now(),
   });
@@ -602,11 +552,11 @@ const handleBashOutput = (tabId: string, output: string) => {
 };
 
 const handleBashComplete = (tabId: string, exitCode: number, processId?: string) => {
-  const tab = tabs.value.find(t => t.id === tabId);
+  const tab = tabs.value.find((t) => t.id === tabId);
   if (!tab) return;
 
   tab.isRunning = false;
-  tab.currentCommand = '';
+  tab.currentCommand = "";
 
   if (processId) {
     tab.processId = undefined;
@@ -615,13 +565,13 @@ const handleBashComplete = (tabId: string, exitCode: number, processId?: string)
   // 显示执行结果
   if (exitCode === 0) {
     tab.output.push({
-      type: 'success',
+      type: "success",
       content: `✓ 命令执行完成 (退出码: ${exitCode})`,
       timestamp: Date.now(),
     });
   } else {
     tab.output.push({
-      type: 'error',
+      type: "error",
       content: `✗ 命令执行失败 (退出码: ${exitCode})`,
       timestamp: Date.now(),
     });
@@ -634,7 +584,7 @@ const handleBashComplete = (tabId: string, exitCode: number, processId?: string)
 };
 
 const updateTabPrompt = (directory: string) => {
-  tabs.value.forEach(tab => {
+  tabs.value.forEach((tab) => {
     tab.workingDirectory = directory;
     tab.prompt = `[${directory}]$ `;
   });
@@ -651,9 +601,9 @@ const parseAnsiColors = (text: string): string => {
     .replace(/\x1b\[35m/g, '<span class="ansi-magenta">')
     .replace(/\x1b\[36m/g, '<span class="ansi-cyan">')
     .replace(/\x1b\[37m/g, '<span class="ansi-white">')
-    .replace(/\x1b\[0m/g, '</span>')
+    .replace(/\x1b\[0m/g, "</span>")
     .replace(/\x1b\[1m/g, '<span class="ansi-bold">')
-    .replace(/\x1b\[22m/g, '</span>');
+    .replace(/\x1b\[22m/g, "</span>");
 };
 
 const formatOutputLine = (line: OutputLine): string => {
@@ -661,7 +611,7 @@ const formatOutputLine = (line: OutputLine): string => {
 };
 
 const focusCommandInput = () => {
-  const activeTabIndex = tabs.value.findIndex(tab => tab.id === activeTabId.value);
+  const activeTabIndex = tabs.value.findIndex((tab) => tab.id === activeTabId.value);
   if (activeTabIndex !== -1 && commandInput.value[activeTabIndex]) {
     commandInput.value[activeTabIndex].focus();
     moveCursorToEnd();
@@ -669,7 +619,7 @@ const focusCommandInput = () => {
 };
 
 const moveCursorToEnd = () => {
-  const activeTabIndex = tabs.value.findIndex(tab => tab.id === activeTabId.value);
+  const activeTabIndex = tabs.value.findIndex((tab) => tab.id === activeTabId.value);
   if (activeTabIndex !== -1 && commandInput.value[activeTabIndex]) {
     const input = commandInput.value[activeTabIndex];
     input.setSelectionRange(input.value.length, input.value.length);
@@ -677,7 +627,7 @@ const moveCursorToEnd = () => {
 };
 
 const scrollToBottom = () => {
-  const activeTabIndex = tabs.value.findIndex(tab => tab.id === activeTabId.value);
+  const activeTabIndex = tabs.value.findIndex((tab) => tab.id === activeTabId.value);
   if (activeTabIndex !== -1 && outputContainer.value[activeTabIndex]) {
     const container = outputContainer.value[activeTabIndex];
     container.scrollTop = container.scrollHeight;
@@ -706,26 +656,26 @@ const addToHistory = (command: string) => {
 
 const loadCommandHistory = () => {
   try {
-    const saved = localStorage.getItem('bash-command-history');
+    const saved = localStorage.getItem("bash-command-history");
     if (saved) {
       commandHistory.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load command history:', error);
+    console.warn("Failed to load command history:", error);
   }
 };
 
 const saveCommandHistory = () => {
   try {
-    localStorage.setItem('bash-command-history', JSON.stringify(commandHistory.value));
+    localStorage.setItem("bash-command-history", JSON.stringify(commandHistory.value));
   } catch (error) {
-    console.warn('Failed to save command history:', error);
+    console.warn("Failed to save command history:", error);
   }
 };
 
 const getTabInfo = (tab: Tab): string => {
   if (tab.isRunning) {
-    return '运行中';
+    return "运行中";
   }
   return `${tab.output.length} 行输出`;
 };
@@ -736,15 +686,15 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('terminal-settings', JSON.stringify(terminalSettings.value));
+  localStorage.setItem("terminal-settings", JSON.stringify(terminalSettings.value));
   showSettings.value = false;
 };
 
 const resetSettings = () => {
   terminalSettings.value = {
-    fontSize: 'text-sm',
-    theme: 'dark',
-    cursorStyle: 'block',
+    fontSize: "text-sm",
+    theme: "dark",
+    cursorStyle: "block",
     bell: false,
     autoScroll: true,
     maxHistory: 1000,
@@ -758,31 +708,31 @@ onMounted(() => {
 
   // 加载设置
   try {
-    const saved = localStorage.getItem('terminal-settings');
+    const saved = localStorage.getItem("terminal-settings");
     if (saved) {
       terminalSettings.value = { ...terminalSettings.value, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load terminal settings:', error);
+    console.warn("Failed to load terminal settings:", error);
   }
 
   // 全局键盘事件监听
-  document.addEventListener('keydown', handleGlobalKeydown);
+  document.addEventListener("keydown", handleGlobalKeydown);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleGlobalKeydown);
+  document.removeEventListener("keydown", handleGlobalKeydown);
 });
 
 const handleGlobalKeydown = (event: KeyboardEvent) => {
   // 快捷键：Ctrl+T 新建标签页
-  if ((event.ctrlKey || event.metaKey) && event.key === 't') {
+  if ((event.ctrlKey || event.metaKey) && event.key === "t") {
     event.preventDefault();
     createNewTab();
   }
 
   // 快捷键：Ctrl+W 关闭当前标签页
-  if ((event.ctrlKey || event.metaKey) && event.key === 'w') {
+  if ((event.ctrlKey || event.metaKey) && event.key === "w") {
     event.preventDefault();
     if (currentTab.value) {
       closeTab(currentTab.value.id);
@@ -790,9 +740,9 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
   }
 
   // 快捷键：Ctrl+Tab 切换标签页
-  if (event.ctrlKey && event.key === 'Tab') {
+  if (event.ctrlKey && event.key === "Tab") {
     event.preventDefault();
-    const currentIndex = tabs.value.findIndex(tab => tab.id === activeTabId.value);
+    const currentIndex = tabs.value.findIndex((tab) => tab.id === activeTabId.value);
     const nextIndex = (currentIndex + 1) % tabs.value.length;
     const nextTab = tabs.value[nextIndex];
     if (nextTab) {
@@ -851,7 +801,8 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
   @apply text-sm text-gray-700 dark:text-gray-300;
 }
 
-.setting-select, .setting-checkbox {
+.setting-select,
+.setting-checkbox {
   @apply ml-2;
 }
 
@@ -949,14 +900,30 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
 }
 
 /* ANSI 颜色样式 */
-:deep(.ansi-red) { @apply text-red-500; }
-:deep(.ansi-green) { @apply text-green-500; }
-:deep(.ansi-yellow) { @apply text-yellow-500; }
-:deep(.ansi-blue) { @apply text-blue-500; }
-:deep(.ansi-magenta) { @apply text-magenta-500; }
-:deep(.ansi-cyan) { @apply text-cyan-500; }
-:deep(.ansi-white) { @apply text-gray-300; }
-:deep(.ansi-bold) { @apply font-bold; }
+:deep(.ansi-red) {
+  @apply text-red-500;
+}
+:deep(.ansi-green) {
+  @apply text-green-500;
+}
+:deep(.ansi-yellow) {
+  @apply text-yellow-500;
+}
+:deep(.ansi-blue) {
+  @apply text-blue-500;
+}
+:deep(.ansi-magenta) {
+  @apply text-magenta-500;
+}
+:deep(.ansi-cyan) {
+  @apply text-cyan-500;
+}
+:deep(.ansi-white) {
+  @apply text-gray-300;
+}
+:deep(.ansi-bold) {
+  @apply font-bold;
+}
 
 .input-line {
   @apply flex items-center;
@@ -976,7 +943,7 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
 
 .cursor-block::after {
   @apply absolute w-2 h-4 bg-white;
-  content: '';
+  content: "";
   animation: blink 1s infinite;
 }
 
@@ -1016,7 +983,8 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
   @apply flex items-center justify-between px-4 py-1 border-t border-border dark:border-border-dark bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400;
 }
 
-.status-left, .status-right {
+.status-left,
+.status-right {
   @apply flex items-center gap-3;
 }
 
@@ -1029,7 +997,13 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
 }
 
 @keyframes blink {
-  0%, 50% { opacity: 1; }
-  51%, 100% { opacity: 0; }
+  0%,
+  50% {
+    opacity: 1;
+  }
+  51%,
+  100% {
+    opacity: 0;
+  }
 }
 </style>

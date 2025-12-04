@@ -3,27 +3,15 @@
     <!-- List Header -->
     <div v-if="message.content.title" class="list-header">
       <h3 class="list-title">{{ message.content.title }}</h3>
-      <span v-if="message.content.items" class="list-count">
-        {{ message.content.items.length }} 项
-      </span>
+      <span v-if="message.content.items" class="list-count"> {{ message.content.items.length }} 项 </span>
     </div>
 
     <!-- List Items -->
     <div class="list-items">
-      <div
-        v-for="(item, index) in message.content.items"
-        :key="index"
-        :class="['list-item', { 'clickable': item.action }]"
-        @click="handleItemClick(item)"
-      >
+      <div v-for="(item, index) in message.content.items" :key="index" :class="['list-item', { clickable: item.action }]" @click="handleItemClick(item)">
         <!-- Item Icon/Image -->
         <div v-if="item.icon || item.image" class="item-media">
-          <img
-            v-if="item.image"
-            :src="item.image"
-            :alt="item.title"
-            class="item-image"
-          />
+          <img v-if="item.image" :src="item.image" :alt="item.title" class="item-image" />
           <div v-else-if="item.icon" class="item-icon">
             {{ item.icon }}
           </div>
@@ -36,11 +24,7 @@
             {{ item.description }}
           </p>
           <div v-if="item.metadata" class="item-metadata">
-            <span
-              v-for="(meta, key) in item.metadata"
-              :key="key"
-              class="metadata-tag"
-            >
+            <span v-for="(meta, key) in item.metadata" :key="key" class="metadata-tag">
               {{ meta }}
             </span>
           </div>
@@ -57,11 +41,7 @@
 
     <!-- List Footer -->
     <div v-if="message.content.footer" class="list-footer">
-      <button
-        v-if="message.content.footer.action"
-        @click="handleFooterAction"
-        class="footer-action"
-      >
+      <button v-if="message.content.footer.action" @click="handleFooterAction" class="footer-action">
         {{ message.content.footer.text }}
       </button>
       <span v-else class="footer-text">
@@ -72,11 +52,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { ListMessage as ListMessageType } from '@/types';
+import { defineComponent } from "vue";
+import type { ListMessage as ListMessageType } from "@/types";
 
 export default defineComponent({
-  name: 'ListMessage',
+  name: "ListMessage",
 
   props: {
     message: {
@@ -93,12 +73,12 @@ export default defineComponent({
   setup(props, { emit }) {
     function handleItemClick(item: unknown & { action?: unknown }) {
       if ((item as { action?: unknown }).action) {
-        emit('itemClick', item);
+        emit("itemClick", item);
       }
     }
 
     function handleFooterAction() {
-      emit('footerAction');
+      emit("footerAction");
     }
 
     return {

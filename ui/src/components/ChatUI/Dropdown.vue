@@ -5,20 +5,11 @@
         <Button>{{ label }}</Button>
       </slot>
     </div>
-    
+
     <Teleport to="body">
-      <div
-        v-if="visible"
-        class="dropdown-menu"
-        :style="menuStyle"
-      >
-        <div
-          v-for="item in items"
-          :key="item.key"
-          class="dropdown-item"
-          @click="handleSelect(item)"
-        >
-          <Icon v-if="item.icon" :type="(item.icon as any)" />
+      <div v-if="visible" class="dropdown-menu" :style="menuStyle">
+        <div v-for="item in items" :key="item.key" class="dropdown-item" @click="handleSelect(item)">
+          <Icon v-if="item.icon" :type="item.icon as any" />
           <span>{{ item.label }}</span>
         </div>
       </div>
@@ -27,9 +18,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, onMounted, onUnmounted } from 'vue';
-import Button from './Button.vue';
-import Icon from './Icon.vue';
+import { ref, onMounted, onUnmounted } from "vue";
+import Button from "./Button.vue";
+import Icon from "./Icon.vue";
 
 interface DropdownItem {
   key: string;
@@ -43,7 +34,7 @@ interface Props {
 }
 
 withDefaults(defineProps<Props>(), {
-  label: '选择',
+  label: "选择",
 });
 
 const emit = defineEmits<{
@@ -62,7 +53,7 @@ const toggle = () => {
 };
 
 const handleSelect = (item: DropdownItem) => {
-  emit('select', item);
+  emit("select", item);
   visible.value = false;
 };
 
@@ -70,7 +61,7 @@ const updateMenuPosition = () => {
   if (!dropdownRef.value) return;
   const rect = dropdownRef.value.getBoundingClientRect();
   menuStyle.value = {
-    position: 'fixed',
+    position: "fixed",
     top: `${rect.bottom + 8}px`,
     left: `${rect.left}px`,
     minWidth: `${rect.width}px`,
@@ -84,11 +75,11 @@ const handleClickOutside = (e: MouseEvent) => {
 };
 
 onMounted(() => {
-  document.addEventListener('click', handleClickOutside);
+  document.addEventListener("click", handleClickOutside);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 </script>
 

@@ -20,8 +20,8 @@
 </template>
 
 <script setup lang="ts">
-import { useRoute } from 'vue-router';
-import { computed } from 'vue';
+import { useRoute } from "vue-router";
+import { computed } from "vue";
 
 interface Props {
   title?: string;
@@ -29,7 +29,7 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  title: 'Aster Agent',
+  title: "Aster Agent",
   showHomeLink: true,
 });
 
@@ -40,7 +40,7 @@ const shouldShowHomeLink = computed(() => {
   if (props.showHomeLink !== undefined) {
     return props.showHomeLink;
   }
-  return route.path !== '/';
+  return route.path !== "/";
 });
 </script>
 

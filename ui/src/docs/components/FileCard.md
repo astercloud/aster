@@ -12,12 +12,12 @@
 </template>
 
 <script setup>
-import { FileCard } from '@/components/ChatUI';
+import { FileCard } from "@/components/ChatUI";
 
 const fileInfo = {
-  name: 'document.pdf',
+  name: "document.pdf",
   size: 1024000,
-  url: '/files/document.pdf'
+  url: "/files/document.pdf",
 };
 </script>
 ```
@@ -32,11 +32,11 @@ const fileInfo = {
 </template>
 
 <script setup>
-import { FileCard } from '@/components/ChatUI';
+import { FileCard } from "@/components/ChatUI";
 
 const readOnlyFile = {
-  name: 'readonly.txt',
-  size: 2048
+  name: "readonly.txt",
+  size: 2048,
 };
 </script>
 ```
@@ -55,24 +55,24 @@ const readOnlyFile = {
 </template>
 
 <script setup>
-import { FileCard, Flex } from '@/components/ChatUI';
+import { FileCard, Flex } from "@/components/ChatUI";
 
 const file1 = {
-  name: 'presentation.pptx',
+  name: "presentation.pptx",
   size: 5242880,
-  url: '/files/presentation.pptx'
+  url: "/files/presentation.pptx",
 };
 
 const file2 = {
-  name: 'spreadsheet.xlsx',
+  name: "spreadsheet.xlsx",
   size: 1048576,
-  url: '/files/spreadsheet.xlsx'
+  url: "/files/spreadsheet.xlsx",
 };
 
 const file3 = {
-  name: 'image.jpg',
+  name: "image.jpg",
   size: 512000,
-  url: '/files/image.jpg'
+  url: "/files/image.jpg",
 };
 </script>
 ```
@@ -92,12 +92,12 @@ const file3 = {
 </template>
 
 <script setup>
-import { FileCard, Bubble, Flex } from '@/components/ChatUI';
+import { FileCard, Bubble, Flex } from "@/components/ChatUI";
 
 const attachedFile = {
-  name: 'project-plan.pdf',
+  name: "project-plan.pdf",
   size: 2097152,
-  url: '/files/project-plan.pdf'
+  url: "/files/project-plan.pdf",
 };
 </script>
 ```
@@ -106,17 +106,17 @@ const attachedFile = {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 必填 |
-| --- | --- | --- | --- |
-| file | 文件信息对象 | `FileInfo` | ✓ |
+| 参数 | 说明         | 类型       | 必填 |
+| ---- | ------------ | ---------- | ---- |
+| file | 文件信息对象 | `FileInfo` | ✓    |
 
 ### FileInfo 类型
 
-| 属性 | 说明 | 类型 | 必填 |
-| --- | --- | --- | --- |
-| name | 文件名 | `string` | ✓ |
-| size | 文件大小（字节） | `number` | ✓ |
-| url | 下载链接 | `string` | - |
+| 属性 | 说明             | 类型     | 必填 |
+| ---- | ---------------- | -------- | ---- |
+| name | 文件名           | `string` | ✓    |
+| size | 文件大小（字节） | `number` | ✓    |
+| url  | 下载链接         | `string` | -    |
 
 ### 特性说明
 

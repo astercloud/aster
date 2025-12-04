@@ -4,35 +4,30 @@
     <div class="doc-content">
       <div class="markdown-body" v-html="renderedContent"></div>
     </div>
-    
+
     <!-- 右侧 Demo 展示 -->
     <div class="doc-demo">
       <div class="demo-header">
         <h3 class="demo-title">实时演示</h3>
         <div class="demo-actions">
-          <button
-            v-for="tab in demoTabs"
-            :key="tab.key"
-            :class="['demo-tab', { active: activeTab === tab.key }]"
-            @click="activeTab = tab.key as 'code' | 'preview'"
-          >
+          <button v-for="tab in demoTabs" :key="tab.key" :class="['demo-tab', { active: activeTab === tab.key }]" @click="activeTab = tab.key as 'code' | 'preview'">
             {{ tab.label }}
           </button>
         </div>
       </div>
-      
+
       <div class="demo-body">
         <!-- 预览区域 -->
         <div v-show="activeTab === 'preview'" class="demo-preview">
           <slot name="demo"></slot>
         </div>
-        
+
         <!-- 代码区域 -->
         <div v-show="activeTab === 'code'" class="demo-code">
           <pre><code v-html="highlightedCode"></code></pre>
           <button class="copy-btn" @click="copyCode">
             <Icon type="copy" />
-            {{ copied ? '已复制' : '复制代码' }}
+            {{ copied ? "已复制" : "复制代码" }}
           </button>
         </div>
       </div>
@@ -41,9 +36,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
-import { marked } from 'marked';
-import Icon from './ChatUI/Icon.vue';
+import { ref, computed } from "vue";
+import { marked } from "marked";
+import Icon from "./ChatUI/Icon.vue";
 
 interface Props {
   content: string;
@@ -52,12 +47,12 @@ interface Props {
 
 const props = defineProps<Props>();
 
-const activeTab = ref<'preview' | 'code'>('preview');
+const activeTab = ref<"preview" | "code">("preview");
 const copied = ref(false);
 
 const demoTabs = [
-  { key: 'preview', label: '预览' },
-  { key: 'code', label: '代码' },
+  { key: "preview", label: "预览" },
+  { key: "code", label: "代码" },
 ];
 
 const renderedContent = computed(() => {
@@ -69,18 +64,18 @@ const renderedContent = computed(() => {
 });
 
 const highlightedCode = computed(() => {
-  if (!props.code) return '';
+  if (!props.code) return "";
   // 简单的代码高亮（实际项目中可以使用 highlight.js）
   return props.code
-    .replace(/</g, '&lt;')
-    .replace(/>/g, '&gt;')
+    .replace(/</g, "&lt;")
+    .replace(/>/g, "&gt;")
     .replace(/(".*?")/g, '<span class="string">$1</span>')
     .replace(/\b(const|let|var|function|return|import|export|from)\b/g, '<span class="keyword">$1</span>');
 });
 
 const copyCode = async () => {
   if (!props.code) return;
-  
+
   try {
     await navigator.clipboard.writeText(props.code);
     copied.value = true;
@@ -88,7 +83,7 @@ const copyCode = async () => {
       copied.value = false;
     }, 2000);
   } catch (error) {
-    console.error('Failed to copy:', error);
+    console.error("Failed to copy:", error);
   }
 };
 </script>

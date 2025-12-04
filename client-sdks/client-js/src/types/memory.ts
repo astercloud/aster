@@ -111,11 +111,7 @@ export interface SearchResult {
 /**
  * 记忆来源类型
  */
-export type MemorySource =
-  | "user_input"
-  | "tool_output"
-  | "inference"
-  | "external";
+export type MemorySource = "user_input" | "tool_output" | "inference" | "external";
 
 /**
  * 记忆溯源信息

@@ -5,6 +5,7 @@
 ## 前置条件
 
 1. **Anthropic API Key**
+
    ```bash
    export ANTHROPIC_API_KEY="your-api-key-here"
    ```
@@ -22,17 +23,20 @@
 最简单的 PTC 示例,演示如何让 LLM 生成 Python 代码并调用 Aster 工具。
 
 **运行:**
+
 ```bash
 cd basic
 go run main.go
 ```
 
 **功能:**
+
 - 使用 Glob 查找所有 .go 文件
 - 使用 Read 读取文件内容
 - 统计代码行数和字符数
 
 **预期输出:**
+
 ```
 正在调用 LLM 生成 Python 代码...
 
@@ -53,12 +57,14 @@ go run main.go
 演示如何使用 PTC 进行批量文件处理。
 
 **运行:**
+
 ```bash
 cd file-processor
 go run main.go
 ```
 
 **功能:**
+
 - 批量读取多个文件
 - 数据转换和处理
 - 并发执行提升性能
@@ -68,12 +74,14 @@ go run main.go
 演示复杂的代码分析任务。
 
 **运行:**
+
 ```bash
 cd code-analyzer
 go run main.go
 ```
 
 **功能:**
+
 - 使用 Grep 搜索特定模式
 - 统计代码复杂度
 - 生成分析报告
@@ -147,6 +155,7 @@ toolSchemas := []provider.ToolSchema{
 ```
 
 可选值:
+
 - `"direct"`: LLM 直接调用
 - `"code_execution_20250825"`: Python 代码中调用
 
@@ -187,6 +196,7 @@ log.SetFlags(log.LstdFlags | log.Lshortfile)
 ```
 
 会输出:
+
 - HTTP 桥接服务器启动信息
 - 工具调用详情
 - Provider API 请求详情
@@ -211,6 +221,7 @@ curl "http://localhost:8080/tools/schema?name=Read"
 ### Q: 报错 "aiohttp is required"
 
 A: 安装 Python 依赖:
+
 ```bash
 pip install aiohttp
 ```
@@ -218,11 +229,13 @@ pip install aiohttp
 ### Q: HTTP 桥接服务器启动失败
 
 A: 检查端口占用:
+
 ```bash
 lsof -i :8080
 ```
 
 修改端口:
+
 ```go
 codeExecTool.SetBridgeURL("http://localhost:9000")
 ```
@@ -230,6 +243,7 @@ codeExecTool.SetBridgeURL("http://localhost:9000")
 ### Q: Python 代码执行超时
 
 A: 增加超时时间:
+
 ```go
 config := &bridge.RuntimeConfig{
     Timeout: 60 * time.Second,
@@ -240,6 +254,7 @@ runtime := bridge.NewPythonRuntime(config)
 ### Q: 如何限制可调用的工具?
 
 A: 只为需要的工具设置 `AllowedCallers`:
+
 ```go
 // 仅允许 Read 和 Glob 在 Python 中调用
 toolSchemas := []provider.ToolSchema{

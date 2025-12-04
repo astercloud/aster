@@ -13,25 +13,13 @@
         </div>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="刷新进程列表"
-          @click="refreshProcesses"
-        >
+        <button class="action-button" title="刷新进程列表" @click="refreshProcesses">
           <Icon type="refresh" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="清理已完成"
-          @click="clearCompleted"
-        >
+        <button class="action-button" title="清理已完成" @click="clearCompleted">
           <Icon type="trash" size="sm" />
         </button>
       </div>
@@ -70,31 +58,19 @@
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="monitorSettings.autoScroll"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="monitorSettings.autoScroll" type="checkbox" class="setting-checkbox" />
             自动滚动到最新输出
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="monitorSettings.showTimestamp"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="monitorSettings.showTimestamp" type="checkbox" class="setting-checkbox" />
             显示时间戳
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="monitorSettings.enableNotifications"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="monitorSettings.enableNotifications" type="checkbox" class="setting-checkbox" />
             启用通知
           </label>
         </div>
@@ -119,23 +95,14 @@
       </div>
       <div class="filter-group">
         <label class="filter-label">搜索:</label>
-        <input
-          v-model="searchQuery"
-          type="text"
-          placeholder="搜索进程命令..."
-          class="filter-input"
-        />
+        <input v-model="searchQuery" type="text" placeholder="搜索进程命令..." class="filter-input" />
       </div>
     </div>
 
     <!-- 进程列表 -->
     <div class="processes-container">
       <div class="processes-list">
-        <div
-          v-for="process in filteredProcesses"
-          :key="process.id"
-          :class="['process-item', `status-${process.status}`]"
-        >
+        <div v-for="process in filteredProcesses" :key="process.id" :class="['process-item', `status-${process.status}`]">
           <!-- 进程头部 -->
           <div class="process-header">
             <div class="process-info">
@@ -156,34 +123,16 @@
               </span>
             </div>
             <div class="process-actions">
-              <button
-                v-if="process.status === 'running'"
-                class="action-btn stop-btn"
-                title="停止进程"
-                @click="stopProcess(process)"
-              >
+              <button v-if="process.status === 'running'" class="action-btn stop-btn" title="停止进程" @click="stopProcess(process)">
                 <Icon type="square" size="xs" />
               </button>
-              <button
-                v-if="process.status === 'running'"
-                class="action-btn kill-btn"
-                title="强制终止进程"
-                @click="killProcess(process)"
-              >
+              <button v-if="process.status === 'running'" class="action-btn kill-btn" title="强制终止进程" @click="killProcess(process)">
                 <Icon type="x-circle" size="xs" />
               </button>
-              <button
-                class="action-btn clear-btn"
-                title="清除输出"
-                @click="clearProcessOutput(process)"
-              >
+              <button class="action-btn clear-btn" title="清除输出" @click="clearProcessOutput(process)">
                 <Icon type="trash" size="xs" />
               </button>
-              <button
-                class="action-btn focus-btn"
-                title="关注此进程"
-                @click="toggleProcessFocus(process)"
-              >
+              <button class="action-btn focus-btn" title="关注此进程" @click="toggleProcessFocus(process)">
                 <Icon :type="process.focused ? 'star' : 'star-outline'" size="xs" />
               </button>
             </div>
@@ -199,12 +148,12 @@
             <div class="stat-item">
               <Icon type="cpu" size="xs" />
               <span class="stat-label">CPU:</span>
-              <span class="stat-value">{{ process.cpuUsage || 'N/A' }}%</span>
+              <span class="stat-value">{{ process.cpuUsage || "N/A" }}%</span>
             </div>
             <div class="stat-item">
               <Icon type="hard-drive" size="xs" />
               <span class="stat-label">内存:</span>
-              <span class="stat-value">{{ process.memoryUsage || 'N/A' }}</span>
+              <span class="stat-value">{{ process.memoryUsage || "N/A" }}</span>
             </div>
             <div class="stat-item">
               <Icon type="file-text" size="xs" />
@@ -214,56 +163,29 @@
           </div>
 
           <!-- 输出区域 -->
-          <div
-            v-if="process.focused || process.output.length > 0"
-            class="process-output"
-          >
+          <div v-if="process.focused || process.output.length > 0" class="process-output">
             <div class="output-header">
               <div class="output-title">
                 <span>进程输出</span>
                 <span class="output-count">{{ process.output.length }} 行</span>
               </div>
               <div class="output-actions">
-                <button
-                  class="output-action-btn"
-                  title="滚动到底部"
-                  @click="scrollToBottom(process.id)"
-                >
+                <button class="output-action-btn" title="滚动到底部" @click="scrollToBottom(process.id)">
                   <Icon type="arrow-down" size="xs" />
                 </button>
-                <button
-                  class="output-action-btn"
-                  title="全屏查看"
-                  @click="viewOutputFullscreen(process)"
-                >
+                <button class="output-action-btn" title="全屏查看" @click="viewOutputFullscreen(process)">
                   <Icon type="maximize" size="xs" />
                 </button>
-                <button
-                  class="output-action-btn"
-                  title="复制输出"
-                  @click="copyProcessOutput(process)"
-                >
+                <button class="output-action-btn" title="复制输出" @click="copyProcessOutput(process)">
                   <Icon type="copy" size="xs" />
                 </button>
-                <button
-                  class="output-action-btn"
-                  title="保存输出"
-                  @click="saveProcessOutput(process)"
-                >
+                <button class="output-action-btn" title="保存输出" @click="saveProcessOutput(process)">
                   <Icon type="download" size="xs" />
                 </button>
               </div>
             </div>
-            <div
-              :ref="`output-${process.id}`"
-              class="output-content"
-              @scroll="handleOutputScroll(process.id)"
-            >
-              <div
-                v-for="(line, index) in process.output"
-                :key="index"
-                :class="['output-line', { 'error-line': line.type === 'error' }]"
-              >
+            <div :ref="`output-${process.id}`" class="output-content" @scroll="handleOutputScroll(process.id)">
+              <div v-for="(line, index) in process.output" :key="index" :class="['output-line', { 'error-line': line.type === 'error' }]">
                 <span v-if="monitorSettings.showTimestamp" class="timestamp">
                   {{ formatTimestamp(line.timestamp) }}
                 </span>
@@ -279,9 +201,7 @@
     <div v-if="filteredProcesses.length === 0" class="empty-state">
       <Icon type="terminal" size="lg" />
       <h3>暂无后台任务</h3>
-      <p class="empty-hint">
-        没有运行中的后台进程，所有进程都已正常完成
-      </p>
+      <p class="empty-hint">没有运行中的后台进程，所有进程都已正常完成</p>
       <button class="refresh-btn" @click="refreshProcesses">
         <Icon type="refresh" size="sm" />
         刷新进程列表
@@ -293,26 +213,20 @@
       <div class="status-left">
         <span class="system-info">
           <Icon type="server" size="xs" />
-          <span>系统负载: {{ systemStatus.load || 'N/A' }}</span>
+          <span>系统负载: {{ systemStatus.load || "N/A" }}</span>
         </span>
         <span class="system-info">
           <Icon type="cpu" size="xs" />
-          <span>CPU: {{ systemStatus.cpu || 'N/A' }}%</span>
+          <span>CPU: {{ systemStatus.cpu || "N/A" }}%</span>
         </span>
         <span class="system-info">
           <Icon type="hard-drive" size="xs" />
-          <span>内存: {{ systemStatus.memory || 'N/A' }}</span>
+          <span>内存: {{ systemStatus.memory || "N/A" }}</span>
         </span>
       </div>
       <div class="status-right">
-        <span class="last-update">
-          最后更新: {{ formatTime(lastUpdateTime) }}
-        </span>
-        <button
-          class="status-btn"
-          title="手动更新"
-          @click="refreshProcesses"
-        >
+        <span class="last-update"> 最后更新: {{ formatTime(lastUpdateTime) }} </span>
+        <button class="status-btn" title="手动更新" @click="refreshProcesses">
           <Icon type="refresh" size="xs" />
         </button>
       </div>
@@ -323,22 +237,14 @@
       <div class="fullscreen-header">
         <h3>{{ selectedProcess.command }}</h3>
         <div class="fullscreen-actions">
-          <button
-            class="fullscreen-action-btn"
-            title="关闭全屏"
-            @click="closeFullscreenOutput"
-          >
+          <button class="fullscreen-action-btn" title="关闭全屏" @click="closeFullscreenOutput">
             <Icon type="minimize" size="sm" />
           </button>
         </div>
       </div>
       <div class="fullscreen-content">
         <div class="fullscreen-output">
-          <div
-            v-for="(line, index) in selectedProcess.output"
-            :key="index"
-            :class="['fullscreen-line', { 'error-line': line.type === 'error' }]"
-          >
+          <div v-for="(line, index) in selectedProcess.output" :key="index" :class="['fullscreen-line', { 'error-line': line.type === 'error' }]">
             <span v-if="monitorSettings.showTimestamp" class="timestamp">
               {{ formatTimestamp(line.timestamp) }}
             </span>
@@ -351,13 +257,13 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted, onUnmounted, nextTick } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, onMounted, onUnmounted, nextTick } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface OutputLine {
   content: string;
   timestamp: number;
-  type: 'stdout' | 'stderr' | 'error';
+  type: "stdout" | "stderr" | "error";
 }
 
 interface Process {
@@ -366,7 +272,7 @@ interface Process {
   command: string;
   user: string;
   startTime: number;
-  status: 'running' | 'completed' | 'failed' | 'stopped';
+  status: "running" | "completed" | "failed" | "stopped";
   output: OutputLine[];
   cpuUsage?: number;
   memoryUsage?: string;
@@ -394,8 +300,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -406,8 +312,8 @@ const emit = defineEmits<{
 
 // 响应式数据
 const processes = ref<Process[]>([]);
-const statusFilter = ref('');
-const searchQuery = ref('');
+const statusFilter = ref("");
+const searchQuery = ref("");
 const showSettings = ref(false);
 const showFullscreenOutput = ref(false);
 const selectedProcess = ref<Process | null>(null);
@@ -425,9 +331,9 @@ const monitorSettings = ref<MonitorSettings>({
 
 // 系统状态
 const systemStatus = ref<SystemStatus>({
-  load: '0.15, 0.12, 0.08',
+  load: "0.15, 0.12, 0.08",
   cpu: 25,
-  memory: '8.2GB / 16GB',
+  memory: "8.2GB / 16GB",
 });
 
 // 自动刷新定时器
@@ -438,7 +344,7 @@ const websocket = ref<WebSocket | null>(null);
 
 // 计算属性
 const activeProcesses = computed(() => {
-  return processes.value.filter(p => p.status === 'running');
+  return processes.value.filter((p) => p.status === "running");
 });
 
 const filteredProcesses = computed(() => {
@@ -446,16 +352,13 @@ const filteredProcesses = computed(() => {
 
   // 状态筛选
   if (statusFilter.value) {
-    filtered = filtered.filter(p => p.status === statusFilter.value);
+    filtered = filtered.filter((p) => p.status === statusFilter.value);
   }
 
   // 搜索筛选
   if (searchQuery.value.trim()) {
     const query = searchQuery.value.toLowerCase();
-    filtered = filtered.filter(p =>
-      p.command.toLowerCase().includes(query) ||
-      p.pid.toString().includes(query)
-    );
+    filtered = filtered.filter((p) => p.command.toLowerCase().includes(query) || p.pid.toString().includes(query));
   }
 
   return filtered.sort((a, b) => {
@@ -475,7 +378,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('BashOutputTool WebSocket connected');
+      console.log("BashOutputTool WebSocket connected");
       startAutoRefresh();
     };
 
@@ -484,52 +387,52 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('BashOutputTool WebSocket disconnected');
+      console.log("BashOutputTool WebSocket disconnected");
       stopAutoRefresh();
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('BashOutputTool WebSocket error:', error);
+      console.error("BashOutputTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'process_list':
+    case "process_list":
       if (message.processes) {
         updateProcesses(message.processes);
       }
       break;
-    case 'process_output':
+    case "process_output":
       if (message.processId && message.line) {
         handleProcessOutput(message.processId, message.line);
       }
       break;
-    case 'process_status':
+    case "process_status":
       if (message.process) {
         updateProcessStatus(message.process);
       }
       break;
-    case 'process_started':
+    case "process_started":
       if (message.process) {
         addProcess(message.process);
       }
       break;
-    case 'process_stopped':
+    case "process_stopped":
       if (message.processId) {
         removeProcess(message.processId);
       }
       break;
-    case 'system_status':
+    case "system_status":
       if (message.status) {
         systemStatus.value = message.status;
       }
@@ -545,8 +448,8 @@ const sendWebSocketMessage = (message: any) => {
 
 // 进程管理
 const updateProcesses = (processList: Process[]) => {
-  processList.forEach(processData => {
-    const existingProcess = processes.value.find(p => p.id === processData.id);
+  processList.forEach((processData) => {
+    const existingProcess = processes.value.find((p) => p.id === processData.id);
     if (existingProcess) {
       Object.assign(existingProcess, processData);
     } else {
@@ -557,7 +460,7 @@ const updateProcesses = (processList: Process[]) => {
 };
 
 const handleProcessOutput = (processId: string, line: OutputLine) => {
-  const process = processes.value.find(p => p.id === processId);
+  const process = processes.value.find((p) => p.id === processId);
   if (process) {
     // 限制输出行数
     if (process.output.length >= monitorSettings.value.maxOutputLines) {
@@ -573,31 +476,31 @@ const handleProcessOutput = (processId: string, line: OutputLine) => {
       });
     }
 
-    emit('outputReceived', process, line);
+    emit("outputReceived", process, line);
 
     // 错误通知
-    if (monitorSettings.value.enableNotifications && line.type === 'error') {
-      showNotification(`进程 ${process.command} 产生错误输出`, 'error');
+    if (monitorSettings.value.enableNotifications && line.type === "error") {
+      showNotification(`进程 ${process.command} 产生错误输出`, "error");
     }
   }
 };
 
 const updateProcessStatus = (processUpdate: Partial<Process>) => {
-  const process = processes.value.find(p => p.id === processUpdate.id);
+  const process = processes.value.find((p) => p.id === processUpdate.id);
   if (process) {
     const oldStatus = process.status;
     Object.assign(process, processUpdate);
 
     // 状态变化通知
     if (monitorSettings.value.enableNotifications && oldStatus !== processUpdate.status) {
-      if (processUpdate.status === 'completed') {
-        showNotification(`进程 ${process.command} 已完成`, 'success');
-      } else if (processUpdate.status === 'failed') {
-        showNotification(`进程 ${process.command} 执行失败`, 'error');
+      if (processUpdate.status === "completed") {
+        showNotification(`进程 ${process.command} 已完成`, "success");
+      } else if (processUpdate.status === "failed") {
+        showNotification(`进程 ${process.command} 执行失败`, "error");
       }
     }
 
-    emit('processStopped', process);
+    emit("processStopped", process);
   }
 };
 
@@ -606,14 +509,14 @@ const addProcess = (newProcess: Process) => {
   lastUpdateTime.value = Date.now();
 
   if (monitorSettings.value.enableNotifications) {
-    showNotification(`新进程启动: ${newProcess.command}`, 'info');
+    showNotification(`新进程启动: ${newProcess.command}`, "info");
   }
 
-  emit('processStarted', newProcess);
+  emit("processStarted", newProcess);
 };
 
 const removeProcess = (processId: string) => {
-  const index = processes.value.findIndex(p => p.id === processId);
+  const index = processes.value.findIndex((p) => p.id === processId);
   if (index !== -1) {
     processes.value.splice(index, 1);
     lastUpdateTime.value = Date.now();
@@ -625,7 +528,7 @@ const stopProcess = async (process: Process) => {
   if (!confirm(`确定要停止进程 "${process.command}" 吗？`)) return;
 
   sendWebSocketMessage({
-    type: 'stop_process',
+    type: "stop_process",
     processId: process.id,
   });
 };
@@ -634,7 +537,7 @@ const killProcess = async (process: Process) => {
   if (!confirm(`确定要强制终止进程 "${process.command}" 吗？`)) return;
 
   sendWebSocketMessage({
-    type: 'kill_process',
+    type: "kill_process",
     processId: process.id,
   });
 };
@@ -652,19 +555,19 @@ const toggleProcessFocus = (process: Process) => {
 
 const copyProcessOutput = async (process: Process) => {
   try {
-    const output = process.output.map(line => line.content).join('\n');
+    const output = process.output.map((line) => line.content).join("\n");
     await navigator.clipboard.writeText(output);
-    showNotification('输出已复制到剪贴板', 'success');
+    showNotification("输出已复制到剪贴板", "success");
   } catch (error) {
-    console.error('Failed to copy output:', error);
+    console.error("Failed to copy output:", error);
   }
 };
 
 const saveProcessOutput = (process: Process) => {
-  const output = process.output.map(line => line.content).join('\n');
-  const blob = new Blob([output], { type: 'text/plain' });
+  const output = process.output.map((line) => line.content).join("\n");
+  const blob = new Blob([output], { type: "text/plain" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `process-${process.pid}-${Date.now()}.log`;
   a.click();
@@ -684,14 +587,14 @@ const closeFullscreenOutput = () => {
 // 刷新和管理
 const refreshProcesses = () => {
   sendWebSocketMessage({
-    type: 'get_process_list',
+    type: "get_process_list",
   });
 };
 
 const clearCompleted = () => {
-  if (!confirm('确定要清除所有已完成的进程吗？')) return;
+  if (!confirm("确定要清除所有已完成的进程吗？")) return;
 
-  processes.value = processes.value.filter(p => p.status === 'running');
+  processes.value = processes.value.filter((p) => p.status === "running");
   saveProcesses();
 };
 
@@ -717,7 +620,7 @@ const updateSystemStatus = () => {
   const cpu = 15 + Math.random() * 30;
   const memoryPercent = 40 + Math.random() * 30;
   const totalMemory = 16;
-  const usedMemory = (totalMemory * memoryPercent / 100).toFixed(1);
+  const usedMemory = ((totalMemory * memoryPercent) / 100).toFixed(1);
 
   systemStatus.value = {
     load: `${(Math.random() * 0.3).toFixed(2)}, ${(Math.random() * 0.3).toFixed(2)}, ${(Math.random() * 0.3).toFixed(2)}`,
@@ -739,23 +642,23 @@ const handleOutputScroll = (processId: string) => {
   if (outputElement) {
     const isAtBottom = outputElement.scrollHeight - outputElement.scrollTop <= outputElement.clientHeight + 10;
     if (isAtBottom) {
-      outputElement.dataset.autoScroll = 'true';
+      outputElement.dataset.autoScroll = "true";
     } else {
-      outputElement.dataset.autoScroll = 'false';
+      outputElement.dataset.autoScroll = "false";
     }
   }
 };
 
 // 通知系统
-const showNotification = (message: string, type: 'info' | 'success' | 'error' = 'info') => {
+const showNotification = (message: string, type: "info" | "success" | "error" = "info") => {
   // 简单的通知实现
   console.log(`[${type.toUpperCase()}] ${message}`);
 
   // 这里可以集成更复杂的通知系统
-  if ('Notification' in window && Notification.permission === 'granted') {
+  if ("Notification" in window && Notification.permission === "granted") {
     new Notification(message, {
       body: `后台任务监控 - ${type}`,
-      icon: '/favicon.ico',
+      icon: "/favicon.ico",
     });
   }
 };
@@ -766,7 +669,7 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('bash-output-settings', JSON.stringify(monitorSettings.value));
+  localStorage.setItem("bash-output-settings", JSON.stringify(monitorSettings.value));
   showSettings.value = false;
 
   // 重启自动刷新
@@ -796,67 +699,65 @@ const resetSettings = () => {
 // 本地存储
 const saveProcesses = () => {
   try {
-    localStorage.setItem('bash-output-processes', JSON.stringify(processes.value));
+    localStorage.setItem("bash-output-processes", JSON.stringify(processes.value));
   } catch (error) {
-    console.warn('Failed to save processes:', error);
+    console.warn("Failed to save processes:", error);
   }
 };
 
 const loadProcesses = () => {
   try {
-    const saved = localStorage.getItem('bash-output-processes');
+    const saved = localStorage.getItem("bash-output-processes");
     if (saved) {
       processes.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load processes:', error);
+    console.warn("Failed to load processes:", error);
   }
 };
 
 const saveFocusedProcesses = () => {
   try {
-    const focusedIds = processes.value
-      .filter(p => p.focused)
-      .map(p => p.id);
-    localStorage.setItem('bash-output-focused-processes', JSON.stringify(focusedIds));
+    const focusedIds = processes.value.filter((p) => p.focused).map((p) => p.id);
+    localStorage.setItem("bash-output-focused-processes", JSON.stringify(focusedIds));
   } catch (error) {
-    console.warn('Failed to save focused processes:', error);
+    console.warn("Failed to save focused processes:", error);
   }
 };
 
 const loadFocusedProcesses = () => {
   try {
-    const saved = localStorage.getItem('bash-output-focused-processes');
+    const saved = localStorage.getItem("bash-output-focused-processes");
     if (saved) {
       const focusedIds = JSON.parse(saved);
-      processes.value.forEach(process => {
+      processes.value.forEach((process) => {
         process.focused = focusedIds.includes(process.id);
       });
     }
   } catch (error) {
-    console.warn('Failed to load focused processes:', error);
+    console.warn("Failed to load focused processes:", error);
   }
 };
 
 // 工具方法
 const getStatusIcon = (status: string): any => {
   const icons: Record<string, string> = {
-    running: 'play',
-    completed: 'check',
-    failed: 'x-circle',
-    stopped: 'square',
+    running: "play",
+    completed: "check",
+    failed: "x-circle",
+    stopped: "square",
   };
-  return icons[status] || 'help-circle';
+  return icons[status] || "help-circle";
 };
 
 const getStatusText = (status: string) => {
   const texts: Record<string, string> = {
-    running: '运行中',
-    completed: '已完成',
-    failed: '失败',
-    stopped: '已停止',
+    running: "运行中",
+    completed: "已完成",
+    failed: "失败",
+    stopped: "已停止",
   };
-  return texts[status] || '未知';
+  return texts[status] || "未知";
 };
 
 const formatTime = (timestamp: number) => {
@@ -874,13 +775,13 @@ const formatTime = (timestamp: number) => {
     const hours = Math.floor(diff / 3600000);
     return `${hours}小时前`;
   } else {
-    return date.toLocaleDateString('zh-CN');
+    return date.toLocaleDateString("zh-CN");
   }
 };
 
 const formatTimestamp = (timestamp: number) => {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN');
+  return date.toLocaleTimeString("zh-CN");
 };
 
 const getRunningTime = (startTime: number) => {
@@ -896,7 +797,7 @@ const getRunningTime = (startTime: number) => {
   if (minutes > 0) parts.push(`${minutes}分钟`);
   if (seconds > 0) parts.push(`${seconds}秒`);
 
-  return parts.length > 0 ? parts.join('') : '0秒';
+  return parts.length > 0 ? parts.join("") : "0秒";
 };
 
 const formatOutputLine = (content: string): string => {
@@ -909,12 +810,12 @@ const formatOutputLine = (content: string): string => {
     .replace(/\x1b\[35m/g, '<span class="ansi-magenta">')
     .replace(/\x1b\[36m/g, '<span class="ansi-cyan">')
     .replace(/\x1b\[37m/g, '<span class="ansi-white">')
-    .replace(/\x1b\[0m/g, '</span>');
+    .replace(/\x1b\[0m/g, "</span>");
 };
 
 // 通知权限请求
 const requestNotificationPermission = () => {
-  if ('Notification' in window && Notification.permission === 'default') {
+  if ("Notification" in window && Notification.permission === "default") {
     Notification.requestPermission();
   }
 };
@@ -1022,7 +923,8 @@ onUnmounted(() => {
   @apply text-sm font-medium text-gray-700 dark:text-gray-300;
 }
 
-.filter-select, .filter-input {
+.filter-select,
+.filter-input {
   @apply px-3 py-1 text-sm border border-gray-200 dark:border-gray-600 rounded focus:outline-none focus:ring-1 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
@@ -1206,7 +1108,8 @@ onUnmounted(() => {
   @apply flex items-center justify-between px-4 py-2 border-t border-border dark:border-border-dark bg-gray-50 dark:bg-gray-700 text-xs text-gray-600 dark:text-gray-400;
 }
 
-.status-left, .status-right {
+.status-left,
+.status-right {
   @apply flex items-center gap-3;
 }
 
@@ -1260,11 +1163,25 @@ onUnmounted(() => {
 }
 
 /* ANSI颜色样式 */
-:deep(.ansi-red) { @apply text-red-500; }
-:deep(.ansi-green) { @apply text-green-500; }
-:deep(.ansi-yellow) { @apply text-yellow-500; }
-:deep(.ansi-blue) { @apply text-blue-500; }
-:deep(.ansi-magenta) { @apply text-magenta-500; }
-:deep(.ansi-cyan) { @apply text-cyan-500; }
-:deep(.ansi-white) { @apply text-gray-100; }
+:deep(.ansi-red) {
+  @apply text-red-500;
+}
+:deep(.ansi-green) {
+  @apply text-green-500;
+}
+:deep(.ansi-yellow) {
+  @apply text-yellow-500;
+}
+:deep(.ansi-blue) {
+  @apply text-blue-500;
+}
+:deep(.ansi-magenta) {
+  @apply text-magenta-500;
+}
+:deep(.ansi-cyan) {
+  @apply text-cyan-500;
+}
+:deep(.ansi-white) {
+  @apply text-gray-100;
+}
 </style>

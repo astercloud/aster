@@ -2,10 +2,7 @@
   <div class="workflow-progress">
     <!-- 进度条 -->
     <div class="progress-bar-container">
-      <div
-        class="progress-bar-fill"
-        :style="{ width: `${progressPercentage}%` }"
-      >
+      <div class="progress-bar-fill" :style="{ width: `${progressPercentage}%` }">
         <div class="progress-bar-shimmer"></div>
       </div>
     </div>
@@ -13,26 +10,16 @@
     <!-- 进度文本 -->
     <div class="progress-text">
       <div class="progress-stats">
-        <span class="progress-fraction">
-          {{ completed }} / {{ total }}
-        </span>
-        <span class="progress-percentage">
-          {{ progressPercentage }}%
-        </span>
+        <span class="progress-fraction"> {{ completed }} / {{ total }} </span>
+        <span class="progress-percentage"> {{ progressPercentage }}% </span>
       </div>
 
       <!-- 当前步骤 -->
       <div v-if="current >= 0 && current < total" class="progress-current">
         <svg class="w-3 h-3 text-blue-600 dark:text-blue-400" fill="currentColor" viewBox="0 0 20 20">
-          <path
-            fill-rule="evenodd"
-            d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z"
-            clip-rule="evenodd"
-          />
+          <path fill-rule="evenodd" d="M10 18a8 8 0 100-16 8 8 0 000 16zm3.707-9.293a1 1 0 00-1.414-1.414L9 10.586 7.707 9.293a1 1 0 00-1.414 1.414l2 2a1 1 0 001.414 0l4-4z" clip-rule="evenodd" />
         </svg>
-        <span class="text-sm text-slate-600 dark:text-slate-400">
-          步骤 {{ current + 1 }} / {{ total }}
-        </span>
+        <span class="text-sm text-slate-600 dark:text-slate-400"> 步骤 {{ current + 1 }} / {{ total }} </span>
       </div>
     </div>
 
@@ -47,7 +34,7 @@
             'progress-dot--completed': index < completed,
             'progress-dot--active': index === current,
             'progress-dot--pending': index > current,
-          }
+          },
         ]"
         :title="`步骤 ${index + 1}`"
       ></div>
@@ -56,10 +43,10 @@
 </template>
 
 <script lang="ts">
-import { defineComponent, computed } from 'vue';
+import { defineComponent, computed } from "vue";
 
 export default defineComponent({
-  name: 'WorkflowProgress',
+  name: "WorkflowProgress",
   props: {
     total: {
       type: Number,

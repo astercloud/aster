@@ -236,12 +236,7 @@ export interface ToolCall {
 /**
  * 流式 Chat 事件
  */
-export type StreamChatEvent =
-  | { type: "start"; sessionId: string }
-  | { type: "token"; token: string }
-  | { type: "tool_call"; toolCall: ToolCall }
-  | { type: "end"; response: ChatResponse }
-  | { type: "error"; error: string };
+export type StreamChatEvent = { type: "start"; sessionId: string } | { type: "token"; token: string } | { type: "tool_call"; toolCall: ToolCall } | { type: "end"; response: ChatResponse } | { type: "error"; error: string };
 
 // ============================================================================
 // Agent Statistics

@@ -2,11 +2,7 @@
   <div class="carousel">
     <div class="carousel-container" ref="containerRef">
       <div class="carousel-track" :style="{ transform: `translateX(-${currentIndex * 100}%)` }">
-        <div
-          v-for="(item, index) in items"
-          :key="index"
-          class="carousel-item"
-        >
+        <div v-for="(item, index) in items" :key="index" class="carousel-item">
           <slot :item="item" :index="index">
             {{ item }}
           </slot>
@@ -14,35 +10,22 @@
       </div>
     </div>
 
-    <button
-      v-if="showArrows && currentIndex > 0"
-      class="carousel-arrow carousel-prev"
-      @click="prev"
-    >
+    <button v-if="showArrows && currentIndex > 0" class="carousel-arrow carousel-prev" @click="prev">
       <Icon type="chevron-left" />
     </button>
-    <button
-      v-if="showArrows && currentIndex < items.length - 1"
-      class="carousel-arrow carousel-next"
-      @click="next"
-    >
+    <button v-if="showArrows && currentIndex < items.length - 1" class="carousel-arrow carousel-next" @click="next">
       <Icon type="chevron-right" />
     </button>
 
     <div v-if="showDots" class="carousel-dots">
-      <button
-        v-for="(_, index) in items"
-        :key="index"
-        :class="['carousel-dot', { active: index === currentIndex }]"
-        @click="goTo(index)"
-      />
+      <button v-for="(_, index) in items" :key="index" :class="['carousel-dot', { active: index === currentIndex }]" @click="goTo(index)" />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref } from 'vue';
-import Icon from './Icon.vue';
+import { ref } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   items: any[];

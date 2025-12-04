@@ -1,11 +1,6 @@
 <template>
   <div class="thinking-timeline">
-    <ThinkingStep
-      v-for="(step, index) in steps"
-      :key="step.id || `step-${index}`"
-      :step="step"
-      :is-last="index === steps.length - 1"
-    />
+    <ThinkingStep v-for="(step, index) in steps" :key="step.id || `step-${index}`" :step="step" :is-last="index === steps.length - 1" />
 
     <!-- 空状态 -->
     <div v-if="steps.length === 0" class="empty-state">
@@ -23,13 +18,13 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import ThinkingStep from './ThinkingStep.vue';
-import type { ThinkingStep as ThinkingStepType } from '@/types/thinking';
-import type { PropType } from 'vue';
+import { defineComponent } from "vue";
+import ThinkingStep from "./ThinkingStep.vue";
+import type { ThinkingStep as ThinkingStepType } from "@/types/thinking";
+import type { PropType } from "vue";
 
 export default defineComponent({
-  name: 'ThinkingTimeline',
+  name: "ThinkingTimeline",
   components: {
     ThinkingStep,
   },

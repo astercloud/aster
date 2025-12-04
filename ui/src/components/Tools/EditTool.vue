@@ -8,44 +8,23 @@
           <span>文件编辑器</span>
         </div>
         <div v-if="currentFile" class="file-indicator">
-          <Icon :type="(getIconForFile(currentFile) as any)" size="xs" />
+          <Icon :type="getIconForFile(currentFile) as any" size="xs" />
           <span class="file-name">{{ currentFile.name }}</span>
           <span v-if="hasUnsavedChanges" class="unsaved-indicator">●</span>
         </div>
       </div>
       <div class="header-actions">
-        <button
-          v-if="currentFile"
-          class="action-button"
-          title="保存文件"
-          :disabled="isSaving"
-          @click="saveFile"
-        >
+        <button v-if="currentFile" class="action-button" title="保存文件" :disabled="isSaving" @click="saveFile">
           <Icon v-if="isSaving" type="spinner" size="sm" class="animate-spin" />
           <Icon v-else type="save" size="sm" />
         </button>
-        <button
-          v-if="currentFile"
-          class="action-button"
-          title="保存并关闭"
-          :disabled="isSaving"
-          @click="saveAndClose"
-        >
+        <button v-if="currentFile" class="action-button" title="保存并关闭" :disabled="isSaving" @click="saveAndClose">
           <Icon type="check" size="sm" />
         </button>
-        <button
-          v-if="currentFile"
-          class="action-button"
-          title="关闭文件"
-          @click="closeFile"
-        >
+        <button v-if="currentFile" class="action-button" title="关闭文件" @click="closeFile">
           <Icon type="close" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
       </div>
@@ -86,51 +65,29 @@
         </div>
         <div class="setting-group">
           <label>Tab大小</label>
-          <input
-            v-model.number="editorSettings.tabSize"
-            type="number"
-            min="2"
-            max="8"
-            class="setting-input"
-          />
+          <input v-model.number="editorSettings.tabSize" type="number" min="2" max="8" class="setting-input" />
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="editorSettings.wordWrap"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="editorSettings.wordWrap" type="checkbox" class="setting-checkbox" />
             自动换行
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="editorSettings.lineNumbers"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="editorSettings.lineNumbers" type="checkbox" class="setting-checkbox" />
             显示行号
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="editorSettings.minimap"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="editorSettings.minimap" type="checkbox" class="setting-checkbox" />
             显示缩略图
           </label>
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="editorSettings.autoSave"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="editorSettings.autoSave" type="checkbox" class="setting-checkbox" />
             自动保存
           </label>
         </div>
@@ -153,24 +110,15 @@
       <div class="quick-access">
         <h4>快速访问</h4>
         <div class="quick-actions">
-          <button
-            class="quick-action-btn"
-            @click="browseFiles"
-          >
+          <button class="quick-action-btn" @click="browseFiles">
             <Icon type="folder-open" size="sm" />
             浏览文件
           </button>
-          <button
-            class="quick-action-btn"
-            @click="createNewFile"
-          >
+          <button class="quick-action-btn" @click="createNewFile">
             <Icon type="file-plus" size="sm" />
             新建文件
           </button>
-          <button
-            class="quick-action-btn"
-            @click="openFromUrl"
-          >
+          <button class="quick-action-btn" @click="openFromUrl">
             <Icon type="link" size="sm" />
             从URL打开
           </button>
@@ -181,14 +129,9 @@
       <div v-if="recentFiles.length > 0" class="recent-files">
         <h4>最近编辑</h4>
         <div class="recent-list">
-          <div
-            v-for="(file, index) in recentFiles"
-            :key="index"
-            class="recent-item"
-            @click="openFile(file)"
-          >
+          <div v-for="(file, index) in recentFiles" :key="index" class="recent-item" @click="openFile(file)">
             <div class="file-icon">
-              <Icon :type="(getIconForFile(file) as any)" size="sm" />
+              <Icon :type="getIconForFile(file) as any" size="sm" />
             </div>
             <div class="file-info">
               <div class="file-name">{{ file.name }}</div>
@@ -199,18 +142,10 @@
               </div>
             </div>
             <div class="file-actions">
-              <button
-                class="file-action-btn"
-                title="从磁盘重新加载"
-                @click.stop="reloadFromFile(file)"
-              >
+              <button class="file-action-btn" title="从磁盘重新加载" @click.stop="reloadFromFile(file)">
                 <Icon type="refresh" size="xs" />
               </button>
-              <button
-                class="file-action-btn remove-btn"
-                title="从最近列表移除"
-                @click.stop="removeFromRecent(index)"
-              >
+              <button class="file-action-btn remove-btn" title="从最近列表移除" @click.stop="removeFromRecent(index)">
                 <Icon type="close" size="xs" />
               </button>
             </div>
@@ -219,23 +154,11 @@
       </div>
 
       <!-- 拖拽区域 -->
-      <div
-        class="drop-zone"
-        :class="{ 'drag-over': isDragOver }"
-        @dragover.prevent="handleDragOver"
-        @dragleave.prevent="handleDragLeave"
-        @drop.prevent="handleDrop"
-      >
+      <div class="drop-zone" :class="{ 'drag-over': isDragOver }" @dragover.prevent="handleDragOver" @dragleave.prevent="handleDragLeave" @drop.prevent="handleDrop">
         <Icon type="upload" size="lg" />
         <p>拖拽文件到此处开始编辑</p>
         <p class="drop-hint">支持多种文件格式</p>
-        <input
-          type="file"
-          ref="fileInput"
-          class="file-input"
-          @change="handleFileSelect"
-          multiple
-        />
+        <input type="file" ref="fileInput" class="file-input" @change="handleFileSelect" multiple />
       </div>
     </div>
 
@@ -245,85 +168,43 @@
       <div class="editor-toolbar">
         <div class="toolbar-left">
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="撤销"
-              :disabled="!canUndo"
-              @click="undo"
-            >
+            <button class="toolbar-btn" title="撤销" :disabled="!canUndo" @click="undo">
               <Icon type="undo" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="重做"
-              :disabled="!canRedo"
-              @click="redo"
-            >
+            <button class="toolbar-btn" title="重做" :disabled="!canRedo" @click="redo">
               <Icon type="redo" size="xs" />
             </button>
           </div>
           <div class="toolbar-separator"></div>
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="查找"
-              @click="toggleFind"
-            >
+            <button class="toolbar-btn" title="查找" @click="toggleFind">
               <Icon type="search" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="替换"
-              @click="toggleReplace"
-            >
+            <button class="toolbar-btn" title="替换" @click="toggleReplace">
               <Icon type="replace" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="转到行"
-              @click="goToLine()"
-            >
+            <button class="toolbar-btn" title="转到行" @click="goToLine()">
               <Icon type="hash" size="xs" />
             </button>
           </div>
           <div class="toolbar-separator"></div>
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              title="格式化代码"
-              @click="formatCode"
-            >
+            <button class="toolbar-btn" title="格式化代码" @click="formatCode">
               <Icon type="align-left" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="折叠代码"
-              @click="toggleFold"
-            >
+            <button class="toolbar-btn" title="折叠代码" @click="toggleFold">
               <Icon type="chevron-down" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              title="切换注释"
-              @click="toggleComment"
-            >
+            <button class="toolbar-btn" title="切换注释" @click="toggleComment">
               <Icon type="message-square" size="xs" />
             </button>
           </div>
           <div class="toolbar-separator"></div>
           <div class="toolbar-group">
-            <button
-              class="toolbar-btn"
-              :title="showDiff ? '隐藏差异' : '显示差异'"
-              @click="toggleDiff"
-            >
+            <button class="toolbar-btn" :title="showDiff ? '隐藏差异' : '显示差异'" @click="toggleDiff">
               <Icon type="git-merge" size="xs" />
             </button>
-            <button
-              class="toolbar-btn"
-              :title="showSidebar ? '隐藏侧边栏' : '显示侧边栏'"
-              @click="toggleSidebar"
-            >
+            <button class="toolbar-btn" :title="showSidebar ? '隐藏侧边栏' : '显示侧边栏'" @click="toggleSidebar">
               <Icon type="sidebar" size="xs" />
             </button>
           </div>
@@ -347,87 +228,32 @@
       <div v-if="showFindBar" class="find-replace-bar">
         <div class="find-input-group">
           <Icon type="search" size="sm" class="input-icon" />
-          <input
-            v-model="findQuery"
-            ref="findInput"
-            type="text"
-            placeholder="查找..."
-            class="find-input"
-            @keydown.enter="findNext"
-            @keydown.shift.enter="findPrevious"
-          />
+          <input v-model="findQuery" ref="findInput" type="text" placeholder="查找..." class="find-input" @keydown.enter="findNext" @keydown.shift.enter="findPrevious" />
           <div class="find-controls">
-            <span v-if="findResults.total > 0" class="find-results">
-              {{ findResults.current }} / {{ findResults.total }}
-            </span>
-            <button
-              class="find-btn"
-              title="上一个"
-              :disabled="findResults.total === 0"
-              @click="findPrevious"
-            >
+            <span v-if="findResults.total > 0" class="find-results"> {{ findResults.current }} / {{ findResults.total }} </span>
+            <button class="find-btn" title="上一个" :disabled="findResults.total === 0" @click="findPrevious">
               <Icon type="chevron-up" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="下一个"
-              :disabled="findResults.total === 0"
-              @click="findNext"
-            >
+            <button class="find-btn" title="下一个" :disabled="findResults.total === 0" @click="findNext">
               <Icon type="chevron-down" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="区分大小写"
-              :class="{ active: findOptions.caseSensitive }"
-              @click="findOptions.caseSensitive = !findOptions.caseSensitive"
-            >
+            <button class="find-btn" title="区分大小写" :class="{ active: findOptions.caseSensitive }" @click="findOptions.caseSensitive = !findOptions.caseSensitive">
               <Icon type="case-sensitive" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="正则表达式"
-              :class="{ active: findOptions.useRegex }"
-              @click="findOptions.useRegex = !findOptions.useRegex"
-            >
+            <button class="find-btn" title="正则表达式" :class="{ active: findOptions.useRegex }" @click="findOptions.useRegex = !findOptions.useRegex">
               <Icon type="regex" size="xs" />
             </button>
-            <button
-              class="find-btn"
-              title="全词匹配"
-              :class="{ active: findOptions.wholeWord }"
-              @click="findOptions.wholeWord = !findOptions.wholeWord"
-            >
+            <button class="find-btn" title="全词匹配" :class="{ active: findOptions.wholeWord }" @click="findOptions.wholeWord = !findOptions.wholeWord">
               <Icon type="whole-word" size="xs" />
             </button>
           </div>
         </div>
         <div v-if="showReplace" class="replace-input-group">
           <Icon type="replace" size="sm" class="input-icon" />
-          <input
-            v-model="replaceQuery"
-            type="text"
-            placeholder="替换为..."
-            class="replace-input"
-            @keydown.enter="replaceNext"
-          />
+          <input v-model="replaceQuery" type="text" placeholder="替换为..." class="replace-input" @keydown.enter="replaceNext" />
           <div class="replace-controls">
-            <button
-              class="replace-btn"
-              title="替换"
-              :disabled="findResults.total === 0"
-              @click="replaceNext"
-            >
-              替换
-            </button>
-            <button
-              class="replace-btn"
-              title="全部替换"
-              :disabled="findResults.total === 0"
-              @click="replaceAll"
-            >
-              全部替换
-            </button>
+            <button class="replace-btn" title="替换" :disabled="findResults.total === 0" @click="replaceNext">替换</button>
+            <button class="replace-btn" title="全部替换" :disabled="findResults.total === 0" @click="replaceAll">全部替换</button>
           </div>
         </div>
       </div>
@@ -437,24 +263,15 @@
         <!-- 侧边栏 -->
         <div v-if="showSidebar" class="sidebar">
           <div class="sidebar-tabs">
-            <button
-              :class="['sidebar-tab', { active: activeSidebarTab === 'outline' }]"
-              @click="activeSidebarTab = 'outline'"
-            >
+            <button :class="['sidebar-tab', { active: activeSidebarTab === 'outline' }]" @click="activeSidebarTab = 'outline'">
               <Icon type="list" size="xs" />
               大纲
             </button>
-            <button
-              :class="['sidebar-tab', { active: activeSidebarTab === 'symbols' }]"
-              @click="activeSidebarTab = 'symbols'"
-            >
+            <button :class="['sidebar-tab', { active: activeSidebarTab === 'symbols' }]" @click="activeSidebarTab = 'symbols'">
               <Icon type="hash" size="xs" />
               符号
             </button>
-            <button
-              :class="['sidebar-tab', { active: activeSidebarTab === 'problems' }]"
-              @click="activeSidebarTab = 'problems'"
-            >
+            <button :class="['sidebar-tab', { active: activeSidebarTab === 'problems' }]" @click="activeSidebarTab = 'problems'">
               <Icon type="alert-circle" size="xs" />
               问题
             </button>
@@ -463,14 +280,9 @@
           <div class="sidebar-content">
             <!-- 大纲视图 -->
             <div v-if="activeSidebarTab === 'outline'" class="outline-view">
-              <div
-                v-for="(item, index) in outlineItems"
-                :key="index"
-                :class="['outline-item', `level-${item.level}`]"
-                @click="goToLine(item.line)"
-              >
+              <div v-for="(item, index) in outlineItems" :key="index" :class="['outline-item', `level-${item.level}`]" @click="goToLine(item.line)">
                 <span class="outline-icon">
-                  <Icon :type="(getOutlineIcon(item.type) as any)" size="xs" />
+                  <Icon :type="getOutlineIcon(item.type) as any" size="xs" />
                 </span>
                 <span class="outline-text">{{ item.text }}</span>
                 <span class="outline-line">{{ item.line }}</span>
@@ -479,13 +291,8 @@
 
             <!-- 符号列表 -->
             <div v-if="activeSidebarTab === 'symbols'" class="symbols-view">
-              <div
-                v-for="(symbol, index) in symbols"
-                :key="index"
-                :class="['symbol-item', symbol.type]"
-                @click="goToLine(symbol.line)"
-              >
-                <Icon :type="(getSymbolIcon(symbol.type) as any)" size="xs" />
+              <div v-for="(symbol, index) in symbols" :key="index" :class="['symbol-item', symbol.type]" @click="goToLine(symbol.line)">
+                <Icon :type="getSymbolIcon(symbol.type) as any" size="xs" />
                 <span class="symbol-name">{{ symbol.name }}</span>
                 <span class="symbol-line">{{ symbol.line }}</span>
               </div>
@@ -493,13 +300,8 @@
 
             <!-- 问题列表 -->
             <div v-if="activeSidebarTab === 'problems'" class="problems-view">
-              <div
-                v-for="(problem, index) in problems"
-                :key="index"
-                :class="['problem-item', problem.severity]"
-                @click="goToLine(problem.line)"
-              >
-                <Icon :type="(getProblemIcon(problem.severity) as any)" size="xs" />
+              <div v-for="(problem, index) in problems" :key="index" :class="['problem-item', problem.severity]" @click="goToLine(problem.line)">
+                <Icon :type="getProblemIcon(problem.severity) as any" size="xs" />
                 <span class="problem-message">{{ problem.message }}</span>
                 <span class="problem-line">{{ problem.line }}</span>
               </div>
@@ -513,10 +315,7 @@
           <div v-if="showDiff" class="diff-view">
             <div class="diff-header">
               <h4>文件差异对比</h4>
-              <button
-                class="diff-close"
-                @click="showDiff = false"
-              >
+              <button class="diff-close" @click="showDiff = false">
                 <Icon type="close" size="xs" />
               </button>
             </div>
@@ -541,12 +340,7 @@
           <!-- 主编辑器 -->
           <div v-else class="main-editor">
             <div v-if="editorSettings.lineNumbers" class="line-numbers">
-              <div
-                v-for="(line, index) in contentLines"
-                :key="index"
-                :class="['line-number', { 'current-line': index === cursorPosition.line - 1, 'has-breakpoint': hasBreakpoint(index + 1) }]"
-                @click="toggleBreakpoint(index + 1)"
-              >
+              <div v-for="(line, index) in contentLines" :key="index" :class="['line-number', { 'current-line': index === cursorPosition.line - 1, 'has-breakpoint': hasBreakpoint(index + 1) }]" @click="toggleBreakpoint(index + 1)">
                 {{ index + 1 }}
               </div>
             </div>
@@ -559,13 +353,9 @@
                   fontSize: editorSettings.fontSize + 'px',
                   fontFamily: editorSettings.fontFamily,
                   tabSize: editorSettings.tabSize,
-                  lineHeight: 1.6
+                  lineHeight: 1.6,
                 }"
-                :class="[
-                  'editor-textarea',
-                  { 'word-wrap': editorSettings.wordWrap },
-                  `theme-${editorSettings.theme}`
-                ]"
+                :class="['editor-textarea', { 'word-wrap': editorSettings.wordWrap }, `theme-${editorSettings.theme}`]"
                 spellcheck="false"
                 @input="handleInput"
                 @keydown="handleKeydown"
@@ -590,12 +380,8 @@
       <div class="status-left">
         <span class="branch">main</span>
         <span class="sync-status"> synced</span>
-        <span v-if="errors.length > 0" class="errors-count">
-          {{ errors.length }} 错误
-        </span>
-        <span v-if="warnings.length > 0" class="warnings-count">
-          {{ warnings.length }} 警告
-        </span>
+        <span v-if="errors.length > 0" class="errors-count"> {{ errors.length }} 错误 </span>
+        <span v-if="warnings.length > 0" class="warnings-count"> {{ warnings.length }} 警告 </span>
       </div>
       <div class="status-right">
         <span class="indent-size">Spaces: {{ editorSettings.tabSize }}</span>
@@ -609,8 +395,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface EditFile {
   name: string;
@@ -627,12 +413,12 @@ interface OutlineItem {
   line: number;
   level: number;
   text: string;
-  type: 'class' | 'function' | 'variable' | 'import' | 'export' | 'comment';
+  type: "class" | "function" | "variable" | "import" | "export" | "comment";
 }
 
 interface Symbol {
   name: string;
-  type: 'function' | 'class' | 'variable' | 'constant';
+  type: "function" | "class" | "variable" | "constant";
   line: number;
   description?: string;
 }
@@ -640,7 +426,7 @@ interface Symbol {
 interface Problem {
   line: number;
   column: number;
-  severity: 'error' | 'warning' | 'info';
+  severity: "error" | "warning" | "info";
   message: string;
   source?: string;
 }
@@ -661,8 +447,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -672,7 +458,7 @@ const emit = defineEmits<{
 
 // 响应式数据
 const currentFile = ref<EditFile | null>(null);
-const fileContent = ref('');
+const fileContent = ref("");
 const recentFiles = ref<EditFile[]>([]);
 const isSaving = ref(false);
 const showSettings = ref(false);
@@ -680,12 +466,12 @@ const showDiff = ref(false);
 const showSidebar = ref(false);
 const showFindBar = ref(false);
 const showReplace = ref(false);
-const activeSidebarTab = ref<'outline' | 'symbols' | 'problems'>('outline');
+const activeSidebarTab = ref<"outline" | "symbols" | "problems">("outline");
 const isDragOver = ref(false);
 
 // 编辑器设置
 const editorSettings = ref({
-  theme: 'vs-code',
+  theme: "vs-code",
   fontSize: 14,
   fontFamily: 'Consolas, Monaco, "Courier New", monospace',
   tabSize: 2,
@@ -697,8 +483,8 @@ const editorSettings = ref({
 });
 
 // 查找替换
-const findQuery = ref('');
-const replaceQuery = ref('');
+const findQuery = ref("");
+const replaceQuery = ref("");
 const findResults = ref<FindResults>({ current: 0, total: 0 });
 const findOptions = ref({
   caseSensitive: false,
@@ -708,7 +494,7 @@ const findOptions = ref({
 
 // 编辑状态
 const cursorPosition = ref<CursorPosition>({ line: 1, column: 1 });
-const selectionInfo = ref('');
+const selectionInfo = ref("");
 const canUndo = ref(false);
 const canRedo = ref(false);
 
@@ -721,8 +507,8 @@ const outlineItems = ref<OutlineItem[]>([]);
 const symbols = ref<Symbol[]>([]);
 const problems = ref<Problem[]>([]);
 const breakpoints = ref<number[]>([]);
-const errors = computed(() => problems.value.filter(p => p.severity === 'error'));
-const warnings = computed(() => problems.value.filter(p => p.severity === 'warning'));
+const errors = computed(() => problems.value.filter((p) => p.severity === "error"));
+const warnings = computed(() => problems.value.filter((p) => p.severity === "warning"));
 
 // 自动保存
 const autoSaveTimer = ref<NodeJS.Timeout | null>(null);
@@ -734,7 +520,7 @@ const websocket = ref<WebSocket | null>(null);
 
 // 计算属性
 const contentLines = computed(() => {
-  return fileContent.value.split('\n');
+  return fileContent.value.split("\n");
 });
 
 const hasUnsavedChanges = computed(() => {
@@ -742,16 +528,16 @@ const hasUnsavedChanges = computed(() => {
 });
 
 const fileSize = computed(() => {
-  if (!currentFile.value?.size) return '';
+  if (!currentFile.value?.size) return "";
   const bytes = new Blob([fileContent.value]).size;
   const k = 1024;
-  const sizes = ['B', 'KB', 'MB', 'GB'];
+  const sizes = ["B", "KB", "MB", "GB"];
   const i = Math.floor(Math.log(bytes) / Math.log(k));
-  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + ' ' + sizes[i];
+  return parseFloat((bytes / Math.pow(k, i)).toFixed(1)) + " " + sizes[i];
 });
 
 const encoding = computed(() => {
-  return currentFile.value?.encoding || 'UTF-8';
+  return currentFile.value?.encoding || "UTF-8";
 });
 
 // WebSocket 连接
@@ -760,7 +546,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('EditTool WebSocket connected');
+      console.log("EditTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -768,38 +554,38 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('EditTool WebSocket disconnected');
+      console.log("EditTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('EditTool WebSocket error:', error);
+      console.error("EditTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'file_saved':
+    case "file_saved":
       if (message.file && currentFile.value) {
         currentFile.value.originalContent = currentFile.value.content;
         isSaving.value = false;
-        emit('fileSaved', currentFile.value);
+        emit("fileSaved", currentFile.value);
       }
       break;
-    case 'file_loaded':
+    case "file_loaded":
       if (message.file) {
         loadFileContent(message.file);
       }
       break;
-    case 'syntax_analysis':
+    case "syntax_analysis":
       if (message.analysis) {
         updateSyntaxAnalysis(message.analysis);
       }
@@ -843,15 +629,15 @@ const loadFileContent = (file: EditFile) => {
 };
 
 const createNewFile = () => {
-  const fileName = prompt('输入新文件名:') || 'untitled.txt';
+  const fileName = prompt("输入新文件名:") || "untitled.txt";
   const newFile: EditFile = {
     name: fileName,
     path: `/${fileName}`,
-    content: '',
-    originalContent: '',
+    content: "",
+    originalContent: "",
     lastEdit: Date.now(),
     size: 0,
-    encoding: 'UTF-8',
+    encoding: "UTF-8",
     language: getLanguage(fileName),
   };
   openFile(newFile);
@@ -862,10 +648,10 @@ const browseFiles = () => {
 };
 
 const openFromUrl = () => {
-  const url = prompt('输入文件URL:');
+  const url = prompt("输入文件URL:");
   if (url) {
     sendWebSocketMessage({
-      type: 'load_file_from_url',
+      type: "load_file_from_url",
       url: url,
     });
   }
@@ -874,7 +660,7 @@ const openFromUrl = () => {
 const reloadFromFile = (file: EditFile) => {
   if (confirm(`确定要重新加载文件 ${file.name} 吗？未保存的更改将丢失。`)) {
     sendWebSocketMessage({
-      type: 'reload_file',
+      type: "reload_file",
       path: file.path,
     });
   }
@@ -888,7 +674,7 @@ const saveFile = async () => {
   currentFile.value.lastEdit = Date.now();
 
   sendWebSocketMessage({
-    type: 'save_file',
+    type: "save_file",
     file: {
       ...currentFile.value,
       content: fileContent.value,
@@ -905,15 +691,15 @@ const saveAndClose = async () => {
 
 const closeFile = () => {
   if (currentFile.value && hasUnsavedChanges.value) {
-    if (!confirm('文件有未保存的更改，确定要关闭吗？')) {
+    if (!confirm("文件有未保存的更改，确定要关闭吗？")) {
       return;
     }
   }
 
   if (currentFile.value) {
-    emit('fileClosed', currentFile.value);
+    emit("fileClosed", currentFile.value);
     currentFile.value = null;
-    fileContent.value = '';
+    fileContent.value = "";
     resetFindReplace();
     clearAutoSave();
     outlineItems.value = [];
@@ -948,8 +734,8 @@ const handleFileSelect = (event: Event) => {
 };
 
 const handleFiles = (files: FileList) => {
-  Array.from(files).forEach(file => {
-    if (file.type.startsWith('text/') || isTextFileName(file.name)) {
+  Array.from(files).forEach((file) => {
+    if (file.type.startsWith("text/") || isTextFileName(file.name)) {
       const reader = new FileReader();
       reader.onload = (e) => {
         const result = e.target?.result as string;
@@ -960,7 +746,7 @@ const handleFiles = (files: FileList) => {
           originalContent: result,
           lastEdit: Date.now(),
           size: file.size,
-          encoding: 'UTF-8',
+          encoding: "UTF-8",
           language: getLanguage(file.name),
         };
         openFile(newFile);
@@ -971,13 +757,9 @@ const handleFiles = (files: FileList) => {
 };
 
 const isTextFileName = (fileName: string): boolean => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
-  const textExtensions = [
-    'txt', 'md', 'json', 'js', 'ts', 'jsx', 'tsx', 'html', 'css', 'scss',
-    'py', 'java', 'cpp', 'c', 'h', 'hpp', 'go', 'rs', 'sql', 'sh', 'bash',
-    'yml', 'yaml', 'xml', 'csv', 'log', 'vue', 'svelte', 'php', 'rb'
-  ];
-  return textExtensions.includes(extension || '');
+  const extension = fileName.split(".").pop()?.toLowerCase();
+  const textExtensions = ["txt", "md", "json", "js", "ts", "jsx", "tsx", "html", "css", "scss", "py", "java", "cpp", "c", "h", "hpp", "go", "rs", "sql", "sh", "bash", "yml", "yaml", "xml", "csv", "log", "vue", "svelte", "php", "rb"];
+  return textExtensions.includes(extension || "");
 };
 
 // 查找替换方法
@@ -1012,7 +794,7 @@ const findNext = () => {
 
   let match;
   if (findOptions.value.useRegex) {
-    const regex = new RegExp(findQuery.value, findOptions.value.caseSensitive ? 'g' : 'gi');
+    const regex = new RegExp(findQuery.value, findOptions.value.caseSensitive ? "g" : "gi");
     regex.lastIndex = start;
     match = regex.exec(text);
   } else {
@@ -1042,9 +824,9 @@ const findPrevious = () => {
 
   let match;
   if (findOptions.value.useRegex) {
-    const regex = new RegExp(findQuery.value, findOptions.value.caseSensitive ? 'g' : 'gi');
+    const regex = new RegExp(findQuery.value, findOptions.value.caseSensitive ? "g" : "gi");
     const matches = [...text.matchAll(regex)];
-    const currentIndex = matches.findIndex(m => m.index >= textarea.selectionStart);
+    const currentIndex = matches.findIndex((m) => m.index >= textarea.selectionStart);
     if (currentIndex > 0) {
       match = matches[currentIndex - 1];
     } else if (matches.length > 0) {
@@ -1100,23 +882,19 @@ const createSearchQuery = () => {
 };
 
 const createReplaceRegex = () => {
-  const flags = findOptions.value.caseSensitive ? 'g' : 'gi';
+  const flags = findOptions.value.caseSensitive ? "g" : "gi";
   let pattern = findQuery.value;
   if (findOptions.value.wholeWord) {
     pattern = `\\b${pattern}\\b`;
   }
-  return new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, '\\$&'), flags);
+  return new RegExp(pattern.replace(/[.*+?^${}()|[\]\\]/g, "\\$&"), flags);
 };
 
 const isMatch = (text: string): boolean => {
   if (findOptions.value.caseSensitive) {
-    return findOptions.value.wholeWord
-      ? new RegExp(`\\b${findQuery.value}\\b`).test(text)
-      : text.includes(findQuery.value);
+    return findOptions.value.wholeWord ? new RegExp(`\\b${findQuery.value}\\b`).test(text) : text.includes(findQuery.value);
   } else {
-    return findOptions.value.wholeWord
-      ? new RegExp(`\\b${findQuery.value}\\b`, 'i').test(text)
-      : text.toLowerCase().includes(findQuery.value.toLowerCase());
+    return findOptions.value.wholeWord ? new RegExp(`\\b${findQuery.value}\\b`, "i").test(text) : text.toLowerCase().includes(findQuery.value.toLowerCase());
   }
 };
 
@@ -1132,8 +910,8 @@ const updateFindResults = () => {
 };
 
 const resetFindReplace = () => {
-  findQuery.value = '';
-  replaceQuery.value = '';
+  findQuery.value = "";
+  replaceQuery.value = "";
   findResults.value = { current: 0, total: 0 };
   showFindBar.value = false;
   showReplace.value = false;
@@ -1141,7 +919,7 @@ const resetFindReplace = () => {
 
 // 导航方法
 const goToLine = (lineNumber?: number) => {
-  const line = lineNumber || parseInt(prompt('转到行号:') || '1');
+  const line = lineNumber || parseInt(prompt("转到行号:") || "1");
   if (line && line > 0 && line <= contentLines.value.length) {
     const lines = contentLines.value;
     let offset = 0;
@@ -1161,7 +939,7 @@ const goToLine = (lineNumber?: number) => {
 const undo = () => {
   if (historyIndex.value > 0) {
     historyIndex.value--;
-    fileContent.value = editHistory.value[historyIndex.value] ?? '';
+    fileContent.value = editHistory.value[historyIndex.value] ?? "";
     canUndo.value = historyIndex.value > 0;
     canRedo.value = true;
   }
@@ -1170,7 +948,7 @@ const undo = () => {
 const redo = () => {
   if (historyIndex.value < editHistory.value.length - 1) {
     historyIndex.value++;
-    fileContent.value = editHistory.value[historyIndex.value] ?? '';
+    fileContent.value = editHistory.value[historyIndex.value] ?? "";
     canUndo.value = true;
     canRedo.value = historyIndex.value < editHistory.value.length - 1;
   }
@@ -1179,24 +957,24 @@ const redo = () => {
 const formatCode = () => {
   if (!currentFile.value) return;
 
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
 
-  if (['js', 'ts', 'jsx', 'tsx', 'json'].includes(extension || '')) {
+  if (["js", "ts", "jsx", "tsx", "json"].includes(extension || "")) {
     try {
-      if (extension === 'json') {
+      if (extension === "json") {
         const parsed = JSON.parse(fileContent.value);
         fileContent.value = JSON.stringify(parsed, null, 2);
       }
       // 这里可以集成 Prettier 或其他格式化工具
     } catch (error) {
-      console.warn('Code formatting failed:', error);
+      console.warn("Code formatting failed:", error);
     }
   }
 };
 
 const toggleFold = () => {
   // 代码折叠功能
-  console.log('Toggle fold functionality');
+  console.log("Toggle fold functionality");
 };
 
 const toggleComment = () => {
@@ -1206,23 +984,23 @@ const toggleComment = () => {
   const start = textarea.selectionStart;
   const end = textarea.selectionEnd;
   const text = textarea.value;
-  const lines = text.substring(start, end).split('\n');
+  const lines = text.substring(start, end).split("\n");
 
   // 检查是否所有行都已注释
-  const allCommented = lines.every(line => line.trim().startsWith('//'));
+  const allCommented = lines.every((line) => line.trim().startsWith("//"));
 
-  const newLines = lines.map(line => {
+  const newLines = lines.map((line) => {
     const trimmed = line.trim();
     if (allCommented) {
       // 取消注释
-      return trimmed.startsWith('//') ? trimmed.substring(2).trim() : line;
+      return trimmed.startsWith("//") ? trimmed.substring(2).trim() : line;
     } else {
       // 添加注释
-      return line.trim() === '' ? line : `// ${line}`;
+      return line.trim() === "" ? line : `// ${line}`;
     }
   });
 
-  const newContent = newLines.join('\n');
+  const newContent = newLines.join("\n");
   fileContent.value = text.substring(0, start) + newContent + text.substring(end);
 };
 
@@ -1267,31 +1045,31 @@ const handleKeydown = (event: KeyboardEvent) => {
   // 快捷键
   if (event.ctrlKey || event.metaKey) {
     switch (event.key) {
-      case 's':
+      case "s":
         event.preventDefault();
         saveFile();
         break;
-      case 'f':
+      case "f":
         event.preventDefault();
         toggleFind();
         break;
-      case 'h':
+      case "h":
         event.preventDefault();
         toggleReplace();
         break;
-      case 'g':
+      case "g":
         event.preventDefault();
         goToLine();
         break;
-      case 'd':
+      case "d":
         event.preventDefault();
         toggleDiff();
         break;
-      case 'b':
+      case "b":
         event.preventDefault();
         toggleSidebar();
         break;
-      case 'z':
+      case "z":
         if (event.shiftKey) {
           event.preventDefault();
           redo();
@@ -1300,11 +1078,11 @@ const handleKeydown = (event: KeyboardEvent) => {
           undo();
         }
         break;
-      case 'y':
+      case "y":
         event.preventDefault();
         redo();
         break;
-      case '/':
+      case "/":
         event.preventDefault();
         toggleComment();
         break;
@@ -1312,7 +1090,7 @@ const handleKeydown = (event: KeyboardEvent) => {
   }
 
   // Tab支持
-  if (event.key === 'Tab') {
+  if (event.key === "Tab") {
     event.preventDefault();
     const start = textarea.selectionStart;
     const end = textarea.selectionEnd;
@@ -1336,10 +1114,10 @@ const handleKeyup = () => {
 };
 
 const handleIncreaseIndent = (start: number, end: number, value: string) => {
-  const lines = value.substring(start, end).split('\n');
-  const tabString = ' '.repeat(editorSettings.value.tabSize);
-  const indentedLines = lines.map(line => tabString + line);
-  const newContent = indentedLines.join('\n');
+  const lines = value.substring(start, end).split("\n");
+  const tabString = " ".repeat(editorSettings.value.tabSize);
+  const indentedLines = lines.map((line) => tabString + line);
+  const newContent = indentedLines.join("\n");
 
   fileContent.value = value.substring(0, start) + newContent + value.substring(end);
 
@@ -1352,17 +1130,17 @@ const handleIncreaseIndent = (start: number, end: number, value: string) => {
 };
 
 const handleDecreaseIndent = (start: number, end: number, value: string) => {
-  const lines = value.substring(start, end).split('\n');
+  const lines = value.substring(start, end).split("\n");
   const tabSize = editorSettings.value.tabSize;
-  const dedentedLines = lines.map(line => {
-    if (line.startsWith(' '.repeat(tabSize))) {
+  const dedentedLines = lines.map((line) => {
+    if (line.startsWith(" ".repeat(tabSize))) {
       return line.substring(tabSize);
-    } else if (line.startsWith('\t')) {
+    } else if (line.startsWith("\t")) {
       return line.substring(1);
     }
     return line;
   });
-  const newContent = dedentedLines.join('\n');
+  const newContent = dedentedLines.join("\n");
 
   fileContent.value = value.substring(0, start) + newContent + value.substring(end);
 
@@ -1385,7 +1163,7 @@ const updateCursorPosition = () => {
   let column = 1;
 
   for (let i = 0; i < position; i++) {
-    if (text[i] === '\n') {
+    if (text[i] === "\n") {
       line++;
       column = 1;
     } else {
@@ -1404,10 +1182,10 @@ const updateSelectionInfo = () => {
   const end = textarea.selectionEnd;
 
   if (start === end) {
-    selectionInfo.value = '';
+    selectionInfo.value = "";
   } else {
     const selectedText = textarea.value.substring(start, end);
-    const lines = selectedText.split('\n');
+    const lines = selectedText.split("\n");
     const charCount = selectedText.length;
 
     if (lines.length === 1) {
@@ -1420,11 +1198,11 @@ const updateSelectionInfo = () => {
 
 const syncScroll = (event: Event) => {
   const textarea = event.target as HTMLTextAreaElement;
-  const minimapViewport = document.querySelector('.minimap-viewport') as HTMLElement;
+  const minimapViewport = document.querySelector(".minimap-viewport") as HTMLElement;
 
   if (minimapViewport) {
     const scrollPercentage = textarea.scrollTop / (textarea.scrollHeight - textarea.clientHeight);
-    const minimapContent = document.querySelector('.minimap-content') as HTMLElement;
+    const minimapContent = document.querySelector(".minimap-content") as HTMLElement;
     if (minimapContent) {
       const maxScroll = minimapContent.scrollHeight - minimapViewport.clientHeight;
       minimapViewport.scrollTop = scrollPercentage * maxScroll;
@@ -1450,11 +1228,11 @@ const hasBreakpoint = (lineNumber: number): boolean => {
 const analyzeSyntax = () => {
   if (!currentFile.value) return;
 
-  const extension = currentFile.value.name.split('.').pop()?.toLowerCase();
+  const extension = currentFile.value.name.split(".").pop()?.toLowerCase();
   const content = fileContent.value;
 
   // 简化的语法分析
-  const lines = content.split('\n');
+  const lines = content.split("\n");
   outlineItems.value = [];
   symbols.value = [];
   problems.value = [];
@@ -1470,14 +1248,14 @@ const analyzeSyntax = () => {
         outlineItems.value.push({
           line: lineNumber,
           level: 1,
-          text: match[2] ?? '',
-          type: 'function'
+          text: match[2] ?? "",
+          type: "function",
         });
         symbols.value.push({
-          name: match[2] ?? '',
-          type: 'function',
+          name: match[2] ?? "",
+          type: "function",
           line: lineNumber,
-          description: trimmed
+          description: trimmed,
         });
       }
     }
@@ -1489,14 +1267,14 @@ const analyzeSyntax = () => {
         outlineItems.value.push({
           line: lineNumber,
           level: 0,
-          text: match[2] ?? '',
-          type: 'class'
+          text: match[2] ?? "",
+          type: "class",
         });
         symbols.value.push({
-          name: match[2] ?? '',
-          type: 'class',
+          name: match[2] ?? "",
+          type: "class",
           line: lineNumber,
-          description: trimmed
+          description: trimmed,
         });
       }
     }
@@ -1507,12 +1285,12 @@ const analyzeSyntax = () => {
         line: lineNumber,
         level: 2,
         text: trimmed,
-        type: 'import'
+        type: "import",
       });
     }
 
     // 简单的语法检查
-    if (trimmed.endsWith('{') && !trimmed.includes('}')) {
+    if (trimmed.endsWith("{") && !trimmed.includes("}")) {
       // 可能缺少闭合括号
       const openBraces = (trimmed.match(/\{/g) || []).length;
       const closeBraces = (trimmed.match(/\}/g) || []).length;
@@ -1520,9 +1298,9 @@ const analyzeSyntax = () => {
         problems.value.push({
           line: lineNumber,
           column: trimmed.length + 1,
-          severity: 'warning',
-          message: '可能缺少闭合括号',
-          source: 'syntax'
+          severity: "warning",
+          message: "可能缺少闭合括号",
+          source: "syntax",
         });
       }
     }
@@ -1582,14 +1360,14 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('editor-settings', JSON.stringify(editorSettings.value));
+  localStorage.setItem("editor-settings", JSON.stringify(editorSettings.value));
   showSettings.value = false;
   setupAutoSave();
 };
 
 const resetSettings = () => {
   editorSettings.value = {
-    theme: 'vs-code',
+    theme: "vs-code",
     fontSize: 14,
     fontFamily: 'Consolas, Monaco, "Courier New", monospace',
     tabSize: 2,
@@ -1604,92 +1382,92 @@ const resetSettings = () => {
 
 // 工具方法
 const getIconForFile = (file: EditFile) => {
-  const extension = file.name.split('.').pop()?.toLowerCase();
+  const extension = file.name.split(".").pop()?.toLowerCase();
   const iconMap: { [key: string]: string } = {
-    js: 'file-code',
-    ts: 'file-code',
-    jsx: 'file-code',
-    tsx: 'file-code',
-    vue: 'file-code',
-    html: 'file-code',
-    css: 'file-code',
-    scss: 'file-code',
-    json: 'file-code',
-    md: 'file-text',
-    py: 'file-code',
-    java: 'file-code',
-    cpp: 'file-code',
-    c: 'file-code',
-    go: 'file-code',
-    rs: 'file-code',
-    sql: 'file-code',
-    sh: 'file-code',
-    yml: 'file-code',
-    yaml: 'file-code',
-    xml: 'file-code',
+    js: "file-code",
+    ts: "file-code",
+    jsx: "file-code",
+    tsx: "file-code",
+    vue: "file-code",
+    html: "file-code",
+    css: "file-code",
+    scss: "file-code",
+    json: "file-code",
+    md: "file-text",
+    py: "file-code",
+    java: "file-code",
+    cpp: "file-code",
+    c: "file-code",
+    go: "file-code",
+    rs: "file-code",
+    sql: "file-code",
+    sh: "file-code",
+    yml: "file-code",
+    yaml: "file-code",
+    xml: "file-code",
   };
-  return iconMap[extension || ''] || 'file';
+  return iconMap[extension || ""] || "file";
 };
 
 const getLanguage = (fileName: string): string => {
-  const extension = fileName.split('.').pop()?.toLowerCase();
+  const extension = fileName.split(".").pop()?.toLowerCase();
   const languages: { [key: string]: string } = {
-    js: 'JavaScript',
-    ts: 'TypeScript',
-    jsx: 'React',
-    tsx: 'React TS',
-    vue: 'Vue',
-    html: 'HTML',
-    css: 'CSS',
-    scss: 'SCSS',
-    py: 'Python',
-    java: 'Java',
-    cpp: 'C++',
-    c: 'C',
-    go: 'Go',
-    rs: 'Rust',
-    sql: 'SQL',
-    json: 'JSON',
-    md: 'Markdown',
-    yml: 'YAML',
-    yaml: 'YAML',
-    xml: 'XML',
-    sh: 'Shell',
-    php: 'PHP',
-    rb: 'Ruby',
+    js: "JavaScript",
+    ts: "TypeScript",
+    jsx: "React",
+    tsx: "React TS",
+    vue: "Vue",
+    html: "HTML",
+    css: "CSS",
+    scss: "SCSS",
+    py: "Python",
+    java: "Java",
+    cpp: "C++",
+    c: "C",
+    go: "Go",
+    rs: "Rust",
+    sql: "SQL",
+    json: "JSON",
+    md: "Markdown",
+    yml: "YAML",
+    yaml: "YAML",
+    xml: "XML",
+    sh: "Shell",
+    php: "PHP",
+    rb: "Ruby",
   };
-  return languages[extension || ''] || 'Plain Text';
+  return languages[extension || ""] || "Plain Text";
 };
 
 const getOutlineIcon = (type: string): string => {
   const iconMap: { [key: string]: string } = {
-    class: 'box',
-    function: 'code',
-    variable: 'tag',
-    import: 'download',
-    export: 'upload',
-    comment: 'message-square',
+    class: "box",
+    function: "code",
+    variable: "tag",
+    import: "download",
+    export: "upload",
+    comment: "message-square",
   };
-  return iconMap[type] || 'file';
+  return iconMap[type] || "file";
 };
 
 const getSymbolIcon = (type: string): string => {
   const iconMap: { [key: string]: string } = {
-    function: 'code',
-    class: 'box',
-    variable: 'tag',
-    constant: 'hash',
+    function: "code",
+    class: "box",
+    variable: "tag",
+    constant: "hash",
   };
-  return iconMap[type] || 'file';
+  return iconMap[type] || "file";
 };
 
 const getProblemIcon = (severity: string): string => {
   const iconMap: { [key: string]: string } = {
-    error: 'x-circle',
-    warning: 'alert-triangle',
-    info: 'info',
+    error: "x-circle",
+    warning: "alert-triangle",
+    info: "info",
   };
-  return iconMap[severity] || 'info';
+  return iconMap[severity] || "info";
 };
 
 const formatEditTime = (timestamp: number) => {
@@ -1704,12 +1482,12 @@ const formatEditTime = (timestamp: number) => {
   } else if (hours < 24) {
     return `${hours}小时前`;
   } else {
-    return date.toLocaleDateString('zh-CN');
+    return date.toLocaleDateString("zh-CN");
   }
 };
 
 const addToRecentFiles = (file: EditFile) => {
-  const existingIndex = recentFiles.value.findIndex(f => f.path === file.path);
+  const existingIndex = recentFiles.value.findIndex((f) => f.path === file.path);
   if (existingIndex !== -1) {
     recentFiles.value[existingIndex] = file;
   } else {
@@ -1721,18 +1499,18 @@ const addToRecentFiles = (file: EditFile) => {
 
   // 保存到本地存储
   try {
-    localStorage.setItem('edit-recent-files', JSON.stringify(recentFiles.value));
+    localStorage.setItem("edit-recent-files", JSON.stringify(recentFiles.value));
   } catch (error) {
-    console.warn('Failed to save recent files:', error);
+    console.warn("Failed to save recent files:", error);
   }
 };
 
 const removeFromRecent = (index: number) => {
   recentFiles.value.splice(index, 1);
   try {
-    localStorage.setItem('edit-recent-files', JSON.stringify(recentFiles.value));
+    localStorage.setItem("edit-recent-files", JSON.stringify(recentFiles.value));
   } catch (error) {
-    console.warn('Failed to save recent files:', error);
+    console.warn("Failed to save recent files:", error);
   }
 };
 
@@ -1742,34 +1520,34 @@ onMounted(() => {
 
   // 加载设置
   try {
-    const saved = localStorage.getItem('editor-settings');
+    const saved = localStorage.getItem("editor-settings");
     if (saved) {
       editorSettings.value = { ...editorSettings.value, ...JSON.parse(saved) };
     }
   } catch (error) {
-    console.warn('Failed to load editor settings:', error);
+    console.warn("Failed to load editor settings:", error);
   }
 
   // 加载最近文件
   try {
-    const saved = localStorage.getItem('edit-recent-files');
+    const saved = localStorage.getItem("edit-recent-files");
     if (saved) {
       recentFiles.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load recent files:', error);
+    console.warn("Failed to load recent files:", error);
   }
 
   // 初始化编辑历史
-  editHistory.value = [''];
+  editHistory.value = [""];
   historyIndex.value = 0;
 
   // 全局键盘事件监听
-  document.addEventListener('keydown', handleGlobalKeydown);
+  document.addEventListener("keydown", handleGlobalKeydown);
 });
 
 onUnmounted(() => {
-  document.removeEventListener('keydown', handleGlobalKeydown);
+  document.removeEventListener("keydown", handleGlobalKeydown);
   clearAutoSave();
 });
 
@@ -1777,13 +1555,13 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
   // 全局快捷键
   if (event.ctrlKey || event.metaKey) {
     switch (event.key) {
-      case 'o':
+      case "o":
         if (!currentFile.value) {
           event.preventDefault();
           browseFiles();
         }
         break;
-      case 'n':
+      case "n":
         if (!currentFile.value) {
           event.preventDefault();
           createNewFile();
@@ -1794,9 +1572,13 @@ const handleGlobalKeydown = (event: KeyboardEvent) => {
 };
 
 // 监听设置变化
-watch(editorSettings, () => {
-  setupAutoSave();
-}, { deep: true });
+watch(
+  editorSettings,
+  () => {
+    setupAutoSave();
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped>
@@ -1856,7 +1638,8 @@ watch(editorSettings, () => {
   @apply text-sm text-gray-700 dark:text-gray-300;
 }
 
-.setting-select, .setting-input {
+.setting-select,
+.setting-input {
   @apply ml-2;
 }
 
@@ -2020,19 +1803,23 @@ watch(editorSettings, () => {
   @apply border-b border-gray-200 dark:border-gray-600 bg-white dark:bg-gray-800;
 }
 
-.find-input-group, .replace-input-group {
+.find-input-group,
+.replace-input-group {
   @apply flex items-center gap-2 px-4 py-2;
 }
 
-.find-input, .replace-input {
+.find-input,
+.replace-input {
   @apply flex-1 px-3 py-1.5 border border-border dark:border-border-dark rounded focus:outline-none focus:ring-2 focus:ring-blue-500 dark:bg-gray-700 dark:text-white;
 }
 
-.find-controls, .replace-controls {
+.find-controls,
+.replace-controls {
   @apply flex items-center gap-1;
 }
 
-.find-btn, .replace-btn {
+.find-btn,
+.replace-btn {
   @apply p-1 text-gray-500 dark:text-gray-400 hover:text-gray-700 dark:hover:text-gray-200 hover:bg-gray-100 dark:hover:bg-gray-600 rounded transition-colors disabled:opacity-50 disabled:cursor-not-allowed;
 }
 
@@ -2068,11 +1855,15 @@ watch(editorSettings, () => {
   @apply flex-1 overflow-y-auto p-2;
 }
 
-.outline-view, .symbols-view, .problems-view {
+.outline-view,
+.symbols-view,
+.problems-view {
   @apply space-y-1;
 }
 
-.outline-item, .symbol-item, .problem-item {
+.outline-item,
+.symbol-item,
+.problem-item {
   @apply flex items-center gap-2 px-2 py-1 text-sm rounded hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors;
 }
 
@@ -2088,7 +1879,9 @@ watch(editorSettings, () => {
   @apply pl-8;
 }
 
-.outline-line, .symbol-line, .problem-line {
+.outline-line,
+.symbol-line,
+.problem-line {
   @apply ml-auto text-xs text-gray-500 dark:text-gray-400;
 }
 
@@ -2170,7 +1963,7 @@ watch(editorSettings, () => {
 
 .line-number.has-breakpoint::before {
   @apply absolute left-0 top-1/2 transform -translate-y-1/2 w-2 h-2 bg-red-500 rounded-full;
-  content: '';
+  content: "";
 }
 
 .code-editor {
@@ -2226,7 +2019,8 @@ watch(editorSettings, () => {
   @apply flex items-center justify-between px-4 py-1 border-t border-border dark:border-border-dark bg-gray-100 dark:bg-gray-800 text-xs text-gray-600 dark:text-gray-400;
 }
 
-.status-left, .status-right {
+.status-left,
+.status-right {
   @apply flex items-center gap-3;
 }
 

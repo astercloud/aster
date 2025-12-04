@@ -48,11 +48,7 @@
 
 ```vue
 <template>
-  <Avatar 
-    src="https://example.com/avatar.jpg"
-    alt="User Name"
-    size="lg"
-  />
+  <Avatar src="https://example.com/avatar.jpg" alt="User Name" size="lg" />
 </template>
 ```
 
@@ -73,10 +69,10 @@
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| src | 头像图片 URL | `string` | - |
-| alt | 图片描述，也用作占位符 | `string` | `''` |
-| size | 头像尺寸 | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'` |
-| shape | 头像形状 | `'circle' \| 'square'` | `'circle'` |
-| status | 在线状态 | `'online' \| 'offline' \| 'busy'` | - |
+| 参数   | 说明                   | 类型                                   | 默认值     |
+| ------ | ---------------------- | -------------------------------------- | ---------- |
+| src    | 头像图片 URL           | `string`                               | -          |
+| alt    | 图片描述，也用作占位符 | `string`                               | `''`       |
+| size   | 头像尺寸               | `'xs' \| 'sm' \| 'md' \| 'lg' \| 'xl'` | `'md'`     |
+| shape  | 头像形状               | `'circle' \| 'square'`                 | `'circle'` |
+| status | 在线状态               | `'online' \| 'offline' \| 'busy'`      | -          |

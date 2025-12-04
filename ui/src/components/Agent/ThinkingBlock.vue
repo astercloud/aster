@@ -1,24 +1,11 @@
 <template>
-  <div
-    :class="[
-      'thinking-block',
-      { 'thinking-block-pending': pendingApproval },
-      { 'thinking-block-finished': isFinished }
-    ]"
-  >
+  <div :class="['thinking-block', { 'thinking-block-pending': pendingApproval }, { 'thinking-block-finished': isFinished }]">
     <!-- 头部 -->
     <button class="thinking-header" @click="toggleExpanded">
       <Icon :type="isExpanded ? 'chevron-down' : 'chevron-right'" size="sm" />
-      <Icon
-        type="brain"
-        :class="[
-          'thinking-icon',
-          { 'thinking-icon-active': !isFinished && !pendingApproval },
-          { 'thinking-icon-pending': pendingApproval }
-        ]"
-      />
+      <Icon type="brain" :class="['thinking-icon', { 'thinking-icon-active': !isFinished && !pendingApproval }, { 'thinking-icon-pending': pendingApproval }]" />
       <span class="thinking-title">思考中...</span>
-      
+
       <!-- 状态标签 -->
       <span v-if="pendingApproval" class="status-badge status-pending">
         <Icon type="alert" size="sm" />
@@ -32,11 +19,7 @@
 
     <!-- 思考内容 -->
     <div v-if="isExpanded" class="thinking-content">
-      <div
-        v-for="(event, idx) in thoughts"
-        :key="event.id || idx"
-        :class="['thought-item', getEventClass(event)]"
-      >
+      <div v-for="(event, idx) in thoughts" :key="event.id || idx" :class="['thought-item', getEventClass(event)]">
         <!-- 事件头部 -->
         <div class="thought-header">
           <span :class="['thought-stage', getStageClass(event)]">
@@ -53,7 +36,7 @@
           <p v-if="event.reasoning" class="thought-reasoning">
             {{ event.reasoning }}
           </p>
-          
+
           <div v-if="event.decision && !isToolEvent(event)" class="thought-decision">
             <Icon type="play" size="sm" />
             <span>{{ event.decision }}</span>
@@ -105,19 +88,11 @@
         </div>
 
         <div class="approval-actions">
-          <Button
-            variant="primary"
-            class="approval-btn-approve"
-            @click="$emit('approve', pendingApproval)"
-          >
+          <Button variant="primary" class="approval-btn-approve" @click="$emit('approve', pendingApproval)">
             <Icon type="check" size="sm" />
             批准执行
           </Button>
-          <Button
-            variant="secondary"
-            class="approval-btn-reject"
-            @click="$emit('reject')"
-          >
+          <Button variant="secondary" class="approval-btn-reject" @click="$emit('reject')">
             <Icon type="close" size="sm" />
             拒绝
           </Button>
@@ -128,9 +103,9 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
-import Button from '../ChatUI/Button.vue';
+import { ref, watch } from "vue";
+import Icon from "../ChatUI/Icon.vue";
+import Button from "../ChatUI/Button.vue";
 
 interface ToolCallData {
   toolName: string;
@@ -194,32 +169,32 @@ const isToolEvent = (event: ThinkAloudEvent) => {
 };
 
 const getEventClass = (event: ThinkAloudEvent) => {
-  if (event.toolCall) return 'thought-item-tool-call';
-  if (event.toolResult) return 'thought-item-tool-result';
-  if (event.stage === 'Human in the Loop') return 'thought-item-hitl';
-  return 'thought-item-thinking';
+  if (event.toolCall) return "thought-item-tool-call";
+  if (event.toolResult) return "thought-item-tool-result";
+  if (event.stage === "Human in the Loop") return "thought-item-hitl";
+  return "thought-item-thinking";
 };
 
 const getStageClass = (event: ThinkAloudEvent) => {
-  if (event.toolCall) return 'stage-tool-call';
-  if (event.toolResult) return 'stage-tool-result';
-  if (event.stage === 'Human in the Loop') return 'stage-hitl';
-  return 'stage-thinking';
+  if (event.toolCall) return "stage-tool-call";
+  if (event.toolResult) return "stage-tool-result";
+  if (event.stage === "Human in the Loop") return "stage-hitl";
+  return "stage-thinking";
 };
 
 const getStageIcon = (event: ThinkAloudEvent) => {
-  if (event.toolCall) return 'terminal';
-  if (event.toolResult) return 'check';
-  if (event.stage === 'Human in the Loop') return 'alert';
-  return 'brain';
+  if (event.toolCall) return "terminal";
+  if (event.toolResult) return "check";
+  if (event.stage === "Human in the Loop") return "alert";
+  return "brain";
 };
 
 const formatTime = (timestamp: string) => {
   const date = new Date(timestamp);
-  return date.toLocaleTimeString('zh-CN', {
-    hour: '2-digit',
-    minute: '2-digit',
-    second: '2-digit',
+  return date.toLocaleTimeString("zh-CN", {
+    hour: "2-digit",
+    minute: "2-digit",
+    second: "2-digit",
   });
 };
 

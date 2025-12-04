@@ -2,12 +2,7 @@
   <div v-if="replies.length > 0" class="quick-replies">
     <div class="quick-replies-inner">
       <div class="quick-replies-scroll">
-        <button
-          v-for="(reply, index) in replies"
-          :key="index"
-          @click="handleSelect(reply)"
-          :class="['quick-reply-button', reply.isHighlight && 'highlight']"
-        >
+        <button v-for="(reply, index) in replies" :key="index" @click="handleSelect(reply)" :class="['quick-reply-button', reply.isHighlight && 'highlight']">
           <svg v-if="reply.icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="reply.icon"></path>
           </svg>
@@ -20,11 +15,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { QuickReply } from '@/types';
+import { defineComponent } from "vue";
+import type { QuickReply } from "@/types";
 
 export default defineComponent({
-  name: 'QuickReplies',
+  name: "QuickReplies",
 
   props: {
     replies: {
@@ -39,7 +34,7 @@ export default defineComponent({
 
   setup(props, { emit }) {
     function handleSelect(reply: QuickReply) {
-      emit('select', reply);
+      emit("select", reply);
     }
 
     return {

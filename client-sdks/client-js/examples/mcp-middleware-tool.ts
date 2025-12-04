@@ -2,11 +2,7 @@
  * MCP + Middleware + Tool 使用示例
  */
 
-import {
-  MCPResource,
-  MiddlewareResource,
-  ToolResource,
-} from "@aster/client-js";
+import { MCPResource, MiddlewareResource, ToolResource } from "@aster/client-js";
 
 async function main() {
   console.log("=".repeat(60));
@@ -78,10 +74,7 @@ async function main() {
       console.log("   成功:", result.success);
       console.log("   耗时:", result.executionTime, "ms");
       if (result.result) {
-        console.log(
-          "   结果:",
-          JSON.stringify(result.result).substring(0, 100),
-        );
+        console.log("   结果:", JSON.stringify(result.result).substring(0, 100));
       }
     }
   } catch (error: any) {
@@ -92,19 +85,10 @@ async function main() {
   try {
     const stats = await mcp.getStats();
     console.log("📊 MCP 统计:");
-    console.log(
-      "   连接的 Servers:",
-      stats.connectedServers,
-      "/",
-      stats.totalServers,
-    );
+    console.log("   连接的 Servers:", stats.connectedServers, "/", stats.totalServers);
     console.log("   总工具数:", stats.totalTools);
     console.log("   总调用次数:", stats.totalCalls);
-    console.log(
-      "   成功率:",
-      ((stats.successfulCalls / stats.totalCalls) * 100).toFixed(1),
-      "%",
-    );
+    console.log("   成功率:", ((stats.successfulCalls / stats.totalCalls) * 100).toFixed(1), "%");
   } catch (error: any) {
     console.log("⚠️  获取统计失败:", error.message);
   }
@@ -120,9 +104,7 @@ async function main() {
   console.log(`📋 总共 ${middlewares.length} 个 Middlewares:`);
   middlewares.forEach((mw, index) => {
     const status = mw.enabled ? "✅" : "⏸️ ";
-    console.log(
-      `   ${status} ${index + 1}. [P${mw.priority}] ${mw.displayName} - ${mw.description}`,
-    );
+    console.log(`   ${status} ${index + 1}. [P${mw.priority}] ${mw.displayName} - ${mw.description}`);
   });
 
   // 配置 Summarization Middleware（上下文压缩）
@@ -191,9 +173,7 @@ async function main() {
     allStats.slice(0, 3).forEach((stat) => {
       console.log(`   ${stat.name}:`);
       console.log(`     执行: ${stat.executionCount} 次`);
-      console.log(
-        `     成功率: ${((stat.successCount / stat.executionCount) * 100).toFixed(1)}%`,
-      );
+      console.log(`     成功率: ${((stat.successCount / stat.executionCount) * 100).toFixed(1)}%`);
       console.log(`     平均耗时: ${stat.avgExecutionTime.toFixed(2)} ms`);
     });
   } catch (error: any) {
@@ -225,9 +205,7 @@ async function main() {
   builtinTools.forEach((t, index) => {
     const status = t.enabled ? "✅" : "⏸️ ";
     const approval = t.requiresApproval ? "🔒" : "";
-    console.log(
-      `   ${status}${approval} ${index + 1}. ${t.name} - ${t.description}`,
-    );
+    console.log(`   ${status}${approval} ${index + 1}. ${t.name} - ${t.description}`);
   });
 
   // 执行 Bash 工具（同步）
@@ -295,9 +273,7 @@ async function main() {
     });
     console.log(`\n📊 运行中的任务: ${tasks.length} 个`);
     tasks.forEach((t, index) => {
-      console.log(
-        `   ${index + 1}. [${t.toolName}] ${t.status} - ${t.progress}%`,
-      );
+      console.log(`   ${index + 1}. [${t.toolName}] ${t.status} - ${t.progress}%`);
     });
   } catch (error: any) {
     console.log("⚠️  获取任务列表失败:", error.message);
@@ -313,9 +289,7 @@ async function main() {
       .forEach((stat, index) => {
         console.log(`   ${index + 1}. ${stat.toolName}:`);
         console.log(`      调用: ${stat.totalCalls} 次`);
-        console.log(
-          `      成功率: ${((stat.successCount / stat.totalCalls) * 100).toFixed(1)}%`,
-        );
+        console.log(`      成功率: ${((stat.successCount / stat.totalCalls) * 100).toFixed(1)}%`);
         console.log(`      平均耗时: ${stat.avgExecutionTime.toFixed(2)} ms`);
       });
   } catch (error: any) {
@@ -332,9 +306,7 @@ async function main() {
     console.log("   总调用次数:", report.totalCalls);
     console.log("   最常用工具:");
     report.topTools.slice(0, 3).forEach((t, index) => {
-      console.log(
-        `      ${index + 1}. ${t.toolName} - ${t.callCount} 次 (${t.percentage.toFixed(1)}%)`,
-      );
+      console.log(`      ${index + 1}. ${t.toolName} - ${t.callCount} 次 (${t.percentage.toFixed(1)}%)`);
     });
   } catch (error: any) {
     console.log("⚠️  获取报告失败:", error.message);

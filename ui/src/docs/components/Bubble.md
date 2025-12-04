@@ -22,16 +22,8 @@
 ```vue
 <template>
   <Flex direction="column" gap="md">
-    <Bubble 
-      content="我是 AI 助手" 
-      position="left"
-      avatar="https://example.com/avatar.jpg"
-    />
-    <Bubble 
-      content="你好" 
-      position="right"
-      avatar="https://example.com/user.jpg"
-    />
+    <Bubble content="我是 AI 助手" position="left" avatar="https://example.com/avatar.jpg" />
+    <Bubble content="你好" position="right" avatar="https://example.com/user.jpg" />
   </Flex>
 </template>
 ```
@@ -56,10 +48,7 @@
 
 ```vue
 <template>
-  <Bubble 
-    content="这是 **粗体** 和 *斜体* 文本，还有 `代码`"
-    position="left"
-  />
+  <Bubble content="这是 **粗体** 和 *斜体* 文本，还有 `代码`" position="left" />
 </template>
 ```
 
@@ -69,7 +58,7 @@
 
 ```vue
 <template>
-  <Bubble 
+  <Bubble
     :content="`\`\`\`javascript
 function hello() {
   console.log('Hello World');
@@ -84,9 +73,9 @@ function hello() {
 
 ### Props
 
-| 参数 | 说明 | 类型 | 默认值 |
-| --- | --- | --- | --- |
-| content | 消息内容（支持 Markdown） | `string` | - |
-| position | 气泡位置 | `'left' \| 'right'` | `'left'` |
-| status | 消息状态（仅右侧有效） | `'pending' \| 'sent' \| 'error'` | - |
-| avatar | 头像 URL | `string` | - |
+| 参数     | 说明                      | 类型                             | 默认值   |
+| -------- | ------------------------- | -------------------------------- | -------- |
+| content  | 消息内容（支持 Markdown） | `string`                         | -        |
+| position | 气泡位置                  | `'left' \| 'right'`              | `'left'` |
+| status   | 消息状态（仅右侧有效）    | `'pending' \| 'sent' \| 'error'` | -        |
+| avatar   | 头像 URL                  | `string`                         | -        |

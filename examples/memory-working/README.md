@@ -5,6 +5,7 @@
 ## Working Memory 简介
 
 Working Memory 是一个持久化的、结构化的状态管理系统，用于：
+
 - 跟踪当前会话状态
 - 存储用户偏好和上下文
 - 管理多步骤任务的进度
@@ -12,13 +13,13 @@ Working Memory 是一个持久化的、结构化的状态管理系统，用于�
 
 ### 与文本记忆的区别
 
-| 特性 | Working Memory | 文本记忆 |
-|------|---------------|---------|
-| **用途** | 会话状态管理 | 长期知识库 |
-| **大小** | 小（< 500 words）| 大（无限制）|
-| **更新方式** | 完全覆盖 | 追加或覆盖 |
-| **自动加载** | 是 | 否 |
-| **Schema 验证** | 支持 | 不支持 |
+| 特性            | Working Memory    | 文本记忆     |
+| --------------- | ----------------- | ------------ |
+| **用途**        | 会话状态管理      | 长期知识库   |
+| **大小**        | 小（< 500 words） | 大（无限制） |
+| **更新方式**    | 完全覆盖          | 追加或覆盖   |
+| **自动加载**    | 是                | 否           |
+| **Schema 验证** | 支持              | 不支持       |
 
 ## 示例内容
 
@@ -37,6 +38,7 @@ manager.Update(ctx, "thread-002", "resource", bobProfile)
 ```
 
 **适用场景：**
+
 - 独立的用户会话
 - 不同上下文的对话
 - 需要隔离状态的情况
@@ -57,6 +59,7 @@ manager.Update(ctx, "edit-002", "article-123", updatedState)
 ```
 
 **适用场景：**
+
 - 多轮协作编辑
 - 团队共享的项目状态
 - 长期追踪的资源
@@ -212,15 +215,15 @@ Role: Product Manager
 memory:
   working_memory:
     enabled: true
-    scope: "thread"  # "thread" | "resource"
+    scope: "thread" # "thread" | "resource"
     base_path: "/working_memory/"
-    ttl: 0  # 过期时间（秒），0表示不过期
+    ttl: 0 # 过期时间（秒），0表示不过期
 
     # 可选：JSON Schema
     schema:
       type: object
       properties:
-        user_name: {type: string}
+        user_name: { type: string }
         task_status:
           type: string
           enum: ["not_started", "in_progress", "completed"]

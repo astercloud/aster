@@ -68,44 +68,37 @@ Aster is an event-driven AI Agent framework built with Go, implementing the Goog
 ### Key Components
 
 1. **Agent System** (`pkg/agent/`)
-
    - Core agent implementation with event-driven architecture
    - Three event channels: Progress (real-time output), Control (human interaction), Monitor (governance)
    - Dependencies injection pattern with Registry pattern for tools and templates
 
 2. **Workflow Engine** (`pkg/workflow/`)
-
    - Sequential, Parallel, and Loop workflow agents
    - 8-step types with Router for dynamic routing
    - Stream-based execution with Go 1.23 iter.Seq2
 
 3. **Memory Management** (`pkg/memory/`)
-
    - Three-tier system: Text Memory, Working Memory, Semantic Memory
    - Advanced features: Provenance (source tracking), Consolidation (LLM-driven merging), PII Auto-Redaction
    - Vector store integration with confidence scoring
 
 4. **Middleware System** (`pkg/middleware/`)
-
    - Onion-model architecture with priority-based layers
    - Built-in middlewares: filesystem, summarization, agent memory, working memory
    - Custom middleware support via WrapModelCall/WrapToolCall interfaces
 
 5. **Tools System** (`pkg/tools/`)
-
    - Registry pattern for tool discovery and management
    - Built-in tools: filesystem operations, bash execution, HTTP requests, web search, todo management
    - MCP (Model Context Protocol) support for external tool integration
    - Long-running tools with async execution and progress tracking
 
 6. **Session & Persistence** (`pkg/session/`)
-
    - PostgreSQL and MySQL support with JSONB/JSON columns
    - Event sourcing with append-only storage
    - 7-point recovery mechanism for fault tolerance
 
 7. **Multi-Agent Collaboration** (`pkg/stars/`)
-
    - Stars pattern for agent collaboration
    - Scheduler for intelligent task distribution
    - Permission management system

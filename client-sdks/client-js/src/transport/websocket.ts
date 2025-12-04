@@ -70,10 +70,7 @@ export class WebSocketClient {
    * 连接到 WebSocket 服务器
    */
   async connect(url: string): Promise<void> {
-    if (
-      this.state === WebSocketState.CONNECTED ||
-      this.state === WebSocketState.CONNECTING
-    ) {
+    if (this.state === WebSocketState.CONNECTED || this.state === WebSocketState.CONNECTING) {
       console.warn("[WebSocket] Already connected or connecting");
       return;
     }
@@ -84,8 +81,7 @@ export class WebSocketClient {
     return new Promise((resolve, reject) => {
       try {
         // 在浏览器和 Node.js 中使用不同的 WebSocket
-        const WebSocketImpl =
-          typeof window !== "undefined" ? window.WebSocket : require("ws");
+        const WebSocketImpl = typeof window !== "undefined" ? window.WebSocket : require("ws");
 
         this.ws = new WebSocketImpl(url);
 
@@ -131,10 +127,7 @@ export class WebSocketClient {
    * 断开连接
    */
   disconnect(): void {
-    if (
-      this.state === WebSocketState.DISCONNECTED ||
-      this.state === WebSocketState.DISCONNECTING
-    ) {
+    if (this.state === WebSocketState.DISCONNECTED || this.state === WebSocketState.DISCONNECTING) {
       return;
     }
 
@@ -153,8 +146,7 @@ export class WebSocketClient {
    * 发送消息
    */
   send(message: any): void {
-    const data =
-      typeof message === "string" ? message : JSON.stringify(message);
+    const data = typeof message === "string" ? message : JSON.stringify(message);
 
     if (this.state === WebSocketState.CONNECTED && this.ws) {
       try {
@@ -204,10 +196,7 @@ export class WebSocketClient {
    */
   private handleMessage(data: string | Buffer): void {
     try {
-      const message =
-        typeof data === "string"
-          ? JSON.parse(data)
-          : JSON.parse(data.toString());
+      const message = typeof data === "string" ? JSON.parse(data) : JSON.parse(data.toString());
 
       // 检查是否为心跳响应
       if (message.type === "pong") {
@@ -232,10 +221,7 @@ export class WebSocketClient {
    * 刷新消息队列
    */
   private flushMessageQueue(): void {
-    while (
-      this.messageQueue.length > 0 &&
-      this.state === WebSocketState.CONNECTED
-    ) {
+    while (this.messageQueue.length > 0 && this.state === WebSocketState.CONNECTED) {
       const message = this.messageQueue.shift();
       this.send(message);
     }
@@ -256,9 +242,7 @@ export class WebSocketClient {
 
     // 指数退避
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    console.log(
-      `[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
-    );
+    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
 
     await new Promise((resolve) => setTimeout(resolve, delay));
 

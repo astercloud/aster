@@ -5,6 +5,7 @@
 ## 📦 组件总览
 
 ### 对话组件 (9个)
+
 - **Chat** - 聊天容器，完整的对话界面
 - **Bubble** - 消息气泡，支持 Markdown
 - **ThinkBubble** - 思考气泡，显示 Agent 推理
@@ -16,18 +17,21 @@
 - **MessageStatus** - 消息状态指示器
 
 ### 基础组件 (4个)
+
 - **Button** - 按钮，多种样式和尺寸
 - **Icon** - 图标，内置常用图标
 - **Avatar** - 头像，支持状态指示
 - **Image** - 图片，自动加载和错误处理
 
 ### 表单组件 (4个)
+
 - **Input** - 输入框，支持标签和错误提示
 - **Search** - 搜索框，带清除按钮
 - **Checkbox** - 复选框
 - **Radio** - 单选框
 
 ### 布局组件 (8个)
+
 - **Flex** - 弹性布局容器
 - **Divider** - 分割线，支持文字
 - **List** - 列表，支持自定义项
@@ -38,6 +42,7 @@
 - **Carousel** - 轮播图
 
 ### 反馈组件 (6个)
+
 - **Notice** - 通知提示，多种类型
 - **Progress** - 进度条，支持状态
 - **Tooltip** - 工具提示，四个方向
@@ -46,6 +51,7 @@
 - **Dropdown** - 下拉菜单
 
 ### 数据展示 (2个)
+
 - **Tag** - 标签，多种颜色
 - **RichText** - 富文本，Markdown 渲染
 
@@ -63,38 +69,33 @@ npm install marked
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    placeholder="输入消息..."
-    :quick-replies="quickReplies"
-    @send="handleSend"
-  />
+  <Chat :messages="messages" placeholder="输入消息..." :quick-replies="quickReplies" @send="handleSend" />
 </template>
 
 <script setup>
-import { ref } from 'vue';
-import { Chat } from '@/components/ChatUI';
+import { ref } from "vue";
+import { Chat } from "@/components/ChatUI";
 
 const messages = ref([
   {
-    id: '1',
-    type: 'text',
-    content: '你好！',
-    position: 'left',
+    id: "1",
+    type: "text",
+    content: "你好！",
+    position: "left",
   },
 ]);
 
 const quickReplies = [
-  { name: '帮我写文章', value: 'write' },
-  { name: '分析代码', value: 'analyze' },
+  { name: "帮我写文章", value: "write" },
+  { name: "分析代码", value: "analyze" },
 ];
 
 const handleSend = (message) => {
   messages.value.push({
     id: Date.now().toString(),
-    type: 'text',
+    type: "text",
     content: message.content,
-    position: 'right',
+    position: "right",
   });
 };
 </script>
@@ -107,6 +108,7 @@ const handleSend = (message) => {
 主聊天组件，包含消息列表和输入区域。
 
 **Props:**
+
 - `messages` - 消息列表
 - `placeholder` - 输入框占位符
 - `disabled` - 是否禁用输入
@@ -114,6 +116,7 @@ const handleSend = (message) => {
 - `toolbar` - 工具栏按钮
 
 **Events:**
+
 - `send` - 发送消息
 - `quickReply` - 点击快捷回复
 - `cardAction` - 卡片操作
@@ -123,12 +126,14 @@ const handleSend = (message) => {
 显示文本消息的气泡组件。
 
 **Props:**
+
 - `content` - 消息内容（支持 Markdown）
 - `position` - 位置 `'left' | 'right'`
 - `status` - 状态 `'pending' | 'sent' | 'error'`
 - `avatar` - 头像 URL
 
 **特性:**
+
 - 自动渲染 Markdown
 - 支持代码高亮
 - 消息状态指示器
@@ -138,9 +143,11 @@ const handleSend = (message) => {
 显示 Agent 思考状态的组件。
 
 **Props:**
+
 - `content` - 思考内容
 
 **使用场景:**
+
 - Agent 正在处理请求
 - 显示推理过程
 - 工具调用状态
@@ -150,6 +157,7 @@ const handleSend = (message) => {
 显示对方正在输入的动画。
 
 **特性:**
+
 - 三点动画效果
 - 自动循环播放
 
@@ -158,21 +166,24 @@ const handleSend = (message) => {
 显示结构化内容的卡片组件。
 
 **Props:**
+
 - `title` - 卡片标题
 - `content` - 卡片内容
 - `actions` - 操作按钮列表
 
 **Events:**
+
 - `action` - 点击操作按钮
 
 **示例:**
+
 ```vue
 <Card
   title="推荐文章"
   content="这是一篇关于 AI 的文章..."
   :actions="[
     { text: '查看详情', value: 'view' },
-    { text: '分享', value: 'share' }
+    { text: '分享', value: 'share' },
   ]"
   @action="handleAction"
 />
@@ -183,6 +194,7 @@ const handleSend = (message) => {
 显示文件信息和下载链接。
 
 **Props:**
+
 - `file` - 文件对象
   - `name` - 文件名
   - `size` - 文件大小（字节）
@@ -193,6 +205,7 @@ const handleSend = (message) => {
 通用按钮组件。
 
 **Props:**
+
 - `icon` - 图标名称 `'send' | 'image' | 'mic' | 'attach'`
 - `variant` - 样式变体 `'primary' | 'secondary' | 'text'`
 - `size` - 尺寸 `'sm' | 'md' | 'lg'`
@@ -279,7 +292,7 @@ const handleSend = (message) => {
   :toolbar="[
     { icon: 'image', onClick: handleImageUpload },
     { icon: 'attach', onClick: handleFileUpload },
-    { icon: 'mic', onClick: handleVoiceInput }
+    { icon: 'mic', onClick: handleVoiceInput },
   ]"
 />
 ```
@@ -291,7 +304,7 @@ const handleSend = (message) => {
   :quick-replies="[
     { name: '帮我写文章', value: 'write', icon: '✍️' },
     { name: '分析代码', value: 'analyze', icon: '🔍' },
-    { name: '生成工作流', value: 'workflow', icon: '⚙️' }
+    { name: '生成工作流', value: 'workflow', icon: '⚙️' },
   ]"
   @quick-reply="handleQuickReply"
 />
@@ -303,7 +316,7 @@ const handleSend = (message) => {
 const handleStreamResponse = async (message) => {
   // 添加思考消息
   const thinkingId = addThinkingMessage();
-  
+
   try {
     // 流式接收响应
     for await (const chunk of streamChat(message)) {
@@ -328,44 +341,41 @@ module.exports = {
   theme: {
     extend: {
       colors: {
-        primary: '#3b82f6',
-        secondary: '#64748b',
-      }
-    }
-  }
-}
+        primary: "#3b82f6",
+        secondary: "#64748b",
+      },
+    },
+  },
+};
 ```
 
 ## 与 Aster Agent 集成
 
 ```vue
 <template>
-  <Chat
-    :messages="messages"
-    @send="handleSend"
-  />
+  <Chat :messages="messages" @send="handleSend" />
 </template>
 
 <script setup>
-import { useAsterClient } from '@/composables/useAsterClient';
-import { Chat } from '@/components/ChatUI';
+import { useAsterClient } from "@/composables/useAsterClient";
+import { Chat } from "@/components/ChatUI";
 
 const { client } = useAsterClient();
 
 const handleSend = async (message) => {
   // 添加用户消息
   addUserMessage(message);
-  
+
   // 显示思考状态
   const thinkingId = addThinkingMessage();
-  
+
   try {
     // 调用 Agent
     const response = await client.agents.chat(agentId, message.content);
-    
+
     // 移除思考消息
     removeMessage(thinkingId);
-    
+
     // 添加 Agent 回复
     addAgentMessage(response.data.text);
   } catch (error) {

@@ -7,18 +7,10 @@
         <span>网络搜索</span>
       </div>
       <div class="header-actions">
-        <button
-          class="action-button"
-          title="搜索设置"
-          @click="toggleSettings"
-        >
+        <button class="action-button" title="搜索设置" @click="toggleSettings">
           <Icon type="settings" size="sm" />
         </button>
-        <button
-          class="action-button"
-          title="搜索历史"
-          @click="toggleHistory"
-        >
+        <button class="action-button" title="搜索历史" @click="toggleHistory">
           <Icon type="clock" size="sm" />
         </button>
       </div>
@@ -77,11 +69,7 @@
         </div>
         <div class="setting-group">
           <label>
-            <input
-              v-model="searchSettings.saveHistory"
-              type="checkbox"
-              class="setting-checkbox"
-            />
+            <input v-model="searchSettings.saveHistory" type="checkbox" class="setting-checkbox" />
             保存搜索历史
           </label>
         </div>
@@ -117,11 +105,7 @@
             @keydown.up="highlightSuggestion('up')"
             @input="handleSearchInput"
           />
-          <button
-            class="search-button"
-            :disabled="!searchQuery.trim() || isSearching"
-            @click="performSearch"
-          >
+          <button class="search-button" :disabled="!searchQuery.trim() || isSearching" @click="performSearch">
             <Icon v-if="isSearching" type="spinner" size="sm" class="animate-spin" />
             <Icon v-else type="search" size="sm" />
           </button>
@@ -130,13 +114,7 @@
 
       <!-- 搜索建议 -->
       <div v-if="showSuggestions && suggestions.length > 0" class="suggestions-dropdown">
-        <div
-          v-for="(suggestion, index) in suggestions"
-          :key="index"
-          :class="['suggestion-item', { highlighted: highlightedSuggestionIndex === index }]"
-          @click="selectSuggestion(suggestion)"
-          @mouseenter="highlightedSuggestionIndex = index"
-        >
+        <div v-for="(suggestion, index) in suggestions" :key="index" :class="['suggestion-item', { highlighted: highlightedSuggestionIndex === index }]" @click="selectSuggestion(suggestion)" @mouseenter="highlightedSuggestionIndex = index">
           <Icon type="search" size="xs" class="suggestion-icon" />
           <span class="suggestion-text">{{ suggestion }}</span>
         </div>
@@ -196,27 +174,15 @@
           <span class="search-query">"{{ lastSearchQuery }}"</span>
         </div>
         <div class="results-actions">
-          <button
-            class="action-btn"
-            title="导出结果"
-            @click="exportResults"
-          >
+          <button class="action-btn" title="导出结果" @click="exportResults">
             <Icon type="download" size="xs" />
             导出
           </button>
-          <button
-            class="action-btn"
-            title="重新搜索"
-            @click="performSearch"
-          >
+          <button class="action-btn" title="重新搜索" @click="performSearch">
             <Icon type="refresh" size="xs" />
             刷新
           </button>
-          <button
-            class="action-btn"
-            title="清空结果"
-            @click="clearResults"
-          >
+          <button class="action-btn" title="清空结果" @click="clearResults">
             <Icon type="trash" size="xs" />
             清空
           </button>
@@ -225,37 +191,19 @@
 
       <!-- 结果列表 -->
       <div class="results-list">
-        <div
-          v-for="(result, index) in searchResults"
-          :key="index"
-          class="result-item"
-          @click="openResult(result)"
-        >
+        <div v-for="(result, index) in searchResults" :key="index" class="result-item" @click="openResult(result)">
           <div class="result-header">
             <div class="result-title">
               <h3 v-html="result.title"></h3>
             </div>
             <div class="result-actions">
-              <button
-                class="result-action-btn"
-                title="在新标签打开"
-                @click.stop="openInNewTab(result)"
-              >
+              <button class="result-action-btn" title="在新标签打开" @click.stop="openInNewTab(result)">
                 <Icon type="external-link" size="xs" />
               </button>
-              <button
-                class="result-action-btn"
-                title="复制链接"
-                @click.stop="copyLink(result)"
-              >
+              <button class="result-action-btn" title="复制链接" @click.stop="copyLink(result)">
                 <Icon type="copy" size="xs" />
               </button>
-              <button
-                class="result-action-btn favorite-btn"
-                :class="{ active: isFavorite(result) }"
-                title="收藏"
-                @click.stop="toggleFavorite(result)"
-              >
+              <button class="result-action-btn favorite-btn" :class="{ active: isFavorite(result) }" title="收藏" @click.stop="toggleFavorite(result)">
                 <Icon type="star" size="xs" />
               </button>
             </div>
@@ -283,9 +231,7 @@
             <div v-if="result.richData.rating" class="rich-rating">
               <Icon type="star" size="xs" class="rating-star" />
               <span>{{ result.richData.rating }}</span>
-              <span v-if="result.richData.reviewCount" class="review-count">
-                ({{ result.richData.reviewCount }} 评价)
-              </span>
+              <span v-if="result.richData.reviewCount" class="review-count"> ({{ result.richData.reviewCount }} 评价) </span>
             </div>
             <div v-if="result.richData.price" class="rich-price">
               <span class="price-amount">{{ result.richData.price }}</span>
@@ -297,24 +243,14 @@
 
       <!-- 分页 -->
       <div v-if="totalPages > 1" class="pagination">
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === 1"
-          @click="goToPage(currentPage - 1)"
-        >
+        <button class="pagination-btn" :disabled="currentPage === 1" @click="goToPage(currentPage - 1)">
           <Icon type="chevron-left" size="xs" />
           上一页
         </button>
 
-        <div class="pagination-info">
-          第 {{ currentPage }} 页，共 {{ totalPages }} 页
-        </div>
+        <div class="pagination-info">第 {{ currentPage }} 页，共 {{ totalPages }} 页</div>
 
-        <button
-          class="pagination-btn"
-          :disabled="currentPage === totalPages"
-          @click="goToPage(currentPage + 1)"
-        >
+        <button class="pagination-btn" :disabled="currentPage === totalPages" @click="goToPage(currentPage + 1)">
           下一页
           <Icon type="chevron-right" size="xs" />
         </button>
@@ -325,32 +261,21 @@
     <div v-if="!isSearching && searchResults.length === 0 && lastSearchQuery" class="empty-results">
       <Icon type="search" size="lg" />
       <h3>未找到相关结果</h3>
-      <p class="empty-hint">
-        试试调整搜索关键词或筛选条件
-      </p>
-      <button class="retry-btn" @click="clearResults">
-        重新搜索
-      </button>
+      <p class="empty-hint">试试调整搜索关键词或筛选条件</p>
+      <button class="retry-btn" @click="clearResults">重新搜索</button>
     </div>
 
     <!-- 初始状态 -->
     <div v-if="!isSearching && searchResults.length === 0 && !lastSearchQuery" class="initial-state">
       <Icon type="search" size="lg" />
       <h3>开始网络搜索</h3>
-      <p class="initial-hint">
-        输入关键词开始搜索，支持多种搜索方式和高级筛选
-      </p>
+      <p class="initial-hint">输入关键词开始搜索，支持多种搜索方式和高级筛选</p>
 
       <!-- 热门搜索 -->
       <div class="trending-searches">
         <h4>热门搜索</h4>
         <div class="trending-tags">
-          <button
-            v-for="(trend, index) in trendingSearches"
-            :key="index"
-            class="trending-tag"
-            @click="searchForTrend(trend)"
-          >
+          <button v-for="(trend, index) in trendingSearches" :key="index" class="trending-tag" @click="searchForTrend(trend)">
             {{ trend }}
           </button>
         </div>
@@ -360,12 +285,7 @@
       <div v-if="searchHistory.length > 0" class="recent-searches">
         <h4>最近搜索</h4>
         <div class="recent-list">
-          <div
-            v-for="(item, index) in searchHistory.slice(0, 5)"
-            :key="index"
-            class="recent-item"
-            @click="searchFromHistory(item)"
-          >
+          <div v-for="(item, index) in searchHistory.slice(0, 5)" :key="index" class="recent-item" @click="searchFromHistory(item)">
             <Icon type="clock" size="xs" />
             <span class="recent-query">{{ item.query }}</span>
             <span class="recent-time">{{ formatTime(item.timestamp) }}</span>
@@ -378,39 +298,25 @@
     <div v-if="showHistory" class="history-panel">
       <div class="history-header">
         <h4>搜索历史</h4>
-        <button
-          class="history-close-btn"
-          @click="showHistory = false"
-        >
+        <button class="history-close-btn" @click="showHistory = false">
           <Icon type="close" size="xs" />
         </button>
       </div>
       <div class="history-actions">
-        <button
-          class="history-action-btn"
-          @click="clearHistory"
-        >
+        <button class="history-action-btn" @click="clearHistory">
           <Icon type="trash" size="xs" />
           清空历史
         </button>
       </div>
       <div class="history-list">
-        <div
-          v-for="(item, index) in searchHistory"
-          :key="index"
-          class="history-item"
-          @click="searchFromHistory(item)"
-        >
+        <div v-for="(item, index) in searchHistory" :key="index" class="history-item" @click="searchFromHistory(item)">
           <div class="history-query">{{ item.query }}</div>
           <div class="history-meta">
             <span class="history-engine">{{ getSearchEngineName(item.engine) }}</span>
             <span class="history-time">{{ formatTime(item.timestamp) }}</span>
             <span class="history-results">{{ item.resultsCount }} 个结果</span>
           </div>
-          <button
-            class="history-delete-btn"
-            @click.stop="deleteHistoryItem(index)"
-          >
+          <button class="history-delete-btn" @click.stop="deleteHistoryItem(index)">
             <Icon type="close" size="xs" />
           </button>
         </div>
@@ -420,8 +326,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, nextTick, onMounted, onUnmounted } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
+import { ref, computed, watch, nextTick, onMounted, onUnmounted } from "vue";
+import Icon from "../ChatUI/Icon.vue";
 
 interface SearchResult {
   title: string;
@@ -462,8 +368,8 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  wsUrl: 'ws://localhost:8080/ws',
-  sessionId: 'default',
+  wsUrl: "ws://localhost:8080/ws",
+  sessionId: "default",
 });
 
 const emit = defineEmits<{
@@ -472,8 +378,8 @@ const emit = defineEmits<{
 }>();
 
 // 响应式数据
-const searchQuery = ref('');
-const currentSearchEngine = ref('google');
+const searchQuery = ref("");
+const currentSearchEngine = ref("google");
 const searchResults = ref<SearchResult[]>([]);
 const suggestions = ref<string[]>([]);
 const searchHistory = ref<SearchHistory[]>([]);
@@ -485,33 +391,27 @@ const showSuggestions = ref(false);
 const highlightedSuggestionIndex = ref(-1);
 
 // 搜索参数
-const timeFilter = ref('');
-const resultType = ref('');
-const sortBy = ref('relevance');
+const timeFilter = ref("");
+const resultType = ref("");
+const sortBy = ref("relevance");
 const currentPage = ref(1);
 const totalResults = ref(0);
 const totalPages = ref(0);
 const searchTime = ref(0);
-const lastSearchQuery = ref('');
+const lastSearchQuery = ref("");
 
 // 搜索设置
 const searchSettings = ref<SearchSettings>({
-  searchEngine: 'google',
+  searchEngine: "google",
   resultsCount: 10,
-  language: 'zh-CN',
-  region: 'cn',
-  safeSearch: 'moderate',
+  language: "zh-CN",
+  region: "cn",
+  safeSearch: "moderate",
   saveHistory: true,
 });
 
 // 热门搜索
-const trendingSearches = ref([
-  'AI 最新发展',
-  'Vue 3 新特性',
-  'TypeScript 教程',
-  'Web 开发最佳实践',
-  '开源项目推荐',
-]);
+const trendingSearches = ref(["AI 最新发展", "Vue 3 新特性", "TypeScript 教程", "Web 开发最佳实践", "开源项目推荐"]);
 
 const searchInput = ref<HTMLInputElement>();
 const websocket = ref<WebSocket | null>(null);
@@ -526,7 +426,7 @@ const connectWebSocket = () => {
     websocket.value = new WebSocket(`${props.wsUrl}?session=${props.sessionId}`);
 
     websocket.value.onopen = () => {
-      console.log('WebSearchTool WebSocket connected');
+      console.log("WebSearchTool WebSocket connected");
     };
 
     websocket.value.onmessage = (event) => {
@@ -534,31 +434,31 @@ const connectWebSocket = () => {
         const message = JSON.parse(event.data);
         handleWebSocketMessage(message);
       } catch (error) {
-        console.error('Failed to parse WebSocket message:', error);
+        console.error("Failed to parse WebSocket message:", error);
       }
     };
 
     websocket.value.onclose = () => {
-      console.log('WebSearchTool WebSocket disconnected');
+      console.log("WebSearchTool WebSocket disconnected");
       setTimeout(connectWebSocket, 5000);
     };
 
     websocket.value.onerror = (error) => {
-      console.error('WebSearchTool WebSocket error:', error);
+      console.error("WebSearchTool WebSocket error:", error);
     };
   } catch (error) {
-    console.error('Failed to connect WebSocket:', error);
+    console.error("Failed to connect WebSocket:", error);
   }
 };
 
 const handleWebSocketMessage = (message: any) => {
   switch (message.type) {
-    case 'search_results':
+    case "search_results":
       if (message.results) {
         handleSearchResults(message.results);
       }
       break;
-    case 'search_suggestions':
+    case "search_suggestions":
       if (message.suggestions) {
         suggestions.value = message.suggestions;
         showSuggestions.value = true;
@@ -598,7 +498,7 @@ const performSearch = async () => {
 
     // 发送搜索请求
     sendWebSocketMessage({
-      type: 'web_search',
+      type: "web_search",
       params: searchParams,
     });
 
@@ -615,10 +515,9 @@ const performSearch = async () => {
       addToHistory(lastSearchQuery.value, currentSearchEngine.value, mockResults.length);
     }
 
-    emit('searchPerformed', lastSearchQuery.value, mockResults);
-
+    emit("searchPerformed", lastSearchQuery.value, mockResults);
   } catch (error) {
-    console.error('Search failed:', error);
+    console.error("Search failed:", error);
     searchResults.value = [];
   } finally {
     isSearching.value = false;
@@ -628,7 +527,7 @@ const performSearch = async () => {
 
 const mockWebSearch = async (params: any): Promise<SearchResult[]> => {
   // 模拟搜索延迟
-  await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 1200));
+  await new Promise((resolve) => setTimeout(resolve, 800 + Math.random() * 1200));
 
   // 模拟搜索结果
   const mockResults: SearchResult[] = [
@@ -636,12 +535,12 @@ const mockWebSearch = async (params: any): Promise<SearchResult[]> => {
       title: `<b>${params.query}</b> - 搜索结果 1`,
       url: `https://example.com/result1?q=${encodeURIComponent(params.query)}`,
       snippet: `这是关于 ${params.query} 的第一个搜索结果。包含了相关的信息和详细内容...`,
-      domain: 'example.com',
+      domain: "example.com",
       date: new Date().toISOString(),
-      language: 'zh-CN',
-      type: resultType.value || 'web',
+      language: "zh-CN",
+      type: resultType.value || "web",
       richData: {
-        thumbnail: 'https://via.placeholder.com/100x60',
+        thumbnail: "https://via.placeholder.com/100x60",
         rating: 4.5,
         reviewCount: 128,
       },
@@ -650,19 +549,19 @@ const mockWebSearch = async (params: any): Promise<SearchResult[]> => {
       title: `<b>${params.query}</b> - 官方文档`,
       url: `https://docs.example.com/${params.query}`,
       snippet: `官方文档提供了关于 ${params.query} 的权威信息和技术细节...`,
-      domain: 'docs.example.com',
+      domain: "docs.example.com",
       date: new Date().toISOString(),
-      language: 'zh-CN',
-      type: resultType.value || 'web',
+      language: "zh-CN",
+      type: resultType.value || "web",
     },
     {
       title: `深入了解 ${params.query}`,
       url: `https://blog.example.com/${params.query}`,
       snippet: `在这篇详细的文章中，我们将深入探讨 ${params.query} 的各个方面...`,
-      domain: 'blog.example.com',
+      domain: "blog.example.com",
       date: new Date(Date.now() - 86400000).toISOString(),
-      language: 'zh-CN',
-      type: resultType.value || 'web',
+      language: "zh-CN",
+      type: resultType.value || "web",
       richData: {
         rating: 4.8,
         reviewCount: 256,
@@ -672,19 +571,19 @@ const mockWebSearch = async (params: any): Promise<SearchResult[]> => {
       title: `${params.query} 相关教程`,
       url: `https://tutorial.example.com/${params.query}`,
       snippet: `逐步教程教你如何使用 ${params.query}，包含实例和最佳实践...`,
-      domain: 'tutorial.example.com',
+      domain: "tutorial.example.com",
       date: new Date(Date.now() - 172800000).toISOString(),
-      language: 'zh-CN',
-      type: resultType.value || 'web',
+      language: "zh-CN",
+      type: resultType.value || "web",
     },
     {
       title: `${params.query} 社区讨论`,
       url: `https://community.example.com/${params.query}`,
       snippet: `社区成员分享的关于 ${params.query} 的经验和见解...`,
-      domain: 'community.example.com',
+      domain: "community.example.com",
       date: new Date(Date.now() - 259200000).toISOString(),
-      language: 'zh-CN',
-      type: resultType.value || 'web',
+      language: "zh-CN",
+      type: resultType.value || "web",
     },
   ];
 
@@ -718,39 +617,28 @@ const fetchSuggestions = () => {
   if (!searchQuery.value.trim()) return;
 
   sendWebSocketMessage({
-    type: 'get_search_suggestions',
+    type: "get_search_suggestions",
     query: searchQuery.value.trim(),
     engine: currentSearchEngine.value,
   });
 
   // 模拟搜索建议
-  suggestions.value = [
-    searchQuery.value + ' 教程',
-    searchQuery.value + ' 下载',
-    searchQuery.value + ' 官网',
-    searchQuery.value + ' 评价',
-  ];
+  suggestions.value = [searchQuery.value + " 教程", searchQuery.value + " 下载", searchQuery.value + " 官网", searchQuery.value + " 评价"];
   showSuggestions.value = true;
 };
 
 // 搜索建议处理
-const highlightSuggestion = (direction: 'up' | 'down') => {
+const highlightSuggestion = (direction: "up" | "down") => {
   if (!showSuggestions.value || suggestions.value.length === 0) return;
 
-  if (direction === 'down') {
-    highlightedSuggestionIndex.value = Math.min(
-      highlightedSuggestionIndex.value + 1,
-      suggestions.value.length - 1
-    );
+  if (direction === "down") {
+    highlightedSuggestionIndex.value = Math.min(highlightedSuggestionIndex.value + 1, suggestions.value.length - 1);
   } else {
-    highlightedSuggestionIndex.value = Math.max(
-      highlightedSuggestionIndex.value - 1,
-      -1
-    );
+    highlightedSuggestionIndex.value = Math.max(highlightedSuggestionIndex.value - 1, -1);
   }
 
   if (highlightedSuggestionIndex.value >= 0) {
-    searchQuery.value = suggestions.value[highlightedSuggestionIndex.value] ?? '';
+    searchQuery.value = suggestions.value[highlightedSuggestionIndex.value] ?? "";
   }
 };
 
@@ -765,28 +653,28 @@ const selectSuggestion = (suggestion: string) => {
 
 // 结果操作
 const openResult = (result: SearchResult) => {
-  window.open(result.url, '_blank');
-  emit('resultSelected', result);
+  window.open(result.url, "_blank");
+  emit("resultSelected", result);
 };
 
 const openInNewTab = (result: SearchResult) => {
-  window.open(result.url, '_blank');
+  window.open(result.url, "_blank");
 };
 
 const copyLink = async (result: SearchResult) => {
   try {
     await navigator.clipboard.writeText(result.url);
   } catch (error) {
-    console.error('Failed to copy link:', error);
+    console.error("Failed to copy link:", error);
   }
 };
 
 const isFavorite = (result: SearchResult): boolean => {
-  return favorites.value.some(fav => fav.url === result.url);
+  return favorites.value.some((fav) => fav.url === result.url);
 };
 
 const toggleFavorite = (result: SearchResult) => {
-  const index = favorites.value.findIndex(fav => fav.url === result.url);
+  const index = favorites.value.findIndex((fav) => fav.url === result.url);
   if (index === -1) {
     favorites.value.push(result);
   } else {
@@ -813,9 +701,9 @@ const exportResults = () => {
   };
 
   const dataStr = JSON.stringify(exportData, null, 2);
-  const blob = new Blob([dataStr], { type: 'application/json' });
+  const blob = new Blob([dataStr], { type: "application/json" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `search-results-${Date.now()}.json`;
   a.click();
@@ -824,8 +712,8 @@ const exportResults = () => {
 
 const clearResults = () => {
   searchResults.value = [];
-  searchQuery.value = '';
-  lastSearchQuery.value = '';
+  searchQuery.value = "";
+  lastSearchQuery.value = "";
   currentPage.value = 1;
   totalResults.value = 0;
   totalPages.value = 0;
@@ -843,9 +731,7 @@ const addToHistory = (query: string, engine: string, resultsCount: number) => {
   };
 
   // 避免重复
-  const existingIndex = searchHistory.value.findIndex(
-    item => item.query === query && item.engine === engine
-  );
+  const existingIndex = searchHistory.value.findIndex((item) => item.query === query && item.engine === engine);
   if (existingIndex !== -1) {
     searchHistory.value.splice(existingIndex, 1);
   }
@@ -873,7 +759,7 @@ const deleteHistoryItem = (index: number) => {
 };
 
 const clearHistory = () => {
-  if (confirm('确定要清空所有搜索历史吗？')) {
+  if (confirm("确定要清空所有搜索历史吗？")) {
     searchHistory.value = [];
     saveHistory();
   }
@@ -881,39 +767,39 @@ const clearHistory = () => {
 
 const saveHistory = () => {
   try {
-    localStorage.setItem('web-search-history', JSON.stringify(searchHistory.value));
+    localStorage.setItem("web-search-history", JSON.stringify(searchHistory.value));
   } catch (error) {
-    console.warn('Failed to save search history:', error);
+    console.warn("Failed to save search history:", error);
   }
 };
 
 const loadHistory = () => {
   try {
-    const saved = localStorage.getItem('web-search-history');
+    const saved = localStorage.getItem("web-search-history");
     if (saved) {
       searchHistory.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load search history:', error);
+    console.warn("Failed to load search history:", error);
   }
 };
 
 const saveFavorites = () => {
   try {
-    localStorage.setItem('web-search-favorites', JSON.stringify(favorites.value));
+    localStorage.setItem("web-search-favorites", JSON.stringify(favorites.value));
   } catch (error) {
-    console.warn('Failed to save favorites:', error);
+    console.warn("Failed to save favorites:", error);
   }
 };
 
 const loadFavorites = () => {
   try {
-    const saved = localStorage.getItem('web-search-favorites');
+    const saved = localStorage.getItem("web-search-favorites");
     if (saved) {
       favorites.value = JSON.parse(saved);
     }
   } catch (error) {
-    console.warn('Failed to load favorites:', error);
+    console.warn("Failed to load favorites:", error);
   }
 };
 
@@ -931,18 +817,18 @@ const toggleSettings = () => {
 };
 
 const saveSettings = () => {
-  localStorage.setItem('web-search-settings', JSON.stringify(searchSettings.value));
+  localStorage.setItem("web-search-settings", JSON.stringify(searchSettings.value));
   currentSearchEngine.value = searchSettings.value.searchEngine;
   showSettings.value = false;
 };
 
 const resetSettings = () => {
   searchSettings.value = {
-    searchEngine: 'google',
+    searchEngine: "google",
     resultsCount: 10,
-    language: 'zh-CN',
-    region: 'cn',
-    safeSearch: 'moderate',
+    language: "zh-CN",
+    region: "cn",
+    safeSearch: "moderate",
     saveHistory: true,
   };
 };
@@ -954,11 +840,11 @@ const toggleHistory = () => {
 // 工具方法
 const getSearchEngineName = (engine: string): string => {
   const engineNames: Record<string, string> = {
-    google: 'Google',
-    bing: 'Bing',
-    duckduckgo: 'DuckDuckGo',
-    baidu: '百度',
-    yahoo: 'Yahoo',
+    google: "Google",
+    bing: "Bing",
+    duckduckgo: "DuckDuckGo",
+    baidu: "百度",
+    yahoo: "Yahoo",
   };
   return engineNames[engine] || engine;
 };
@@ -970,15 +856,15 @@ const formatDate = (dateString: string): string => {
   const days = Math.floor(diff / (1000 * 60 * 60 * 24));
 
   if (days === 0) {
-    return '今天';
+    return "今天";
   } else if (days === 1) {
-    return '昨天';
+    return "昨天";
   } else if (days < 7) {
     return `${days}天前`;
   } else if (days < 30) {
     return `${Math.floor(days / 7)}周前`;
   } else {
-    return date.toLocaleDateString('zh-CN');
+    return date.toLocaleDateString("zh-CN");
   }
 };
 
@@ -988,7 +874,7 @@ const formatTime = (timestamp: number): string => {
   const diff = now.getTime() - date.getTime();
 
   if (diff < 60000) {
-    return '刚刚';
+    return "刚刚";
   } else if (diff < 3600000) {
     const minutes = Math.floor(diff / 60000);
     return `${minutes}分钟前`;
@@ -996,14 +882,14 @@ const formatTime = (timestamp: number): string => {
     const hours = Math.floor(diff / 3600000);
     return `${hours}小时前`;
   } else {
-    return date.toLocaleDateString('zh-CN');
+    return date.toLocaleDateString("zh-CN");
   }
 };
 
 // 点击外部关闭搜索建议
 const handleClickOutside = (event: MouseEvent) => {
   const target = event.target as Element;
-  if (!target.closest('.search-input-wrapper') && !target.closest('.suggestions-dropdown')) {
+  if (!target.closest(".search-input-wrapper") && !target.closest(".suggestions-dropdown")) {
     showSuggestions.value = false;
   }
 };
@@ -1015,17 +901,17 @@ onMounted(() => {
   loadFavorites();
 
   // 绑定外部点击事件
-  document.addEventListener('click', handleClickOutside);
+  document.addEventListener("click", handleClickOutside);
 
   // 加载设置
   try {
-    const saved = localStorage.getItem('web-search-settings');
+    const saved = localStorage.getItem("web-search-settings");
     if (saved) {
       searchSettings.value = { ...searchSettings.value, ...JSON.parse(saved) };
       currentSearchEngine.value = searchSettings.value.searchEngine;
     }
   } catch (error) {
-    console.warn('Failed to load search settings:', error);
+    console.warn("Failed to load search settings:", error);
   }
 
   // 自动聚焦搜索框
@@ -1035,13 +921,17 @@ onMounted(() => {
 });
 
 onUnmounted(() => {
-  document.removeEventListener('click', handleClickOutside);
+  document.removeEventListener("click", handleClickOutside);
 });
 
 // 监听搜索设置变化
-watch(searchSettings, (newSettings) => {
-  currentSearchEngine.value = newSettings.searchEngine;
-}, { deep: true });
+watch(
+  searchSettings,
+  (newSettings) => {
+    currentSearchEngine.value = newSettings.searchEngine;
+  },
+  { deep: true },
+);
 </script>
 
 <style scoped>
@@ -1258,7 +1148,10 @@ watch(searchSettings, (newSettings) => {
   @apply flex items-center gap-3 text-xs text-gray-500 dark:text-gray-400;
 }
 
-.result-date, .result-domain, .result-language, .result-type {
+.result-date,
+.result-domain,
+.result-language,
+.result-type {
   @apply px-2 py-1 bg-gray-100 dark:bg-gray-600 rounded;
 }
 
@@ -1290,15 +1183,18 @@ watch(searchSettings, (newSettings) => {
   @apply text-sm text-gray-600 dark:text-gray-400;
 }
 
-.empty-results, .initial-state {
+.empty-results,
+.initial-state {
   @apply flex-1 flex flex-col items-center justify-center p-8 text-gray-400 dark:text-gray-500;
 }
 
-.empty-results h3, .initial-state h3 {
+.empty-results h3,
+.initial-state h3 {
   @apply text-lg font-medium mb-2;
 }
 
-.empty-hint, .initial-hint {
+.empty-hint,
+.initial-hint {
   @apply text-sm text-center mb-6;
 }
 
@@ -1306,11 +1202,13 @@ watch(searchSettings, (newSettings) => {
   @apply px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded transition-colors;
 }
 
-.trending-searches, .recent-searches {
+.trending-searches,
+.recent-searches {
   @apply w-full max-w-md mt-6;
 }
 
-.trending-searches h4, .recent-searches h4 {
+.trending-searches h4,
+.recent-searches h4 {
   @apply text-sm font-semibold text-gray-600 dark:text-gray-400 mb-3;
 }
 
@@ -1326,15 +1224,18 @@ watch(searchSettings, (newSettings) => {
   @apply space-y-2;
 }
 
-.recent-item, .history-item {
+.recent-item,
+.history-item {
   @apply flex items-center gap-3 p-3 bg-gray-50 dark:bg-gray-700 rounded-lg hover:bg-gray-100 dark:hover:bg-gray-600 cursor-pointer transition-colors;
 }
 
-.recent-query, .history-query {
+.recent-query,
+.history-query {
   @apply flex-1 text-sm text-gray-800 dark:text-gray-200;
 }
 
-.recent-time, .history-time {
+.recent-time,
+.history-time {
   @apply text-xs text-gray-500 dark:text-gray-400;
 }
 

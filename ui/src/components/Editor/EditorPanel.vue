@@ -3,24 +3,15 @@
     <!-- 头部 -->
     <div class="editor-header">
       <div class="header-tabs">
-        <button
-          :class="['tab-button', { active: mode === 'edit' }]"
-          @click="setMode('edit')"
-        >
+        <button :class="['tab-button', { active: mode === 'edit' }]" @click="setMode('edit')">
           <Icon type="edit" size="sm" />
           编辑
         </button>
-        <button
-          :class="['tab-button', { active: mode === 'split' }]"
-          @click="setMode('split')"
-        >
+        <button :class="['tab-button', { active: mode === 'split' }]" @click="setMode('split')">
           <Icon type="columns" size="sm" />
           分栏
         </button>
-        <button
-          :class="['tab-button', { active: mode === 'preview' }]"
-          @click="setMode('preview')"
-        >
+        <button :class="['tab-button', { active: mode === 'preview' }]" @click="setMode('preview')">
           <Icon type="eye" size="sm" />
           预览
         </button>
@@ -40,25 +31,13 @@
     <div class="editor-content">
       <!-- 编辑模式 -->
       <div v-if="mode === 'edit'" class="content-pane">
-        <MarkdownEditor
-          v-model="localContent"
-          placeholder="在这里编辑 Markdown 内容..."
-          :min-height="300"
-          :show-toolbar="true"
-          @change="handleInput"
-        />
+        <MarkdownEditor v-model="localContent" placeholder="在这里编辑 Markdown 内容..." :min-height="300" :show-toolbar="true" @change="handleInput" />
       </div>
 
       <!-- 分栏模式 -->
       <div v-else-if="mode === 'split'" class="content-split">
         <div class="split-pane">
-          <MarkdownEditor
-            v-model="localContent"
-            placeholder="在这里编辑 Markdown 内容..."
-            :min-height="300"
-            :show-toolbar="false"
-            @change="handleInput"
-          />
+          <MarkdownEditor v-model="localContent" placeholder="在这里编辑 Markdown 内容..." :min-height="300" :show-toolbar="false" @change="handleInput" />
         </div>
         <div class="split-divider"></div>
         <div class="split-pane">
@@ -84,26 +63,22 @@
           {{ lineCount }} 行
         </span>
       </div>
-      
+
       <div class="footer-actions">
-        <button class="footer-button" @click="handleClear">
-          清空
-        </button>
-        <button class="footer-button footer-button-primary" @click="handleSave">
-          保存
-        </button>
+        <button class="footer-button" @click="handleClear">清空</button>
+        <button class="footer-button footer-button-primary" @click="handleSave">保存</button>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch } from 'vue';
-import Icon from '../ChatUI/Icon.vue';
-import MarkdownEditor from './MarkdownEditor.vue';
-import MarkdownPreview from './MarkdownPreview.vue';
+import { ref, computed, watch } from "vue";
+import Icon from "../ChatUI/Icon.vue";
+import MarkdownEditor from "./MarkdownEditor.vue";
+import MarkdownPreview from "./MarkdownPreview.vue";
 
-type EditorMode = 'edit' | 'split' | 'preview';
+type EditorMode = "edit" | "split" | "preview";
 
 interface Props {
   modelValue: string;
@@ -111,12 +86,12 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  mode: 'edit',
+  mode: "edit",
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
-  'update:mode': [mode: EditorMode];
+  "update:modelValue": [value: string];
+  "update:mode": [mode: EditorMode];
   save: [content: string];
   export: [content: string];
 }>();
@@ -124,24 +99,27 @@ const emit = defineEmits<{
 const localContent = ref(props.modelValue);
 const isFullscreen = ref(false);
 
-watch(() => props.modelValue, (val) => {
-  localContent.value = val;
-});
+watch(
+  () => props.modelValue,
+  (val) => {
+    localContent.value = val;
+  },
+);
 
 const wordCount = computed(() => {
-  return localContent.value.replace(/\s/g, '').length;
+  return localContent.value.replace(/\s/g, "").length;
 });
 
 const lineCount = computed(() => {
-  return localContent.value.split('\n').length;
+  return localContent.value.split("\n").length;
 });
 
 const handleInput = () => {
-  emit('update:modelValue', localContent.value);
+  emit("update:modelValue", localContent.value);
 };
 
 const setMode = (newMode: EditorMode) => {
-  emit('update:mode', newMode);
+  emit("update:mode", newMode);
 };
 
 const toggleFullscreen = () => {
@@ -149,16 +127,16 @@ const toggleFullscreen = () => {
 };
 
 const handleSave = () => {
-  emit('save', localContent.value);
+  emit("save", localContent.value);
 };
 
 const handleExport = () => {
-  emit('export', localContent.value);
-  
+  emit("export", localContent.value);
+
   // 下载为 Markdown 文件
-  const blob = new Blob([localContent.value], { type: 'text/markdown' });
+  const blob = new Blob([localContent.value], { type: "text/markdown" });
   const url = URL.createObjectURL(blob);
-  const a = document.createElement('a');
+  const a = document.createElement("a");
   a.href = url;
   a.download = `document-${Date.now()}.md`;
   a.click();
@@ -166,9 +144,9 @@ const handleExport = () => {
 };
 
 const handleClear = () => {
-  if (confirm('确定要清空内容吗？')) {
-    localContent.value = '';
-    emit('update:modelValue', '');
+  if (confirm("确定要清空内容吗？")) {
+    localContent.value = "";
+    emit("update:modelValue", "");
   }
 };
 </script>

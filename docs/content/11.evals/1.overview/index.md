@@ -511,13 +511,7 @@ func main() {
       "reference": "伦敦是英国的首都。"
     }
   ],
-  "scorers": [
-    "keyword_coverage",
-    "lexical_similarity",
-    "faithfulness",
-    "hallucination",
-    "answer_relevancy"
-  ],
+  "scorers": ["keyword_coverage", "lexical_similarity", "faithfulness", "hallucination", "answer_relevancy"],
   "concurrency": 5,
   "keywords": ["首都"],
   "provider_config": {

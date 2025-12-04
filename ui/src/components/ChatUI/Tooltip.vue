@@ -8,25 +8,25 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from 'vue';
+import { ref, computed } from "vue";
 
 interface Props {
   content: string;
-  position?: 'top' | 'bottom' | 'left' | 'right';
+  position?: "top" | "bottom" | "left" | "right";
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  position: 'top',
+  position: "top",
 });
 
 const show = ref(false);
 
 const positionClass = computed(() => {
   const map = {
-    top: 'tooltip-top',
-    bottom: 'tooltip-bottom',
-    left: 'tooltip-left',
-    right: 'tooltip-right',
+    top: "tooltip-top",
+    bottom: "tooltip-bottom",
+    left: "tooltip-left",
+    right: "tooltip-right",
   };
   return map[props.position];
 });

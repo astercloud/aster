@@ -7,12 +7,7 @@
       <div class="card-content" v-html="content"></div>
     </div>
     <div v-if="actions && actions.length > 0" class="card-actions">
-      <button
-        v-for="action in actions"
-        :key="action.value"
-        class="card-action-btn"
-        @click="$emit('action', action)"
-      >
+      <button v-for="action in actions" :key="action.value" class="card-action-btn" @click="$emit('action', action)">
         {{ action.text }}
       </button>
     </div>

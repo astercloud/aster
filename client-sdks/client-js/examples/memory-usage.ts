@@ -85,39 +85,25 @@ async function main() {
   console.log("-".repeat(60));
 
   // 存储知识
-  const chunk1 = await memory.semantic.store(
-    "Paris is the capital of France.",
-    { source: "wikipedia", category: "geography", language: "en" },
-  );
+  const chunk1 = await memory.semantic.store("Paris is the capital of France.", { source: "wikipedia", category: "geography", language: "en" });
   console.log("✅ 存储记忆块 1:", chunk1);
 
-  const chunk2 = await memory.semantic.store(
-    "The Eiffel Tower is located in Paris.",
-    { source: "wikipedia", category: "landmarks", language: "en" },
-  );
+  const chunk2 = await memory.semantic.store("The Eiffel Tower is located in Paris.", { source: "wikipedia", category: "landmarks", language: "en" });
   console.log("✅ 存储记忆块 2:", chunk2);
 
-  const chunk3 = await memory.semantic.store(
-    "France is a country in Western Europe.",
-    { source: "wikipedia", category: "geography", language: "en" },
-  );
+  const chunk3 = await memory.semantic.store("France is a country in Western Europe.", { source: "wikipedia", category: "geography", language: "en" });
   console.log("✅ 存储记忆块 3:", chunk3);
 
   // 语义搜索
   console.log('\n🔎 搜索: "What is the capital of France?"');
-  const results = await memory.semantic.search(
-    "What is the capital of France?",
-    {
-      limit: 5,
-      threshold: 0.7,
-      filter: { category: "geography" },
-    },
-  );
+  const results = await memory.semantic.search("What is the capital of France?", {
+    limit: 5,
+    threshold: 0.7,
+    filter: { category: "geography" },
+  });
 
   results.forEach((chunk, index) => {
-    console.log(
-      `  ${index + 1}. [Score: ${chunk.score?.toFixed(2)}] ${chunk.content}`,
-    );
+    console.log(`  ${index + 1}. [Score: ${chunk.score?.toFixed(2)}] ${chunk.content}`);
     console.log(`     Metadata:`, chunk.metadata);
   });
 

@@ -14,10 +14,7 @@
             </div>
           </div>
           <div class="flex gap-3">
-            <a href="https://github.com/aster-cloud/aster" target="_blank" 
-               class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors">
-              GitHub
-            </a>
+            <a href="https://github.com/astercloud/aster" target="_blank" class="px-4 py-2 text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-gray-700 rounded-lg transition-colors"> GitHub </a>
           </div>
         </div>
       </div>
@@ -26,12 +23,8 @@
     <!-- Hero Section -->
     <section class="max-w-7xl mx-auto px-6 py-16">
       <div class="text-center mb-12">
-        <h2 class="text-5xl font-bold text-gray-900 dark:text-white mb-4">
-          构建强大的 AI Agent 应用
-        </h2>
-        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">
-          完整的 Vue 3 组件库，包含 Agent 管理、对话界面、工作流可视化等功能
-        </p>
+        <h2 class="text-5xl font-bold text-gray-900 dark:text-white mb-4">构建强大的 AI Agent 应用</h2>
+        <p class="text-xl text-gray-600 dark:text-gray-400 max-w-3xl mx-auto">完整的 Vue 3 组件库，包含 Agent 管理、对话界面、工作流可视化等功能</p>
       </div>
 
       <!-- Quick Stats -->
@@ -58,97 +51,76 @@
     <!-- Navigation Cards -->
     <section class="max-w-7xl mx-auto px-6 pb-16">
       <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">快速导航</h3>
-      
+
       <div class="grid md:grid-cols-2 lg:grid-cols-3 gap-6">
         <!-- Agent Demo -->
-        <router-link to="/agent-demo" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all">
+        <router-link to="/agent-demo" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-blue-500 dark:hover:border-blue-400 transition-all">
           <div class="w-12 h-12 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">🤖</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Agent 聊天演示</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">体验完整的 Agent 对话功能，包括思考过程、工具调用等</p>
-          <div class="text-blue-600 dark:text-blue-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            立即体验 →
-          </div>
+          <div class="text-blue-600 dark:text-blue-400 font-medium group-hover:translate-x-1 transition-transform inline-block">立即体验 →</div>
         </router-link>
 
         <!-- Component Docs -->
-        <router-link to="/docs" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-purple-500 dark:hover:border-purple-400 transition-all">
+        <router-link to="/docs" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-purple-500 dark:hover:border-purple-400 transition-all">
           <div class="w-12 h-12 bg-purple-100 dark:bg-purple-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">📖</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">交互式文档</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">查看所有组件的文档和实时演示</p>
-          <div class="text-purple-600 dark:text-purple-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            查看文档 →
-          </div>
+          <div class="text-purple-600 dark:text-purple-400 font-medium group-hover:translate-x-1 transition-transform inline-block">查看文档 →</div>
         </router-link>
 
         <!-- Components Showcase -->
-        <router-link to="/components" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-green-500 dark:hover:border-green-400 transition-all">
+        <router-link to="/components" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-green-500 dark:hover:border-green-400 transition-all">
           <div class="w-12 h-12 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">🎨</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">组件展示</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">浏览所有可用组件的视觉效果</p>
-          <div class="text-green-600 dark:text-green-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            浏览组件 →
-          </div>
+          <div class="text-green-600 dark:text-green-400 font-medium group-hover:translate-x-1 transition-transform inline-block">浏览组件 →</div>
         </router-link>
 
         <!-- Agent Management -->
-        <router-link to="/agents" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-orange-500 dark:hover:border-orange-400 transition-all">
+        <router-link to="/agents" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-orange-500 dark:hover:border-orange-400 transition-all">
           <div class="w-12 h-12 bg-orange-100 dark:bg-orange-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">⚙️</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">Agent 管理</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">创建、配置和管理你的 AI Agents</p>
-          <div class="text-orange-600 dark:text-orange-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            管理 Agents →
-          </div>
+          <div class="text-orange-600 dark:text-orange-400 font-medium group-hover:translate-x-1 transition-transform inline-block">管理 Agents →</div>
         </router-link>
 
         <!-- Workflows -->
-        <router-link to="/workflows" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-pink-500 dark:hover:border-pink-400 transition-all">
+        <router-link to="/workflows" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-pink-500 dark:hover:border-pink-400 transition-all">
           <div class="w-12 h-12 bg-pink-100 dark:bg-pink-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">🔄</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">工作流</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">可视化 Agent 工作流和执行步骤</p>
-          <div class="text-pink-600 dark:text-pink-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            查看工作流 →
-          </div>
+          <div class="text-pink-600 dark:text-pink-400 font-medium group-hover:translate-x-1 transition-transform inline-block">查看工作流 →</div>
         </router-link>
 
         <!-- Rooms -->
-        <router-link to="/rooms" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-indigo-500 dark:hover:border-indigo-400 transition-all">
+        <router-link to="/rooms" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-indigo-500 dark:hover:border-indigo-400 transition-all">
           <div class="w-12 h-12 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">👥</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">协作房间</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">多 Agent 协作和团队工作空间</p>
-          <div class="text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            进入房间 →
-          </div>
+          <div class="text-indigo-600 dark:text-indigo-400 font-medium group-hover:translate-x-1 transition-transform inline-block">进入房间 →</div>
         </router-link>
 
         <!-- Projects -->
-        <router-link to="/projects" 
-                     class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-yellow-500 dark:hover:border-yellow-400 transition-all">
+        <router-link to="/projects" class="group bg-white dark:bg-gray-800 rounded-xl p-6 shadow-sm border border-gray-200 dark:border-gray-700 hover:shadow-lg hover:border-yellow-500 dark:hover:border-yellow-400 transition-all">
           <div class="w-12 h-12 bg-yellow-100 dark:bg-yellow-900/30 rounded-lg flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
             <span class="text-2xl">📁</span>
           </div>
           <h4 class="text-xl font-semibold text-gray-900 dark:text-white mb-2">项目管理</h4>
           <p class="text-gray-600 dark:text-gray-400 mb-4">AI 写作项目和会话管理</p>
-          <div class="text-yellow-600 dark:text-yellow-400 font-medium group-hover:translate-x-1 transition-transform inline-block">
-            管理项目 →
-          </div>
+          <div class="text-yellow-600 dark:text-yellow-400 font-medium group-hover:translate-x-1 transition-transform inline-block">管理项目 →</div>
         </router-link>
       </div>
     </section>
@@ -156,7 +128,7 @@
     <!-- Features -->
     <section class="max-w-7xl mx-auto px-6 pb-16">
       <h3 class="text-3xl font-bold text-gray-900 dark:text-white mb-8">核心特性</h3>
-      
+
       <div class="grid md:grid-cols-2 gap-8">
         <div class="flex gap-4">
           <div class="flex-shrink-0 w-10 h-10 bg-blue-100 dark:bg-blue-900/30 rounded-lg flex items-center justify-center">
@@ -232,14 +204,8 @@
           <div>npm run dev</div>
         </div>
         <div class="flex gap-4">
-          <router-link to="/agent-demo" 
-                       class="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors">
-            查看演示
-          </router-link>
-          <router-link to="/docs" 
-                       class="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold hover:bg-white/20 transition-colors">
-            阅读文档
-          </router-link>
+          <router-link to="/agent-demo" class="px-6 py-3 bg-white text-blue-600 rounded-lg font-semibold hover:bg-gray-100 transition-colors"> 查看演示 </router-link>
+          <router-link to="/docs" class="px-6 py-3 bg-white/10 backdrop-blur-sm border border-white/20 rounded-lg font-semibold hover:bg-white/20 transition-colors"> 阅读文档 </router-link>
         </div>
       </div>
     </section>
@@ -248,16 +214,10 @@
     <footer class="border-t border-gray-200 dark:border-gray-700 bg-white/80 dark:bg-gray-800/80 backdrop-blur-sm">
       <div class="max-w-7xl mx-auto px-6 py-8">
         <div class="flex flex-col md:flex-row justify-between items-center gap-4">
-          <div class="text-gray-600 dark:text-gray-400">
-            © 2024 Aster Cloud. MIT License.
-          </div>
+          <div class="text-gray-600 dark:text-gray-400">© 2024 Aster Cloud. MIT License.</div>
           <div class="flex gap-6">
-            <a href="https://github.com/aster-cloud/aster" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              GitHub
-            </a>
-            <router-link to="/docs" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors">
-              文档
-            </router-link>
+            <a href="https://github.com/astercloud/aster" target="_blank" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"> GitHub </a>
+            <router-link to="/docs" class="text-gray-600 dark:text-gray-400 hover:text-gray-900 dark:hover:text-white transition-colors"> 文档 </router-link>
           </div>
         </div>
       </div>

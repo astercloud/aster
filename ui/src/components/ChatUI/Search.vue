@@ -2,19 +2,8 @@
   <div class="search-container">
     <div class="search-input-wrapper">
       <Icon type="search" class="search-icon" />
-      <input
-        v-model="searchValue"
-        type="text"
-        :placeholder="placeholder"
-        class="search-input"
-        @input="handleInput"
-        @keydown.enter="handleSearch"
-      />
-      <button
-        v-if="searchValue"
-        class="clear-button"
-        @click="handleClear"
-      >
+      <input v-model="searchValue" type="text" :placeholder="placeholder" class="search-input" @input="handleInput" @keydown.enter="handleSearch" />
+      <button v-if="searchValue" class="clear-button" @click="handleClear">
         <Icon type="close" size="sm" />
       </button>
     </div>
@@ -22,8 +11,8 @@
 </template>
 
 <script setup lang="ts">
-import { ref, watch } from 'vue';
-import Icon from './Icon.vue';
+import { ref, watch } from "vue";
+import Icon from "./Icon.vue";
 
 interface Props {
   modelValue?: string;
@@ -31,33 +20,36 @@ interface Props {
 }
 
 const props = withDefaults(defineProps<Props>(), {
-  modelValue: '',
-  placeholder: '搜索...',
+  modelValue: "",
+  placeholder: "搜索...",
 });
 
 const emit = defineEmits<{
-  'update:modelValue': [value: string];
+  "update:modelValue": [value: string];
   search: [value: string];
 }>();
 
 const searchValue = ref(props.modelValue);
 
-watch(() => props.modelValue, (val) => {
-  searchValue.value = val;
-});
+watch(
+  () => props.modelValue,
+  (val) => {
+    searchValue.value = val;
+  },
+);
 
 const handleInput = () => {
-  emit('update:modelValue', searchValue.value);
+  emit("update:modelValue", searchValue.value);
 };
 
 const handleSearch = () => {
-  emit('search', searchValue.value);
+  emit("search", searchValue.value);
 };
 
 const handleClear = () => {
-  searchValue.value = '';
-  emit('update:modelValue', '');
-  emit('search', '');
+  searchValue.value = "";
+  emit("update:modelValue", "");
+  emit("search", "");
 };
 </script>
 

@@ -12,11 +12,7 @@
 
     <!-- Card Image -->
     <div v-if="message.content.image" class="card-image">
-      <img
-        :src="message.content.image.url"
-        :alt="message.content.image.alt || '卡片图片'"
-        loading="lazy"
-      />
+      <img :src="message.content.image.url" :alt="message.content.image.alt || '卡片图片'" loading="lazy" />
     </div>
 
     <!-- Card Body -->
@@ -26,11 +22,7 @@
 
     <!-- Card Fields -->
     <div v-if="message.content.fields && message.content.fields.length > 0" class="card-fields">
-      <div
-        v-for="(field, index) in message.content.fields"
-        :key="index"
-        class="card-field"
-      >
+      <div v-for="(field, index) in message.content.fields" :key="index" class="card-field">
         <span class="field-label">{{ field.label }}</span>
         <span class="field-value">{{ field.value }}</span>
       </div>
@@ -38,15 +30,7 @@
 
     <!-- Card Actions -->
     <div v-if="message.content.actions && message.content.actions.length > 0" class="card-actions">
-      <button
-        v-for="(action, index) in message.content.actions"
-        :key="index"
-        @click="handleAction(action)"
-        :class="[
-          'card-action-btn',
-          action.style === 'primary' ? 'btn-primary' : 'btn-secondary'
-        ]"
-      >
+      <button v-for="(action, index) in message.content.actions" :key="index" @click="handleAction(action)" :class="['card-action-btn', action.style === 'primary' ? 'btn-primary' : 'btn-secondary']">
         <svg v-if="action.icon" class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" :d="getIconPath(action.icon)"></path>
         </svg>
@@ -62,11 +46,11 @@
 </template>
 
 <script lang="ts">
-import { defineComponent } from 'vue';
-import type { CardMessage as CardMessageType } from '@/types';
+import { defineComponent } from "vue";
+import type { CardMessage as CardMessageType } from "@/types";
 
 export default defineComponent({
-  name: 'CardMessage',
+  name: "CardMessage",
 
   props: {
     message: {
@@ -81,16 +65,16 @@ export default defineComponent({
 
   setup(props, { emit }) {
     function handleAction(action: unknown) {
-      emit('action', action);
+      emit("action", action);
     }
 
     function getIconPath(icon: string): string {
       const icons: Record<string, string> = {
-        link: 'M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14',
-        download: 'M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4',
-        share: 'M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z',
+        link: "M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14",
+        download: "M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4",
+        share: "M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z",
       };
-      return icons[icon] || '';
+      return icons[icon] || "";
     }
 
     return {
