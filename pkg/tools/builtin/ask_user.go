@@ -3,12 +3,40 @@ package builtin
 import (
 	"context"
 	"fmt"
+	"sync"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
 	"github.com/astercloud/aster/pkg/types"
 	"github.com/google/uuid"
 )
+
+// 全局 pending requests 注册表（用于外部响应）
+var (
+	globalAskUserRequests   = make(map[string]chan map[string]any)
+	globalAskUserRequestsMu sync.RWMutex
+)
+
+// RespondToAskUser 响应 AskUser 请求（供外部调用）
+func RespondToAskUser(requestID string, answers map[string]any) error {
+	globalAskUserRequestsMu.RLock()
+	ch, ok := globalAskUserRequests[requestID]
+	globalAskUserRequestsMu.RUnlock()
+
+	if !ok {
+		return fmt.Errorf("no pending AskUser request with ID: %s", requestID)
+	}
+
+	select {
+	case ch <- answers:
+		globalAskUserRequestsMu.Lock()
+		delete(globalAskUserRequests, requestID)
+		globalAskUserRequestsMu.Unlock()
+		return nil
+	default:
+		return fmt.Errorf("response channel full or closed for request: %s", requestID)
+	}
+}
 
 // AskUserQuestionTool 结构化用户提问工具
 // 用于在执行过程中向用户提出结构化问题并获取回答
@@ -118,6 +146,11 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 	responseChan := make(chan map[string]any, 1)
 	t.pendingRequests[requestID] = responseChan
 
+	// 注册到全局表（供外部调用 RespondToAskUser）
+	globalAskUserRequestsMu.Lock()
+	globalAskUserRequests[requestID] = responseChan
+	globalAskUserRequestsMu.Unlock()
+
 	// 创建响应回调函数
 	respond := func(answers map[string]any) error {
 		select {
@@ -151,6 +184,9 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 	select {
 	case answers := <-responseChan:
 		delete(t.pendingRequests, requestID)
+		globalAskUserRequestsMu.Lock()
+		delete(globalAskUserRequests, requestID)
+		globalAskUserRequestsMu.Unlock()
 		return map[string]any{
 			"ok":         true,
 			"request_id": requestID,
@@ -160,6 +196,9 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 
 	case <-ctx.Done():
 		delete(t.pendingRequests, requestID)
+		globalAskUserRequestsMu.Lock()
+		delete(globalAskUserRequests, requestID)
+		globalAskUserRequestsMu.Unlock()
 		return map[string]any{
 			"ok":         false,
 			"request_id": requestID,
@@ -169,6 +208,9 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 
 	case <-time.After(5 * time.Minute): // 5分钟超时
 		delete(t.pendingRequests, requestID)
+		globalAskUserRequestsMu.Lock()
+		delete(globalAskUserRequests, requestID)
+		globalAskUserRequestsMu.Unlock()
 		return map[string]any{
 			"ok":         false,
 			"request_id": requestID,

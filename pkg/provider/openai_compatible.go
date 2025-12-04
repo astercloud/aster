@@ -276,7 +276,17 @@ func (p *OpenAICompatibleProvider) buildRequest(
 		}
 		// 添加工具
 		if len(opts.Tools) > 0 {
-			requestBody["tools"] = p.convertTools(opts.Tools)
+			convertedTools := p.convertTools(opts.Tools)
+			requestBody["tools"] = convertedTools
+			// 设置 tool_choice 为 auto，明确启用工具调用
+			// 参考: https://openrouter.ai/docs/parameters
+			requestBody["tool_choice"] = "auto"
+			// 添加调试日志，输出工具名称
+			toolNames := make([]string, len(opts.Tools))
+			for i, t := range opts.Tools {
+				toolNames[i] = t.Name
+			}
+			log.Printf("[%s] Sending %d tools to API: %v", p.providerName, len(opts.Tools), toolNames)
 		}
 	}
 

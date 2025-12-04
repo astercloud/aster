@@ -203,9 +203,32 @@ func (dp *DeepseekProvider) Stream(ctx context.Context, messages []types.Message
 // buildRequest 构建请求体
 func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamOptions) map[string]any {
 	log.Printf("[DeepseekProvider] 🎯 Building request with model: %s", dp.config.Model)
+
+	// 转换消息
+	convertedMessages := dp.convertMessages(messages)
+
+	// 处理 system prompt（OpenAI 兼容格式：作为第一条 system role 消息）
+	if opts != nil && opts.System != "" {
+		// 在消息数组开头插入 system 消息
+		systemMessage := map[string]any{
+			"role":    "system",
+			"content": opts.System,
+		}
+		convertedMessages = append([]map[string]any{systemMessage}, convertedMessages...)
+		log.Printf("[DeepseekProvider] Added system message, total messages: %d, system prompt length: %d", len(convertedMessages), len(opts.System))
+	} else if dp.systemPrompt != "" {
+		// 使用 Provider 级别的 system prompt
+		systemMessage := map[string]any{
+			"role":    "system",
+			"content": dp.systemPrompt,
+		}
+		convertedMessages = append([]map[string]any{systemMessage}, convertedMessages...)
+		log.Printf("[DeepseekProvider] Added provider system message, total messages: %d", len(convertedMessages))
+	}
+
 	req := map[string]any{
 		"model":    dp.config.Model,
-		"messages": dp.convertMessages(messages),
+		"messages": convertedMessages,
 		"stream":   true,
 	}
 
@@ -218,14 +241,6 @@ func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamO
 
 		if opts.Temperature > 0 {
 			req["temperature"] = opts.Temperature
-		}
-
-		if opts.System != "" {
-			// Deepseek API 支持 system 字段（OpenAI 兼容）
-			req["system"] = opts.System
-			log.Printf("[DeepseekProvider] System prompt length: %d", len(opts.System))
-		} else if dp.systemPrompt != "" {
-			req["system"] = dp.systemPrompt
 		}
 
 		if len(opts.Tools) > 0 {
@@ -258,9 +273,6 @@ func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamO
 		}
 	} else {
 		req["max_tokens"] = 4096
-		if dp.systemPrompt != "" {
-			req["system"] = dp.systemPrompt
-		}
 	}
 
 	return req
