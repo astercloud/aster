@@ -131,6 +131,7 @@ config := &server.Config{
 ### 预定义角色
 
 #### Admin - 管理员
+
 ```go
 {
     Name: "admin",
@@ -142,6 +143,7 @@ config := &server.Config{
 ```
 
 #### User - 普通用户
+
 ```go
 {
     Name: "user",
@@ -155,6 +157,7 @@ config := &server.Config{
 ```
 
 #### Viewer - 查看者
+
 ```go
 {
     Name: "viewer",
@@ -166,6 +169,7 @@ config := &server.Config{
 ```
 
 #### Developer - 开发者
+
 ```go
 {
     Name: "developer",
@@ -204,7 +208,7 @@ rbac.AddRole(customRole)
 ```go
 func (h *AgentHandler) Delete(c *gin.Context) {
     user := getUserFromContext(c)  // 从 context 获取用户
-    
+
     // 检查权限
     if !h.rbac.HasPermission(c.Request.Context(), user, "agents", "delete") {
         c.JSON(http.StatusForbidden, gin.H{
@@ -212,7 +216,7 @@ func (h *AgentHandler) Delete(c *gin.Context) {
         })
         return
     }
-    
+
     // 执行删除...
 }
 ```
@@ -223,14 +227,14 @@ func (h *AgentHandler) Delete(c *gin.Context) {
 func RequirePermission(rbac *auth.RBAC, resource, action string) gin.HandlerFunc {
     return func(c *gin.Context) {
         user := getUserFromContext(c)
-        
+
         if !rbac.HasPermission(c.Request.Context(), user, resource, action) {
             c.AbortWithStatusJSON(http.StatusForbidden, gin.H{
                 "error": "Permission denied",
             })
             return
         }
-        
+
         c.Next()
     }
 }
@@ -257,6 +261,7 @@ permissions := rbac.GetUserPermissions(user)
 ### 1. API Key 管理
 
 **✅ 推荐**:
+
 - 使用环境变量存储 API Keys
 - 定期轮换 keys
 - 设置过期时间
@@ -278,6 +283,7 @@ apiKeyInfo := &auth.APIKeyInfo{
 ```
 
 **❌ 避免**:
+
 - 在代码中硬编码 keys
 - 使用简单的 keys
 - 永不过期的 keys
@@ -286,6 +292,7 @@ apiKeyInfo := &auth.APIKeyInfo{
 ### 2. JWT 配置
 
 **✅ 推荐**:
+
 - 使用强密钥 (>= 32 字符)
 - 设置合理的过期时间
 - 包含必要的 claims
@@ -300,6 +307,7 @@ jwtConfig := auth.JWTConfig{
 ```
 
 **❌ 避免**:
+
 - 弱密钥
 - 过长的过期时间 (> 7 天)
 - 在 token 中存储敏感信息
@@ -308,6 +316,7 @@ jwtConfig := auth.JWTConfig{
 ### 3. RBAC 设计
 
 **✅ 推荐**:
+
 - 遵循最小权限原则
 - 使用角色而非直接权限
 - 定期审计权限
@@ -324,6 +333,7 @@ roles := []string{
 ```
 
 **❌ 避免**:
+
 - 过度授权
 - 复杂的权限层级
 - 未文档化的权限
@@ -332,6 +342,7 @@ roles := []string{
 ### 4. 安全传输
 
 **✅ 推荐**:
+
 - 使用 HTTPS
 - 启用 HSTS
 - 验证 SSL 证书
@@ -361,12 +372,12 @@ import (
 func main() {
     // 1. 创建认证管理器
     authManager := auth.NewManager(auth.AuthMethodAPIKey)
-    
+
     // 2. 注册 API Key 认证
     apiKeyStore := auth.NewMemoryAPIKeyStore()
     apiKeyAuth := auth.NewAPIKeyAuthenticator(apiKeyStore)
     authManager.Register(apiKeyAuth)
-    
+
     // 3. 注册 JWT 认证
     jwtAuth := auth.NewJWTAuthenticator(auth.JWTConfig{
         SecretKey: os.Getenv("JWT_SECRET"),
@@ -374,10 +385,10 @@ func main() {
         ExpiryDuration: 24 * time.Hour,
     })
     authManager.Register(jwtAuth)
-    
+
     // 4. 创建 RBAC
     rbac := auth.NewRBAC()
-    
+
     // 5. 配置服务器
     config := &server.Config{
         Auth: server.AuthConfig{
@@ -385,7 +396,7 @@ func main() {
             JWT: server.JWTConfig{Enabled: true},
         },
     }
-    
+
     srv, _ := server.New(config, deps)
     srv.Start()
 }
@@ -399,19 +410,19 @@ func (h *AuthHandler) Login(c *gin.Context) {
         Username string `json:"username"`
         Password string `json:"password"`
     }
-    
+
     c.ShouldBindJSON(&req)
-    
+
     // 验证用户名密码
     user, err := validateCredentials(req.Username, req.Password)
     if err != nil {
         c.JSON(401, gin.H{"error": "Invalid credentials"})
         return
     }
-    
+
     // 生成 JWT
     token, expiresAt, _ := h.jwtAuth.GenerateToken(user)
-    
+
     c.JSON(200, gin.H{
         "token": token,
         "expires_at": expiresAt,
@@ -431,14 +442,14 @@ func AuthMiddleware(authManager *auth.Manager, rbac *auth.RBAC) gin.HandlerFunc 
             c.AbortWithStatusJSON(401, gin.H{"error": "Missing token"})
             return
         }
-        
+
         // 验证 token
         user, err := authManager.Validate(c.Request.Context(), auth.AuthMethodJWT, token)
         if err != nil {
             c.AbortWithStatusJSON(401, gin.H{"error": "Invalid token"})
             return
         }
-        
+
         // 存储用户信息
         c.Set("user", user)
         c.Next()

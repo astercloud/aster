@@ -123,7 +123,7 @@ CMD ["./agent-service"]
 
 ```yaml
 # docker-compose.yml
-version: '3.8'
+version: "3.8"
 
 services:
   agent-service:
@@ -172,8 +172,8 @@ services:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus-data:/prometheus
     command:
-      - '--config.file=/etc/prometheus/prometheus.yml'
-      - '--storage.tsdb.path=/prometheus'
+      - "--config.file=/etc/prometheus/prometheus.yml"
+      - "--storage.tsdb.path=/prometheus"
     restart: unless-stopped
 
   grafana:
@@ -574,7 +574,7 @@ name: Build and Deploy
 on:
   push:
     branches: [main]
-    tags: ['v*']
+    tags: ["v*"]
   pull_request:
     branches: [main]
 
@@ -591,7 +591,7 @@ jobs:
       - name: Set up Go
         uses: actions/setup-go@v4
         with:
-          go-version: '1.21'
+          go-version: "1.21"
 
       - name: Run tests
         run: |
@@ -722,7 +722,7 @@ metadata:
   name: agent-service-canary
   namespace: production
 spec:
-  replicas: 1  # 金丝雀副本数
+  replicas: 1 # 金丝雀副本数
   selector:
     matchLabels:
       app: agent-service
@@ -751,7 +751,7 @@ metadata:
   namespace: production
   annotations:
     nginx.ingress.kubernetes.io/canary: "true"
-    nginx.ingress.kubernetes.io/canary-weight: "10"  # 10% 流量到金丝雀
+    nginx.ingress.kubernetes.io/canary-weight: "10" # 10% 流量到金丝雀
 spec:
   ingressClassName: nginx
   rules:

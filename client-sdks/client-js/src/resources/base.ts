@@ -40,7 +40,7 @@ export interface RetryOptions {
  */
 export interface RequestOptions {
   /** HTTP 方法 */
-  method?: 'GET' | 'POST' | 'PUT' | 'DELETE' | 'PATCH';
+  method?: "GET" | "POST" | "PUT" | "DELETE" | "PATCH";
   /** 请求体 */
   body?: any;
   /** 查询参数 */
@@ -66,7 +66,7 @@ export class BaseResource {
     maxRetries: 3,
     retryableStatusCodes: [408, 429, 500, 502, 503, 504],
     backoffMultiplier: 2,
-    maxBackoffTime: 30000 // 30秒
+    maxBackoffTime: 30000, // 30秒
   };
 
   constructor(options: ClientOptions) {
@@ -75,10 +75,10 @@ export class BaseResource {
       ...options,
       retry: {
         ...this.defaultRetry,
-        ...options.retry
-      }
+        ...options.retry,
+      },
     };
-    
+
     this.fetchImpl = options.fetchImpl ?? fetch;
   }
 
@@ -88,11 +88,11 @@ export class BaseResource {
    */
   protected async request<T>(
     path: string,
-    options: RequestOptions = {}
+    options: RequestOptions = {},
   ): Promise<T> {
     const url = this.buildUrl(path, options.params);
     const timeout = options.timeout ?? this.options.timeout;
-    
+
     let lastError: Error | null = null;
     const maxRetries = this.options.retry!.maxRetries!;
 
@@ -105,28 +105,32 @@ export class BaseResource {
 
         try {
           const response = await this.fetchImpl(url, {
-            method: options.method ?? 'GET',
+            method: options.method ?? "GET",
             headers: this.buildHeaders(options.headers),
             body: options.body ? JSON.stringify(options.body) : undefined,
-            signal: options.signal ?? controller.signal
+            signal: options.signal ?? controller.signal,
           });
 
           clearTimeout(timeoutId);
 
           // 检查是否需要重试
-          if (!response.ok && this.shouldRetry(response.status) && attempt < maxRetries) {
-            lastError = new Error(`HTTP ${response.status}: ${response.statusText}`);
+          if (
+            !response.ok &&
+            this.shouldRetry(response.status) &&
+            attempt < maxRetries
+          ) {
+            lastError = new Error(
+              `HTTP ${response.status}: ${response.statusText}`,
+            );
             await this.delay(this.getBackoffDelay(attempt));
             continue;
           }
 
           // 处理响应
           return await this.handleResponse<T>(response);
-
         } finally {
           clearTimeout(timeoutId);
         }
-
       } catch (error: any) {
         lastError = error;
 
@@ -149,8 +153,8 @@ export class BaseResource {
    * 构建完整 URL
    */
   private buildUrl(path: string, params?: Record<string, any>): string {
-    const baseUrl = this.options.baseUrl.replace(/\/+$/, '');
-    const fullPath = path.startsWith('/') ? path : `/${path}`;
+    const baseUrl = this.options.baseUrl.replace(/\/+$/, "");
+    const fullPath = path.startsWith("/") ? path : `/${path}`;
     let url = `${baseUrl}${fullPath}`;
 
     // 添加查询参数
@@ -173,16 +177,18 @@ export class BaseResource {
   /**
    * 构建请求 headers
    */
-  private buildHeaders(customHeaders?: Record<string, string>): Record<string, string> {
+  private buildHeaders(
+    customHeaders?: Record<string, string>,
+  ): Record<string, string> {
     const headers: Record<string, string> = {
-      'Content-Type': 'application/json',
+      "Content-Type": "application/json",
       ...this.options.headers,
-      ...customHeaders
+      ...customHeaders,
     };
 
     // 添加 API Key
     if (this.options.apiKey) {
-      headers['Authorization'] = `Bearer ${this.options.apiKey}`;
+      headers["Authorization"] = `Bearer ${this.options.apiKey}`;
     }
 
     return headers;
@@ -206,7 +212,9 @@ export class BaseResource {
     } catch (error) {
       // 不是有效的 JSON
       if (!response.ok) {
-        throw new Error(`HTTP ${response.status}: ${text || response.statusText}`);
+        throw new Error(
+          `HTTP ${response.status}: ${text || response.statusText}`,
+        );
       }
       return text as T;
     }
@@ -218,7 +226,12 @@ export class BaseResource {
     }
 
     // 解包 {success: true, data: {...}} 格式的响应
-    if (data && typeof data === 'object' && 'success' in data && 'data' in data) {
+    if (
+      data &&
+      typeof data === "object" &&
+      "success" in data &&
+      "data" in data
+    ) {
       return data.data as T;
     }
 
@@ -238,11 +251,11 @@ export class BaseResource {
   private isRetryableError(error: any): boolean {
     // 超时、网络错误等
     return (
-      error.name === 'AbortError' ||
-      error.name === 'TimeoutError' ||
-      error.message?.includes('fetch failed') ||
-      error.message?.includes('network') ||
-      error.message?.includes('ECONNREFUSED')
+      error.name === "AbortError" ||
+      error.name === "TimeoutError" ||
+      error.message?.includes("fetch failed") ||
+      error.message?.includes("network") ||
+      error.message?.includes("ECONNREFUSED")
     );
   }
 
@@ -254,7 +267,7 @@ export class BaseResource {
     const { backoffMultiplier, maxBackoffTime } = this.options.retry!;
     const delay = Math.min(
       1000 * Math.pow(backoffMultiplier!, attempt),
-      maxBackoffTime!
+      maxBackoffTime!,
     );
     // 添加随机抖动（±25%）
     const jitter = delay * (0.75 + Math.random() * 0.5);
@@ -265,7 +278,7 @@ export class BaseResource {
    * 延迟函数
    */
   private delay(ms: number): Promise<void> {
-    return new Promise(resolve => setTimeout(resolve, ms));
+    return new Promise((resolve) => setTimeout(resolve, ms));
   }
 
   /**

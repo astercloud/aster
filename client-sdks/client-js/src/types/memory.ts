@@ -12,7 +12,7 @@
  * - thread: 会话级别（当前对话）
  * - resource: 全局级别（跨会话）
  */
-export type WorkingMemoryScope = 'thread' | 'resource';
+export type WorkingMemoryScope = "thread" | "resource";
 
 /**
  * JSON Schema 定义
@@ -111,7 +111,11 @@ export interface SearchResult {
 /**
  * 记忆来源类型
  */
-export type MemorySource = 'user_input' | 'tool_output' | 'inference' | 'external';
+export type MemorySource =
+  | "user_input"
+  | "tool_output"
+  | "inference"
+  | "external";
 
 /**
  * 记忆溯源信息
@@ -150,10 +154,10 @@ export interface ProvenanceResponse {
 /**
  * 记忆合并策略
  */
-export type ConsolidationStrategy = 
-  | 'dedup'              // 去重
-  | 'resolve_conflict'   // 解决冲突
-  | 'summarize';         // 总结
+export type ConsolidationStrategy =
+  | "dedup" // 去重
+  | "resolve_conflict" // 解决冲突
+  | "summarize"; // 总结
 
 /**
  * 记忆合并选项
@@ -177,11 +181,11 @@ export interface ConsolidateOptions {
 /**
  * 合并任务状态
  */
-export type ConsolidationStatus = 
-  | 'pending'    // 等待中
-  | 'running'    // 运行中
-  | 'completed'  // 完成
-  | 'failed';    // 失败
+export type ConsolidationStatus =
+  | "pending" // 等待中
+  | "running" // 运行中
+  | "completed" // 完成
+  | "failed"; // 失败
 
 /**
  * 记忆合并结果
@@ -226,7 +230,7 @@ export interface JobStatus {
 /**
  * 消息角色
  */
-export type MessageRole = 'user' | 'assistant' | 'system' | 'tool';
+export type MessageRole = "user" | "assistant" | "system" | "tool";
 
 /**
  * 消息内容

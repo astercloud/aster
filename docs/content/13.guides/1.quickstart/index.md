@@ -6,6 +6,7 @@ description: 创建第一个 Agent，实现文件操作和命令执行
 # 基础 Agent 示例
 
 本示例展示如何创建一个完整的 Agent，包括：
+
 - 🔧 依赖注入与配置
 - 📡 事件订阅与处理
 - 💬 与 Agent 对话
@@ -44,6 +45,7 @@ templateRegistry := agent.NewTemplateRegistry()
 ```
 
 **关键点**：
+
 - `ToolRegistry` - 管理所有可用工具
 - `SandboxFactory` - 创建沙箱实例
 - `ProviderFactory` - 创建 LLM Provider
@@ -64,6 +66,7 @@ templateRegistry.Register(&types.AgentTemplateDefinition{
 ```
 
 **模板字段说明**：
+
 - `ID` - 模板唯一标识
 - `Model` - 使用的模型名称
 - `SystemPrompt` - 系统提示词，定义 Agent 角色
@@ -101,6 +104,7 @@ config := &types.AgentConfig{
 ```
 
 **配置说明**：
+
 - `TemplateID` - 使用的模板 ID
 - `ModelConfig` - LLM 配置（Provider、模型、API Key）
 - `Sandbox` - 沙箱配置（类型、工作目录）
@@ -267,6 +271,7 @@ type Dependencies struct {
 ```
 
 **优势**：
+
 - ✅ 易于测试（可注入 Mock 对象）
 - ✅ 易于扩展（注册自定义实现）
 - ✅ 配置灵活（生产/开发环境切换）
@@ -290,15 +295,15 @@ graph LR
 
 **事件类型**：
 
-| 通道 | 事件类型 | 用途 |
-|------|---------|------|
-| Progress | TextChunkEvent | 流式文本输出 |
-| Progress | ToolStartEvent | 工具调用开始 |
-| Progress | ToolEndEvent | 工具调用结束 |
-| Progress | DoneEvent | 步骤完成 |
-| Monitor | StateChangedEvent | 状态变化 |
-| Monitor | TokenUsageEvent | Token 使用统计 |
-| Control | ToolApprovalEvent | 工具调用确认请求 |
+| 通道     | 事件类型          | 用途             |
+| -------- | ----------------- | ---------------- |
+| Progress | TextChunkEvent    | 流式文本输出     |
+| Progress | ToolStartEvent    | 工具调用开始     |
+| Progress | ToolEndEvent      | 工具调用结束     |
+| Progress | DoneEvent         | 步骤完成         |
+| Monitor  | StateChangedEvent | 状态变化         |
+| Monitor  | TokenUsageEvent   | Token 使用统计   |
+| Control  | ToolApprovalEvent | 工具调用确认请求 |
 
 ### Agent 生命周期
 

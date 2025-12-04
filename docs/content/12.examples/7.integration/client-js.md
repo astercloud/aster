@@ -24,24 +24,24 @@ npm install @aster/client-js
 ## 2. 基本使用
 
 ```ts
-import { AgentsdkClient } from '@aster/client-js';
+import { AgentsdkClient } from "@aster/client-js";
 
 const client = new AgentsdkClient({
-  baseUrl: 'http://localhost:8080', // aster serve 的地址
+  baseUrl: "http://localhost:8080", // aster serve 的地址
 });
 
 async function main() {
   const res = await client.chat({
-    template_id: 'assistant',
-    input: '请帮我总结一下 README',
-    metadata: { user_id: 'alice' },
-    middlewares: ['filesystem', 'agent_memory'],
+    template_id: "assistant",
+    input: "请帮我总结一下 README",
+    metadata: { user_id: "alice" },
+    middlewares: ["filesystem", "agent_memory"],
   });
 
-  if (res.status === 'ok') {
-    console.log('Answer:', res.text);
+  if (res.status === "ok") {
+    console.log("Answer:", res.text);
   } else {
-    console.error('Error:', res.error_message);
+    console.error("Error:", res.error_message);
   }
 }
 
@@ -66,14 +66,14 @@ paths:
         content:
           application/json:
             schema:
-              $ref: '#/components/schemas/ChatRequest'
+              $ref: "#/components/schemas/ChatRequest"
       responses:
-        '200':
+        "200":
           description: Chat completed
           content:
             application/json:
               schema:
-                $ref: '#/components/schemas/ChatResponse'
+                $ref: "#/components/schemas/ChatResponse"
 ```
 
 这意味着你也可以使用任意 OpenAPI 生成器(如 `openapi-generator` 或 `orval`)基于该规范生成自定义客户端。

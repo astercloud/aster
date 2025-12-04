@@ -40,6 +40,7 @@ graph TB
 ```
 
 **特点：**
+
 - ✅ **顺序执行** - 按优先级从小到大执行
 - ✅ **双向拦截** - 请求和响应都可以处理
 - ✅ **链式调用** - 每层调用下一层的 handler
@@ -86,6 +87,7 @@ WrapModelCall(ctx context.Context, req *ModelRequest, handler ModelCallHandler) 
 ```
 
 **用途：**
+
 - 修改发送给 LLM 的消息
 - 增强 SystemPrompt
 - 自动总结历史消息
@@ -101,6 +103,7 @@ WrapToolCall(ctx context.Context, req *ToolCallRequest, handler ToolCallHandler)
 ```
 
 **用途：**
+
 - 验证工具调用参数
 - 人工审批工具执行
 - 缓存工具结果
@@ -130,6 +133,7 @@ type Middleware interface {
 ```
 
 **用途：**
+
 - 初始化资源（数据库连接、缓存等）
 - 加载持久化数据
 - 释放资源
@@ -144,22 +148,23 @@ func (m *MyMiddleware) Priority() int {
 ```
 
 **优先级范围：**
+
 - **0-100**: 系统核心中间件
 - **100-500**: 功能中间件
 - **500-1000**: 用户自定义中间件
 
 ## 📦 内置中间件
 
-| 中间件 | 优先级 | 功能 | 用途 |
-|--------|--------|------|------|
-| [Summarization](/examples/middleware/builtin#summarization) | 40 | 自动总结 | 压缩对话历史 |
-| [Filesystem](/examples/middleware/builtin#filesystem) | 100 | 文件系统增强 | 注入文件工具 |
-| [SubAgent](/examples/middleware/builtin#subagent) | 200 | 子Agent | 任务委托 |
-| [AgentMemory](/examples/middleware/builtin#memory) | 150 | 记忆管理 | 跨会话记忆 |
-| [HumanInTheLoop](/middleware/builtin/human-in-the-loop) | 50 | 人工干预 | 审批工具调用 |
-| [TodoList](/examples/middleware/builtin#todolist) | 120 | 任务列表 | 任务跟踪 |
-| [PatchToolCalls](/examples/middleware/builtin#patch) | 300 | 工具修复 | 补丁和兼容 |
-| [PII Redaction](/middleware/builtin/pii-redaction) | 200 | PII 自动脱敏 | 敏感信息保护 |
+| 中间件                                                      | 优先级 | 功能         | 用途         |
+| ----------------------------------------------------------- | ------ | ------------ | ------------ |
+| [Summarization](/examples/middleware/builtin#summarization) | 40     | 自动总结     | 压缩对话历史 |
+| [Filesystem](/examples/middleware/builtin#filesystem)       | 100    | 文件系统增强 | 注入文件工具 |
+| [SubAgent](/examples/middleware/builtin#subagent)           | 200    | 子Agent      | 任务委托     |
+| [AgentMemory](/examples/middleware/builtin#memory)          | 150    | 记忆管理     | 跨会话记忆   |
+| [HumanInTheLoop](/middleware/builtin/human-in-the-loop)     | 50     | 人工干预     | 审批工具调用 |
+| [TodoList](/examples/middleware/builtin#todolist)           | 120    | 任务列表     | 任务跟踪     |
+| [PatchToolCalls](/examples/middleware/builtin#patch)        | 300    | 工具修复     | 补丁和兼容   |
+| [PII Redaction](/middleware/builtin/pii-redaction)          | 200    | PII 自动脱敏 | 敏感信息保护 |
 
 ## 🚀 快速开始
 
@@ -254,6 +259,7 @@ summaryMW, _ := middleware.NewSummarizationMiddleware(&middleware.SummarizationM
 ```
 
 **效果**:
+
 - 自动监控消息历史的 Token 数
 - 超过阈值时，总结旧消息
 - 用总结替换历史，释放上下文空间
@@ -272,6 +278,7 @@ filesMW := middleware.NewFilesystemMiddleware(&middleware.FilesystemMiddlewareCo
 ```
 
 **效果**:
+
 - 自动注入 `Read`, `Write`, `Edit`, `glob`, `grep` 工具
 - 大结果自动驱逐到文件
 - 路径安全验证
@@ -303,6 +310,7 @@ subagentMW, _ := middleware.NewSubAgentMiddleware(&middleware.SubAgentMiddleware
 ```
 
 **效果**:
+
 - 注入 `task` 工具启动子 Agent
 - 子 Agent 独立上下文，任务隔离
 - 支持专业化分工
@@ -334,6 +342,7 @@ hitlMW, _ := middleware.NewHumanInTheLoopMiddleware(&middleware.HumanInTheLoopMi
 ```
 
 **效果**:
+
 - 拦截指定工具的调用
 - 人工审批后才执行
 - 支持批准、拒绝、编辑三种决策
@@ -548,12 +557,12 @@ func (m *StatsMiddleware) GetStats() map[string]int {
 
 ### Q: 中间件和工具的区别？
 
-| 特性 | 中间件 | 工具 |
-|------|--------|------|
+| 特性     | 中间件               | 工具         |
+| -------- | -------------------- | ------------ |
 | 执行时机 | 自动执行（每次调用） | LLM 决定调用 |
-| 作用范围 | 全局（所有请求） | 单次工具调用 |
-| 功能 | 拦截、增强、控制流程 | 具体功能实现 |
-| 使用场景 | 横切关注点 | 业务功能 |
+| 作用范围 | 全局（所有请求）     | 单次工具调用 |
+| 功能     | 拦截、增强、控制流程 | 具体功能实现 |
+| 使用场景 | 横切关注点           | 业务功能     |
 
 ### Q: 多个中间件如何执行？
 

@@ -245,4 +245,3 @@ go run ./workflow-semantic
 
 - 如果未配置真实的向量存储/embedding 服务, 示例会使用内存向量存储 + MockEmbedder, 仅用于演示流程;
 - 若已在 `aster.yaml` 中配置了 pgvector + OpenAI 等 adapter, 可以在自己的项目中复用相同的 `SemanticMemory` 配置, 将本示例中的 Workflow Agent 变成真正的生产级 RAG 步骤。
-

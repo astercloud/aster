@@ -46,11 +46,11 @@ export interface MCPServerInfo extends MCPServerConfig {
 /**
  * MCP Server 状态
  */
-export type MCPServerStatus = 
-  | 'connected'      // 已连接
-  | 'disconnected'   // 已断开
-  | 'connecting'     // 连接中
-  | 'error';         // 错误
+export type MCPServerStatus =
+  | "connected" // 已连接
+  | "disconnected" // 已断开
+  | "connecting" // 连接中
+  | "error"; // 错误
 
 // ============================================================================
 // MCP Tools
@@ -69,7 +69,7 @@ export interface MCPTool {
   /** 输出 Schema */
   outputSchema?: MCPToolSchema;
   /** 工具类型 */
-  type?: 'function' | 'api' | 'command';
+  type?: "function" | "api" | "command";
   /** 所属 Server */
   serverId: string;
 }
@@ -192,7 +192,7 @@ export interface MCPPrompt {
 export interface MCPPromptResult {
   /** 消息列表 */
   messages: Array<{
-    role: 'user' | 'assistant' | 'system';
+    role: "user" | "assistant" | "system";
     content: string;
   }>;
 }
@@ -228,12 +228,12 @@ export interface MCPStats {
 /**
  * MCP 事件类型
  */
-export type MCPEventType = 
-  | 'server_connected'
-  | 'server_disconnected'
-  | 'tool_called'
-  | 'tool_completed'
-  | 'error';
+export type MCPEventType =
+  | "server_connected"
+  | "server_disconnected"
+  | "tool_called"
+  | "tool_completed"
+  | "error";
 
 /**
  * MCP 事件

@@ -51,7 +51,7 @@ config.Model    = "deepseek-chat"
 
 如果你需要更细节的多模态/视频/Prompt Cache 说明:
 
-- OpenAI 细节: 支持 o1/o3、Prompt Caching、多模态等;  
+- OpenAI 细节: 支持 o1/o3、Prompt Caching、多模态等;
 - Gemini 细节: 支持 1M+ 上下文、视频理解。
 
 出于简洁考虑,这些细节保存在独立页面中,但默认不在左侧导航中显示:
@@ -85,7 +85,8 @@ config := &types.AgentConfig{
 
 这样既保留了多 Provider 兼容能力, 又不会在文档上堆积大量重复/冗长的说明。
 
-## 5. ExecutionMode 配置 
+## 5. ExecutionMode 配置
+
 aster 现在支持配置执行模式，优化不同场景的性能：
 
 ```go
@@ -99,11 +100,11 @@ config := &types.ModelConfig{
 
 ### 执行模式类型
 
-| 模式 | 说明 | 适用场景 | 性能 |
-|------|------|---------|------|
-| `ExecutionModeStreaming` | 流式输出（默认） | 交互式对话、实时反馈 | 用户体验好 |
-| `ExecutionModeNonStreaming` | 非流式批处理 | 翻译、批量处理 | **速度快3-5倍** |
-| `ExecutionModeAuto` | 自动选择 | 通用场景 | 智能优化 |
+| 模式                        | 说明             | 适用场景             | 性能            |
+| --------------------------- | ---------------- | -------------------- | --------------- |
+| `ExecutionModeStreaming`    | 流式输出（默认） | 交互式对话、实时反馈 | 用户体验好      |
+| `ExecutionModeNonStreaming` | 非流式批处理     | 翻译、批量处理       | **速度快3-5倍** |
+| `ExecutionModeAuto`         | 自动选择         | 通用场景             | 智能优化        |
 
 ### 使用示例
 
@@ -125,9 +126,8 @@ translateConfig := &types.ModelConfig{
 
 ### 性能对比
 
-| 任务 | Streaming | NonStreaming | 性能提升 |
-|------|-----------|--------------|---------|
-| 翻译200行文档 | 30秒 | 5-10秒 | **3-5倍** |
-| Token消耗 | 标准 | 降低20% | **更省钱** |
-| 用户体验 | 实时反馈 | 快速完成 | 各有优势 |
-
+| 任务          | Streaming | NonStreaming | 性能提升   |
+| ------------- | --------- | ------------ | ---------- |
+| 翻译200行文档 | 30秒      | 5-10秒       | **3-5倍**  |
+| Token消耗     | 标准      | 降低20%      | **更省钱** |
+| 用户体验      | 实时反馈  | 快速完成     | 各有优势   |

@@ -1,6 +1,6 @@
 /**
  * AsterClient 事件驱动架构 - 三通道事件类型定义
- * 
+ *
  * 三通道设计：
  * - Progress Channel: 数据流（思考、文本、工具执行）
  * - Control Channel: 审批流（工具审批、暂停/恢复）
@@ -14,7 +14,7 @@
 /**
  * 事件通道类型
  */
-export type Channel = 'progress' | 'control' | 'monitor';
+export type Channel = "progress" | "control" | "monitor";
 
 /**
  * 事件过滤器
@@ -35,8 +35,8 @@ export interface EventFilter {
  * AI 正在思考的过程
  */
 export interface ProgressThinkingEvent {
-  type: 'thinking';
-  channel: 'progress';
+  type: "thinking";
+  channel: "progress";
   data: {
     /** 思考内容 */
     content: string;
@@ -48,8 +48,8 @@ export interface ProgressThinkingEvent {
  * 流式文本输出
  */
 export interface ProgressTextChunkEvent {
-  type: 'text_chunk';
-  channel: 'progress';
+  type: "text_chunk";
+  channel: "progress";
   data: {
     /** 增量文本 */
     delta: string;
@@ -63,8 +63,8 @@ export interface ProgressTextChunkEvent {
  * 工具调用开始
  */
 export interface ProgressToolStartEvent {
-  type: 'tool_start';
-  channel: 'progress';
+  type: "tool_start";
+  channel: "progress";
   data: {
     /** 工具名称 */
     toolName: string;
@@ -78,8 +78,8 @@ export interface ProgressToolStartEvent {
  * 工具调用完成
  */
 export interface ProgressToolEndEvent {
-  type: 'tool_end';
-  channel: 'progress';
+  type: "tool_end";
+  channel: "progress";
   data: {
     /** 工具名称 */
     toolName: string;
@@ -93,8 +93,8 @@ export interface ProgressToolEndEvent {
  * Agent 执行完成
  */
 export interface ProgressDoneEvent {
-  type: 'done';
-  channel: 'progress';
+  type: "done";
+  channel: "progress";
   data: {
     /** 最终文本 */
     text: string;
@@ -106,8 +106,8 @@ export interface ProgressDoneEvent {
  * 执行过程中发生错误
  */
 export interface ProgressErrorEvent {
-  type: 'error';
-  channel: 'progress';
+  type: "error";
+  channel: "progress";
   data: {
     /** 错误信息 */
     error: string;
@@ -134,8 +134,8 @@ export type ProgressEvent =
  * 需要用户审批工具调用
  */
 export interface ControlToolApprovalRequestEvent {
-  type: 'tool_approval_request';
-  channel: 'control';
+  type: "tool_approval_request";
+  channel: "control";
   data: {
     /** 审批 ID */
     approvalId: string;
@@ -151,8 +151,8 @@ export interface ControlToolApprovalRequestEvent {
  * 用户审批结果
  */
 export interface ControlToolApprovalResponseEvent {
-  type: 'tool_approval_response';
-  channel: 'control';
+  type: "tool_approval_response";
+  channel: "control";
   data: {
     /** 审批 ID */
     approvalId: string;
@@ -166,8 +166,8 @@ export interface ControlToolApprovalResponseEvent {
  * Agent 执行被暂停
  */
 export interface ControlPauseEvent {
-  type: 'pause';
-  channel: 'control';
+  type: "pause";
+  channel: "control";
   data: {
     /** 暂停原因 */
     reason: string;
@@ -179,8 +179,8 @@ export interface ControlPauseEvent {
  * Agent 执行恢复
  */
 export interface ControlResumeEvent {
-  type: 'resume';
-  channel: 'control';
+  type: "resume";
+  channel: "control";
   data: {
     /** 恢复时间戳 */
     timestamp: string;
@@ -205,8 +205,8 @@ export type ControlEvent =
  * 记录 Token 消耗
  */
 export interface MonitorTokenUsageEvent {
-  type: 'token_usage';
-  channel: 'monitor';
+  type: "token_usage";
+  channel: "monitor";
   data: {
     /** Prompt Tokens */
     promptTokens: number;
@@ -222,8 +222,8 @@ export interface MonitorTokenUsageEvent {
  * 记录操作延迟
  */
 export interface MonitorLatencyEvent {
-  type: 'latency';
-  channel: 'monitor';
+  type: "latency";
+  channel: "monitor";
   data: {
     /** 延迟（毫秒） */
     latencyMs: number;
@@ -237,8 +237,8 @@ export interface MonitorLatencyEvent {
  * 记录 API 调用成本
  */
 export interface MonitorCostEvent {
-  type: 'cost';
-  channel: 'monitor';
+  type: "cost";
+  channel: "monitor";
   data: {
     /** 成本金额 */
     cost: number;
@@ -252,8 +252,8 @@ export interface MonitorCostEvent {
  * 记录合规检查结果
  */
 export interface MonitorComplianceEvent {
-  type: 'compliance';
-  channel: 'monitor';
+  type: "compliance";
+  channel: "monitor";
   data: {
     /** 是否通过 */
     passed: boolean;
@@ -304,29 +304,29 @@ export interface EventEnvelope {
  * 类型守卫：检查是否为 Progress 事件
  */
 export function isProgressEvent(event: StreamEvent): event is ProgressEvent {
-  return event.channel === 'progress';
+  return event.channel === "progress";
 }
 
 /**
  * 类型守卫：检查是否为 Control 事件
  */
 export function isControlEvent(event: StreamEvent): event is ControlEvent {
-  return event.channel === 'control';
+  return event.channel === "control";
 }
 
 /**
  * 类型守卫：检查是否为 Monitor 事件
  */
 export function isMonitorEvent(event: StreamEvent): event is MonitorEvent {
-  return event.channel === 'monitor';
+  return event.channel === "monitor";
 }
 
 /**
  * 类型守卫：检查具体事件类型
  */
-export function isEventType<T extends StreamEvent['type']>(
+export function isEventType<T extends StreamEvent["type"]>(
   event: StreamEvent,
-  type: T
+  type: T,
 ): event is Extract<StreamEvent, { type: T }> {
   return event.type === type;
 }

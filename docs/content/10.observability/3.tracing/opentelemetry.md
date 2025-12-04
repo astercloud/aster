@@ -134,19 +134,19 @@ import (
 func (h *AgentHandler) Create(c *gin.Context) {
     ctx := c.Request.Context()
     tracer := otel.Tracer("aster")
-    
+
     // 开始新的 span
     ctx, span := tracer.Start(ctx, "agent.create")
     defer span.End()
-    
+
     // 添加属性
     span.SetAttributes(
         attribute.String("agent.id", agentID),
         attribute.String("agent.type", agentType),
     )
-    
+
     // 业务逻辑...
-    
+
     // 记录事件
     span.AddEvent("Agent created successfully")
 }
@@ -168,19 +168,19 @@ if err != nil {
 func processAgent(ctx context.Context) error {
     ctx, span := tracer.Start(ctx, "process_agent")
     defer span.End()
-    
+
     // 子操作 1
     if err := validateAgent(ctx); err != nil {
         span.RecordError(err)
         return err
     }
-    
+
     // 子操作 2
     if err := saveAgent(ctx); err != nil {
         span.RecordError(err)
         return err
     }
-    
+
     return nil
 }
 
@@ -188,7 +188,7 @@ func validateAgent(ctx context.Context) error {
     // 自动成为 process_agent 的子 span
     ctx, span := tracer.Start(ctx, "validate_agent")
     defer span.End()
-    
+
     // 验证逻辑...
     return nil
 }
@@ -226,6 +226,7 @@ sdktrace.WithSampler(sdktrace.TraceIDRatioBased(config.SamplingRate))
 ### 查看 Trace
 
 在 Jaeger UI 中：
+
 1. 选择 Service: aster
 2. 选择 Operation: GET /v1/agents
 3. 点击 "Find Traces"
@@ -262,11 +263,13 @@ POST /v1/agents/chat
 ### 优化
 
 1. **降低采样率**
+
    ```go
    SamplingRate: 0.1  // 仅采样 10%
    ```
 
 2. **批量导出**
+
    ```go
    sdktrace.WithBatcher(exporter,
        sdktrace.WithMaxExportBatchSize(512),
@@ -298,7 +301,7 @@ rate(http_request_duration_seconds_bucket{job="aster"}[5m])
 ## Docker Compose 完整示例
 
 ```yaml
-version: '3.8'
+version: "3.8"
 
 services:
   aster:
@@ -310,7 +313,7 @@ services:
       - OBSERVABILITY_TRACING_OTLP_ENDPOINT=otel-collector:4318
     depends_on:
       - otel-collector
-  
+
   otel-collector:
     image: otel/opentelemetry-collector:latest
     command: ["--config=/etc/otel-collector-config.yaml"]
@@ -320,20 +323,20 @@ services:
       - "4318:4318"
     depends_on:
       - jaeger
-  
+
   jaeger:
     image: jaegertracing/all-in-one:latest
     ports:
       - "16686:16686"
       - "14250:14250"
-  
+
   prometheus:
     image: prom/prometheus:latest
     ports:
       - "9090:9090"
     volumes:
       - ./prometheus.yml:/etc/prometheus/prometheus.yml
-  
+
   grafana:
     image: grafana/grafana:latest
     ports:
@@ -347,6 +350,7 @@ services:
 ### 1. Span 命名
 
 使用有意义的名称：
+
 ```go
 // ✅ Good
 tracer.Start(ctx, "agent.create")
@@ -384,7 +388,7 @@ if err != nil {
 ### 5. 采样策略
 
 - 开发：100% 采样
-- 测试：50% 采样  
+- 测试：50% 采样
 - 生产：10-20% 采样
 
 ## 故障排查
@@ -392,11 +396,13 @@ if err != nil {
 ### Traces 不显示
 
 1. **检查配置**
+
    ```go
    config.Observability.Tracing.Enabled = true
    ```
 
 2. **检查连接**
+
    ```bash
    telnet localhost 4318
    ```

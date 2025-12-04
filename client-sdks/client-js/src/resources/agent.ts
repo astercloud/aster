@@ -3,7 +3,7 @@
  * Agent 完整管理功能
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   AgentInfo,
   AgentFilter,
@@ -16,8 +16,8 @@ import {
   AgentTemplate,
   AgentStats,
   AgentValidationResult,
-  AgentStatus
-} from '../types/agent';
+  AgentStatus,
+} from "../types/agent";
 
 /**
  * Agent 资源类
@@ -37,9 +37,9 @@ export class AgentResource extends BaseResource {
    * @returns Agent 信息
    */
   async create(request: CreateAgentRequest): Promise<AgentInfo> {
-    return this.request<AgentInfo>('/v1/agents', {
-      method: 'POST',
-      body: request
+    return this.request<AgentInfo>("/v1/agents", {
+      method: "POST",
+      body: request,
     });
   }
 
@@ -58,8 +58,8 @@ export class AgentResource extends BaseResource {
    * @returns Agent 列表
    */
   async list(filter?: AgentFilter): Promise<PaginatedAgentResponse> {
-    return this.request<PaginatedAgentResponse>('/v1/agents', {
-      params: filter
+    return this.request<PaginatedAgentResponse>("/v1/agents", {
+      params: filter,
     });
   }
 
@@ -71,11 +71,11 @@ export class AgentResource extends BaseResource {
    */
   async update(
     agentId: string,
-    updates: UpdateAgentRequest
+    updates: UpdateAgentRequest,
   ): Promise<AgentInfo> {
     return this.request<AgentInfo>(`/v1/agents/${agentId}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -85,7 +85,7 @@ export class AgentResource extends BaseResource {
    */
   async delete(agentId: string): Promise<void> {
     await this.request(`/v1/agents/${agentId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -99,7 +99,7 @@ export class AgentResource extends BaseResource {
    * @returns 更新后的 Agent
    */
   async activate(agentId: string): Promise<AgentInfo> {
-    return this.updateStatus(agentId, 'active');
+    return this.updateStatus(agentId, "active");
   }
 
   /**
@@ -108,7 +108,7 @@ export class AgentResource extends BaseResource {
    * @returns 更新后的 Agent
    */
   async disable(agentId: string): Promise<AgentInfo> {
-    return this.updateStatus(agentId, 'disabled');
+    return this.updateStatus(agentId, "disabled");
   }
 
   /**
@@ -117,7 +117,7 @@ export class AgentResource extends BaseResource {
    * @returns 更新后的 Agent
    */
   async archive(agentId: string): Promise<AgentInfo> {
-    return this.updateStatus(agentId, 'archived');
+    return this.updateStatus(agentId, "archived");
   }
 
   /**
@@ -128,7 +128,7 @@ export class AgentResource extends BaseResource {
    */
   private async updateStatus(
     agentId: string,
-    status: AgentStatus
+    status: AgentStatus,
   ): Promise<AgentInfo> {
     return this.update(agentId, { status });
   }
@@ -143,13 +143,10 @@ export class AgentResource extends BaseResource {
    * @param request Chat 请求
    * @returns Chat 响应
    */
-  async chat(
-    agentId: string,
-    request: ChatRequest
-  ): Promise<ChatResponse> {
+  async chat(agentId: string, request: ChatRequest): Promise<ChatResponse> {
     return this.request<ChatResponse>(`/v1/agents/${agentId}/chat`, {
-      method: 'POST',
-      body: request
+      method: "POST",
+      body: request,
     });
   }
 
@@ -161,18 +158,20 @@ export class AgentResource extends BaseResource {
    */
   async *chatStream(
     agentId: string,
-    request: ChatRequest
+    request: ChatRequest,
   ): AsyncIterable<StreamChatEvent> {
     const response = await fetch(
       `${this.options.baseUrl}/v1/agents/${agentId}/chat/stream`,
       {
-        method: 'POST',
+        method: "POST",
         headers: {
-          'Content-Type': 'application/json',
-          ...(this.options.apiKey && { 'Authorization': `Bearer ${this.options.apiKey}` })
+          "Content-Type": "application/json",
+          ...(this.options.apiKey && {
+            Authorization: `Bearer ${this.options.apiKey}`,
+          }),
         },
-        body: JSON.stringify(request)
-      }
+        body: JSON.stringify(request),
+      },
     );
 
     if (!response.ok) {
@@ -181,11 +180,11 @@ export class AgentResource extends BaseResource {
 
     const reader = response.body?.getReader();
     if (!reader) {
-      throw new Error('Response body is not readable');
+      throw new Error("Response body is not readable");
     }
 
     const decoder = new TextDecoder();
-    let buffer = '';
+    let buffer = "";
 
     try {
       while (true) {
@@ -193,20 +192,20 @@ export class AgentResource extends BaseResource {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-        const lines = buffer.split('\n');
-        buffer = lines.pop() || '';
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
         for (const line of lines) {
-          if (line.startsWith('data: ')) {
+          if (line.startsWith("data: ")) {
             const data = line.slice(6);
-            if (data === '[DONE]') {
+            if (data === "[DONE]") {
               return;
             }
             try {
               const event = JSON.parse(data) as StreamChatEvent;
               yield event;
             } catch (error) {
-              console.error('Failed to parse SSE data:', data);
+              console.error("Failed to parse SSE data:", data);
             }
           }
         }
@@ -226,7 +225,7 @@ export class AgentResource extends BaseResource {
    */
   async listTemplates(): Promise<AgentTemplate[]> {
     const result = await this.request<{ templates: AgentTemplate[] }>(
-      '/v1/agents/templates'
+      "/v1/agents/templates",
     );
     return result.templates;
   }
@@ -248,21 +247,22 @@ export class AgentResource extends BaseResource {
    */
   async createFromTemplate(
     templateId: string,
-    overrides: Partial<CreateAgentRequest>
+    overrides: Partial<CreateAgentRequest>,
   ): Promise<AgentInfo> {
     const template = await this.getTemplate(templateId);
-    
+
     const request: CreateAgentRequest = {
       name: overrides.name || `Agent from ${template.name}`,
       templateId,
-      llmProvider: overrides.llmProvider || template.recommendedProvider || 'openai',
-      llmModel: overrides.llmModel || template.recommendedModel || 'gpt-4',
+      llmProvider:
+        overrides.llmProvider || template.recommendedProvider || "openai",
+      llmModel: overrides.llmModel || template.recommendedModel || "gpt-4",
       systemPrompt: overrides.systemPrompt || template.defaultSystemPrompt,
       tools: overrides.tools || template.defaultTools,
       middlewares: overrides.middlewares || template.defaultMiddlewares,
       description: overrides.description,
       llmParams: overrides.llmParams,
-      metadata: overrides.metadata
+      metadata: overrides.metadata,
     };
 
     return this.create(request);
@@ -280,10 +280,10 @@ export class AgentResource extends BaseResource {
    */
   async getStats(
     agentId: string,
-    timeRange?: { start: string; end: string }
+    timeRange?: { start: string; end: string },
   ): Promise<AgentStats> {
     return this.request<AgentStats>(`/v1/agents/${agentId}/stats`, {
-      params: timeRange
+      params: timeRange,
     });
   }
 
@@ -303,8 +303,8 @@ export class AgentResource extends BaseResource {
     totalCost: number;
     currency: string;
   }> {
-    return this.request('/v1/agents/stats/aggregated', {
-      params: timeRange
+    return this.request("/v1/agents/stats/aggregated", {
+      params: timeRange,
     });
   }
 
@@ -318,11 +318,11 @@ export class AgentResource extends BaseResource {
    * @returns 验证结果
    */
   async validate(
-    config: CreateAgentRequest | UpdateAgentRequest
+    config: CreateAgentRequest | UpdateAgentRequest,
   ): Promise<AgentValidationResult> {
-    return this.request<AgentValidationResult>('/v1/agents/validate', {
-      method: 'POST',
-      body: config
+    return this.request<AgentValidationResult>("/v1/agents/validate", {
+      method: "POST",
+      body: config,
     });
   }
 
@@ -335,9 +335,9 @@ export class AgentResource extends BaseResource {
    * @param agentIds Agent ID 列表
    */
   async deleteBatch(agentIds: string[]): Promise<void> {
-    await this.request('/v1/agents/batch', {
-      method: 'DELETE',
-      body: { agentIds }
+    await this.request("/v1/agents/batch", {
+      method: "DELETE",
+      body: { agentIds },
     });
   }
 
@@ -346,9 +346,9 @@ export class AgentResource extends BaseResource {
    * @param agentIds Agent ID 列表
    */
   async archiveBatch(agentIds: string[]): Promise<void> {
-    await this.request('/v1/agents/batch/archive', {
-      method: 'POST',
-      body: { agentIds }
+    await this.request("/v1/agents/batch/archive", {
+      method: "POST",
+      body: { agentIds },
     });
   }
 
@@ -357,9 +357,9 @@ export class AgentResource extends BaseResource {
    * @param agentIds Agent ID 列表
    */
   async activateBatch(agentIds: string[]): Promise<void> {
-    await this.request('/v1/agents/batch/activate', {
-      method: 'POST',
-      body: { agentIds }
+    await this.request("/v1/agents/batch/activate", {
+      method: "POST",
+      body: { agentIds },
     });
   }
 
@@ -375,8 +375,8 @@ export class AgentResource extends BaseResource {
    */
   async clone(agentId: string, newName: string): Promise<AgentInfo> {
     return this.request<AgentInfo>(`/v1/agents/${agentId}/clone`, {
-      method: 'POST',
-      body: { name: newName }
+      method: "POST",
+      body: { name: newName },
     });
   }
 }

@@ -3,17 +3,17 @@
  * 整合所有资源模块
  */
 
-import { ClientOptions } from './resources/base';
-import { AgentResource } from './resources/agent';
-import { MemoryResource } from './resources/memory';
-import { SessionResource } from './resources/session';
-import { WorkflowResource } from './resources/workflow';
-import { MCPResource } from './resources/mcp';
-import { MiddlewareResource } from './resources/middleware';
-import { ToolResource } from './resources/tool';
-import { TelemetryResource } from './resources/telemetry';
-import { EvalResource } from './resources/eval';
-import { SystemResource } from './resources/system';
+import { ClientOptions } from "./resources/base";
+import { AgentResource } from "./resources/agent";
+import { MemoryResource } from "./resources/memory";
+import { SessionResource } from "./resources/session";
+import { WorkflowResource } from "./resources/workflow";
+import { MCPResource } from "./resources/mcp";
+import { MiddlewareResource } from "./resources/middleware";
+import { ToolResource } from "./resources/tool";
+import { TelemetryResource } from "./resources/telemetry";
+import { EvalResource } from "./resources/eval";
+import { SystemResource } from "./resources/system";
 
 /**
  * aster 客户端配置
@@ -34,20 +34,20 @@ export interface asterConfig {
 
 /**
  * aster 主客户端
- * 
+ *
  * @example
  * ```typescript
  * const client = new aster({
  *   baseUrl: 'http://localhost:8080',
  *   apiKey: 'your-api-key'
  * });
- * 
+ *
  * // 使用 Memory
  * await client.memory.working.set('key', { data: 'value' });
- * 
+ *
  * // 使用 Workflow
  * const wf = await client.workflows.create({ type: 'parallel', ... });
- * 
+ *
  * // 使用 MCP
  * await client.mcp.call('server-id', 'tool-name', { params });
  * ```
@@ -95,7 +95,7 @@ export class aster {
       baseUrl: config.baseUrl,
       apiKey: config.apiKey,
       timeout: config.timeout,
-      retry: config.retry
+      retry: config.retry,
     };
 
     // 初始化所有资源模块
@@ -136,10 +136,7 @@ export class aster {
    * @param timeRange 时间范围
    * @returns 使用统计
    */
-  async getUsageStatistics(timeRange?: {
-    start: string;
-    end: string;
-  }) {
+  async getUsageStatistics(timeRange?: { start: string; end: string }) {
     return this.telemetry.getUsageStatistics(timeRange);
   }
 
@@ -148,10 +145,7 @@ export class aster {
    * @param timeRange 时间范围
    * @returns 性能指标
    */
-  async getPerformanceMetrics(timeRange?: {
-    start: string;
-    end: string;
-  }) {
+  async getPerformanceMetrics(timeRange?: { start: string; end: string }) {
     return this.telemetry.getPerformanceMetrics(timeRange);
   }
 }

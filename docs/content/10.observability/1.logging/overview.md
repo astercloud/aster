@@ -9,11 +9,13 @@ navigation: false
 aster 提供了 `pkg/logging` 包, 用于统一管理结构化日志输出, 并通过 Transport 抽象支持多目标输出。
 
 目标:
+
 - 使用统一的 `Logger` 接口和 `Transport` 抽象。
 - 支持多个输出目标(Stdout、文件等)。
 - 与现有 telemetry(指标/追踪)互补, 共同构成完整的可观测性。
 
 示例代码路径:
+
 - `pkg/logging/logging.go`
 - `examples/logging/main.go`
 
@@ -89,7 +91,7 @@ fileLogger.Info(ctx, "agent.chat.started", map[string]interface{}{
 
 `pkg/logging` 提供了一个可选的全局 Logger, 方便快速集成:
 
-```go
+````go
 // 默认使用 LevelInfo + StdoutTransport
 logging.Info(ctx, "request.completed", map[string]interface{}{
     "status":  "ok",
@@ -155,7 +157,7 @@ func main() {
     fileLogger.Flush(ctx)
     stdLogger.Flush(ctx)
 }
-```
+````
 
 运行:
 
@@ -205,12 +207,12 @@ func (dp *DeepseekProvider) Complete(ctx context.Context, messages []types.Messa
     // ✅ 直接使用全局函数
     logging.Info(ctx, fmt.Sprintf("🚀 [DeepseekProvider] 开始API调用"), nil)
     logging.Info(ctx, fmt.Sprintf("📊 [DeepseekProvider] 请求参数: %d条消息, %d个工具", len(messages), len(opts.Tools)), nil)
-    
+
     // ... API调用 ...
-    
+
     logging.Info(ctx, fmt.Sprintf("💰 [DeepseekProvider] Token使用: 输入=%d, 输出=%d", inputTokens, outputTokens), nil)
     logging.Info(ctx, fmt.Sprintf("🎉 [DeepseekProvider] API调用完成"), nil)
-    
+
     return response, nil
 }
 ```
@@ -227,7 +229,7 @@ func (dp *DeepseekProvider) Complete(ctx context.Context, messages []types.Messa
 ### 优势
 
 - ✅ **零配置** - 导入即用，无需初始化
-- ✅ **统一管理** - 全局logging.Default，一处配置处处生效  
+- ✅ **统一管理** - 全局logging.Default，一处配置处处生效
 - ✅ **结构化输出** - JSON格式，易于解析和分析
 - ✅ **可控开关** - 支持日志级别控制
 
@@ -261,12 +263,12 @@ logging.Error(ctx, "error occurred", nil)
 
 ### 日志级别使用建议
 
-| 级别 | 使用场景 | 示例 |
-|------|---------|------|
-| **Debug** | 详细调试信息 | 解析过程、中间状态 |
-| **Info** | 重要业务流程 | API调用开始/完成、Token统计 |
-| **Warn** | 警告信息 | 性能问题、即将废弃 |
-| **Error** | 错误信息 | API失败、解析错误 |
+| 级别      | 使用场景     | 示例                        |
+| --------- | ------------ | --------------------------- |
+| **Debug** | 详细调试信息 | 解析过程、中间状态          |
+| **Info**  | 重要业务流程 | API调用开始/完成、Token统计 |
+| **Warn**  | 警告信息     | 性能问题、即将废弃          |
+| **Error** | 错误信息     | API失败、解析错误           |
 
 ### 控制日志级别
 

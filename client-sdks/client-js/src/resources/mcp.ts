@@ -3,7 +3,7 @@
  * Model Context Protocol - AsterClient 作为 MCP Client 和 Server
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   MCPServerConfig,
   MCPServerInfo,
@@ -14,8 +14,8 @@ import {
   MCPResourceContent,
   MCPPrompt,
   MCPPromptResult,
-  MCPStats
-} from '../types/mcp';
+  MCPStats,
+} from "../types/mcp";
 
 /**
  * MCP 资源类
@@ -35,9 +35,9 @@ export class MCPResource extends BaseResource {
    * @returns Server 信息
    */
   async addServer(config: MCPServerConfig): Promise<MCPServerInfo> {
-    return this.request<MCPServerInfo>('/v1/mcp/servers', {
-      method: 'POST',
-      body: config
+    return this.request<MCPServerInfo>("/v1/mcp/servers", {
+      method: "POST",
+      body: config,
     });
   }
 
@@ -56,7 +56,7 @@ export class MCPResource extends BaseResource {
    */
   async listServers(): Promise<MCPServerInfo[]> {
     const result = await this.request<{ servers: MCPServerInfo[] }>(
-      '/v1/mcp/servers'
+      "/v1/mcp/servers",
     );
     return result.servers;
   }
@@ -78,11 +78,11 @@ export class MCPResource extends BaseResource {
    */
   async updateServer(
     serverId: string,
-    updates: Partial<MCPServerConfig>
+    updates: Partial<MCPServerConfig>,
   ): Promise<MCPServerInfo> {
     return this.request<MCPServerInfo>(`/v1/mcp/servers/${serverId}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -92,7 +92,7 @@ export class MCPResource extends BaseResource {
    */
   async removeServer(serverId: string): Promise<void> {
     await this.request(`/v1/mcp/servers/${serverId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -110,10 +110,9 @@ export class MCPResource extends BaseResource {
    * @returns 连接结果
    */
   async connectServer(serverId: string): Promise<MCPServerInfo> {
-    return this.request<MCPServerInfo>(
-      `/v1/mcp/servers/${serverId}/connect`,
-      { method: 'POST' }
-    );
+    return this.request<MCPServerInfo>(`/v1/mcp/servers/${serverId}/connect`, {
+      method: "POST",
+    });
   }
 
   /**
@@ -131,7 +130,7 @@ export class MCPResource extends BaseResource {
    */
   async disconnectServer(serverId: string): Promise<void> {
     await this.request(`/v1/mcp/servers/${serverId}/disconnect`, {
-      method: 'POST'
+      method: "POST",
     });
   }
 
@@ -154,7 +153,7 @@ export class MCPResource extends BaseResource {
    */
   async getServerTools(serverId: string): Promise<MCPTool[]> {
     const result = await this.request<{ tools: MCPTool[] }>(
-      `/v1/mcp/servers/${serverId}/tools`
+      `/v1/mcp/servers/${serverId}/tools`,
     );
     return result.tools;
   }
@@ -164,9 +163,7 @@ export class MCPResource extends BaseResource {
    * @returns 工具列表
    */
   async listAllTools(): Promise<MCPTool[]> {
-    const result = await this.request<{ tools: MCPTool[] }>(
-      '/v1/mcp/tools'
-    );
+    const result = await this.request<{ tools: MCPTool[] }>("/v1/mcp/tools");
     return result.tools;
   }
 
@@ -176,10 +173,10 @@ export class MCPResource extends BaseResource {
    * @returns 调用响应
    */
   async callTool(request: MCPToolCallRequest): Promise<MCPToolCallResponse> {
-    return this.request<MCPToolCallResponse>('/v1/mcp/tools/call', {
-      method: 'POST',
+    return this.request<MCPToolCallResponse>("/v1/mcp/tools/call", {
+      method: "POST",
       body: request,
-      timeout: request.timeout
+      timeout: request.timeout,
     });
   }
 
@@ -193,7 +190,7 @@ export class MCPResource extends BaseResource {
   async call(
     serverId: string,
     toolName: string,
-    params: Record<string, any>
+    params: Record<string, any>,
   ): Promise<MCPToolCallResponse> {
     return this.callTool({ serverId, toolName, params });
   }
@@ -209,7 +206,7 @@ export class MCPResource extends BaseResource {
    */
   async listResources(serverId: string): Promise<MCPResourceData[]> {
     const result = await this.request<{ resources: MCPResourceData[] }>(
-      `/v1/mcp/servers/${serverId}/resources`
+      `/v1/mcp/servers/${serverId}/resources`,
     );
     return result.resources;
   }
@@ -222,14 +219,14 @@ export class MCPResource extends BaseResource {
    */
   async readResource(
     serverId: string,
-    uri: string
+    uri: string,
   ): Promise<MCPResourceContent> {
     return this.request<MCPResourceContent>(
       `/v1/mcp/servers/${serverId}/resources/read`,
       {
-        method: 'POST',
-        body: { uri }
-      }
+        method: "POST",
+        body: { uri },
+      },
     );
   }
 
@@ -244,7 +241,7 @@ export class MCPResource extends BaseResource {
    */
   async listPrompts(serverId: string): Promise<MCPPrompt[]> {
     const result = await this.request<{ prompts: MCPPrompt[] }>(
-      `/v1/mcp/servers/${serverId}/prompts`
+      `/v1/mcp/servers/${serverId}/prompts`,
     );
     return result.prompts;
   }
@@ -259,14 +256,14 @@ export class MCPResource extends BaseResource {
   async getPrompt(
     serverId: string,
     name: string,
-    args?: Record<string, any>
+    args?: Record<string, any>,
   ): Promise<MCPPromptResult> {
     return this.request<MCPPromptResult>(
       `/v1/mcp/servers/${serverId}/prompts/${name}`,
       {
-        method: 'POST',
-        body: { arguments: args }
-      }
+        method: "POST",
+        body: { arguments: args },
+      },
     );
   }
 
@@ -279,7 +276,7 @@ export class MCPResource extends BaseResource {
    * @returns 统计数据
    */
   async getStats(): Promise<MCPStats> {
-    return this.request<MCPStats>('/v1/mcp/stats');
+    return this.request<MCPStats>("/v1/mcp/stats");
   }
 
   /**

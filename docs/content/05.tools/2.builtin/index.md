@@ -54,6 +54,7 @@ graph TB
 </div>
 
 **包含工具：**
+
 - `Read` / `Write` - 文件读写
 - `Bash` - 命令执行
 - `HttpRequest` - HTTP 请求
@@ -74,6 +75,7 @@ graph TB
 </div>
 
 **特性：**
+
 - MCP 协议集成
 - 自动工具发现
 - 远程工具调用
@@ -94,6 +96,7 @@ graph TB
 </div>
 
 **能力：**
+
 - 实现 Tool 接口
 - Slash Commands
 - Agent Skills
@@ -129,6 +132,7 @@ sequenceDiagram
 ### 核心组件
 
 **1. Tool Registry (工具注册表)**
+
 ```go
 type Registry interface {
     // 注册工具
@@ -143,6 +147,7 @@ type Registry interface {
 ```
 
 **2. Tool 接口**
+
 ```go
 type Tool interface {
     // 工具名称
@@ -160,6 +165,7 @@ type Tool interface {
 ```
 
 **3. Tool Context (工具上下文)**
+
 ```go
 type ToolContext struct {
     Sandbox      sandbox.Sandbox       // 沙箱实例

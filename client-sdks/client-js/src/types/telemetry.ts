@@ -10,11 +10,11 @@
 /**
  * Metric 类型
  */
-export type MetricType = 
-  | 'counter'      // 计数器（只增不减）
-  | 'gauge'        // 仪表盘（可增可减）
-  | 'histogram'    // 直方图（分布统计）
-  | 'summary';     // 摘要（百分位数）
+export type MetricType =
+  | "counter" // 计数器（只增不减）
+  | "gauge" // 仪表盘（可增可减）
+  | "histogram" // 直方图（分布统计）
+  | "summary"; // 摘要（百分位数）
 
 /**
  * Metric 信息
@@ -62,7 +62,7 @@ export interface MetricQueryOptions {
   /** 标签过滤 */
   labels?: Record<string, string>;
   /** 聚合方式 */
-  aggregation?: 'sum' | 'avg' | 'min' | 'max' | 'count';
+  aggregation?: "sum" | "avg" | "min" | "max" | "count";
   /** 分组 */
   groupBy?: string[];
 }
@@ -90,7 +90,7 @@ export interface TraceInfo {
   /** 持续时间（毫秒） */
   duration?: number;
   /** 状态 */
-  status: 'ok' | 'error';
+  status: "ok" | "error";
   /** 标签 */
   tags?: Record<string, any>;
   /** 事件 */
@@ -127,7 +127,7 @@ export interface TraceQueryOptions {
   /** 最大持续时间（毫秒） */
   maxDuration?: number;
   /** 状态 */
-  status?: 'ok' | 'error';
+  status?: "ok" | "error";
   /** 标签过滤 */
   tags?: Record<string, any>;
   /** 限制数量 */
@@ -141,7 +141,7 @@ export interface TraceQueryOptions {
 /**
  * 日志级别
  */
-export type LogLevel = 'debug' | 'info' | 'warn' | 'error' | 'fatal';
+export type LogLevel = "debug" | "info" | "warn" | "error" | "fatal";
 
 /**
  * 日志条目
@@ -185,7 +185,7 @@ export interface LogQueryOptions {
   /** 限制数量 */
   limit?: number;
   /** 排序 */
-  sort?: 'asc' | 'desc';
+  sort?: "asc" | "desc";
 }
 
 // ============================================================================
@@ -201,13 +201,13 @@ export interface TelemetryConfig {
   /** Metrics 配置 */
   metrics?: {
     enabled: boolean;
-    exportInterval?: number;  // 导出间隔（秒）
+    exportInterval?: number; // 导出间隔（秒）
     endpoint?: string;
   };
   /** Traces 配置 */
   traces?: {
     enabled: boolean;
-    samplingRate?: number;    // 采样率（0-1）
+    samplingRate?: number; // 采样率（0-1）
     endpoint?: string;
   };
   /** Logs 配置 */
@@ -227,7 +227,7 @@ export interface TelemetryConfig {
  */
 export interface HealthCheckResult {
   /** 状态 */
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   /** 时间戳 */
   timestamp: string;
   /** 组件健康状态 */
@@ -241,7 +241,7 @@ export interface HealthCheckResult {
  */
 export interface ComponentHealth {
   /** 状态 */
-  status: 'healthy' | 'degraded' | 'unhealthy';
+  status: "healthy" | "degraded" | "unhealthy";
   /** 消息 */
   message?: string;
   /** 详细信息 */
@@ -266,10 +266,10 @@ export interface PerformanceMetrics {
     total: number;
     successful: number;
     failed: number;
-    avgLatency: number;      // 平均延迟（ms）
-    p50Latency: number;      // P50 延迟
-    p95Latency: number;      // P95 延迟
-    p99Latency: number;      // P99 延迟
+    avgLatency: number; // 平均延迟（ms）
+    p50Latency: number; // P50 延迟
+    p95Latency: number; // P95 延迟
+    p99Latency: number; // P99 延迟
   };
   /** Token 统计 */
   tokens?: {
@@ -345,18 +345,18 @@ export interface UsageStatistics {
 /**
  * 导出格式
  */
-export type ExportFormat = 
-  | 'json'
-  | 'csv'
-  | 'prometheus'   // Prometheus 格式
-  | 'opentelemetry'; // OpenTelemetry 格式
+export type ExportFormat =
+  | "json"
+  | "csv"
+  | "prometheus" // Prometheus 格式
+  | "opentelemetry"; // OpenTelemetry 格式
 
 /**
  * 导出请求
  */
 export interface ExportTelemetryRequest {
   /** 导出类型 */
-  type: 'metrics' | 'traces' | 'logs';
+  type: "metrics" | "traces" | "logs";
   /** 格式 */
   format: ExportFormat;
   /** 时间范围 */

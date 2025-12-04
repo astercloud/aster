@@ -29,11 +29,13 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 ```
 
 **参数**：
+
 - `ctx`: 上下文，用于控制 Agent 生命周期
 - `config`: Agent 配置，包括模型、工具、中间件等
 - `deps`: 依赖注入，提供工具注册表、Provider 工厂等
 
 **返回**：
+
 - `*Agent`: Agent 实例
 - `error`: 创建失败时返回错误
 
@@ -86,10 +88,12 @@ func (a *Agent) Chat(ctx context.Context, text string) (*types.CompleteResult, e
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `text`: 用户消息文本
 
 **返回**：
+
 - `*types.CompleteResult`: 对话结果，包含响应文本、停止原因、Token 使用量
 - `error`: 错误信息
 
@@ -126,10 +130,12 @@ func (a *Agent) Send(ctx context.Context, text string) error
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `text`: 用户消息文本
 
 **返回**：
+
 - `error`: 发送失败时返回错误
 
 **示例**：
@@ -161,6 +167,7 @@ if err != nil {
 ```
 
 **适用场景**：
+
 - 需要实时显示流式输出
 - 需要人工审批工具调用
 - 需要监控 Agent 执行状态
@@ -176,11 +183,13 @@ func (a *Agent) Stream(ctx context.Context, message string, opts ...Option) *str
 ```
 
 **参数**：
+
 - `ctx`: 上下文
 - `message`: 用户消息文本
 - `opts`: 可选配置
 
 **返回**：
+
 - `*stream.Reader[*session.Event]`: 事件 Reader
 
 **示例**：
@@ -219,6 +228,7 @@ func (a *Agent) Subscribe(channels []types.AgentChannel, opts *types.SubscribeOp
 ```
 
 **参数**：
+
 - `channels`: 要订阅的通道列表
   - `types.ChannelProgress`: 进度事件（文本流、工具执行）
   - `types.ChannelControl`: 控制事件（工具审批请求）
@@ -227,6 +237,7 @@ func (a *Agent) Subscribe(channels []types.AgentChannel, opts *types.SubscribeOp
   - `Filter`: 事件过滤器
 
 **返回**：
+
 - `<-chan types.AgentEventEnvelope`: 事件通道
 
 **示例**：
@@ -255,14 +266,14 @@ for envelope := range eventCh {
 
 **事件类型**：
 
-| 事件类型 | 通道 | 说明 |
-|---------|------|------|
-| `EventTypeTextDelta` | Progress | 流式文本增量 |
-| `EventTypeTextDone` | Progress | 文本流结束 |
-| `EventTypeToolCallRequest` | Control | 工具调用请求 |
-| `EventTypeToolCallResult` | Progress | 工具执行结果 |
-| `EventTypeGovernance` | Monitor | 治理事件（权限检查、速率限制）|
-| `EventTypeError` | Monitor | 错误事件 |
+| 事件类型                   | 通道     | 说明                           |
+| -------------------------- | -------- | ------------------------------ |
+| `EventTypeTextDelta`       | Progress | 流式文本增量                   |
+| `EventTypeTextDone`        | Progress | 文本流结束                     |
+| `EventTypeToolCallRequest` | Control  | 工具调用请求                   |
+| `EventTypeToolCallResult`  | Progress | 工具执行结果                   |
+| `EventTypeGovernance`      | Monitor  | 治理事件（权限检查、速率限制） |
+| `EventTypeError`           | Monitor  | 错误事件                       |
 
 ---
 
@@ -275,6 +286,7 @@ func (a *Agent) Unsubscribe(ch <-chan types.AgentEventEnvelope)
 ```
 
 **参数**：
+
 - `ch`: 要取消的事件通道
 
 **示例**：
@@ -301,6 +313,7 @@ func (a *Agent) ID() string
 ```
 
 **返回**：
+
 - `string`: Agent ID
 
 **示例**：
@@ -320,6 +333,7 @@ func (a *Agent) Status() *types.AgentStatus
 ```
 
 **返回**：
+
 - `*types.AgentStatus`: Agent 状态信息
 
 **示例**：
@@ -357,6 +371,7 @@ func (a *Agent) Close() error
 ```
 
 **返回**：
+
 - `error`: 关闭失败时返回错误
 
 **示例**：
@@ -372,6 +387,7 @@ if err := ag.Close(); err != nil {
 ```
 
 **关闭行为**：
+
 - 停止所有正在执行的任务
 - 关闭所有事件通道
 - 释放 Provider 连接

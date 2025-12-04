@@ -11,31 +11,41 @@ Aster 提供完整的多 Agent 系统架构，从单 Agent 内部的任务委派
 ## 📚 核心组件
 
 ### [SubAgent 中间件](/middleware/subagent)
+
 **任务委派机制** - Agent 内部的复杂任务拆分
+
 - 通过 `task` 工具调用
 - 上下文隔离、并行执行
 - Token 优化、短生命周期
 
 ### [Room](/multi-agent/room)
+
 **协作空间** - 多 Agent 之间的消息通信
+
 - 成员管理（Join/Leave）
 - 消息路由（@mention 支持）
 - 广播和点对点通信
 
 ### [Pool](/multi-agent/pool)
+
 **生命周期管理器** - 统一管理所有 Agent 实例
+
 - 创建、获取、删除 Agent
 - 资源池管理和容量控制
 - 监控和统计
 
 ### [AsterOS](/multi-agent/asteros)
+
 **统一运行时系统** - 对外提供 Agent 服务
+
 - 自动生成 REST API
 - 多接口支持（HTTP/A2A/AGUI）
 - 资源注册和管理
 
 ### [Scheduler](/multi-agent/scheduler)
+
 **任务调度器** - 智能分配任务给合适的 Agent
+
 - 基于能力的任务路由
 - 负载均衡
 - 优先级调度
@@ -76,12 +86,12 @@ room.Broadcast(ctx, "Meeting starts now")
 
 ## 🎯 概念对比
 
-| 概念 | 层次 | 生命周期 | 主要职责 |
-|------|------|----------|----------|
-| SubAgent | 中间件层 | 任务级 | 任务委派、上下文隔离 |
-| Room | 协作层 | 会话级 | 多 Agent 消息通信、路由 |
-| Pool | 管理层 | 应用级 | Agent 生命周期管理 |
-| AsterOS | 运行时层 | 系统级 | 统一运行时、API 网关 |
+| 概念     | 层次     | 生命周期 | 主要职责                |
+| -------- | -------- | -------- | ----------------------- |
+| SubAgent | 中间件层 | 任务级   | 任务委派、上下文隔离    |
+| Room     | 协作层   | 会话级   | 多 Agent 消息通信、路由 |
+| Pool     | 管理层   | 应用级   | Agent 生命周期管理      |
+| AsterOS  | 运行时层 | 系统级   | 统一运行时、API 网关    |
 
 详细对比请查看 [多Agent概念对比](/multi-agent/comparison)
 

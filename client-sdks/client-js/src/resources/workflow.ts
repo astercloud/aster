@@ -3,7 +3,7 @@
  * 管理工作流：Parallel、Sequential、Loop
  */
 
-import { BaseResource, ClientOptions } from './base';
+import { BaseResource, ClientOptions } from "./base";
 import {
   WorkflowDefinition,
   WorkflowInfo,
@@ -16,9 +16,9 @@ import {
   CancelWorkflowRequest,
   WorkflowRunFilter,
   WorkflowValidationResult,
-  UpdateWorkflowRequest
-} from '../types/workflow';
-import { PaginatedResponse } from '../types/session';
+  UpdateWorkflowRequest,
+} from "../types/workflow";
+import { PaginatedResponse } from "../types/session";
 
 /**
  * Workflow 资源类
@@ -38,9 +38,9 @@ export class WorkflowResource extends BaseResource {
    * @returns Workflow 信息
    */
   async create(definition: WorkflowDefinition): Promise<WorkflowInfo> {
-    return this.request<WorkflowInfo>('/v1/workflows', {
-      method: 'POST',
-      body: definition
+    return this.request<WorkflowInfo>("/v1/workflows", {
+      method: "POST",
+      body: definition,
     });
   }
 
@@ -59,10 +59,10 @@ export class WorkflowResource extends BaseResource {
    * @returns Workflow 列表
    */
   async list(
-    filter?: WorkflowFilter
+    filter?: WorkflowFilter,
   ): Promise<PaginatedResponse<WorkflowInfo>> {
-    return this.request<PaginatedResponse<WorkflowInfo>>('/v1/workflows', {
-      params: filter
+    return this.request<PaginatedResponse<WorkflowInfo>>("/v1/workflows", {
+      params: filter,
     });
   }
 
@@ -74,11 +74,11 @@ export class WorkflowResource extends BaseResource {
    */
   async update(
     workflowId: string,
-    updates: UpdateWorkflowRequest
+    updates: UpdateWorkflowRequest,
   ): Promise<WorkflowInfo> {
     return this.request<WorkflowInfo>(`/v1/workflows/${workflowId}`, {
-      method: 'PATCH',
-      body: updates
+      method: "PATCH",
+      body: updates,
     });
   }
 
@@ -88,7 +88,7 @@ export class WorkflowResource extends BaseResource {
    */
   async delete(workflowId: string): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}`, {
-      method: 'DELETE'
+      method: "DELETE",
     });
   }
 
@@ -104,15 +104,12 @@ export class WorkflowResource extends BaseResource {
    */
   async execute(
     workflowId: string,
-    request: ExecuteWorkflowRequest
+    request: ExecuteWorkflowRequest,
   ): Promise<WorkflowRun> {
-    return this.request<WorkflowRun>(
-      `/v1/workflows/${workflowId}/execute`,
-      {
-        method: 'POST',
-        body: request
-      }
-    );
+    return this.request<WorkflowRun>(`/v1/workflows/${workflowId}/execute`, {
+      method: "POST",
+      body: request,
+    });
   }
 
   /**
@@ -122,11 +119,11 @@ export class WorkflowResource extends BaseResource {
    */
   async suspend(
     workflowId: string,
-    request: SuspendWorkflowRequest
+    request: SuspendWorkflowRequest,
   ): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/suspend`, {
-      method: 'POST',
-      body: request
+      method: "POST",
+      body: request,
     });
   }
 
@@ -137,11 +134,11 @@ export class WorkflowResource extends BaseResource {
    */
   async resume(
     workflowId: string,
-    request: ResumeWorkflowRequest
+    request: ResumeWorkflowRequest,
   ): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/resume`, {
-      method: 'POST',
-      body: request
+      method: "POST",
+      body: request,
     });
   }
 
@@ -152,11 +149,11 @@ export class WorkflowResource extends BaseResource {
    */
   async cancel(
     workflowId: string,
-    request: CancelWorkflowRequest
+    request: CancelWorkflowRequest,
   ): Promise<void> {
     await this.request(`/v1/workflows/${workflowId}/cancel`, {
-      method: 'POST',
-      body: request
+      method: "POST",
+      body: request,
     });
   }
 
@@ -172,11 +169,11 @@ export class WorkflowResource extends BaseResource {
    */
   async getRuns(
     workflowId: string,
-    filter?: WorkflowRunFilter
+    filter?: WorkflowRunFilter,
   ): Promise<PaginatedResponse<WorkflowRun>> {
     return this.request<PaginatedResponse<WorkflowRun>>(
       `/v1/workflows/${workflowId}/executions`,
-      { params: filter }
+      { params: filter },
     );
   }
 
@@ -188,7 +185,7 @@ export class WorkflowResource extends BaseResource {
    */
   async listExecutions(
     workflowId: string,
-    filter?: WorkflowRunFilter
+    filter?: WorkflowRunFilter,
   ): Promise<WorkflowRun[]> {
     const result = await this.getRuns(workflowId, filter);
     return result.items || [];
@@ -200,12 +197,9 @@ export class WorkflowResource extends BaseResource {
    * @param runId Run ID
    * @returns 执行详情
    */
-  async getRunDetails(
-    workflowId: string,
-    runId: string
-  ): Promise<RunDetails> {
+  async getRunDetails(workflowId: string, runId: string): Promise<RunDetails> {
     return this.request<RunDetails>(
-      `/v1/workflows/${workflowId}/runs/${runId}`
+      `/v1/workflows/${workflowId}/runs/${runId}`,
     );
   }
 
@@ -215,12 +209,9 @@ export class WorkflowResource extends BaseResource {
    * @param runId Run ID
    * @returns 执行状态
    */
-  async getRunStatus(
-    workflowId: string,
-    runId: string
-  ): Promise<WorkflowRun> {
+  async getRunStatus(workflowId: string, runId: string): Promise<WorkflowRun> {
     return this.request<WorkflowRun>(
-      `/v1/workflows/${workflowId}/runs/${runId}/status`
+      `/v1/workflows/${workflowId}/runs/${runId}/status`,
     );
   }
 
@@ -234,11 +225,11 @@ export class WorkflowResource extends BaseResource {
    * @returns 验证结果
    */
   async validate(
-    definition: WorkflowDefinition
+    definition: WorkflowDefinition,
   ): Promise<WorkflowValidationResult> {
-    return this.request<WorkflowValidationResult>('/v1/workflows/validate', {
-      method: 'POST',
-      body: definition
+    return this.request<WorkflowValidationResult>("/v1/workflows/validate", {
+      method: "POST",
+      body: definition,
     });
   }
 
@@ -251,9 +242,9 @@ export class WorkflowResource extends BaseResource {
    * @param workflowIds Workflow ID 列表
    */
   async deleteBatch(workflowIds: string[]): Promise<void> {
-    await this.request('/v1/workflows/batch', {
-      method: 'DELETE',
-      body: { workflowIds }
+    await this.request("/v1/workflows/batch", {
+      method: "DELETE",
+      body: { workflowIds },
     });
   }
 
@@ -262,9 +253,9 @@ export class WorkflowResource extends BaseResource {
    * @param workflowIds Workflow ID 列表
    */
   async archiveBatch(workflowIds: string[]): Promise<void> {
-    await this.request('/v1/workflows/batch/archive', {
-      method: 'POST',
-      body: { workflowIds }
+    await this.request("/v1/workflows/batch/archive", {
+      method: "POST",
+      body: { workflowIds },
     });
   }
 
@@ -283,9 +274,9 @@ export class WorkflowResource extends BaseResource {
     workflowId: string,
     runId: string,
     options?: {
-      pollInterval?: number;  // 轮询间隔（毫秒），默认 1000
-      timeout?: number;       // 超时时间（毫秒），默认 300000 (5分钟)
-    }
+      pollInterval?: number; // 轮询间隔（毫秒），默认 1000
+      timeout?: number; // 超时时间（毫秒），默认 300000 (5分钟)
+    },
   ): Promise<WorkflowRun> {
     const pollInterval = options?.pollInterval ?? 1000;
     const timeout = options?.timeout ?? 300000;
@@ -296,9 +287,9 @@ export class WorkflowResource extends BaseResource {
 
       // 检查是否完成
       if (
-        run.status === 'completed' ||
-        run.status === 'failed' ||
-        run.status === 'cancelled'
+        run.status === "completed" ||
+        run.status === "failed" ||
+        run.status === "cancelled"
       ) {
         return run;
       }
@@ -306,12 +297,12 @@ export class WorkflowResource extends BaseResource {
       // 检查超时
       if (Date.now() - startTime > timeout) {
         throw new Error(
-          `Workflow execution timeout after ${timeout}ms. Current status: ${run.status}`
+          `Workflow execution timeout after ${timeout}ms. Current status: ${run.status}`,
         );
       }
 
       // 等待后继续轮询
-      await new Promise(resolve => setTimeout(resolve, pollInterval));
+      await new Promise((resolve) => setTimeout(resolve, pollInterval));
     }
   }
 }

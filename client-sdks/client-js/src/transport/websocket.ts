@@ -7,12 +7,12 @@
  * WebSocket 连接状态
  */
 export enum WebSocketState {
-  CONNECTING = 'CONNECTING',
-  CONNECTED = 'CONNECTED',
-  DISCONNECTING = 'DISCONNECTING',
-  DISCONNECTED = 'DISCONNECTED',
-  RECONNECTING = 'RECONNECTING',
-  FAILED = 'FAILED',
+  CONNECTING = "CONNECTING",
+  CONNECTED = "CONNECTED",
+  DISCONNECTING = "DISCONNECTING",
+  DISCONNECTED = "DISCONNECTED",
+  RECONNECTING = "RECONNECTING",
+  FAILED = "FAILED",
 }
 
 /**
@@ -70,8 +70,11 @@ export class WebSocketClient {
    * 连接到 WebSocket 服务器
    */
   async connect(url: string): Promise<void> {
-    if (this.state === WebSocketState.CONNECTED || this.state === WebSocketState.CONNECTING) {
-      console.warn('[WebSocket] Already connected or connecting');
+    if (
+      this.state === WebSocketState.CONNECTED ||
+      this.state === WebSocketState.CONNECTING
+    ) {
+      console.warn("[WebSocket] Already connected or connecting");
       return;
     }
 
@@ -81,15 +84,14 @@ export class WebSocketClient {
     return new Promise((resolve, reject) => {
       try {
         // 在浏览器和 Node.js 中使用不同的 WebSocket
-        const WebSocketImpl = typeof window !== 'undefined' 
-          ? window.WebSocket 
-          : require('ws');
-        
+        const WebSocketImpl =
+          typeof window !== "undefined" ? window.WebSocket : require("ws");
+
         this.ws = new WebSocketImpl(url);
 
         if (this.ws) {
           this.ws.onopen = () => {
-            console.log('[WebSocket] Connected');
+            console.log("[WebSocket] Connected");
             this.setState(WebSocketState.CONNECTED);
             this.reconnectAttempts = 0;
             this.startHeartbeat();
@@ -102,14 +104,14 @@ export class WebSocketClient {
           };
 
           this.ws.onerror = (error) => {
-            console.error('[WebSocket] Error:', error);
+            console.error("[WebSocket] Error:", error);
             reject(error);
           };
 
           this.ws.onclose = (event) => {
-            console.log('[WebSocket] Closed:', event.code, event.reason);
+            console.log("[WebSocket] Closed:", event.code, event.reason);
             this.stopHeartbeat();
-            
+
             if (this.state !== WebSocketState.DISCONNECTING) {
               this.handleReconnect();
             } else {
@@ -117,9 +119,8 @@ export class WebSocketClient {
             }
           };
         }
-
       } catch (error) {
-        console.error('[WebSocket] Connection failed:', error);
+        console.error("[WebSocket] Connection failed:", error);
         this.setState(WebSocketState.FAILED);
         reject(error);
       }
@@ -130,7 +131,10 @@ export class WebSocketClient {
    * 断开连接
    */
   disconnect(): void {
-    if (this.state === WebSocketState.DISCONNECTED || this.state === WebSocketState.DISCONNECTING) {
+    if (
+      this.state === WebSocketState.DISCONNECTED ||
+      this.state === WebSocketState.DISCONNECTING
+    ) {
       return;
     }
 
@@ -149,13 +153,14 @@ export class WebSocketClient {
    * 发送消息
    */
   send(message: any): void {
-    const data = typeof message === 'string' ? message : JSON.stringify(message);
+    const data =
+      typeof message === "string" ? message : JSON.stringify(message);
 
     if (this.state === WebSocketState.CONNECTED && this.ws) {
       try {
         this.ws.send(data);
       } catch (error) {
-        console.error('[WebSocket] Send failed:', error);
+        console.error("[WebSocket] Send failed:", error);
         // 发送失败，加入队列
         this.messageQueue.push(message);
       }
@@ -199,24 +204,27 @@ export class WebSocketClient {
    */
   private handleMessage(data: string | Buffer): void {
     try {
-      const message = typeof data === 'string' ? JSON.parse(data) : JSON.parse(data.toString());
-      
+      const message =
+        typeof data === "string"
+          ? JSON.parse(data)
+          : JSON.parse(data.toString());
+
       // 检查是否为心跳响应
-      if (message.type === 'pong') {
+      if (message.type === "pong") {
         this.handleHeartbeatResponse();
         return;
       }
 
       // 通知所有监听器
-      this.messageListeners.forEach(listener => {
+      this.messageListeners.forEach((listener) => {
         try {
           listener(message);
         } catch (error) {
-          console.error('[WebSocket] Message listener error:', error);
+          console.error("[WebSocket] Message listener error:", error);
         }
       });
     } catch (error) {
-      console.error('[WebSocket] Parse message failed:', error);
+      console.error("[WebSocket] Parse message failed:", error);
     }
   }
 
@@ -224,7 +232,10 @@ export class WebSocketClient {
    * 刷新消息队列
    */
   private flushMessageQueue(): void {
-    while (this.messageQueue.length > 0 && this.state === WebSocketState.CONNECTED) {
+    while (
+      this.messageQueue.length > 0 &&
+      this.state === WebSocketState.CONNECTED
+    ) {
       const message = this.messageQueue.shift();
       this.send(message);
     }
@@ -235,7 +246,7 @@ export class WebSocketClient {
    */
   private async handleReconnect(): Promise<void> {
     if (this.reconnectAttempts >= this.maxReconnectAttempts) {
-      console.error('[WebSocket] Max reconnect attempts reached');
+      console.error("[WebSocket] Max reconnect attempts reached");
       this.setState(WebSocketState.FAILED);
       return;
     }
@@ -245,15 +256,17 @@ export class WebSocketClient {
 
     // 指数退避
     const delay = this.reconnectDelay * Math.pow(2, this.reconnectAttempts - 1);
-    console.log(`[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`);
+    console.log(
+      `[WebSocket] Reconnecting in ${delay}ms (attempt ${this.reconnectAttempts}/${this.maxReconnectAttempts})`,
+    );
 
-    await new Promise(resolve => setTimeout(resolve, delay));
+    await new Promise((resolve) => setTimeout(resolve, delay));
 
     if (this.url) {
       try {
         await this.connect(this.url);
       } catch (error) {
-        console.error('[WebSocket] Reconnect failed:', error);
+        console.error("[WebSocket] Reconnect failed:", error);
         // 继续尝试重连
         this.handleReconnect();
       }
@@ -267,13 +280,13 @@ export class WebSocketClient {
     if (this.state !== newState) {
       this.state = newState;
       console.log(`[WebSocket] State changed: ${newState}`);
-      
+
       // 通知所有监听器
-      this.stateChangeListeners.forEach(listener => {
+      this.stateChangeListeners.forEach((listener) => {
         try {
           listener(newState);
         } catch (error) {
-          console.error('[WebSocket] State change listener error:', error);
+          console.error("[WebSocket] State change listener error:", error);
         }
       });
     }
@@ -287,11 +300,11 @@ export class WebSocketClient {
 
     this.heartbeatTimer = setInterval(() => {
       if (this.state === WebSocketState.CONNECTED) {
-        this.send({ type: 'ping' });
-        
+        this.send({ type: "ping" });
+
         // 设置心跳超时
         this.heartbeatTimeoutTimer = setTimeout(() => {
-          console.warn('[WebSocket] Heartbeat timeout, reconnecting...');
+          console.warn("[WebSocket] Heartbeat timeout, reconnecting...");
           this.disconnect();
           if (this.url) {
             this.connect(this.url);

@@ -11,26 +11,31 @@ navigation: false
 ## 📚 部署选项
 
 ### [本地部署](/deployment/local)
+
 - 开发环境配置
 - HTTP Server 启动
 - 工作流 HTTP API
 
 ### [Docker 部署](/deployment/docker)
+
 - Dockerfile 配置
 - 容器化最佳实践
 - Docker Compose 编排
 
 ### [Kubernetes 部署](/deployment/kubernetes)
+
 - K8s 配置文件
 - 服务发现
 - 自动扩缩容
 
 ### [Serverless 部署](/deployment/serverless)
+
 - Lambda/Cloud Functions
 - 冷启动优化
 - 成本控制
 
 ### [云端沙箱](/deployment/cloud-sandbox)
+
 - 阿里云 AgentBay
 - 火山引擎集成
 
