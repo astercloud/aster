@@ -296,10 +296,8 @@ func (m *LogicMemoryMiddleware) CaptureUserMessage(namespace, content string, me
 		Data:      map[string]any{"content": content},
 		Timestamp: time.Now(),
 	}
-	if metadata != nil {
-		for k, v := range metadata {
-			event.Data[k] = v
-		}
+	for k, v := range metadata {
+		event.Data[k] = v
 	}
 	m.captureEvent(event)
 }
@@ -315,10 +313,8 @@ func (m *LogicMemoryMiddleware) CaptureUserFeedback(namespace string, feedback s
 		},
 		Timestamp: time.Now(),
 	}
-	if metadata != nil {
-		for k, v := range metadata {
-			event.Data[k] = v
-		}
+	for k, v := range metadata {
+		event.Data[k] = v
 	}
 	m.captureEvent(event)
 }
@@ -334,10 +330,8 @@ func (m *LogicMemoryMiddleware) CaptureUserRevision(namespace string, original, 
 		},
 		Timestamp: time.Now(),
 	}
-	if metadata != nil {
-		for k, v := range metadata {
-			event.Data[k] = v
-		}
+	for k, v := range metadata {
+		event.Data[k] = v
 	}
 	m.captureEvent(event)
 }

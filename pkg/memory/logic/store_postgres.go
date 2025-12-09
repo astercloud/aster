@@ -266,7 +266,7 @@ func (s *PostgreSQLStore) List(ctx context.Context, namespace string, filters ..
 	if opts.MinConfidence > 0 {
 		query += fmt.Sprintf(" AND confidence >= $%d", argIndex)
 		args = append(args, opts.MinConfidence)
-		argIndex++
+		// argIndex++ 不需要，后续没有使用
 	}
 
 	// 排序
@@ -292,7 +292,7 @@ func (s *PostgreSQLStore) List(ctx context.Context, namespace string, filters ..
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to list memories", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var memories []*LogicMemory
 	for rows.Next() {
@@ -383,7 +383,7 @@ func (s *PostgreSQLStore) GetStats(ctx context.Context, namespace string) (*Memo
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to get type stats", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var memType string
@@ -406,7 +406,7 @@ func (s *PostgreSQLStore) GetStats(ctx context.Context, namespace string) (*Memo
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to get scope stats", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var scope string
@@ -425,11 +425,6 @@ func (s *PostgreSQLStore) Prune(ctx context.Context, criteria PruneCriteria) (in
 	if s.closed {
 		return 0, ErrStoreClosed
 	}
-
-	query := fmt.Sprintf(`
-		DELETE FROM %s
-		WHERE 1=0
-	`, s.tableName)
 
 	args := []any{}
 	argIndex := 1
@@ -452,15 +447,15 @@ func (s *PostgreSQLStore) Prune(ctx context.Context, criteria PruneCriteria) (in
 	if criteria.MinAccessCount > 0 && criteria.MaxAge > 0 {
 		conditions = append(conditions, fmt.Sprintf("(access_count < $%d AND created_at < $%d)", argIndex, argIndex+1))
 		args = append(args, criteria.MinAccessCount, time.Now().Add(-criteria.MaxAge))
-		argIndex += 2
+		// argIndex += 2 不需要，后续没有使用
 	}
 
 	if len(conditions) == 0 {
 		return 0, nil
 	}
 
-	// 重建查询
-	query = fmt.Sprintf(`
+	// 构建查询
+	query := fmt.Sprintf(`
 		DELETE FROM %s
 		WHERE %s
 	`, s.tableName, conditions[0])
@@ -512,10 +507,15 @@ func (s *PostgreSQLStore) scanMemory(row *sql.Row) (*LogicMemory, error) {
 
 	// 反序列化
 	if len(valueJSON) > 0 {
-		json.Unmarshal(valueJSON, &mem.Value)
+		if err := json.Unmarshal(valueJSON, &mem.Value); err != nil {
+			return nil, NewStoreError("UNMARSHAL_ERROR", "failed to unmarshal value", err)
+		}
 	}
 	if len(metadataJSON) > 0 {
-		json.Unmarshal(metadataJSON, &mem.Metadata)
+		if err := json.Unmarshal(metadataJSON, &mem.Metadata); err != nil {
+			// metadata 反序列化失败不是致命错误，使用空 map
+			mem.Metadata = make(map[string]any)
+		}
 	}
 
 	if category.Valid {
@@ -532,7 +532,7 @@ func (s *PostgreSQLStore) scanMemory(row *sql.Row) (*LogicMemory, error) {
 	if sourceType.Valid {
 		var sources []string
 		if len(sourcesJSON) > 0 {
-			json.Unmarshal(sourcesJSON, &sources)
+			_ = json.Unmarshal(sourcesJSON, &sources) // sources 反序列化失败使用空切片
 		}
 
 		mem.Provenance = &memory.MemoryProvenance{
@@ -576,10 +576,15 @@ func (s *PostgreSQLStore) scanMemoryFromRows(rows *sql.Rows) (*LogicMemory, erro
 
 	// 反序列化
 	if len(valueJSON) > 0 {
-		json.Unmarshal(valueJSON, &mem.Value)
+		if err := json.Unmarshal(valueJSON, &mem.Value); err != nil {
+			return nil, NewStoreError("UNMARSHAL_ERROR", "failed to unmarshal value", err)
+		}
 	}
 	if len(metadataJSON) > 0 {
-		json.Unmarshal(metadataJSON, &mem.Metadata)
+		if err := json.Unmarshal(metadataJSON, &mem.Metadata); err != nil {
+			// metadata 反序列化失败不是致命错误，使用空 map
+			mem.Metadata = make(map[string]any)
+		}
 	}
 
 	if category.Valid {
@@ -596,7 +601,7 @@ func (s *PostgreSQLStore) scanMemoryFromRows(rows *sql.Rows) (*LogicMemory, erro
 	if sourceType.Valid {
 		var sources []string
 		if len(sourcesJSON) > 0 {
-			json.Unmarshal(sourcesJSON, &sources)
+			_ = json.Unmarshal(sourcesJSON, &sources) // sources 反序列化失败使用空切片
 		}
 
 		mem.Provenance = &memory.MemoryProvenance{

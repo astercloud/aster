@@ -642,8 +642,10 @@ func (a *Agent) injectToolManual() {
 	a.mu.Lock()
 	defer a.mu.Unlock()
 
+	ctx := context.Background() // 用于日志记录
+
 	if len(a.toolMap) == 0 {
-		agentLog.Debug(nil, "no tools in toolMap, skipping", map[string]any{"agent_id": a.id})
+		agentLog.Debug(ctx, "no tools in toolMap, skipping", map[string]any{"agent_id": a.id})
 		return
 	}
 
@@ -709,7 +711,7 @@ func (a *Agent) injectToolManual() {
 	}
 
 	if len(summaries) == 0 {
-		agentLog.Debug(nil, "no tools found, skipping", map[string]any{"agent_id": a.id})
+		agentLog.Debug(ctx, "no tools found, skipping", map[string]any{"agent_id": a.id})
 		return
 	}
 
@@ -720,7 +722,7 @@ func (a *Agent) injectToolManual() {
 	var lines []string
 	for _, s := range summaries {
 		lines = append(lines, fmt.Sprintf("- `%s`: %s", s.name, s.summary))
-		agentLog.Debug(nil, "added summary for tool", map[string]any{"agent_id": a.id, "tool": s.name})
+		agentLog.Debug(ctx, "added summary for tool", map[string]any{"agent_id": a.id, "tool": s.name})
 	}
 
 	manualSection := "\n\n### Tools Manual\n\n" +
@@ -740,7 +742,7 @@ func (a *Agent) injectToolManual() {
 	// 追加新的工具手册
 	oldLength := len(a.template.SystemPrompt)
 	a.template.SystemPrompt += manualSection
-	agentLog.Debug(nil, "injected manual", map[string]any{"agent_id": a.id, "old_length": oldLength, "new_length": len(a.template.SystemPrompt)})
+	agentLog.Debug(ctx, "injected manual", map[string]any{"agent_id": a.id, "old_length": oldLength, "new_length": len(a.template.SystemPrompt)})
 }
 
 // ID 返回AgentID

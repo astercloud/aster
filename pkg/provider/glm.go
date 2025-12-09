@@ -184,6 +184,8 @@ func (gp *GLMProvider) Stream(ctx context.Context, messages []types.Message, opt
 
 // buildRequest 构建请求体
 func (gp *GLMProvider) buildRequest(messages []types.Message, opts *StreamOptions) map[string]any {
+	ctx := context.Background() // 用于日志记录
+
 	req := map[string]any{
 		"model":    gp.config.Model,
 		"messages": gp.convertMessages(messages),
@@ -204,7 +206,7 @@ func (gp *GLMProvider) buildRequest(messages []types.Message, opts *StreamOption
 		if opts.System != "" {
 			// GLM API 使用 system 字段
 			req["system"] = opts.System
-			glmLog.Debug(nil, "system prompt", map[string]any{"length": len(opts.System)})
+			glmLog.Debug(ctx, "system prompt", map[string]any{"length": len(opts.System)})
 		} else if gp.systemPrompt != "" {
 			req["system"] = gp.systemPrompt
 		}
@@ -235,7 +237,7 @@ func (gp *GLMProvider) buildRequest(messages []types.Message, opts *StreamOption
 					}
 				}
 			}
-			glmLog.Debug(nil, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
+			glmLog.Debug(ctx, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
 		}
 	} else {
 		req["max_tokens"] = 4096
@@ -249,6 +251,7 @@ func (gp *GLMProvider) buildRequest(messages []types.Message, opts *StreamOption
 
 // convertMessages 转换消息格式（OpenAI 兼容格式）
 func (gp *GLMProvider) convertMessages(messages []types.Message) []map[string]any {
+	ctx := context.Background() // 用于日志记录
 	result := make([]map[string]any, 0, len(messages))
 
 	for _, msg := range messages {
@@ -347,7 +350,7 @@ func (gp *GLMProvider) convertMessages(messages []types.Message) []map[string]an
 				"tool_call_id": tr.ToolUseID,
 			}
 			result = append(result, toolMsg)
-			glmLog.Debug(nil, "added tool result message", map[string]any{"tool_call_id": tr.ToolUseID, "content_length": len(tr.Content)})
+			glmLog.Debug(ctx, "added tool result message", map[string]any{"tool_call_id": tr.ToolUseID, "content_length": len(tr.Content)})
 		}
 	}
 
@@ -359,6 +362,8 @@ func (gp *GLMProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamCh
 	defer close(chunkCh)
 	defer func() { _ = body.Close() }()
 
+	ctx := context.Background() // 用于日志记录
+
 	scanner := bufio.NewScanner(body)
 	eventCount := 0
 	for scanner.Scan() {
@@ -368,7 +373,7 @@ func (gp *GLMProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamCh
 		if !strings.HasPrefix(line, "data: ") {
 			// 记录非数据行（用于调试）
 			if strings.TrimSpace(line) != "" && !strings.HasPrefix(line, ":") {
-				glmLog.Debug(nil, "non-data line", map[string]any{"line": line})
+				glmLog.Debug(ctx, "non-data line", map[string]any{"line": line})
 			}
 			continue
 		}
@@ -377,38 +382,40 @@ func (gp *GLMProvider) processStream(body io.ReadCloser, chunkCh chan<- StreamCh
 
 		// 忽略特殊标记
 		if data == "[DONE]" {
-			glmLog.Debug(nil, "received [DONE] marker", nil)
+			glmLog.Debug(ctx, "received [DONE] marker", nil)
 			break
 		}
 
 		// 解析JSON
 		var event map[string]any
 		if err := json.Unmarshal([]byte(data), &event); err != nil {
-			glmLog.Debug(nil, "failed to parse JSON", map[string]any{"error": err, "data": data})
+			glmLog.Debug(ctx, "failed to parse JSON", map[string]any{"error": err, "data": data})
 			continue
 		}
 
 		eventCount++
-		glmLog.Debug(nil, "stream event", map[string]any{"event_num": eventCount, "event": event})
+		glmLog.Debug(ctx, "stream event", map[string]any{"event_num": eventCount, "event": event})
 
 		chunk := gp.parseStreamEvent(event)
 		if chunk != nil {
-			glmLog.Debug(nil, "parsed chunk", map[string]any{"type": chunk.Type, "index": chunk.Index})
+			glmLog.Debug(ctx, "parsed chunk", map[string]any{"type": chunk.Type, "index": chunk.Index})
 			chunkCh <- *chunk
 		} else {
-			glmLog.Debug(nil, "no chunk parsed from event", nil)
+			glmLog.Debug(ctx, "no chunk parsed from event", nil)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		glmLog.Error(nil, "scanner error", map[string]any{"error": err})
+		glmLog.Error(ctx, "scanner error", map[string]any{"error": err})
 	}
 
-	glmLog.Debug(nil, "processed events", map[string]any{"total": eventCount})
+	glmLog.Debug(ctx, "processed events", map[string]any{"total": eventCount})
 }
 
 // parseStreamEvent 解析流式事件
 func (gp *GLMProvider) parseStreamEvent(event map[string]any) *StreamChunk {
+	ctx := context.Background() // 用于日志记录
+
 	// GLM API 使用 OpenAI 兼容格式
 	chunk := &StreamChunk{}
 
@@ -445,7 +452,7 @@ func (gp *GLMProvider) parseStreamEvent(event map[string]any) *StreamChunk {
 						}
 
 						chunk.Delta = toolInfo
-						glmLog.Debug(nil, "received tool_use block", map[string]any{"index": index, "id": toolInfo["id"], "name": toolInfo["name"]})
+						glmLog.Debug(ctx, "received tool_use block", map[string]any{"index": index, "id": toolInfo["id"], "name": toolInfo["name"]})
 						return chunk
 					}
 				}
@@ -528,6 +535,7 @@ func (gp *GLMProvider) GetSystemPrompt() string {
 
 // parseCompleteResponse 解析完整的非流式响应(OpenAI兼容格式)
 func (gp *GLMProvider) parseCompleteResponse(apiResp map[string]any) (types.Message, error) {
+	ctx := context.Background() // 用于日志记录
 	assistantContent := make([]types.ContentBlock, 0)
 
 	// 获取第一个choice
@@ -571,7 +579,7 @@ func (gp *GLMProvider) parseCompleteResponse(apiResp map[string]any) (types.Mess
 			// 解析参数
 			var input map[string]any
 			if err := json.Unmarshal([]byte(argsJSON), &input); err != nil {
-				glmLog.Warn(nil, "failed to parse tool arguments", map[string]any{"error": err})
+				glmLog.Warn(ctx, "failed to parse tool arguments", map[string]any{"error": err})
 				input = make(map[string]any)
 			}
 

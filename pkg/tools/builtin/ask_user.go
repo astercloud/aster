@@ -49,7 +49,7 @@ func RespondToAskUser(requestID string, answers map[string]any) error {
 	// 发送答案到 channel
 	select {
 	case req.responseChan <- answers:
-		askUserLog.Info(nil, "successfully sent answer for request", map[string]any{"request_id": requestID})
+		askUserLog.Info(context.Background(), "successfully sent answer for request", map[string]any{"request_id": requestID})
 		// 注意：不在这里删除 globalAskUserRequests，让 Execute 函数的 goroutine 来清理
 		return nil
 	default:
@@ -174,7 +174,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 	globalAskUserRequests[requestID] = req
 	globalAskUserRequestsMu.Unlock()
 
-	askUserLog.Info(nil, "registered request, waiting for user response", map[string]any{"request_id": requestID})
+	askUserLog.Info(context.Background(), "registered request, waiting for user response", map[string]any{"request_id": requestID})
 
 	// 创建响应回调函数（用于 Emit 事件）
 	respond := func(answers map[string]any) error {
@@ -211,7 +211,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 		globalAskUserRequestsMu.Lock()
 		delete(globalAskUserRequests, requestID)
 		globalAskUserRequestsMu.Unlock()
-		askUserLog.Debug(nil, "cleaned up request", map[string]any{"request_id": requestID})
+		askUserLog.Debug(context.Background(), "cleaned up request", map[string]any{"request_id": requestID})
 	}
 
 	// 直接在当前 goroutine 中等待，不使用外层 ctx
@@ -219,7 +219,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 	select {
 	case answers := <-responseChan:
 		cleanup()
-		askUserLog.Info(nil, "received answer for request", map[string]any{"request_id": requestID, "answers": answers})
+		askUserLog.Info(context.Background(), "received answer for request", map[string]any{"request_id": requestID, "answers": answers})
 		return map[string]any{
 			"ok":         true,
 			"request_id": requestID,
@@ -228,7 +228,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 		}, nil
 	case <-timeout:
 		cleanup()
-		askUserLog.Warn(nil, "request timed out after 30 minutes", map[string]any{"request_id": requestID})
+		askUserLog.Warn(context.Background(), "request timed out after 30 minutes", map[string]any{"request_id": requestID})
 		return map[string]any{
 			"ok":         false,
 			"request_id": requestID,
@@ -239,14 +239,14 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 		// 外层 context 被取消（比如 Agent 执行循环超时）
 		// 但我们不清理 pending request，让用户仍然可以响应
 		// 启动一个后台 goroutine 来等待用户响应并清理
-		askUserLog.Info(nil, "context cancelled, but keeping request alive for user response", map[string]any{"request_id": requestID})
+		askUserLog.Info(context.Background(), "context cancelled, but keeping request alive for user response", map[string]any{"request_id": requestID})
 		go func() {
 			select {
 			case <-responseChan:
 				// 用户响应了，但我们已经返回了，所以只需要清理
-				askUserLog.Info(nil, "user responded after context cancellation", map[string]any{"request_id": requestID})
+				askUserLog.Info(context.Background(), "user responded after context cancellation", map[string]any{"request_id": requestID})
 			case <-timeout:
-				askUserLog.Warn(nil, "request timed out in background", map[string]any{"request_id": requestID})
+				askUserLog.Warn(context.Background(), "request timed out in background", map[string]any{"request_id": requestID})
 			}
 			cleanup()
 		}()

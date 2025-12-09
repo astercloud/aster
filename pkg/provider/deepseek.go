@@ -203,7 +203,8 @@ func (dp *DeepseekProvider) Stream(ctx context.Context, messages []types.Message
 
 // buildRequest 构建请求体
 func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamOptions) map[string]any {
-	deepseekLog.Debug(nil, "building request", map[string]any{"model": dp.config.Model})
+	ctx := context.Background() // 用于日志记录
+	deepseekLog.Debug(ctx, "building request", map[string]any{"model": dp.config.Model})
 
 	// 转换消息
 	convertedMessages := dp.convertMessages(messages)
@@ -216,7 +217,7 @@ func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamO
 			"content": opts.System,
 		}
 		convertedMessages = append([]map[string]any{systemMessage}, convertedMessages...)
-		deepseekLog.Debug(nil, "added system message", map[string]any{"total_messages": len(convertedMessages), "system_prompt_length": len(opts.System)})
+		deepseekLog.Debug(ctx, "added system message", map[string]any{"total_messages": len(convertedMessages), "system_prompt_length": len(opts.System)})
 	} else if dp.systemPrompt != "" {
 		// 使用 Provider 级别的 system prompt
 		systemMessage := map[string]any{
@@ -224,7 +225,7 @@ func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamO
 			"content": dp.systemPrompt,
 		}
 		convertedMessages = append([]map[string]any{systemMessage}, convertedMessages...)
-		deepseekLog.Debug(nil, "added provider system message", map[string]any{"total_messages": len(convertedMessages)})
+		deepseekLog.Debug(ctx, "added provider system message", map[string]any{"total_messages": len(convertedMessages)})
 	}
 
 	req := map[string]any{
@@ -270,7 +271,7 @@ func (dp *DeepseekProvider) buildRequest(messages []types.Message, opts *StreamO
 					}
 				}
 			}
-			deepseekLog.Debug(nil, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
+			deepseekLog.Debug(ctx, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
 		}
 	} else {
 		req["max_tokens"] = 4096
@@ -379,7 +380,7 @@ func (dp *DeepseekProvider) convertMessages(messages []types.Message) []map[stri
 				"tool_call_id": tr.ToolUseID,
 			}
 			result = append(result, toolMsg)
-			deepseekLog.Debug(nil, "added tool result message", map[string]any{"tool_call_id": tr.ToolUseID, "content_length": len(tr.Content)})
+			deepseekLog.Debug(context.Background(), "added tool result message", map[string]any{"tool_call_id": tr.ToolUseID, "content_length": len(tr.Content)})
 		}
 	}
 
@@ -391,6 +392,8 @@ func (dp *DeepseekProvider) processStream(body io.ReadCloser, chunkCh chan<- Str
 	defer close(chunkCh)
 	defer func() { _ = body.Close() }()
 
+	ctx := context.Background() // 用于日志记录
+
 	scanner := bufio.NewScanner(body)
 	eventCount := 0
 	for scanner.Scan() {
@@ -400,7 +403,7 @@ func (dp *DeepseekProvider) processStream(body io.ReadCloser, chunkCh chan<- Str
 		if !strings.HasPrefix(line, "data: ") {
 			// 记录非数据行（用于调试）
 			if strings.TrimSpace(line) != "" && !strings.HasPrefix(line, ":") {
-				deepseekLog.Debug(nil, "non-data line", map[string]any{"line": line})
+				deepseekLog.Debug(ctx, "non-data line", map[string]any{"line": line})
 			}
 			continue
 		}
@@ -409,38 +412,40 @@ func (dp *DeepseekProvider) processStream(body io.ReadCloser, chunkCh chan<- Str
 
 		// 忽略特殊标记
 		if data == "[DONE]" {
-			deepseekLog.Debug(nil, "received [DONE] marker", nil)
+			deepseekLog.Debug(ctx, "received [DONE] marker", nil)
 			break
 		}
 
 		// 解析JSON
 		var event map[string]any
 		if err := json.Unmarshal([]byte(data), &event); err != nil {
-			deepseekLog.Debug(nil, "failed to parse JSON", map[string]any{"error": err, "data": data})
+			deepseekLog.Debug(ctx, "failed to parse JSON", map[string]any{"error": err, "data": data})
 			continue
 		}
 
 		eventCount++
-		deepseekLog.Debug(nil, "stream event", map[string]any{"event_num": eventCount, "event": event})
+		deepseekLog.Debug(ctx, "stream event", map[string]any{"event_num": eventCount, "event": event})
 
 		chunk := dp.parseStreamEvent(event)
 		if chunk != nil {
-			deepseekLog.Debug(nil, "parsed chunk", map[string]any{"type": chunk.Type, "index": chunk.Index})
+			deepseekLog.Debug(ctx, "parsed chunk", map[string]any{"type": chunk.Type, "index": chunk.Index})
 			chunkCh <- *chunk
 		} else {
-			deepseekLog.Debug(nil, "no chunk parsed from event", nil)
+			deepseekLog.Debug(ctx, "no chunk parsed from event", nil)
 		}
 	}
 
 	if err := scanner.Err(); err != nil {
-		deepseekLog.Error(nil, "scanner error", map[string]any{"error": err})
+		deepseekLog.Error(ctx, "scanner error", map[string]any{"error": err})
 	}
 
-	deepseekLog.Debug(nil, "processed events", map[string]any{"total": eventCount})
+	deepseekLog.Debug(ctx, "processed events", map[string]any{"total": eventCount})
 }
 
 // parseStreamEvent 解析流式事件（OpenAI 兼容格式）
 func (dp *DeepseekProvider) parseStreamEvent(event map[string]any) *StreamChunk {
+	ctx := context.Background() // 用于日志记录
+
 	// Deepseek API 使用 OpenAI 兼容格式
 	chunk := &StreamChunk{}
 
@@ -473,7 +478,7 @@ func (dp *DeepseekProvider) parseStreamEvent(event map[string]any) *StreamChunk 
 									}
 
 									chunk.Delta = toolInfo
-									deepseekLog.Debug(nil, "received tool_use block", map[string]any{"index": index, "id": id, "name": name})
+									deepseekLog.Debug(ctx, "received tool_use block", map[string]any{"index": index, "id": id, "name": name})
 									return chunk
 								}
 							}
@@ -489,7 +494,7 @@ func (dp *DeepseekProvider) parseStreamEvent(event map[string]any) *StreamChunk 
 									"type":      "arguments",
 									"arguments": arguments,
 								}
-								deepseekLog.Debug(nil, "received arguments delta", map[string]any{"index": index, "args": arguments})
+								deepseekLog.Debug(ctx, "received arguments delta", map[string]any{"index": index, "args": arguments})
 								return chunk
 							}
 						}
@@ -503,7 +508,7 @@ func (dp *DeepseekProvider) parseStreamEvent(event map[string]any) *StreamChunk 
 						"type":    "reasoning_delta",
 						"content": reasoningContent,
 					}
-					deepseekLog.Debug(nil, "received reasoning_content", map[string]any{"content": truncateString(reasoningContent, 50)})
+					deepseekLog.Debug(ctx, "received reasoning_content", map[string]any{"content": truncateString(reasoningContent, 50)})
 					return chunk
 				}
 
@@ -628,7 +633,7 @@ func (dp *DeepseekProvider) parseCompleteResponse(apiResp map[string]any) (types
 			// 解析参数
 			var input map[string]any
 			if err := json.Unmarshal([]byte(argsJSON), &input); err != nil {
-				deepseekLog.Warn(nil, "failed to parse tool arguments", map[string]any{"error": err})
+				deepseekLog.Warn(context.Background(), "failed to parse tool arguments", map[string]any{"error": err})
 				input = make(map[string]any)
 			}
 

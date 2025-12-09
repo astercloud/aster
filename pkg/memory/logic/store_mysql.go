@@ -68,7 +68,7 @@ func (s *MySQLStore) migrate() error {
 			scope VARCHAR(20) NOT NULL,
 			type VARCHAR(100) NOT NULL,
 			category VARCHAR(100),
-			` + "`key`" + ` VARCHAR(255) NOT NULL,
+			`+"`key`"+` VARCHAR(255) NOT NULL,
 			value JSON NOT NULL,
 			description TEXT,
 			source_type VARCHAR(50),
@@ -82,7 +82,7 @@ func (s *MySQLStore) migrate() error {
 			metadata JSON,
 			created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
 			updated_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
-			UNIQUE KEY idx_namespace_key (namespace, ` + "`key`" + `),
+			UNIQUE KEY idx_namespace_key (namespace, `+"`key`"+`),
 			KEY idx_namespace (namespace),
 			KEY idx_namespace_type (namespace, type),
 			KEY idx_scope (scope),
@@ -281,7 +281,7 @@ func (s *MySQLStore) List(ctx context.Context, namespace string, filters ...Filt
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to list memories", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var memories []*LogicMemory
 	for rows.Next() {
@@ -373,7 +373,7 @@ func (s *MySQLStore) GetStats(ctx context.Context, namespace string) (*MemorySta
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to get type stats", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var memType string
@@ -396,7 +396,7 @@ func (s *MySQLStore) GetStats(ctx context.Context, namespace string) (*MemorySta
 	if err != nil {
 		return nil, NewStoreError("QUERY_ERROR", "failed to get scope stats", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	for rows.Next() {
 		var scope string
@@ -486,10 +486,15 @@ func (s *MySQLStore) scanMemory(row *sql.Row) (*LogicMemory, error) {
 
 	// 反序列化
 	if len(valueJSON) > 0 {
-		json.Unmarshal(valueJSON, &mem.Value)
+		if err := json.Unmarshal(valueJSON, &mem.Value); err != nil {
+			return nil, NewStoreError("UNMARSHAL_ERROR", "failed to unmarshal value", err)
+		}
 	}
 	if len(metadataJSON) > 0 {
-		json.Unmarshal(metadataJSON, &mem.Metadata)
+		if err := json.Unmarshal(metadataJSON, &mem.Metadata); err != nil {
+			// metadata 反序列化失败不是致命错误，使用空 map
+			mem.Metadata = make(map[string]any)
+		}
 	}
 
 	if category.Valid {
@@ -506,7 +511,7 @@ func (s *MySQLStore) scanMemory(row *sql.Row) (*LogicMemory, error) {
 	if sourceType.Valid {
 		var sources []string
 		if len(sourcesJSON) > 0 {
-			json.Unmarshal(sourcesJSON, &sources)
+			_ = json.Unmarshal(sourcesJSON, &sources) // sources 反序列化失败使用空切片
 		}
 
 		mem.Provenance = &memory.MemoryProvenance{
@@ -550,10 +555,15 @@ func (s *MySQLStore) scanMemoryFromRows(rows *sql.Rows) (*LogicMemory, error) {
 
 	// 反序列化
 	if len(valueJSON) > 0 {
-		json.Unmarshal(valueJSON, &mem.Value)
+		if err := json.Unmarshal(valueJSON, &mem.Value); err != nil {
+			return nil, NewStoreError("UNMARSHAL_ERROR", "failed to unmarshal value", err)
+		}
 	}
 	if len(metadataJSON) > 0 {
-		json.Unmarshal(metadataJSON, &mem.Metadata)
+		if err := json.Unmarshal(metadataJSON, &mem.Metadata); err != nil {
+			// metadata 反序列化失败不是致命错误，使用空 map
+			mem.Metadata = make(map[string]any)
+		}
 	}
 
 	if category.Valid {
@@ -570,7 +580,7 @@ func (s *MySQLStore) scanMemoryFromRows(rows *sql.Rows) (*LogicMemory, error) {
 	if sourceType.Valid {
 		var sources []string
 		if len(sourcesJSON) > 0 {
-			json.Unmarshal(sourcesJSON, &sources)
+			_ = json.Unmarshal(sourcesJSON, &sources) // sources 反序列化失败使用空切片
 		}
 
 		mem.Provenance = &memory.MemoryProvenance{

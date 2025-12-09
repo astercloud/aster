@@ -202,15 +202,15 @@ func (i *Injector) injectToSystemPrompt(basePrompt string, skills []*SkillDefini
 }
 
 // getActiveSkills 获取应该激活的技能
-func (i *Injector) getActiveSkills(context SkillContext) []*SkillDefinition {
+func (i *Injector) getActiveSkills(ctx SkillContext) []*SkillDefinition {
 	var activeSkills []*SkillDefinition
 
-	skillsLog.Debug(nil, "total skills loaded", map[string]any{"count": len(i.skills)})
-	skillsLog.Debug(nil, "enabled skills map", map[string]any{"enabled": i.enabledSkills})
+	skillsLog.Debug(context.Background(), "total skills loaded", map[string]any{"count": len(i.skills)})
+	skillsLog.Debug(context.Background(), "enabled skills map", map[string]any{"enabled": i.enabledSkills})
 
 	for name, skill := range i.skills {
 		enabled := i.enabledSkills[name]
-		skillsLog.Debug(nil, "checking skill", map[string]any{"name": name, "enabled": enabled})
+		skillsLog.Debug(context.Background(), "checking skill", map[string]any{"name": name, "enabled": enabled})
 		if !enabled {
 			continue
 		}

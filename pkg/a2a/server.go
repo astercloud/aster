@@ -126,7 +126,7 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 			Kind:      "message",
 		})
 		if err := s.taskStore.Save(agentID, task); err != nil {
-			a2aLog.Warn(nil, "save task error", map[string]any{"error": err})
+			a2aLog.Warn(ctx, "save task error", map[string]any{"error": err})
 		}
 		return NewErrorResponse(req.ID, ErrorCodeInternalError, fmt.Sprintf("agent not found: %s", agentID), nil)
 	}
@@ -150,7 +150,7 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 			Kind:      "message",
 		})
 		if err := s.taskStore.Save(agentID, task); err != nil {
-			a2aLog.Warn(nil, "save task error", map[string]any{"error": err})
+			a2aLog.Warn(ctx, "save task error", map[string]any{"error": err})
 		}
 		return NewErrorResponse(req.ID, ErrorCodeInternalError, err.Error(), nil)
 	}
@@ -165,7 +165,7 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 			Kind:      "message",
 		})
 		if err := s.taskStore.Save(agentID, task); err != nil {
-			a2aLog.Warn(nil, "save task error", map[string]any{"error": err})
+			a2aLog.Warn(ctx, "save task error", map[string]any{"error": err})
 		}
 		return NewErrorResponse(req.ID, ErrorCodeInternalError, "invalid response type", nil)
 	}
@@ -182,7 +182,7 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 	task.AddMessage(responseMsg)
 	task.UpdateStatus(TaskStateCompleted, &responseMsg)
 	if err := s.taskStore.Save(agentID, task); err != nil {
-		a2aLog.Warn(nil, "save task error", map[string]any{"error": err})
+		a2aLog.Warn(ctx, "save task error", map[string]any{"error": err})
 	}
 
 	return NewSuccessResponse(req.ID, &MessageSendResult{TaskID: taskID})
@@ -242,7 +242,7 @@ func (s *Server) handleTasksCancel(_ context.Context, agentID string, req *JSONR
 	})
 
 	if err := s.taskStore.Save(agentID, task); err != nil {
-		a2aLog.Warn(nil, "save task error", map[string]any{"error": err})
+		a2aLog.Warn(context.Background(), "save task error", map[string]any{"error": err})
 	}
 
 	return NewSuccessResponse(req.ID, &TasksCancelResult{
@@ -314,7 +314,7 @@ func extractText(parts []Part) string {
 func generateID() string {
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
-		a2aLog.Warn(nil, "generate ID error", map[string]any{"error": err})
+		a2aLog.Warn(context.Background(), "generate ID error", map[string]any{"error": err})
 		return fmt.Sprintf("%d", time.Now().UnixNano())
 	}
 	return hex.EncodeToString(b)

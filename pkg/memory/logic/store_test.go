@@ -12,7 +12,7 @@ import (
 
 func TestInMemoryStore_BasicCRUD(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -67,7 +67,7 @@ func TestInMemoryStore_BasicCRUD(t *testing.T) {
 
 func TestInMemoryStore_List(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -151,7 +151,7 @@ func TestInMemoryStore_List(t *testing.T) {
 
 func TestInMemoryStore_SearchByType(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -175,7 +175,7 @@ func TestInMemoryStore_SearchByType(t *testing.T) {
 
 func TestInMemoryStore_SearchByScope(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -199,7 +199,7 @@ func TestInMemoryStore_SearchByScope(t *testing.T) {
 
 func TestInMemoryStore_GetTopK(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -224,7 +224,7 @@ func TestInMemoryStore_GetTopK(t *testing.T) {
 
 func TestInMemoryStore_IncrementAccessCount(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -251,7 +251,7 @@ func TestInMemoryStore_IncrementAccessCount(t *testing.T) {
 
 func TestInMemoryStore_GetStats(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -296,7 +296,7 @@ func TestInMemoryStore_GetStats(t *testing.T) {
 
 func TestInMemoryStore_Prune(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 	namespace := "user:123"
@@ -379,7 +379,7 @@ func TestInMemoryStore_Close(t *testing.T) {
 
 func TestInMemoryStore_InvalidNamespace(t *testing.T) {
 	store := NewInMemoryStore()
-	defer store.Close()
+	defer func() { _ = store.Close() }()
 
 	ctx := context.Background()
 

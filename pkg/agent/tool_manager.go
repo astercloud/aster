@@ -1,6 +1,7 @@
 package agent
 
 import (
+	"context"
 	"fmt"
 	"sync"
 
@@ -49,10 +50,12 @@ func (tm *ToolManager) Initialize(toolNames []string, activeByDefault bool) erro
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 
+	ctx := context.Background() // 用于日志记录
+
 	for _, name := range toolNames {
 		tool, err := tm.registry.Create(name, nil)
 		if err != nil {
-			toolMgrLog.Warn(nil, "failed to create tool", map[string]any{"name": name, "error": err})
+			toolMgrLog.Warn(ctx, "failed to create tool", map[string]any{"name": name, "error": err})
 			continue
 		}
 
@@ -73,23 +76,23 @@ func (tm *ToolManager) Initialize(toolNames []string, activeByDefault bool) erro
 		// 添加到索引
 		source := "builtin"
 		if err := tm.index.IndexTool(tool, source, !isActive); err != nil {
-			toolMgrLog.Warn(nil, "failed to index tool", map[string]any{"name": name, "error": err})
+			toolMgrLog.Warn(ctx, "failed to index tool", map[string]any{"name": name, "error": err})
 			continue
 		}
 
 		if isActive {
 			tm.activeTools[name] = tool
-			toolMgrLog.Debug(nil, "tool loaded (active)", map[string]any{"name": name})
+			toolMgrLog.Debug(ctx, "tool loaded (active)", map[string]any{"name": name})
 		} else {
 			entry := tm.index.GetTool(name)
 			if entry != nil {
 				tm.deferredTools[name] = *entry
-				toolMgrLog.Debug(nil, "tool indexed (deferred)", map[string]any{"name": name})
+				toolMgrLog.Debug(ctx, "tool indexed (deferred)", map[string]any{"name": name})
 			}
 		}
 	}
 
-	toolMgrLog.Info(nil, "initialized", map[string]any{"active_tools": len(tm.activeTools), "deferred_tools": len(tm.deferredTools)})
+	toolMgrLog.Info(ctx, "initialized", map[string]any{"active_tools": len(tm.activeTools), "deferred_tools": len(tm.deferredTools)})
 
 	return nil
 }
@@ -143,6 +146,8 @@ func (tm *ToolManager) ActivateTool(name string) error {
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 
+	ctx := context.Background() // 用于日志记录
+
 	// 检查是否已经活跃
 	if _, ok := tm.activeTools[name]; ok {
 		return nil // 已经活跃
@@ -167,10 +172,10 @@ func (tm *ToolManager) ActivateTool(name string) error {
 	// 更新索引中的延迟状态
 	entry.Deferred = false
 	if err := tm.index.IndexToolEntry(entry); err != nil {
-		toolMgrLog.Warn(nil, "failed to update tool index", map[string]any{"error": err})
+		toolMgrLog.Warn(ctx, "failed to update tool index", map[string]any{"error": err})
 	}
 
-	toolMgrLog.Debug(nil, "tool activated", map[string]any{"name": name})
+	toolMgrLog.Debug(ctx, "tool activated", map[string]any{"name": name})
 	return nil
 }
 
@@ -195,6 +200,8 @@ func (tm *ToolManager) DeactivateTool(name string) error {
 	tm.mu.Lock()
 	defer tm.mu.Unlock()
 
+	ctx := context.Background() // 用于日志记录
+
 	// 不能停用核心工具
 	if tm.isCoreToolLocked(name) {
 		return fmt.Errorf("cannot deactivate core tool: %s", name)
@@ -212,12 +219,12 @@ func (tm *ToolManager) DeactivateTool(name string) error {
 		entry.Deferred = true
 		tm.deferredTools[name] = *entry
 		if err := tm.index.IndexToolEntry(*entry); err != nil {
-			toolMgrLog.Warn(nil, "failed to update tool index", map[string]any{"error": err})
+			toolMgrLog.Warn(ctx, "failed to update tool index", map[string]any{"error": err})
 		}
 	}
 	delete(tm.activeTools, name)
 
-	toolMgrLog.Debug(nil, "tool deactivated", map[string]any{"name": name, "tool_type": fmt.Sprintf("%T", tool)})
+	toolMgrLog.Debug(ctx, "tool deactivated", map[string]any{"name": name, "tool_type": fmt.Sprintf("%T", tool)})
 	return nil
 }
 

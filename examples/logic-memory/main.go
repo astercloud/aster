@@ -62,7 +62,7 @@ func basicUsageExample(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}
-	defer manager.Close()
+	defer func() { _ = manager.Close() }()
 
 	// 3. Record a memory manually
 	mem := &logic.LogicMemory{
@@ -143,7 +143,7 @@ func eventProcessingExample(ctx context.Context) {
 	if err != nil {
 		log.Fatalf("Failed to create manager: %v", err)
 	}
-	defer manager.Close()
+	defer func() { _ = manager.Close() }()
 
 	// Simulate a user revision event (user edited AI-generated content)
 	event := logic.Event{

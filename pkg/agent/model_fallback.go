@@ -82,7 +82,7 @@ func NewModelFallbackManager(fallbacks []*ModelFallback, deps *Dependencies) (*M
 
 		prov, err := deps.ProviderFactory.Create(fb.Config)
 		if err != nil {
-			fallbackLog.Warn(nil, "failed to create provider", map[string]any{"provider": fb.Config.Provider, "model": fb.Config.Model, "error": err})
+			fallbackLog.Warn(context.Background(), "failed to create provider", map[string]any{"provider": fb.Config.Provider, "model": fb.Config.Model, "error": err})
 			fb.Enabled = false
 			continue
 		}
@@ -250,7 +250,7 @@ func (m *ModelFallbackManager) EnableModel(provider, model string) error {
 				fb.provider = prov
 			}
 			fb.Enabled = true
-			fallbackLog.Info(nil, "enabled model", map[string]any{"model": modelKey})
+			fallbackLog.Info(context.Background(), "enabled model", map[string]any{"model": modelKey})
 			return nil
 		}
 	}
@@ -266,7 +266,7 @@ func (m *ModelFallbackManager) DisableModel(provider, model string) error {
 		fbKey := fmt.Sprintf("%s/%s", fb.Config.Provider, fb.Config.Model)
 		if fbKey == modelKey {
 			fb.Enabled = false
-			fallbackLog.Info(nil, "disabled model", map[string]any{"model": modelKey})
+			fallbackLog.Info(context.Background(), "disabled model", map[string]any{"model": modelKey})
 			return nil
 		}
 	}

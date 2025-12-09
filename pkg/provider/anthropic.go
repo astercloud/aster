@@ -174,6 +174,8 @@ func (ap *AnthropicProvider) Stream(ctx context.Context, messages []types.Messag
 
 // buildRequest 构建请求体
 func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *StreamOptions) map[string]any {
+	ctx := context.Background() // 用于日志记录
+
 	req := map[string]any{
 		"model":    ap.config.Model,
 		"messages": ap.convertMessages(messages),
@@ -201,7 +203,7 @@ func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *Stream
 			req["system"] = opts.System
 			// 记录系统提示词长度和关键内容（用于调试）
 			if len(opts.System) > 500 {
-				anthropicLog.Debug(nil, "system prompt", map[string]any{"length": len(opts.System), "preview": opts.System[:200]})
+				anthropicLog.Debug(ctx, "system prompt", map[string]any{"length": len(opts.System), "preview": opts.System[:200]})
 				// 检查是否包含工具手册
 				if strings.Contains(opts.System, "### Tools Manual") {
 					// 提取工具手册部分
@@ -211,13 +213,13 @@ func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *Stream
 						if len(manualPreview) > 300 {
 							manualPreview = manualPreview[:300] + "..."
 						}
-						anthropicLog.Debug(nil, "tools manual found", map[string]any{"preview": manualPreview})
+						anthropicLog.Debug(ctx, "tools manual found", map[string]any{"preview": manualPreview})
 					}
 				} else {
-					anthropicLog.Warn(nil, "tools manual NOT found in system prompt", nil)
+					anthropicLog.Warn(ctx, "tools manual NOT found in system prompt", nil)
 				}
 			} else {
-				anthropicLog.Debug(nil, "system prompt", map[string]any{"content": opts.System})
+				anthropicLog.Debug(ctx, "system prompt", map[string]any{"content": opts.System})
 			}
 		} else if ap.systemPrompt != "" {
 			// 如果 opts 没有 system，使用存储的 systemPrompt
@@ -260,7 +262,7 @@ func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *Stream
 			for i, t := range tools {
 				toolNames[i] = t["name"].(string)
 			}
-			anthropicLog.Debug(nil, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
+			anthropicLog.Debug(ctx, "sending tools to API", map[string]any{"count": len(tools), "names": toolNames})
 
 			// 添加 tool_choice 支持（如果指定）
 			if opts.ToolChoice != nil {
@@ -274,17 +276,17 @@ func (ap *AnthropicProvider) buildRequest(messages []types.Message, opts *Stream
 					toolChoice["disable_parallel_tool_use"] = true
 				}
 				req["tool_choice"] = toolChoice
-				anthropicLog.Debug(nil, "using tool_choice", map[string]any{"tool_choice": toolChoice})
+				anthropicLog.Debug(ctx, "using tool_choice", map[string]any{"tool_choice": toolChoice})
 			}
 			// 记录每个工具的详细信息
 			for _, tool := range tools {
 				if name, ok := tool["name"].(string); ok {
 					if schema, ok := tool["input_schema"].(map[string]any); ok {
-						anthropicLog.Debug(nil, "tool schema", map[string]any{"name": name, "schema": schema})
+						anthropicLog.Debug(ctx, "tool schema", map[string]any{"name": name, "schema": schema})
 					}
 					// 记录工具示例数量
 					if examples, ok := tool["input_examples"].([]map[string]any); ok {
-						anthropicLog.Debug(nil, "tool examples", map[string]any{"name": name, "example_count": len(examples)})
+						anthropicLog.Debug(ctx, "tool examples", map[string]any{"name": name, "example_count": len(examples)})
 					}
 				}
 			}
@@ -403,6 +405,7 @@ func (ap *AnthropicProvider) processStream(body io.ReadCloser, chunkCh chan<- St
 
 // parseStreamEvent 解析流式事件
 func (ap *AnthropicProvider) parseStreamEvent(event map[string]any) *StreamChunk {
+	ctx := context.Background() // 用于日志记录
 	eventType, _ := event["type"].(string)
 
 	chunk := &StreamChunk{
@@ -418,17 +421,17 @@ func (ap *AnthropicProvider) parseStreamEvent(event map[string]any) *StreamChunk
 			chunk.Delta = contentBlock
 			// 添加详细的调试日志
 			if blockType, ok := contentBlock["type"].(string); ok {
-				anthropicLog.Debug(nil, "content_block_start", map[string]any{"type": blockType, "index": chunk.Index})
+				anthropicLog.Debug(ctx, "content_block_start", map[string]any{"type": blockType, "index": chunk.Index})
 				switch blockType {
 				case "tool_use":
-					anthropicLog.Debug(nil, "received tool_use block", map[string]any{"id": contentBlock["id"], "name": contentBlock["name"]})
+					anthropicLog.Debug(ctx, "received tool_use block", map[string]any{"id": contentBlock["id"], "name": contentBlock["name"]})
 				case "text":
-					anthropicLog.Debug(nil, "received text block instead of tool_use", nil)
+					anthropicLog.Debug(ctx, "received text block instead of tool_use", nil)
 				default:
-					anthropicLog.Debug(nil, "unknown block type", map[string]any{"type": blockType})
+					anthropicLog.Debug(ctx, "unknown block type", map[string]any{"type": blockType})
 				}
 			} else {
-				anthropicLog.Debug(nil, "content_block_start without type field", map[string]any{"block": contentBlock})
+				anthropicLog.Debug(ctx, "content_block_start without type field", map[string]any{"block": contentBlock})
 			}
 		}
 
