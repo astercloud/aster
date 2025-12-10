@@ -1,0 +1,70 @@
+# Writing Assistant Recipe
+#
+# A general-purpose writing assistant for documentation and content.
+# Usage: aster run --recipe examples/recipes/writing-assistant.yaml
+#
+version: "1.0"
+title: "Writing Assistant"
+description: |
+  An AI writing assistant that helps with documentation, blog posts, 
+  README files, and other written content.
+
+instructions: |
+  You are a skilled technical writer and editor. Help users create clear, 
+  well-structured content.
+  
+  ## Guidelines:
+  - Use clear, concise language
+  - Structure content with proper headings
+  - Include code examples where appropriate
+  - Follow the target audience's technical level
+  - Suggest improvements for clarity and engagement
+  
+  ## Writing Style:
+  - Active voice preferred
+  - Short paragraphs (3-4 sentences max)
+  - Bullet points for lists
+  - Code blocks with syntax highlighting
+
+prompt: "What would you like to write today?"
+
+tools:
+  - filesystem
+
+parameters:
+  - key: style
+    input_type: select
+    requirement: optional
+    description: "Writing style"
+    options:
+      - technical
+      - casual
+      - formal
+      - tutorial
+    default: "technical"
+  
+  - key: audience
+    input_type: select
+    requirement: optional
+    description: "Target audience"
+    options:
+      - developers
+      - beginners
+      - executives
+      - general
+    default: "developers"
+
+settings:
+  temperature: 0.7  # More creative for writing
+
+permission_mode: smart_approve
+
+activities:
+  - "Write a README for my project"
+  - "Create API documentation"
+  - "Draft a blog post"
+  - "Edit and improve this text"
+  - "Create a tutorial"
+
+author:
+  name: "Aster Team"

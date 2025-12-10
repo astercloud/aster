@@ -22,6 +22,10 @@ func main() {
 		if err := runMCPServe(os.Args[2:]); err != nil {
 			log.Fatalf("aster mcp-serve failed: %v", err)
 		}
+	case "session":
+		if err := runSession(os.Args[2:]); err != nil {
+			log.Fatalf("aster session failed: %v", err)
+		}
 	case "help", "-h", "--help":
 		printUsage()
 	default:
@@ -32,13 +36,20 @@ func main() {
 }
 
 func printUsage() {
-	fmt.Println("Usage:")
-	fmt.Println("  aster serve [flags]")
-	fmt.Println("  aster mcp-serve [flags]")
+	fmt.Println("Aster - AI Agent Framework")
 	fmt.Println()
-	fmt.Println("Subcommands:")
-	fmt.Println("  serve      Start an HTTP server (Gin-based architecture)")
+	fmt.Println("Usage:")
+	fmt.Println("  aster <command> [flags]")
+	fmt.Println()
+	fmt.Println("Commands:")
+	fmt.Println("  session    Start an interactive AI agent session")
+	fmt.Println("  serve      Start an HTTP server")
 	fmt.Println("  mcp-serve  Start an MCP HTTP server")
 	fmt.Println()
-	fmt.Println("Use 'aster <subcommand> -h' for subcommand-specific flags.")
+	fmt.Println("Examples:")
+	fmt.Println("  aster session                    # Start interactive session")
+	fmt.Println("  aster session --recipe my.yaml   # Start with recipe")
+	fmt.Println("  aster serve --port 8080          # Start HTTP server")
+	fmt.Println()
+	fmt.Println("Use 'aster <command> -h' for command-specific help.")
 }

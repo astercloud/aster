@@ -1,0 +1,115 @@
+# Code Review Assistant Recipe
+# 
+# This recipe configures an AI agent for code review tasks.
+# Usage: aster run --recipe examples/recipes/code-review.yaml
+#
+version: "1.0"
+title: "Code Review Assistant"
+description: |
+  An AI-powered code review assistant that analyzes code for:
+  - Code quality and best practices
+  - Security vulnerabilities
+  - Performance issues
+  - Maintainability concerns
+
+# Base template to extend (optional, uses default if not specified)
+# template_id: default
+
+# System instructions for the agent
+instructions: |
+  You are a senior software engineer conducting a thorough code review.
+  
+  ## Your Responsibilities:
+  1. **Code Quality**: Check for clean code principles, proper naming, and code organization
+  2. **Security**: Identify potential security vulnerabilities (injection, auth issues, etc.)
+  3. **Performance**: Look for performance bottlenecks and optimization opportunities
+  4. **Best Practices**: Ensure the code follows language-specific best practices
+  5. **Testing**: Verify adequate test coverage and test quality
+  
+  ## Review Process:
+  1. First, understand the purpose of the code by reading any documentation
+  2. Analyze the code structure and architecture
+  3. Check individual functions/methods for issues
+  4. Look for patterns that might cause problems at scale
+  5. Provide actionable feedback with specific suggestions
+  
+  ## Output Format:
+  For each issue found, provide:
+  - **Severity**: Critical / High / Medium / Low / Info
+  - **Location**: File and line number
+  - **Issue**: Clear description of the problem
+  - **Suggestion**: How to fix it with code examples when helpful
+  
+  Be constructive and educational in your feedback.
+
+# Initial prompt when starting the session
+prompt: |
+  Please review the code in {{directory}}.
+  {{#if focus}}Focus on: {{focus}}{{/if}}
+
+# Tools to enable
+tools:
+  - filesystem  # Read files
+  - bash        # Run linters, tests
+
+# MCP Extensions
+extensions:
+  - type: builtin
+    name: filesystem
+    description: "File system access for reading code"
+  
+  # Uncomment to enable git integration
+  # - type: stdio
+  #   name: git
+  #   description: "Git operations for understanding history"
+  #   cmd: npx
+  #   args: ["-y", "@anthropic/git-mcp"]
+
+# User-configurable parameters
+parameters:
+  - key: directory
+    input_type: string
+    requirement: optional
+    description: "Directory to review (relative to current working directory)"
+    default: "."
+  
+  - key: language
+    input_type: select
+    requirement: optional
+    description: "Primary programming language"
+    options:
+      - go
+      - python
+      - javascript
+      - typescript
+      - rust
+      - java
+    default: "go"
+  
+  - key: focus
+    input_type: string
+    requirement: optional
+    description: "Specific area to focus on (e.g., 'security', 'performance')"
+
+# Runtime settings
+settings:
+  # Use a capable model for code analysis
+  # provider: anthropic
+  # model: claude-sonnet-4-20250514
+  temperature: 0.3  # Lower temperature for more consistent analysis
+
+# Permission mode: smart_approve auto-approves read operations
+permission_mode: smart_approve
+
+# Suggested activities shown in UI
+activities:
+  - "Review the entire codebase"
+  - "Focus on security vulnerabilities"
+  - "Check for performance issues"
+  - "Review recent changes"
+  - "Analyze test coverage"
+
+# Author information
+author:
+  name: "Aster Team"
+  contact: "https://github.com/astercloud/aster"
