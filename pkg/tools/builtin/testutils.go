@@ -150,6 +150,79 @@ func ExecuteToolWithRealFS(t *testing.T, tool tools.Tool, input map[string]any) 
 	return nil
 }
 
+// ExecuteToolWithWorkDir 使用指定工作目录执行工具
+func ExecuteToolWithWorkDir(t *testing.T, tool tools.Tool, input map[string]any, workDir string) map[string]any {
+	ctx := context.Background()
+	tc := &tools.ToolContext{
+		Signal:  ctx,
+		Sandbox: &CustomWorkDirSandbox{workDir: workDir},
+	}
+
+	result, err := tool.Execute(ctx, input, tc)
+	if err != nil {
+		t.Fatalf("Tool execution failed: %v", err)
+	}
+
+	// 将result转换为map[string]any
+	if resultMap, ok := result.(map[string]any); ok {
+		return resultMap
+	}
+
+	t.Fatalf("Expected map[string]any result, got %T", result)
+	return nil
+}
+
+// ExecuteToolWithoutContext 不使用 ToolContext 执行工具（用于测试不依赖 sandbox 的工具）
+func ExecuteToolWithoutContext(t *testing.T, tool tools.Tool, input map[string]any) map[string]any {
+	ctx := context.Background()
+
+	result, err := tool.Execute(ctx, input, nil)
+	if err != nil {
+		t.Fatalf("Tool execution failed: %v", err)
+	}
+
+	// 将result转换为map[string]any
+	if resultMap, ok := result.(map[string]any); ok {
+		return resultMap
+	}
+
+	t.Fatalf("Expected map[string]any result, got %T", result)
+	return nil
+}
+
+// CustomWorkDirSandbox 自定义工作目录的沙箱（仅用于测试）
+type CustomWorkDirSandbox struct {
+	workDir string
+}
+
+func (cs *CustomWorkDirSandbox) Kind() string {
+	return "custom"
+}
+
+func (cs *CustomWorkDirSandbox) WorkDir() string {
+	return cs.workDir
+}
+
+func (cs *CustomWorkDirSandbox) FS() sandbox.SandboxFS {
+	return &RealFS{}
+}
+
+func (cs *CustomWorkDirSandbox) Exec(ctx context.Context, cmd string, opts *sandbox.ExecOptions) (*sandbox.ExecResult, error) {
+	return nil, fmt.Errorf("exec not supported in test sandbox")
+}
+
+func (cs *CustomWorkDirSandbox) Watch(paths []string, listener sandbox.FileChangeListener) (string, error) {
+	return "", fmt.Errorf("watch not supported in test sandbox")
+}
+
+func (cs *CustomWorkDirSandbox) Unwatch(watchID string) error {
+	return nil
+}
+
+func (cs *CustomWorkDirSandbox) Dispose() error {
+	return nil
+}
+
 // RealSandbox 使用真实文件系统的沙箱（仅用于测试）
 type RealSandbox struct{}
 
