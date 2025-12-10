@@ -63,7 +63,11 @@ func (t *BashTool) InputSchema() map[string]any {
 			},
 			"timeout": map[string]any{
 				"type":        "integer",
-				"description": "超时时间（毫秒），默认为120000（2分钟）",
+				"description": "超时时间（毫秒），默认为120000（2分钟），最大600000",
+			},
+			"description": map[string]any{
+				"type":        "string",
+				"description": "命令的简短描述（5-10个词），说明此命令的作用",
 			},
 			"working_dir": map[string]any{
 				"type":        "string",
@@ -105,11 +109,17 @@ func (t *BashTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 
 	command := GetStringParam(input, "command", "")
 	timeoutMs := GetIntParam(input, "timeout", 120000) // 默认2分钟
+	description := GetStringParam(input, "description", "")
 	workingDir := GetStringParam(input, "working_dir", "")
 	shellID := GetStringParam(input, "shell_id", "")
 	background := GetBoolParam(input, "background", false)
 	captureOutput := GetBoolParam(input, "capture_output", true)
 	shellType := GetStringParam(input, "shell", "bash")
+
+	// 限制最大超时时间为 600000ms (10分钟)
+	if timeoutMs > 600000 {
+		timeoutMs = 600000
+	}
 
 	if command == "" {
 		return NewClaudeErrorResponse(fmt.Errorf("command cannot be empty")), nil
@@ -254,6 +264,10 @@ func (t *BashTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 		"duration_ms": duration.Milliseconds(),
 		"start_time":  start.Unix(),
 		"end_time":    time.Now().Unix(),
+	}
+
+	if description != "" {
+		response["description"] = description
 	}
 
 	if captureOutput {

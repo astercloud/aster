@@ -66,6 +66,20 @@ func (t *WebSearchTool) InputSchema() map[string]any {
 				"type":        "boolean",
 				"description": "Include full page content (warning: uses more tokens)",
 			},
+			"allowed_domains": map[string]any{
+				"type":        "array",
+				"description": "Only include results from these domains (e.g., ['github.com', 'stackoverflow.com'])",
+				"items": map[string]any{
+					"type": "string",
+				},
+			},
+			"blocked_domains": map[string]any{
+				"type":        "array",
+				"description": "Never include results from these domains",
+				"items": map[string]any{
+					"type": "string",
+				},
+			},
 		},
 		"required": []string{"query"},
 	}
@@ -101,12 +115,39 @@ func (t *WebSearchTool) Execute(ctx context.Context, input map[string]any, tc *t
 		includeRawContent = irc
 	}
 
+	// 解析域名过滤参数
+	var allowedDomains []string
+	if ad, ok := input["allowed_domains"].([]any); ok {
+		for _, d := range ad {
+			if domain, ok := d.(string); ok && domain != "" {
+				allowedDomains = append(allowedDomains, domain)
+			}
+		}
+	}
+
+	var blockedDomains []string
+	if bd, ok := input["blocked_domains"].([]any); ok {
+		for _, d := range bd {
+			if domain, ok := d.(string); ok && domain != "" {
+				blockedDomains = append(blockedDomains, domain)
+			}
+		}
+	}
+
 	// 3. 构建 Tavily API 请求
 	requestBody := map[string]any{
 		"api_key":             t.apiKey,
 		"query":               query,
 		"max_results":         maxResults,
 		"include_raw_content": includeRawContent,
+	}
+
+	// 添加域名过滤（Tavily API 支持 include_domains 和 exclude_domains）
+	if len(allowedDomains) > 0 {
+		requestBody["include_domains"] = allowedDomains
+	}
+	if len(blockedDomains) > 0 {
+		requestBody["exclude_domains"] = blockedDomains
 	}
 
 	// Tavily API的search_depth只接受"basic"或"advanced"

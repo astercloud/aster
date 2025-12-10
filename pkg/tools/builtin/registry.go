@@ -3,7 +3,7 @@ package builtin
 import "github.com/astercloud/aster/pkg/tools"
 
 // RegisterAll 注册所有内置工具 （重要：克制，未经严格的讨论禁止再增加）
-// 保持精简（约17个工具）
+// 保持精简（约18个工具）
 func RegisterAll(registry *tools.Registry) {
 	// 文件操作工具 (5)
 	registry.Register("Read", NewReadTool)
@@ -31,6 +31,10 @@ func RegisterAll(registry *tools.Registry) {
 	// 网络工具 (2)
 	registry.Register("WebFetch", NewWebFetchTool)
 	registry.Register("WebSearch", NewWebSearchTool)
+
+	// MCP 资源工具 (2)
+	registry.Register("ListMcpResources", NewListMcpResourcesTool)
+	registry.Register("ReadMcpResource", NewReadMcpResourceTool)
 
 	// 技能工具 (1)
 	registry.Register("Skill", NewSkillTool)
@@ -66,12 +70,17 @@ func NetworkTools() []string {
 	return []string{"WebFetch", "WebSearch"}
 }
 
+// McpTools 返回 MCP 资源工具列表
+func McpTools() []string {
+	return []string{"ListMcpResources", "ReadMcpResource"}
+}
+
 // SkillTools 返回技能工具列表
 func SkillTools() []string {
 	return []string{"Skill"}
 }
 
-// AllTools 返回所有内置工具列表（共16个）
+// AllTools 返回所有内置工具列表（共18个）
 func AllTools() []string {
 	tools := FileSystemTools()
 	tools = append(tools, ExecutionTools()...)
@@ -79,6 +88,7 @@ func AllTools() []string {
 	tools = append(tools, PlanningTools()...)
 	tools = append(tools, InteractionTools()...)
 	tools = append(tools, NetworkTools()...)
+	tools = append(tools, McpTools()...)
 	tools = append(tools, SkillTools()...)
 	return tools
 }

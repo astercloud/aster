@@ -1,5 +1,38 @@
 # Changelog
 
+## [v0.28.0] - 2025-12-10
+
+### Added
+
+- **LocalSandbox 安全增强**: 全面提升本地沙箱的安全性
+  - `SecurityLevel`: 四级安全级别 (None, Basic, Strict, Paranoid)
+  - 增强危险命令检测: 70+ 正则模式，覆盖文件破坏、权限提升、系统控制、远程代码执行、网络攻击等
+  - `ResourceLimits`: 资源限制配置 (CPU时间、内存、文件大小、进程数、输出大小)
+  - `AuditEntry`: 完整审计日志，记录所有命令执行
+  - `CommandStats`: 命令统计，追踪调用次数和执行时间
+  - 命令白名单: 严格模式下只允许预定义的安全命令
+  - 动态阻止列表: 运行时添加/移除阻止命令
+  - 安全环境变量: 过滤危险环境变量 (LD_PRELOAD, DYLD_INSERT_LIBRARIES 等)
+  - 命令注入检测: 检测反引号、命令替换、换行符注入等
+  - 路径安全检查: 检测敏感路径访问和路径遍历攻击
+  - 关键命令保护: 即使排除命令也检查最危险的模式
+
+### Changed
+
+- **randomString**: 使用 crypto/rand 替代 time-based 实现，提高安全性
+- **execDirect**: 排除命令仍执行关键安全检查
+
+### Tests
+
+- 添加 8 个新的安全测试用例
+  - TestLocalSandbox_SecurityLevels
+  - TestLocalSandbox_EnhancedDangerousPatterns (16 个危险命令)
+  - TestLocalSandbox_AuditLog
+  - TestLocalSandbox_CommandStats
+  - TestLocalSandbox_BlockedCommands
+  - TestLocalSandbox_DynamicBlockedCommands
+  - TestLocalSandbox_SetSecurityLevel
+
 ## [v0.27.0] - 2025-12-10
 
 ### Added

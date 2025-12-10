@@ -68,6 +68,10 @@ func (t *TaskTool) InputSchema() map[string]any {
 				"type":        "string",
 				"description": "任务 ID（用于 status/cancel 操作）",
 			},
+			"description": map[string]any{
+				"type":        "string",
+				"description": "任务的简短描述（3-5个词），概括任务目的",
+			},
 			"subagent_type": map[string]any{
 				"type":        "string",
 				"description": "要启动的代理类型（用于 run 操作）",
@@ -211,6 +215,7 @@ func (t *TaskTool) cancelTask(taskID string) (any, error) {
 
 // runTask 启动任务
 func (t *TaskTool) runTask(ctx context.Context, input map[string]any) (any, error) {
+	description := GetStringParam(input, "description", "")
 	subagentType := GetStringParam(input, "subagent_type", "")
 	prompt := GetStringParam(input, "prompt", "")
 	model := GetStringParam(input, "model", "")
@@ -244,14 +249,14 @@ func (t *TaskTool) runTask(ctx context.Context, input map[string]any) (any, erro
 	taskExecutor := GetGlobalTaskExecutor()
 
 	if taskExecutor.executorFactory != nil {
-		return t.executeWithTaskExecutor(ctx, taskExecutor, subagentType, prompt, model, timeoutMinutes, 100, async, start)
+		return t.executeWithTaskExecutor(ctx, taskExecutor, subagentType, prompt, model, description, timeoutMinutes, 100, async, start)
 	}
 
-	return t.executeWithSubagentManager(ctx, subagentType, prompt, model, "", timeoutMinutes, 100, async, start)
+	return t.executeWithSubagentManager(ctx, subagentType, prompt, model, description, "", timeoutMinutes, 100, async, start)
 }
 
 // executeWithTaskExecutor 使用新的 TaskExecutor 执行（真正的子 Agent）
-func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskExecutor, subagentType, prompt, model string, timeoutMinutes, priority int, async bool, start time.Time) (any, error) {
+func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskExecutor, subagentType, prompt, model, description string, timeoutMinutes, priority int, async bool, start time.Time) (any, error) {
 	opts := &TaskExecuteOptions{
 		Model:    model,
 		Timeout:  time.Duration(timeoutMinutes) * time.Minute,
@@ -273,7 +278,7 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 			}, nil
 		}
 
-		return map[string]any{
+		response := map[string]any{
 			"ok":              true,
 			"task_id":         handle.TaskID,
 			"subagent_type":   subagentType,
@@ -288,7 +293,11 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 			"execution_mode":  "native_subagent",
 			"async_status":    "running_in_background",
 			"monitoring_info": "Task is running as a native subagent. Use task_id to query status.",
-		}, nil
+		}
+		if description != "" {
+			response["description"] = description
+		}
+		return response, nil
 	}
 
 	// 同步执行
@@ -318,6 +327,10 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 		"execution_mode":  "native_subagent",
 	}
 
+	if description != "" {
+		response["description"] = description
+	}
+
 	if execution.Result != nil {
 		response["output"] = execution.Result
 	}
@@ -334,7 +347,7 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 }
 
 // executeWithSubagentManager 使用旧的 SubagentManager 执行（进程级别）
-func (t *TaskTool) executeWithSubagentManager(ctx context.Context, subagentType, prompt, model, resume string, timeoutMinutes, priority int, async bool, start time.Time) (any, error) {
+func (t *TaskTool) executeWithSubagentManager(ctx context.Context, subagentType, prompt, model, description, resume string, timeoutMinutes, priority int, async bool, start time.Time) (any, error) {
 	// 获取子代理管理器
 	subagentManager := GetGlobalSubagentManager()
 
@@ -395,6 +408,10 @@ func (t *TaskTool) executeWithSubagentManager(ctx context.Context, subagentType,
 		"pid":             subagent.PID,
 		"command":         subagent.Command,
 		"execution_mode":  "process_subagent",
+	}
+
+	if description != "" {
+		response["description"] = description
 	}
 
 	// 添加子代理配置信息

@@ -6,6 +6,15 @@ import (
 	"github.com/astercloud/aster/pkg/sandbox"
 )
 
+// MCPManagerInterface MCP 管理器接口
+// 用于工具访问 MCP 服务器和资源
+type MCPManagerInterface interface {
+	// ListServers 列出所有 MCP 服务器 ID
+	ListServers() []string
+	// GetServer 获取指定的 MCP 服务器
+	GetServer(serverID string) (any, bool)
+}
+
 // ToolContext 工具执行上下文
 type ToolContext struct {
 	AgentID    string
@@ -14,8 +23,9 @@ type ToolContext struct {
 	Reporter   Reporter
 	Emit       func(eventType string, data any) // Deprecated: use Reporter
 	Services   map[string]any
-	ThreadID   string // Working Memory 会话 ID
-	ResourceID string // Working Memory 资源 ID
+	ThreadID   string               // Working Memory 会话 ID
+	ResourceID string               // Working Memory 资源 ID
+	MCPManager MCPManagerInterface  // MCP 管理器，用于访问 MCP 资源
 }
 
 // Reporter 工具执行实时反馈接口
