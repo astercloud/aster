@@ -35,6 +35,20 @@ go run ./examples/permission/
 - 规则配置和持久化
 - 与 Agent 集成
 
+### Sandbox Permission (Claude Agent SDK 风格)
+
+沙箱与权限系统的深度集成示例。
+
+```bash
+go run ./examples/sandbox-permission/ -api-key $ANTHROPIC_API_KEY
+```
+
+- SandboxSettings 细粒度配置
+- CanUseTool 自定义权限回调
+- 网络隔离和 Unix Socket 控制
+- 会话级规则和违规记录
+- dangerouslyDisableSandbox 机制
+
 ### Recipe 配置系统
 
 声明式的 Agent 配置方式。
@@ -78,5 +92,6 @@ go run ./examples/desktop/
 
 - [SQLite 会话存储](/core-concepts/session-sqlite)
 - [Permission 系统](/security/permission)
+- [沙箱系统](/core-concepts/sandbox)
 - [Recipe 配置](/core-concepts/recipe)
 - [桌面应用部署](/deployment/desktop)

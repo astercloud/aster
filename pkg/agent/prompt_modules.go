@@ -452,7 +452,6 @@ func (m *ContextWindowModule) Build(ctx *PromptContext) (string, error) {
 }
 
 // ProfessionalObjectivityModule 专业客观性模块
-// 借鉴 Claude Code 的设计原则，强调技术准确性和真实性
 type ProfessionalObjectivityModule struct{}
 
 func (m *ProfessionalObjectivityModule) Name() string  { return "professional_objectivity" }

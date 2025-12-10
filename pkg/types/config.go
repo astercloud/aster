@@ -120,7 +120,7 @@ type ConversationCompressionConfig struct {
 	Enabled bool `json:"enabled"`
 
 	// TokenBudget 总 Token 预算
-	// 默认值: 200000 (类似 Claude Code)
+	// 默认值: 200000
 	TokenBudget int `json:"token_budget,omitempty"`
 
 	// Threshold 触发压缩的使用率阈值 (0.0-1.0)
@@ -199,6 +199,14 @@ type SandboxConfig struct {
 	AllowPaths      []string       `json:"allow_paths,omitempty"`
 	WatchFiles      bool           `json:"watch_files,omitempty"`
 	Extra           map[string]any `json:"extra,omitempty"` // 云平台特定配置
+
+	// === Claude Agent SDK 风格的安全配置 ===
+
+	// Settings 沙箱安全设置（可选，提供更细粒度的控制）
+	Settings *SandboxSettings `json:"settings,omitempty"`
+
+	// PermissionMode 沙箱权限模式
+	PermissionMode SandboxPermissionMode `json:"permission_mode,omitempty"`
 }
 
 // CloudCredentials 云平台凭证
@@ -259,6 +267,16 @@ type AgentConfig struct {
 	Context        *ContextManagerOptions `json:"context,omitempty"`
 	SkillsPackage  *SkillsPackageConfig   `json:"skills_package,omitempty"` // Skills 包配置
 	Metadata       map[string]any         `json:"metadata,omitempty"`
+
+	// === Claude Agent SDK 风格的权限控制 ===
+
+	// CanUseTool 自定义权限检查回调（不序列化）
+	// 应用层可以通过此回调完全控制工具权限
+	CanUseTool CanUseToolFunc `json:"-"`
+
+	// AllowDangerouslySkipPermissions 允许绕过权限检查
+	// 必须显式设置为 true 才能使用 PermissionMode: "bypassPermissions"
+	AllowDangerouslySkipPermissions bool `json:"allow_dangerously_skip_permissions,omitempty"`
 }
 
 // ResumeStrategy 恢复策略

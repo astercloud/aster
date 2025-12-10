@@ -82,5 +82,3 @@ func InitializeTaskExecutor(deps *Dependencies) *SubAgentManager {
 
 	return manager
 }
-
-

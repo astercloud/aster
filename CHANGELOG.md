@@ -1,5 +1,42 @@
 # Changelog
 
+## [v0.27.0] - 2025-12-10
+
+### Added
+
+- **Claude Agent SDK 风格沙箱系统**: 实现与 Claude Agent SDK 对齐的沙箱和权限系统
+  - `SandboxSettings`: 细粒度沙箱安全配置，支持 `AutoAllowBashIfSandboxed`、`ExcludedCommands`、`AllowUnsandboxedCommands`
+  - `NetworkSandboxSettings`: 网络隔离配置，支持主机白名单/黑名单、Unix Socket 控制、代理端口配置
+  - `SandboxIgnoreViolations`: 按模式忽略特定文件/网络违规
+  - `SandboxPermissionMode`: 四种权限模式 (default, acceptEdits, bypassPermissions, plan)
+
+- **CanUseTool 回调机制**: 自定义权限检查回调，允许应用层完全控制工具权限
+  - `CanUseToolFunc`: 权限检查函数类型
+  - `CanUseToolOptions`: 权限检查选项，包含沙箱状态和绕过请求信息
+  - `PermissionResult`: 权限检查结果，支持修改输入参数和动态权限更新
+
+- **EnhancedInspector 增强权限检查器**: 整合 CanUseTool 回调、沙箱配置和规则管理
+  - 会话级规则支持（临时规则，会话结束自动清除）
+  - 动态权限更新（运行时添加/移除规则）
+  - 违规记录和查询功能
+  - 与 Agent 深度集成
+
+- **dangerouslyDisableSandbox 机制**: 允许模型请求绕过沙箱，需要权限审批
+
+- **sandbox-permission 示例**: 完整演示新沙箱权限系统的使用
+
+### Changed
+
+- **LocalSandbox 增强**: 添加 `isExcludedCommand()`、`execDirect()`、`CheckNetworkAccess()`、`CheckUnixSocketAccess()`、`ShouldIgnoreViolation()`、`GetSettings()`、`IsEnabled()` 方法
+- **SandboxFactory 更新**: 支持传递 Settings 到 LocalSandbox
+- **Agent 集成**: 添加 `permissionInspector` 字段，在工具执行前进行权限检查
+
+### Documentation
+
+- 更新 `docs/content/02.core-concepts/5.sandbox.md` 沙箱系统文档
+- 更新 `docs/content/08.security/2.permission.md` 权限系统文档
+- 更新 `docs/content/12.examples/9.desktop/index.md` 桌面应用示例文档
+
 ## [v0.24.0] - 2025-12-09
 
 ### Added

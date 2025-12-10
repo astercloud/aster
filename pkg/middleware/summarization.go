@@ -183,7 +183,6 @@ func (m *SummarizationMiddleware) WrapModelCall(ctx context.Context, req *ModelR
 }
 
 // defaultSummarizer 默认的总结生成器
-// 生成 Claude Code 风格的结构化摘要
 func defaultSummarizer(ctx context.Context, messages []types.Message) (string, error) {
 	var summary strings.Builder
 

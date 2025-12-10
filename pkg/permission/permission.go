@@ -479,7 +479,8 @@ func (i *Inspector) RecordDecision(req *Request, decision Decision, note string)
 	}
 
 	// If "always" decision, create a rule
-	if decision == DecisionAllowAlways {
+	switch decision {
+	case DecisionAllowAlways:
 		i.AddRule(Rule{
 			Pattern:   req.ToolName,
 			Decision:  DecisionAllow,
@@ -487,7 +488,7 @@ func (i *Inspector) RecordDecision(req *Request, decision Decision, note string)
 			CreatedAt: time.Now(),
 			Note:      fmt.Sprintf("Auto-created from allow_always decision: %s", note),
 		})
-	} else if decision == DecisionDenyAlways {
+	case DecisionDenyAlways:
 		i.AddRule(Rule{
 			Pattern:   req.ToolName,
 			Decision:  DecisionDeny,

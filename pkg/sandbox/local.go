@@ -7,9 +7,11 @@ import (
 	"os/exec"
 	"path/filepath"
 	"regexp"
+	"strings"
 	"sync"
 	"time"
 
+	"github.com/astercloud/aster/pkg/types"
 	"github.com/fsnotify/fsnotify"
 )
 
@@ -39,6 +41,12 @@ type LocalSandbox struct {
 	fs              *LocalFS
 	watchers        map[string]*fileWatcher
 	watcherMu       sync.Mutex
+
+	// Claude Agent SDK 风格的安全配置
+	settings         *types.SandboxSettings
+	networkConfig    *types.NetworkSandboxSettings
+	ignoreViolations *types.SandboxIgnoreViolations
+	excludedCommands []string
 }
 
 // fileWatcher 文件监听器
@@ -55,6 +63,9 @@ type LocalSandboxConfig struct {
 	EnforceBoundary bool
 	AllowPaths      []string
 	WatchFiles      bool
+
+	// Claude Agent SDK 风格的安全配置
+	Settings *types.SandboxSettings
 }
 
 // NewLocalSandbox 创建本地沙箱
@@ -94,6 +105,14 @@ func NewLocalSandbox(config *LocalSandboxConfig) (*LocalSandbox, error) {
 		allowPaths:      allowPaths,
 		watchEnabled:    config.WatchFiles,
 		watchers:        make(map[string]*fileWatcher),
+		settings:        config.Settings,
+	}
+
+	// 应用 Claude Agent SDK 风格的安全配置
+	if config.Settings != nil {
+		ls.networkConfig = config.Settings.Network
+		ls.ignoreViolations = config.Settings.IgnoreViolations
+		ls.excludedCommands = config.Settings.ExcludedCommands
 	}
 
 	ls.fs = &LocalFS{
@@ -122,7 +141,12 @@ func (ls *LocalSandbox) FS() SandboxFS {
 
 // Exec 执行命令
 func (ls *LocalSandbox) Exec(ctx context.Context, cmd string, opts *ExecOptions) (*ExecResult, error) {
-	// 安全检查:阻止危险命令
+	// 1. 检查是否为排除命令（直接执行，不经过沙箱限制）
+	if ls.isExcludedCommand(cmd) {
+		return ls.execDirect(ctx, cmd, opts)
+	}
+
+	// 2. 安全检查:阻止危险命令
 	for _, pattern := range dangerousPatterns {
 		if pattern.MatchString(cmd) {
 			return &ExecResult{
@@ -313,4 +337,180 @@ func randomString(n int) string {
 		time.Sleep(time.Nanosecond)
 	}
 	return string(b)
+}
+
+// isExcludedCommand 检查命令是否在排除列表中
+func (ls *LocalSandbox) isExcludedCommand(cmd string) bool {
+	if len(ls.excludedCommands) == 0 {
+		return false
+	}
+
+	// 提取命令的第一个词（命令名）
+	cmdParts := strings.Fields(cmd)
+	if len(cmdParts) == 0 {
+		return false
+	}
+	cmdName := cmdParts[0]
+
+	for _, excluded := range ls.excludedCommands {
+		if cmdName == excluded {
+			return true
+		}
+		// 支持路径形式的命令
+		if strings.HasSuffix(cmdName, "/"+excluded) {
+			return true
+		}
+	}
+
+	return false
+}
+
+// execDirect 直接执行命令（不经过沙箱限制）
+func (ls *LocalSandbox) execDirect(ctx context.Context, cmd string, opts *ExecOptions) (*ExecResult, error) {
+	timeout := 120 * time.Second
+	if opts != nil && opts.Timeout > 0 {
+		timeout = opts.Timeout
+	}
+
+	execCtx, cancel := context.WithTimeout(ctx, timeout)
+	defer cancel()
+
+	command := exec.CommandContext(execCtx, "sh", "-c", cmd)
+
+	workDir := ls.workDir
+	if opts != nil && opts.WorkDir != "" {
+		workDir = ls.fs.Resolve(opts.WorkDir)
+	}
+	command.Dir = workDir
+
+	if opts != nil && len(opts.Env) > 0 {
+		env := os.Environ()
+		for k, v := range opts.Env {
+			env = append(env, fmt.Sprintf("%s=%s", k, v))
+		}
+		command.Env = env
+	}
+
+	output, err := command.CombinedOutput()
+	if err != nil {
+		if exitErr, ok := err.(*exec.ExitError); ok {
+			return &ExecResult{
+				Code:   exitErr.ExitCode(),
+				Stdout: string(output),
+				Stderr: string(output),
+			}, nil
+		}
+		return &ExecResult{
+			Code:   1,
+			Stdout: "",
+			Stderr: err.Error(),
+		}, nil
+	}
+
+	return &ExecResult{
+		Code:   0,
+		Stdout: string(output),
+		Stderr: "",
+	}, nil
+}
+
+// GetSettings 获取沙箱安全设置
+func (ls *LocalSandbox) GetSettings() *types.SandboxSettings {
+	return ls.settings
+}
+
+// IsEnabled 检查沙箱是否启用
+func (ls *LocalSandbox) IsEnabled() bool {
+	if ls.settings == nil {
+		return false
+	}
+	return ls.settings.Enabled
+}
+
+// ShouldIgnoreViolation 检查是否应忽略违规
+func (ls *LocalSandbox) ShouldIgnoreViolation(violationType, path string) bool {
+	if ls.ignoreViolations == nil {
+		return false
+	}
+
+	var patterns []string
+	switch violationType {
+	case "file":
+		patterns = ls.ignoreViolations.FilePatterns
+	case "network":
+		patterns = ls.ignoreViolations.NetworkPatterns
+	default:
+		return false
+	}
+
+	for _, pattern := range patterns {
+		if matched, _ := filepath.Match(pattern, path); matched {
+			return true
+		}
+		// 支持简单的通配符
+		if strings.Contains(pattern, "*") {
+			re := strings.ReplaceAll(pattern, "*", ".*")
+			if matched, _ := regexp.MatchString("^"+re+"$", path); matched {
+				return true
+			}
+		}
+	}
+
+	return false
+}
+
+// CheckNetworkAccess 检查网络访问权限
+func (ls *LocalSandbox) CheckNetworkAccess(host string, port int) bool {
+	if ls.networkConfig == nil {
+		return true // 默认允许
+	}
+
+	// 检查本地绑定
+	if port > 0 && (host == "localhost" || host == "127.0.0.1" || host == "0.0.0.0") {
+		if !ls.networkConfig.AllowLocalBinding {
+			return false
+		}
+	}
+
+	// 检查阻止列表
+	for _, blocked := range ls.networkConfig.BlockedHosts {
+		if host == blocked || strings.HasSuffix(host, "."+blocked) {
+			return false
+		}
+	}
+
+	// 检查允许列表（如果配置了）
+	if len(ls.networkConfig.AllowedHosts) > 0 {
+		allowed := false
+		for _, allowedHost := range ls.networkConfig.AllowedHosts {
+			if host == allowedHost || strings.HasSuffix(host, "."+allowedHost) {
+				allowed = true
+				break
+			}
+		}
+		if !allowed {
+			return false
+		}
+	}
+
+	return true
+}
+
+// CheckUnixSocketAccess 检查 Unix Socket 访问权限
+func (ls *LocalSandbox) CheckUnixSocketAccess(socketPath string) bool {
+	if ls.networkConfig == nil {
+		return true
+	}
+
+	if ls.networkConfig.AllowAllUnixSockets {
+		return true
+	}
+
+	for _, allowed := range ls.networkConfig.AllowUnixSockets {
+		if socketPath == allowed {
+			return true
+		}
+	}
+
+	return false
 }

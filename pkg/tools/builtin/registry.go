@@ -3,7 +3,7 @@ package builtin
 import "github.com/astercloud/aster/pkg/tools"
 
 // RegisterAll 注册所有内置工具 （重要：克制，未经严格的讨论禁止再增加）
-// 工具设计参考 Claude Code，保持精简（约17个工具）
+// 保持精简（约17个工具）
 func RegisterAll(registry *tools.Registry) {
 	// 文件操作工具 (5)
 	registry.Register("Read", NewReadTool)

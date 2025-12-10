@@ -34,6 +34,7 @@ func (f *Factory) Create(config *types.SandboxConfig) (Sandbox, error) {
 			EnforceBoundary: config.EnforceBoundary,
 			AllowPaths:      config.AllowPaths,
 			WatchFiles:      config.WatchFiles,
+			Settings:        config.Settings,
 		})
 
 	case types.SandboxKindDocker:

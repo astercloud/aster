@@ -13,6 +13,7 @@ import (
 	"github.com/astercloud/aster/pkg/events"
 	"github.com/astercloud/aster/pkg/logging"
 	"github.com/astercloud/aster/pkg/middleware"
+	"github.com/astercloud/aster/pkg/permission"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/router"
 	"github.com/astercloud/aster/pkg/sandbox"
@@ -59,7 +60,8 @@ type Agent struct {
 	createdAt    time.Time
 
 	// 权限管理
-	pendingPermissions map[string]chan string // callID -> decision channel
+	pendingPermissions  map[string]chan string        // callID -> decision channel
+	permissionInspector *permission.EnhancedInspector // Claude SDK 风格的权限检查器
 
 	// Plan 模式管理
 	planMode *PlanModeManager
@@ -355,6 +357,18 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 		stopCh:             make(chan struct{}),
 	}
 
+	// 初始化 EnhancedInspector (Claude SDK 风格的权限检查器)
+	permMode := permission.ModeSmartApprove
+	if sandboxConfig != nil && sandboxConfig.PermissionMode == types.SandboxPermissionBypass {
+		permMode = permission.ModeAutoApprove
+	}
+	agent.permissionInspector = permission.NewEnhancedInspector(&permission.EnhancedInspectorConfig{
+		Mode:          permMode,
+		SandboxConfig: sandboxConfig,
+		CanUseTool:    config.CanUseTool,
+	})
+	agentLog.Debug(ctx, "permission inspector created", map[string]any{"mode": permMode})
+
 	// 使用 PromptBuilder 构建 System Prompt（在初始化之前，因为 initialize 会保存信息）
 	if err := agent.buildSystemPrompt(ctx); err != nil {
 		return nil, fmt.Errorf("build system prompt: %w", err)
@@ -444,7 +458,7 @@ func (a *Agent) buildSystemPrompt(ctx context.Context) error {
 	// 添加能力说明模块（如果启用）
 	builder.AddModule(&CapabilitiesModule{})
 
-	// 添加专业客观性模块（Claude Code 设计原则）
+	// 添加专业客观性模块
 	builder.AddModule(&ProfessionalObjectivityModule{})
 
 	// 添加简洁性模块

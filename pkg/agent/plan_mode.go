@@ -11,20 +11,20 @@ import (
 
 // PlanModeState Plan 模式状态
 type PlanModeState struct {
-	Active        bool              // 是否处于 Plan 模式
-	PlanID        string            // 当前计划 ID
-	PlanFilePath  string            // 计划文件路径
-	AllowedTools  map[string]bool   // 允许的工具白名单
-	Reason        string            // 进入 Plan 模式的原因
-	Constraints   *PlanConstraints  // 约束配置
+	Active       bool             // 是否处于 Plan 模式
+	PlanID       string           // 当前计划 ID
+	PlanFilePath string           // 计划文件路径
+	AllowedTools map[string]bool  // 允许的工具白名单
+	Reason       string           // 进入 Plan 模式的原因
+	Constraints  *PlanConstraints // 约束配置
 }
 
 // PlanConstraints Plan 模式约束
 type PlanConstraints struct {
-	ReadOnly           bool     // 只读模式
-	AllowedWritePaths  []string // 允许写入的路径（仅计划文件）
-	DisabledTools      []string // 禁用的工具
-	RequireApproval    bool     // 退出时需要用户批准
+	ReadOnly          bool     // 只读模式
+	AllowedWritePaths []string // 允许写入的路径（仅计划文件）
+	DisabledTools     []string // 禁用的工具
+	RequireApproval   bool     // 退出时需要用户批准
 }
 
 // PlanModeManager Plan 模式管理器
@@ -203,7 +203,6 @@ type ToolCallDeniedError struct {
 func (e *ToolCallDeniedError) Error() string {
 	return fmt.Sprintf("Tool call denied: %s - %s", e.ToolName, e.Reason)
 }
-
 
 // Agent Plan Mode Methods
 

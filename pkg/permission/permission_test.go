@@ -118,8 +118,8 @@ func TestCheckSmartApprove(t *testing.T) {
 	ctx := context.Background()
 
 	tests := []struct {
-		name          string
-		call          *types.ToolCallSnapshot
+		name           string
+		call           *types.ToolCallSnapshot
 		expectApproval bool
 	}{
 		{
@@ -407,9 +407,9 @@ func TestDenyRule(t *testing.T) {
 
 	// Add a deny rule
 	inspector.AddRule(Rule{
-		Pattern:   "dangerous_tool",
-		Decision:  DecisionDeny,
-		Note:      "Tool is blocked",
+		Pattern:  "dangerous_tool",
+		Decision: DecisionDeny,
+		Note:     "Tool is blocked",
 	})
 
 	call := &types.ToolCallSnapshot{

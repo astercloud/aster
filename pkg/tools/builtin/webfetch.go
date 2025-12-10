@@ -15,7 +15,6 @@ import (
 )
 
 // WebFetchTool 网页获取工具
-// 对齐 Claude Code 的 WebFetch 工具设计
 type WebFetchTool struct {
 	defaultTimeout time.Duration
 	client         *http.Client

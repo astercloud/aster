@@ -317,6 +317,76 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 		}
 	}
 
+	//权限检查
+	if a.permissionInspector != nil {
+		call := &types.ToolCallSnapshot{
+			ID:        tu.ID,
+			Name:      tu.Name,
+			Arguments: tu.Input,
+		}
+		checkResult, err := a.permissionInspector.Check(ctx, call)
+		if err != nil {
+			errorMsg := fmt.Sprintf("Permission check error: %v", err)
+			a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
+				Call: types.ToolCallSnapshot{
+					ID:        tu.ID,
+					Name:      tu.Name,
+					State:     types.ToolCallStateFailed,
+					Arguments: tu.Input,
+				},
+				Error: errorMsg,
+			})
+			return &types.ToolResultBlock{
+				ToolUseID: tu.ID,
+				Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
+				IsError:   true,
+			}
+		}
+
+		if checkResult != nil {
+			// 应用输入修改
+			if checkResult.UpdatedInput != nil {
+				tu.Input = checkResult.UpdatedInput
+			}
+
+			if !checkResult.Allowed {
+				if checkResult.NeedsApproval {
+					// 发送权限请求事件到 Control Channel
+					a.eventBus.EmitControl(&types.ControlPermissionRequiredEvent{
+						Call: types.ToolCallSnapshot{
+							ID:        tu.ID,
+							Name:      tu.Name,
+							Arguments: tu.Input,
+						},
+					})
+					// 等待用户决策（简化处理：暂时拒绝）
+					errorMsg := fmt.Sprintf("Permission required for tool: %s (decided by: %s)", tu.Name, checkResult.DecidedBy)
+					return &types.ToolResultBlock{
+						ToolUseID: tu.ID,
+						Content:   fmt.Sprintf(`{"ok":false,"error":"%s","needs_approval":true}`, errorMsg),
+						IsError:   true,
+					}
+				}
+				// 直接拒绝
+				errorMsg := fmt.Sprintf("Permission denied: %s (decided by: %s)", checkResult.Message, checkResult.DecidedBy)
+				a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
+					Call: types.ToolCallSnapshot{
+						ID:        tu.ID,
+						Name:      tu.Name,
+						State:     types.ToolCallStateFailed,
+						Arguments: tu.Input,
+					},
+					Error: errorMsg,
+				})
+				return &types.ToolResultBlock{
+					ToolUseID: tu.ID,
+					Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
+					IsError:   true,
+				}
+			}
+		}
+	}
+
 	// 创建工具调用记录
 	record := tools.NewToolCallRecord(tu.ID, tu.Name, tu.Input).Build()
 	a.mu.Lock()

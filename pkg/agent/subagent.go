@@ -195,7 +195,6 @@ func (m *SubAgentManager) ListSpecs() []*types.SubAgentSpec {
 	return specs
 }
 
-
 // Execute 执行子 Agent 任务
 func (m *SubAgentManager) Execute(ctx context.Context, req *types.SubAgentRequest) (*types.SubAgentResult, error) {
 	// 获取规格
@@ -482,7 +481,6 @@ func (m *SubAgentManager) ListRunning() []*SubAgentHandle {
 	}
 	return handles
 }
-
 
 // buildAgentConfig 构建子 Agent 配置
 func (m *SubAgentManager) buildAgentConfig(spec *types.SubAgentSpec, req *types.SubAgentRequest, taskID string) *types.AgentConfig {

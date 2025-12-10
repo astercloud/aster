@@ -288,7 +288,6 @@ var BreakpointPostTool = BreakpointState{
 
 // ===== Message JSON 序列化 =====
 
-
 // contentBlockJSON 用于 JSON 序列化的内容块结构
 type contentBlockJSON struct {
 	Type      string         `json:"type"`
@@ -328,23 +327,23 @@ func (m Message) MarshalJSON() ([]byte, error) {
 			switch b := block.(type) {
 			case *TextBlock:
 				msg.ContentBlocks = append(msg.ContentBlocks, contentBlockJSON{
-Type: "text",
-Text: b.Text,
-})
+					Type: "text",
+					Text: b.Text,
+				})
 			case *ToolUseBlock:
 				msg.ContentBlocks = append(msg.ContentBlocks, contentBlockJSON{
-Type:  "tool_use",
-ID:    b.ID,
-Name:  b.Name,
-Input: b.Input,
-})
+					Type:  "tool_use",
+					ID:    b.ID,
+					Name:  b.Name,
+					Input: b.Input,
+				})
 			case *ToolResultBlock:
 				msg.ContentBlocks = append(msg.ContentBlocks, contentBlockJSON{
-Type:      "tool_result",
-ToolUseID: b.ToolUseID,
-Content:   b.Content,
-IsError:   b.IsError,
-})
+					Type:      "tool_result",
+					ToolUseID: b.ToolUseID,
+					Content:   b.Content,
+					IsError:   b.IsError,
+				})
 			}
 		}
 	}
