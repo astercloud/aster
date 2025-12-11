@@ -20,7 +20,7 @@ func TestService(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New failed: %v", err)
 	}
-	defer svc.Close()
+	defer func() { _ = svc.Close() }()
 
 	ctx := context.Background()
 
@@ -125,7 +125,7 @@ func TestService(t *testing.T) {
 	t.Run("List", func(t *testing.T) {
 		// Create multiple sessions
 		for i := 0; i < 3; i++ {
-			svc.Create(ctx, &session.CreateRequest{
+			_, _ = svc.Create(ctx, &session.CreateRequest{
 				AppName: "list-app",
 				UserID:  "list-user",
 				AgentID: "agent-1",
@@ -177,7 +177,7 @@ func TestEvents(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New failed: %v", err)
 	}
-	defer svc.Close()
+	defer func() { _ = svc.Close() }()
 
 	ctx := context.Background()
 
@@ -261,7 +261,7 @@ func TestState(t *testing.T) {
 	if err != nil {
 		t.Fatalf("New failed: %v", err)
 	}
-	defer svc.Close()
+	defer func() { _ = svc.Close() }()
 
 	ctx := context.Background()
 
@@ -301,7 +301,7 @@ func TestState(t *testing.T) {
 
 	// Test Has
 	t.Run("Has", func(t *testing.T) {
-		state.Set("exists", true)
+		_ = state.Set("exists", true)
 
 		if !state.Has("exists") {
 			t.Error("Has should return true for existing key")
@@ -313,7 +313,7 @@ func TestState(t *testing.T) {
 
 	// Test Delete
 	t.Run("Delete", func(t *testing.T) {
-		state.Set("to-delete", "value")
+		_ = state.Set("to-delete", "value")
 		err := state.Delete("to-delete")
 		if err != nil {
 			t.Fatalf("Delete failed: %v", err)
@@ -326,8 +326,8 @@ func TestState(t *testing.T) {
 
 	// Test All
 	t.Run("All", func(t *testing.T) {
-		state.Set("all-1", "v1")
-		state.Set("all-2", "v2")
+		_ = state.Set("all-1", "v1")
+		_ = state.Set("all-2", "v2")
 
 		count := 0
 		for range state.All() {
@@ -369,7 +369,7 @@ func TestDatabasePersistence(t *testing.T) {
 	})
 	sessionID := sess.ID()
 
-	svc1.AppendEvent(ctx, sessionID, &session.Event{
+	_ = svc1.AppendEvent(ctx, sessionID, &session.Event{
 		InvocationID: "inv-1",
 		Author:       "user",
 		Content: types.Message{
@@ -377,11 +377,11 @@ func TestDatabasePersistence(t *testing.T) {
 			Content: "Persisted message",
 		},
 	})
-	svc1.Close()
+	_ = svc1.Close()
 
 	// Reopen and verify
 	svc2, _ := New(dbPath)
-	defer svc2.Close()
+	defer func() { _ = svc2.Close() }()
 
 	sess2, err := svc2.Get(ctx, &session.GetRequest{
 		AppName:   "persist-app",
@@ -407,7 +407,7 @@ func TestEventFiltering(t *testing.T) {
 	ctx := context.Background()
 
 	svc, _ := New(dbPath)
-	defer svc.Close()
+	defer func() { _ = svc.Close() }()
 
 	sess, _ := svc.Create(ctx, &session.CreateRequest{
 		AppName: "test-app",
@@ -416,13 +416,13 @@ func TestEventFiltering(t *testing.T) {
 	})
 
 	// Add events with different properties
-	svc.AppendEvent(ctx, sess.ID(), &session.Event{
+	_ = svc.AppendEvent(ctx, sess.ID(), &session.Event{
 		AgentID: "agent-1",
 		Author:  "user",
 		Content: types.Message{Role: types.RoleUser, Content: "msg1"},
 	})
 	time.Sleep(10 * time.Millisecond)
-	svc.AppendEvent(ctx, sess.ID(), &session.Event{
+	_ = svc.AppendEvent(ctx, sess.ID(), &session.Event{
 		AgentID: "agent-2",
 		Author:  "assistant",
 		Content: types.Message{Role: types.RoleAssistant, Content: "msg2"},
@@ -470,13 +470,13 @@ func TestDatabaseFileCreation(t *testing.T) {
 	}
 
 	// Create parent directory
-	os.MkdirAll(filepath.Dir(dbPath), 0755)
+	_ = os.MkdirAll(filepath.Dir(dbPath), 0755)
 
 	svc, err := New(dbPath)
 	if err != nil {
 		t.Fatalf("New should succeed after creating parent dir: %v", err)
 	}
-	svc.Close()
+	_ = svc.Close()
 
 	// Verify file exists
 	if _, err := os.Stat(dbPath); os.IsNotExist(err) {

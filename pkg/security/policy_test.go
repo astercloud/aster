@@ -77,7 +77,7 @@ func TestBasicPolicyEngine_UpdatePolicy(t *testing.T) {
 		Name:    "Original Name",
 		Enabled: true,
 	}
-	engine.AddPolicy(policy)
+	_ = engine.AddPolicy(policy)
 
 	// 更新策略
 	policy.Name = "Updated Name"
@@ -101,7 +101,7 @@ func TestBasicPolicyEngine_DeletePolicy(t *testing.T) {
 		Name:    "Test Policy",
 		Enabled: true,
 	}
-	engine.AddPolicy(policy)
+	_ = engine.AddPolicy(policy)
 
 	// 删除策略
 	err := engine.DeletePolicy("policy1")
@@ -135,7 +135,7 @@ func TestBasicPolicyEngine_ListPolicies(t *testing.T) {
 			Name:    fmt.Sprintf("Policy %d", i),
 			Enabled: true,
 		}
-		engine.AddPolicy(policy)
+		_ = engine.AddPolicy(policy)
 	}
 
 	// 列出所有策略
@@ -163,7 +163,7 @@ func TestBasicPolicyEngine_Evaluate_Allow(t *testing.T) {
 		Resources: []string{"document"},
 		Allow:     []string{"read"},
 	}
-	engine.AddPolicy(policy)
+	_ = engine.AddPolicy(policy)
 
 	request := &PolicyRequest{
 		RequestID: "req1",
@@ -203,7 +203,7 @@ func TestBasicPolicyEngine_Evaluate_Deny(t *testing.T) {
 		Resources: []string{"secret"},
 		Deny:      []string{"read"},
 	}
-	engine.AddPolicy(policy)
+	_ = engine.AddPolicy(policy)
 
 	request := &PolicyRequest{
 		RequestID: "req1",
@@ -267,7 +267,7 @@ func TestBasicPolicyEngine_Evaluate_DisabledPolicy(t *testing.T) {
 		Resources: []string{"document"},
 		Allow:     []string{"read"},
 	}
-	engine.AddPolicy(policy)
+	_ = engine.AddPolicy(policy)
 
 	request := &PolicyRequest{
 		RequestID: "req1",
@@ -321,8 +321,8 @@ func TestBasicPolicyEngine_Evaluate_PriorityOrder(t *testing.T) {
 		Deny:      []string{"read"},
 	}
 
-	engine.AddPolicy(lowPriorityPolicy)
-	engine.AddPolicy(highPriorityPolicy)
+	_ = engine.AddPolicy(lowPriorityPolicy)
+	_ = engine.AddPolicy(highPriorityPolicy)
 
 	request := &PolicyRequest{
 		RequestID: "req1",

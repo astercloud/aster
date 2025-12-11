@@ -244,7 +244,6 @@ func SetGlobalTaskExecutorFactory(factory SubAgentExecutorFactory) {
 	GetGlobalTaskExecutor().SetExecutorFactory(factory)
 }
 
-
 // SetFactoryFromAgent agent 包调用此函数注入工厂
 // 这是 agent.InitializeTaskExecutor 使用的入口点
 func SetFactoryFromAgent(factory SubAgentExecutorFactory) {

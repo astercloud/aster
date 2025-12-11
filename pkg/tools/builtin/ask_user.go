@@ -27,8 +27,6 @@ var (
 	globalAskUserRequestsMu sync.RWMutex
 )
 
-
-
 // RespondToAskUser 响应 AskUser 请求（供外部调用）
 func RespondToAskUser(requestID string, answers map[string]any) error {
 	globalAskUserRequestsMu.RLock()

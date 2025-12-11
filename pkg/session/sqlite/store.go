@@ -40,7 +40,7 @@ func New(dbPath string) (*Service, error) {
 	s := &Service{db: db}
 
 	if err := s.migrate(); err != nil {
-		db.Close()
+		_ = db.Close() // Ignore close error, migration error is more important
 		return nil, fmt.Errorf("migrate database: %w", err)
 	}
 
@@ -244,7 +244,7 @@ func (s *Service) List(ctx context.Context, req *session.ListRequest) ([]*sessio
 	if err != nil {
 		return nil, fmt.Errorf("query sessions: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var results []*session.Session
 	for rows.Next() {
@@ -376,7 +376,7 @@ func (s *Service) GetEvents(ctx context.Context, sessionID string, filter *sessi
 	if err != nil {
 		return nil, fmt.Errorf("query events: %w", err)
 	}
-	defer rows.Close()
+	defer func() { _ = rows.Close() }()
 
 	var events []session.Event
 	for rows.Next() {
@@ -429,7 +429,7 @@ func (s *Service) UpdateState(ctx context.Context, sessionID string, delta map[s
 	if err != nil {
 		return fmt.Errorf("begin transaction: %w", err)
 	}
-	defer tx.Rollback()
+	defer func() { _ = tx.Rollback() }() // Will be a no-op if tx.Commit() succeeds
 
 	now := time.Now()
 	for key, value := range delta {
@@ -458,34 +458,6 @@ func (s *Service) UpdateState(ctx context.Context, sessionID string, delta map[s
 	return tx.Commit()
 }
 
-// getState retrieves all state for a session.
-func (s *Service) getState(ctx context.Context, sessionID string) (map[string]any, error) {
-	rows, err := s.db.QueryContext(ctx,
-		`SELECT key, value FROM session_state WHERE session_id = ?`,
-		sessionID,
-	)
-	if err != nil {
-		return nil, err
-	}
-	defer rows.Close()
-
-	state := make(map[string]any)
-	for rows.Next() {
-		var key, valueJSON string
-		if err := rows.Scan(&key, &valueJSON); err != nil {
-			return nil, err
-		}
-
-		var value any
-		if err := json.Unmarshal([]byte(valueJSON), &value); err != nil {
-			return nil, err
-		}
-		state[key] = value
-	}
-
-	return state, rows.Err()
-}
-
 // sqliteSession implements session.Session
 type sqliteSession struct {
 	service        *Service
@@ -497,12 +469,12 @@ type sqliteSession struct {
 	lastUpdateTime time.Time
 }
 
-func (s *sqliteSession) ID() string                  { return s.id }
-func (s *sqliteSession) AppName() string             { return s.appName }
-func (s *sqliteSession) UserID() string              { return s.userID }
-func (s *sqliteSession) AgentID() string             { return s.agentID }
-func (s *sqliteSession) LastUpdateTime() time.Time  { return s.lastUpdateTime }
-func (s *sqliteSession) Metadata() map[string]any   { return s.metadata }
+func (s *sqliteSession) ID() string                { return s.id }
+func (s *sqliteSession) AppName() string           { return s.appName }
+func (s *sqliteSession) UserID() string            { return s.userID }
+func (s *sqliteSession) AgentID() string           { return s.agentID }
+func (s *sqliteSession) LastUpdateTime() time.Time { return s.lastUpdateTime }
+func (s *sqliteSession) Metadata() map[string]any  { return s.metadata }
 
 func (s *sqliteSession) State() session.State {
 	return &sqliteState{service: s.service, sessionID: s.id}
@@ -584,7 +556,7 @@ func (s *sqliteState) All() iter.Seq2[string, any] {
 		if err != nil {
 			return
 		}
-		defer rows.Close()
+		defer func() { _ = rows.Close() }()
 
 		for rows.Next() {
 			var key, valueJSON string
@@ -609,10 +581,10 @@ func (s *sqliteState) Has(key string) bool {
 	defer s.service.mu.RUnlock()
 
 	var exists bool
-	s.service.db.QueryRow(
+	_ = s.service.db.QueryRow(
 		`SELECT 1 FROM session_state WHERE session_id = ? AND key = ?`,
 		s.sessionID, key,
-	).Scan(&exists)
+	).Scan(&exists) // Ignore error, returns false on error
 	return exists
 }
 
@@ -642,10 +614,10 @@ func (e *sqliteEvents) Len() int {
 	defer e.service.mu.RUnlock()
 
 	var count int
-	e.service.db.QueryRow(
+	_ = e.service.db.QueryRow(
 		`SELECT COUNT(*) FROM events WHERE session_id = ?`,
 		e.sessionID,
-	).Scan(&count)
+	).Scan(&count) // Ignore error, returns 0 on error
 	return count
 }
 
@@ -697,10 +669,10 @@ func (e *sqliteEvents) Last() *session.Event {
 	}
 
 	evt.Timestamp = createdAt
-	json.Unmarshal([]byte(contentJSON), &evt.Content)
-	json.Unmarshal([]byte(actionsJSON), &evt.Actions)
-	json.Unmarshal([]byte(toolIDsJSON), &evt.LongRunningToolIDs)
-	json.Unmarshal([]byte(metadataJSON), &evt.Metadata)
+	_ = json.Unmarshal([]byte(contentJSON), &evt.Content)
+	_ = json.Unmarshal([]byte(actionsJSON), &evt.Actions)
+	_ = json.Unmarshal([]byte(toolIDsJSON), &evt.LongRunningToolIDs)
+	_ = json.Unmarshal([]byte(metadataJSON), &evt.Metadata)
 
 	return &evt
 }

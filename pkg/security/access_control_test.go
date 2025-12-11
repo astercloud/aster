@@ -214,7 +214,7 @@ func TestAccessController_AssignRole(t *testing.T) {
 		Username: "testuser",
 		Status:   UserStatusActive,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 创建角色
 	role := &Role{
@@ -246,7 +246,7 @@ func TestAccessController_RevokeRole(t *testing.T) {
 		Username: "testuser",
 		Status:   UserStatusActive,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 创建并分配角色
 	role := &Role{
@@ -254,7 +254,7 @@ func TestAccessController_RevokeRole(t *testing.T) {
 		Name: "Admin",
 	}
 	ac.roles = map[string]*Role{"role1": role}
-	ac.AssignRole("user1", "role1")
+	_ = ac.AssignRole("user1", "role1")
 
 	// 撤销角色
 	err := ac.RevokeRole("user1", "role1")
@@ -279,7 +279,7 @@ func TestAccessController_CheckPermission(t *testing.T) {
 		Status:   UserStatusActive,
 		Enabled:  true,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 创建权限
 	perm := &Permission{
@@ -300,7 +300,7 @@ func TestAccessController_CheckPermission(t *testing.T) {
 	ac.rolePermissions = map[string][]string{"role1": {"perm1"}}
 
 	// 分配角色给用户
-	ac.AssignRole("user1", "role1")
+	_ = ac.AssignRole("user1", "role1")
 
 	// 检查权限
 	decision, err := ac.CheckPermission("user1", "document", "read", nil)
@@ -322,7 +322,7 @@ func TestAccessController_CheckPermission_Denied(t *testing.T) {
 		Username: "testuser",
 		Status:   UserStatusActive,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 检查权限
 	decision, err := ac.CheckPermission("user1", "document", "delete", nil)
@@ -344,7 +344,7 @@ func TestAccessController_DeleteUser(t *testing.T) {
 		Username: "testuser",
 		Status:   UserStatusActive,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 删除用户
 	err := ac.DeleteUser("user1")
@@ -369,7 +369,7 @@ func TestAccessController_UpdateUser(t *testing.T) {
 		Email:    "old@example.com",
 		Status:   UserStatusActive,
 	}
-	ac.CreateUser(user)
+	_ = ac.CreateUser(user)
 
 	// 更新用户
 	user.Email = "new@example.com"
@@ -397,7 +397,7 @@ func TestAccessController_ConcurrentAccess(t *testing.T) {
 				Username: fmt.Sprintf("testuser%d", id),
 				Status:   UserStatusActive,
 			}
-			ac.CreateUser(user)
+			_ = ac.CreateUser(user)
 			done <- true
 		}(i)
 	}

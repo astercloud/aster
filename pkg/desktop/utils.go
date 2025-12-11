@@ -10,7 +10,9 @@ import (
 // generateID generates a unique ID
 func generateID() string {
 	b := make([]byte, 16)
-	rand.Read(b)
+	if _, err := rand.Read(b); err != nil {
+		panic(err) // Crypto RNG failure is unrecoverable
+	}
 	return hex.EncodeToString(b)
 }
 
@@ -27,7 +29,7 @@ func mustMarshal(v any) json.RawMessage {
 func writeJSON(w http.ResponseWriter, status int, v any) {
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(status)
-	json.NewEncoder(w).Encode(v)
+	_ = json.NewEncoder(w).Encode(v) // Ignore write errors after status sent
 }
 
 // corsMiddleware adds CORS headers

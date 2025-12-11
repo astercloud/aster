@@ -270,10 +270,10 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 		handle, err := executor.ExecuteAsync(ctx, subagentType, prompt, opts)
 		if err != nil {
 			return map[string]any{
-				"ok":            false,
-				"error":         fmt.Sprintf("failed to start subagent: %v", err),
-				"subagent_type": subagentType,
-				"duration_ms":   time.Since(start).Milliseconds(),
+				"ok":             false,
+				"error":          fmt.Sprintf("failed to start subagent: %v", err),
+				"subagent_type":  subagentType,
+				"duration_ms":    time.Since(start).Milliseconds(),
 				"execution_mode": "native_subagent",
 			}, nil
 		}
@@ -304,10 +304,10 @@ func (t *TaskTool) executeWithTaskExecutor(ctx context.Context, executor *TaskEx
 	execution, err := executor.Execute(ctx, subagentType, prompt, opts)
 	if err != nil {
 		return map[string]any{
-			"ok":            false,
-			"error":         fmt.Sprintf("failed to execute subagent: %v", err),
-			"subagent_type": subagentType,
-			"duration_ms":   time.Since(start).Milliseconds(),
+			"ok":             false,
+			"error":          fmt.Sprintf("failed to execute subagent: %v", err),
+			"subagent_type":  subagentType,
+			"duration_ms":    time.Since(start).Milliseconds(),
 			"execution_mode": "native_subagent",
 		}, nil
 	}
@@ -379,10 +379,10 @@ func (t *TaskTool) executeWithSubagentManager(ctx context.Context, subagentType,
 
 	if err != nil {
 		return map[string]any{
-			"ok":            false,
-			"error":         fmt.Sprintf("failed to start/resume subagent: %v", err),
-			"subagent_type": subagentType,
-			"duration_ms":   duration.Milliseconds(),
+			"ok":             false,
+			"error":          fmt.Sprintf("failed to start/resume subagent: %v", err),
+			"subagent_type":  subagentType,
+			"duration_ms":    duration.Milliseconds(),
 			"execution_mode": "process_subagent",
 			"recommendations": []string{
 				"检查子代理类型是否正确",

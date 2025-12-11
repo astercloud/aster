@@ -105,7 +105,7 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]any, tc
 		// 如果提供了路径，需要处理路径格式
 		// AI 可能传入 ".plans/xxx.md" 或 "xxx.md" 或完整路径
 		// planManager 的 basePath 已经是 {workDir}/.plans/，所以需要去掉前缀
-		
+
 		// 提取文件名（去掉所有目录前缀）
 		fileName := planFilePath
 		if idx := strings.LastIndex(planFilePath, "/"); idx >= 0 {

@@ -95,7 +95,7 @@ func demonstrateEnsureDir() {
 		fmt.Printf("  ❌ 创建临时目录失败: %v\n", err)
 		return
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// 测试目录
 	testPath := filepath.Join(tmpDir, "nested", "deep", "directory")

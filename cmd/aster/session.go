@@ -82,7 +82,7 @@ func runSession(args []string) error {
 	if err != nil {
 		return fmt.Errorf("create session store: %w", err)
 	}
-	defer sessionStore.Close()
+	defer func() { _ = sessionStore.Close() }() // Best effort cleanup
 
 	// Create data store
 	storeDir := filepath.Join(config.DataDir(), "store")
@@ -145,7 +145,7 @@ func runSession(args []string) error {
 	if err != nil {
 		return fmt.Errorf("create agent: %w", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }() // Best effort cleanup
 
 	// Create session record
 	sess, err := sessionStore.Create(ctx, &session.CreateRequest{
@@ -353,7 +353,7 @@ func runREPL(ctx context.Context, ag *agent.Agent, sessionStore session.Service,
 		}
 
 		// Record user message to session
-		sessionStore.AppendEvent(ctx, sessionID, &session.Event{
+		_ = sessionStore.AppendEvent(ctx, sessionID, &session.Event{
 			Author: "user",
 			Content: types.Message{
 				Role:    types.RoleUser,

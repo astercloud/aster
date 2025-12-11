@@ -538,7 +538,7 @@ func (i *Inspector) saveRules() {
 		return
 	}
 
-	os.WriteFile(i.persistPath, data, 0644)
+	_ = os.WriteFile(i.persistPath, data, 0644) // Best effort persistence
 }
 
 // DefaultInspector is a global default inspector

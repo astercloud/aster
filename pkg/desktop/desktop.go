@@ -194,12 +194,11 @@ type ConfigPayload struct {
 
 // App represents a desktop application instance
 type App struct {
-	bridge     Bridge
-	agents     map[string]*agent.Agent
-	agentsMu   sync.RWMutex
-	handler    MessageHandler
-	inspector  *permission.Inspector
-	config     *AppConfig
+	bridge    Bridge
+	agents    map[string]*agent.Agent
+	agentsMu  sync.RWMutex
+	inspector *permission.Inspector
+	config    *AppConfig
 }
 
 // AppConfig is the application configuration
@@ -281,7 +280,7 @@ func (a *App) Stop(ctx context.Context) error {
 	// Close all agents
 	a.agentsMu.Lock()
 	for _, ag := range a.agents {
-		ag.Close()
+		_ = ag.Close() // Best effort cleanup
 	}
 	a.agents = make(map[string]*agent.Agent)
 	a.agentsMu.Unlock()
@@ -372,7 +371,7 @@ func (a *App) handleChat(msg *FrontendMessage) (*BackendResponse, error) {
 		ctx := context.Background()
 		err := ag.Send(ctx, payload.Message)
 		if err != nil {
-			a.bridge.SendEvent(&FrontendEvent{
+			_ = a.bridge.SendEvent(&FrontendEvent{
 				Type:    EventTypeError,
 				AgentID: msg.AgentID,
 				Data:    map[string]string{"error": err.Error()},
@@ -399,7 +398,7 @@ func (a *App) handleCancel(msg *FrontendMessage) (*BackendResponse, error) {
 	}
 
 	// Close the agent to cancel operations
-	ag.Close()
+	_ = ag.Close() // Best effort cleanup
 
 	return &BackendResponse{
 		ID:      msg.ID,
@@ -594,7 +593,7 @@ func (a *App) forwardAgentEvents(ag *agent.Agent, agentID string) {
 		}
 
 		if event != nil {
-			a.bridge.SendEvent(event)
+			_ = a.bridge.SendEvent(event) // Ignore send errors in event handler
 		}
 	}
 }

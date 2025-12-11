@@ -38,16 +38,16 @@ import (
 //	    body: JSON.stringify({ agent_id: 'xxx', message: 'hello' })
 //	});
 type TauriBridge struct {
-	app       *App
-	handler   MessageHandler
-	agents    map[string]*agent.Agent
-	agentsMu  sync.RWMutex
-	server    *http.Server
-	port      int
+	app        *App
+	handler    MessageHandler
+	agents     map[string]*agent.Agent
+	agentsMu   sync.RWMutex
+	server     *http.Server
+	port       int
 	sseClients map[string]chan *FrontendEvent
-	sseMu     sync.RWMutex
-	ctx       context.Context
-	cancel    context.CancelFunc
+	sseMu      sync.RWMutex
+	ctx        context.Context
+	cancel     context.CancelFunc
 }
 
 // NewTauriBridge creates a new Tauri bridge
@@ -89,7 +89,7 @@ func (b *TauriBridge) Start(ctx context.Context) error {
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		w.Write([]byte("ok"))
+		_, _ = w.Write([]byte("ok")) // Ignore write errors after status sent
 	})
 
 	// CORS middleware
@@ -106,7 +106,7 @@ func (b *TauriBridge) Start(ctx context.Context) error {
 		if err != nil {
 			return
 		}
-		b.server.Serve(ln)
+		_ = b.server.Serve(ln) // Server error logged by http.Server
 	}()
 
 	return nil

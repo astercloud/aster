@@ -25,7 +25,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建临时目录失败: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	dbPath := filepath.Join(tmpDir, "sessions.db")
 	fmt.Printf("\n📁 数据库路径: %s\n", dbPath)
@@ -36,7 +36,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建 SQLite 服务失败: %v", err)
 	}
-	defer service.Close()
+	defer func() { _ = service.Close() }()
 
 	// 3. 创建会话
 	fmt.Println("\n✓ 创建会话...")
