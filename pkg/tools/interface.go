@@ -23,9 +23,9 @@ type ToolContext struct {
 	Reporter   Reporter
 	Emit       func(eventType string, data any) // Deprecated: use Reporter
 	Services   map[string]any
-	ThreadID   string               // Working Memory 会话 ID
-	ResourceID string               // Working Memory 资源 ID
-	MCPManager MCPManagerInterface  // MCP 管理器，用于访问 MCP 资源
+	ThreadID   string              // Working Memory 会话 ID
+	ResourceID string              // Working Memory 资源 ID
+	MCPManager MCPManagerInterface // MCP 管理器，用于访问 MCP 资源
 }
 
 // Reporter 工具执行实时反馈接口

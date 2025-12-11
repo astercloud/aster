@@ -212,7 +212,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("Failed to create agent: %v", err)
 	}
-	defer ag.Close()
+	defer func() { _ = ag.Close() }()
 
 	// === 6. Demo: Test Permission System ===
 	fmt.Println("\n" + strings.Repeat("=", 60))

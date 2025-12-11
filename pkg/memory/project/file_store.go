@@ -30,7 +30,7 @@ func (s *FileStore) getFilePath(projectID string) string {
 // Load 加载项目记忆
 func (s *FileStore) Load(ctx context.Context, projectID string) (*ProjectMemory, error) {
 	filePath := s.getFilePath(projectID)
-	
+
 	content, err := os.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -46,7 +46,7 @@ func (s *FileStore) Load(ctx context.Context, projectID string) (*ProjectMemory,
 // Save 保存项目记忆
 func (s *FileStore) Save(ctx context.Context, memory *ProjectMemory) error {
 	filePath := s.getFilePath(memory.ProjectID)
-	
+
 	// 确保目录存在
 	dir := filepath.Dir(filePath)
 	if err := os.MkdirAll(dir, 0755); err != nil {
@@ -55,7 +55,7 @@ func (s *FileStore) Save(ctx context.Context, memory *ProjectMemory) error {
 
 	// 生成 Markdown 内容
 	content := s.generateMarkdown(memory)
-	
+
 	// 写入文件
 	if err := os.WriteFile(filePath, []byte(content), 0644); err != nil {
 		return fmt.Errorf("write file failed: %w", err)
@@ -180,14 +180,14 @@ func (s *FileStore) GetVersionHistory(ctx context.Context, projectID string, lim
 // parseMarkdown 解析 Markdown 内容为 ProjectMemory
 func (s *FileStore) parseMarkdown(projectID, content string) (*ProjectMemory, error) {
 	memory := NewProjectMemory(projectID, "", "")
-	
+
 	lines := strings.Split(content, "\n")
 	var currentSection MemorySection
 	var inSection bool
 
 	for _, line := range lines {
 		line = strings.TrimSpace(line)
-		
+
 		// 检测章节标题
 		if strings.HasPrefix(line, "## 用户偏好") {
 			currentSection = SectionPreferences
@@ -224,7 +224,7 @@ func (s *FileStore) parseMarkdown(projectID, content string) (*ProjectMemory, er
 					Source:    "file",
 					CreatedAt: time.Now(),
 				}
-				
+
 				// 尝试提取分类（格式: [category] content）
 				if strings.HasPrefix(entryContent, "[") {
 					if idx := strings.Index(entryContent, "]"); idx > 0 {
@@ -232,7 +232,7 @@ func (s *FileStore) parseMarkdown(projectID, content string) (*ProjectMemory, er
 						entry.Content = strings.TrimSpace(entryContent[idx+1:])
 					}
 				}
-				
+
 				memory.AddEntry(currentSection, entry)
 			}
 		}

@@ -84,7 +84,7 @@ func TestWebBridgeHealthCheck(t *testing.T) {
 	// Create a handler that includes health check
 	mux := http.NewServeMux()
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"status":    "ok",
 			"framework": bridge.Framework(),
 		})
@@ -199,7 +199,7 @@ func TestMustMarshal(t *testing.T) {
 
 func TestCorsMiddleware(t *testing.T) {
 	handler := corsMiddleware(http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		w.Write([]byte("ok"))
+		_, _ = w.Write([]byte("ok"))
 	}))
 
 	// Test normal request

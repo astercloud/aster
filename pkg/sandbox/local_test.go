@@ -15,7 +15,7 @@ func TestLocalSandbox_Basic(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -23,7 +23,7 @@ func TestLocalSandbox_Basic(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	if sb.Kind() != "local" {
 		t.Errorf("expected kind='local', got '%s'", sb.Kind())
@@ -39,7 +39,7 @@ func TestLocalSandbox_Exec(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -47,7 +47,7 @@ func TestLocalSandbox_Exec(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	ctx := context.Background()
 
@@ -69,7 +69,7 @@ func TestLocalSandbox_DangerousCommand(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -77,7 +77,7 @@ func TestLocalSandbox_DangerousCommand(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	ctx := context.Background()
 
@@ -99,7 +99,7 @@ func TestLocalSandbox_ExcludedCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -111,7 +111,7 @@ func TestLocalSandbox_ExcludedCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	// Test excluded command detection
 	if !sb.isExcludedCommand("git status") {
@@ -130,7 +130,7 @@ func TestLocalSandbox_NetworkAccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -146,7 +146,7 @@ func TestLocalSandbox_NetworkAccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	// Test network access checks
 	if sb.CheckNetworkAccess("localhost", 8080) {
@@ -168,7 +168,7 @@ func TestLocalSandbox_UnixSocketAccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -182,7 +182,7 @@ func TestLocalSandbox_UnixSocketAccess(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	if !sb.CheckUnixSocketAccess("/var/run/docker.sock") {
 		t.Error("expected docker socket to be allowed")
@@ -197,7 +197,7 @@ func TestLocalSandbox_IgnoreViolations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -212,7 +212,7 @@ func TestLocalSandbox_IgnoreViolations(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	// Test file violation ignoring
 	if !sb.ShouldIgnoreViolation("file", "/tmp/test.txt") {
@@ -231,7 +231,7 @@ func TestLocalSandbox_Timeout(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -239,7 +239,7 @@ func TestLocalSandbox_Timeout(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	ctx := context.Background()
 
@@ -261,7 +261,7 @@ func TestLocalSandbox_FS(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir:         tmpDir,
@@ -270,7 +270,7 @@ func TestLocalSandbox_FS(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	fs := sb.FS()
 
@@ -310,7 +310,7 @@ func TestLocalSandbox_GetSettings(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	settings := &types.SandboxSettings{
 		Enabled:                  true,
@@ -325,7 +325,7 @@ func TestLocalSandbox_GetSettings(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create sandbox: %v", err)
 	}
-	defer sb.Dispose()
+	defer func() { _ = sb.Dispose() }()
 
 	if !sb.IsEnabled() {
 		t.Error("expected sandbox to be enabled")
@@ -340,13 +340,12 @@ func TestLocalSandbox_GetSettings(t *testing.T) {
 	}
 }
 
-
 func TestLocalSandbox_SecurityLevels(t *testing.T) {
 	tmpDir, err := os.MkdirTemp("", "sandbox-test-*")
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	tests := []struct {
 		name          string
@@ -401,7 +400,7 @@ func TestLocalSandbox_EnhancedDangerousPatterns(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -447,7 +446,7 @@ func TestLocalSandbox_AuditLog(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir:         tmpDir,
@@ -486,7 +485,7 @@ func TestLocalSandbox_CommandStats(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -515,7 +514,7 @@ func TestLocalSandbox_BlockedCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir:         tmpDir,
@@ -558,7 +557,7 @@ func TestLocalSandbox_DynamicBlockedCommands(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir: tmpDir,
@@ -606,7 +605,7 @@ func TestLocalSandbox_SetSecurityLevel(t *testing.T) {
 	if err != nil {
 		t.Fatalf("failed to create temp dir: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	sb, err := NewLocalSandbox(&LocalSandboxConfig{
 		WorkDir:       tmpDir,

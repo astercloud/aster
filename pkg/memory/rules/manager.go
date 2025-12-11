@@ -176,7 +176,7 @@ func (m *Manager) loadRulesFromFile(filePath string, scope Scope) ([]*Rule, erro
 // parseMarkdownRules 解析 Markdown 格式的规则
 func (m *Manager) parseMarkdownRules(content, sourcePath string, scope Scope) ([]*Rule, error) {
 	var rules []*Rule
-	
+
 	// 整个文件作为一条规则
 	title := extractTitle(content)
 	if title == "" {

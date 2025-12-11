@@ -239,7 +239,7 @@ func (m *SubAgentManager) Execute(ctx context.Context, req *types.SubAgentReques
 			Duration:  time.Since(startTime),
 		}, nil
 	}
-	defer agent.Close()
+	defer func() { _ = agent.Close() }() // Best effort cleanup
 
 	// 注册运行中的子 Agent
 	handle := &SubAgentHandle{
@@ -377,7 +377,7 @@ func (m *SubAgentManager) ExecuteAsync(ctx context.Context, req *types.SubAgentR
 			}
 			return
 		}
-		defer agent.Close()
+		defer func() { _ = agent.Close() }() // Best effort cleanup
 
 		handle.Agent = agent
 		handle.Status = "running"

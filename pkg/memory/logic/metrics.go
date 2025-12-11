@@ -11,13 +11,13 @@ type Metrics struct {
 	mu sync.RWMutex
 
 	// 计数器
-	memoryTotal       map[string]int64 // namespace -> count
-	memorySaveTotal   int64
-	memorySaveErrors  int64
-	memoryGetTotal    int64
-	memoryGetErrors   int64
-	memoryDeleteTotal int64
-	eventProcessTotal int64
+	memoryTotal        map[string]int64 // namespace -> count
+	memorySaveTotal    int64
+	memorySaveErrors   int64
+	memoryGetTotal     int64
+	memoryGetErrors    int64
+	memoryDeleteTotal  int64
+	eventProcessTotal  int64
 	eventProcessErrors int64
 	consolidationTotal int64
 	pruneTotal         int64

@@ -506,7 +506,7 @@ func BenchmarkCheck(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		inspector.Check(ctx, call)
+		_, _ = inspector.Check(ctx, call)
 	}
 }
 
@@ -531,6 +531,6 @@ func BenchmarkCheckWithRules(b *testing.B) {
 
 	b.ResetTimer()
 	for i := 0; i < b.N; i++ {
-		inspector.Check(ctx, call)
+		_, _ = inspector.Check(ctx, call)
 	}
 }

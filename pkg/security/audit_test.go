@@ -18,12 +18,12 @@ func TestNewInMemoryAuditLog(t *testing.T) {
 	}
 
 	// 清理
-	auditLog.Close()
+	_ = auditLog.Close()
 }
 
 func TestInMemoryAuditLog_LogEvent(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	event := AuditEvent{
 		Type:      AuditTypeUserLogin,
@@ -52,7 +52,7 @@ func TestInMemoryAuditLog_LogEvent(t *testing.T) {
 
 func TestInMemoryAuditLog_LogEventAsync(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	event := AuditEvent{
 		Type:    AuditTypeUserLogin,
@@ -81,7 +81,7 @@ func TestInMemoryAuditLog_LogEventAsync(t *testing.T) {
 
 func TestInMemoryAuditLog_LogEvents(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	events := []AuditEvent{
 		{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 1"},
@@ -106,7 +106,7 @@ func TestInMemoryAuditLog_LogEvents(t *testing.T) {
 
 func TestInMemoryAuditLog_GetEvent(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	event := AuditEvent{
 		ID:      "event1",
@@ -115,7 +115,7 @@ func TestInMemoryAuditLog_GetEvent(t *testing.T) {
 		Message: "User logged in",
 	}
 
-	auditLog.LogEvent(event)
+	_ = auditLog.LogEvent(event)
 
 	// 获取事件
 	retrieved, err := auditLog.GetEvent("event1")
@@ -130,7 +130,7 @@ func TestInMemoryAuditLog_GetEvent(t *testing.T) {
 
 func TestInMemoryAuditLog_GetEvent_NotFound(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	_, err := auditLog.GetEvent("nonexistent")
 	if err == nil {
@@ -140,12 +140,12 @@ func TestInMemoryAuditLog_GetEvent_NotFound(t *testing.T) {
 
 func TestInMemoryAuditLog_GetEventsByUser(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	// 添加多个用户的事件
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 1"})
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2", Message: "Logout 1"})
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 2"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2", Message: "Logout 1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 2"})
 
 	// 获取user1的事件
 	events, err := auditLog.GetEventsByUser("user1", 10)
@@ -160,12 +160,12 @@ func TestInMemoryAuditLog_GetEventsByUser(t *testing.T) {
 
 func TestInMemoryAuditLog_GetEventsByType(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	// 添加不同类型的事件
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 1"})
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2", Message: "Logout 1"})
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user3", Message: "Login 2"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1", Message: "Login 1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2", Message: "Logout 1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user3", Message: "Login 2"})
 
 	// 获取登录类型的事件
 	events, err := auditLog.GetEventsByType(AuditTypeUserLogin, 10)
@@ -180,20 +180,20 @@ func TestInMemoryAuditLog_GetEventsByType(t *testing.T) {
 
 func TestInMemoryAuditLog_GetEventsByTimeRange(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	now := time.Now()
 	yesterday := now.Add(-24 * time.Hour)
 	tomorrow := now.Add(24 * time.Hour)
 
 	// 添加不同时间的事件
-	auditLog.LogEvent(AuditEvent{
+	_ = auditLog.LogEvent(AuditEvent{
 		Type:      AuditTypeUserLogin,
 		UserID:    "user1",
 		Message:   "Old login",
 		Timestamp: yesterday.Add(-1 * time.Hour),
 	})
-	auditLog.LogEvent(AuditEvent{
+	_ = auditLog.LogEvent(AuditEvent{
 		Type:      AuditTypeUserLogin,
 		UserID:    "user2",
 		Message:   "Recent login",
@@ -218,19 +218,19 @@ func TestInMemoryAuditLog_GetEventsByTimeRange(t *testing.T) {
 
 func TestInMemoryAuditLog_PurgeEvents(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	now := time.Now()
 	yesterday := now.Add(-24 * time.Hour)
 
 	// 添加旧事件和新事件
-	auditLog.LogEvent(AuditEvent{
+	_ = auditLog.LogEvent(AuditEvent{
 		Type:      AuditTypeUserLogin,
 		UserID:    "user1",
 		Message:   "Old login",
 		Timestamp: yesterday.Add(-1 * time.Hour),
 	})
-	auditLog.LogEvent(AuditEvent{
+	_ = auditLog.LogEvent(AuditEvent{
 		Type:      AuditTypeUserLogin,
 		UserID:    "user2",
 		Message:   "Recent login",
@@ -264,11 +264,11 @@ func TestInMemoryAuditLog_PurgeEvents(t *testing.T) {
 
 func TestInMemoryAuditLog_GetStatus(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	// 添加一些事件
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1"})
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogout, UserID: "user2"})
 
 	status := auditLog.GetStatus()
 	if status == nil {
@@ -284,7 +284,7 @@ func TestInMemoryAuditLog_Close(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
 
 	// 添加一个事件
-	auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1"})
+	_ = auditLog.LogEvent(AuditEvent{Type: AuditTypeUserLogin, UserID: "user1"})
 
 	// 关闭
 	err := auditLog.Close()
@@ -295,7 +295,7 @@ func TestInMemoryAuditLog_Close(t *testing.T) {
 
 func TestInMemoryAuditLog_ConcurrentWrites(t *testing.T) {
 	auditLog := NewInMemoryAuditLog(nil)
-	defer auditLog.Close()
+	defer func() { _ = auditLog.Close() }()
 
 	// 并发写入事件
 	done := make(chan bool)
@@ -306,7 +306,7 @@ func TestInMemoryAuditLog_ConcurrentWrites(t *testing.T) {
 				UserID:  "user" + string(rune('0'+id)),
 				Message: "Concurrent login",
 			}
-			auditLog.LogEvent(event)
+			_ = auditLog.LogEvent(event)
 			done <- true
 		}(i)
 	}

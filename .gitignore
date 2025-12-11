@@ -210,5 +210,5 @@ article-writer-web-service/
 
 # lwmacct conventions
 .local/
-.taskfile/
+.task/
 Taskfile.yml

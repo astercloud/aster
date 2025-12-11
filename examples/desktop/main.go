@@ -142,8 +142,8 @@ func main() {
 	fmt.Println("\n\n👋 Shutting down...")
 
 	// Cleanup
-	app.Stop(ctx)
-	ag.Close()
+	_ = app.Stop(ctx)
+	_ = ag.Close()
 }
 
 func createDependencies(workDir string) *agent.Dependencies {

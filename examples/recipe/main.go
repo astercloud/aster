@@ -20,7 +20,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建临时目录失败: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// 演示各种 Recipe 功能
 	demonstrateBasicRecipe(tmpDir)
@@ -47,7 +47,7 @@ instructions: |
   1. 分析代码质量
   2. 发现潜在问题
   3. 提供改进建议
-  
+
   请遵循以下原则：
   - 友好但专业的语气
   - 给出具体的代码示例
@@ -209,7 +209,7 @@ parameters:
     requirement: required
     description: 项目名称
     default: my-project
-    
+
   - key: language
     input_type: select
     requirement: required
@@ -220,13 +220,13 @@ parameters:
       - python
       - typescript
       - rust
-      
+
   - key: with_tests
     input_type: boolean
     requirement: optional
     description: 是否包含测试模板
     default: "true"
-    
+
   - key: license
     input_type: select
     requirement: optional

@@ -38,20 +38,20 @@ const (
 // 危险命令模式 - 增强版，更难绕过
 var dangerousPatterns = []*regexp.Regexp{
 	// 文件系统破坏
-	regexp.MustCompile(`(?i)\brm\s+(-[a-z]*r[a-z]*\s+)*(/|/\*|~|\$HOME)`),           // rm -rf / 及变体
+	regexp.MustCompile(`(?i)\brm\s+(-[a-z]*r[a-z]*\s+)*(/|/\*|~|\$HOME)`),            // rm -rf / 及变体
 	regexp.MustCompile(`(?i)\brm\s+(-[a-z]*f[a-z]*\s+)*(-[a-z]*r[a-z]*\s+)*(/|/\*)`), // rm -fr /
-	regexp.MustCompile(`(?i)\brmdir\s+(/|/\*)`),                                       // rmdir /
-	regexp.MustCompile(`(?i)\bfind\s+/\s+.*-delete`),                                  // find / -delete
-	regexp.MustCompile(`(?i)\bfind\s+/\s+.*-exec\s+rm`),                               // find / -exec rm
+	regexp.MustCompile(`(?i)\brmdir\s+(/|/\*)`),                                      // rmdir /
+	regexp.MustCompile(`(?i)\bfind\s+/\s+.*-delete`),                                 // find / -delete
+	regexp.MustCompile(`(?i)\bfind\s+/\s+.*-exec\s+rm`),                              // find / -exec rm
 
 	// 权限提升
-	regexp.MustCompile(`(?i)(^|\s|;|&&|\|\||\|)(sudo|doas|pkexec)\s`),    // sudo 及替代品
-	regexp.MustCompile(`(?i)(^|\s|;|&&|\|\||\|)/usr/(s)?bin/sudo\s`),     // 绝对路径 sudo
-	regexp.MustCompile(`(?i)\bsu\s+(-\s+)?root`),                         // su root
-	regexp.MustCompile(`(?i)\bchmod\s+[0-7]*[4-7][0-7]{2}\s+/`),          // chmod 危险权限到根目录
-	regexp.MustCompile(`(?i)\bchown\s+.*\s+/`),                           // chown 根目录
-	regexp.MustCompile(`(?i)\bsetuid\b`),                                 // setuid
-	regexp.MustCompile(`(?i)\bsetcap\b`),                                 // setcap
+	regexp.MustCompile(`(?i)(^|\s|;|&&|\|\||\|)(sudo|doas|pkexec)\s`), // sudo 及替代品
+	regexp.MustCompile(`(?i)(^|\s|;|&&|\|\||\|)/usr/(s)?bin/sudo\s`),  // 绝对路径 sudo
+	regexp.MustCompile(`(?i)\bsu\s+(-\s+)?root`),                      // su root
+	regexp.MustCompile(`(?i)\bchmod\s+[0-7]*[4-7][0-7]{2}\s+/`),       // chmod 危险权限到根目录
+	regexp.MustCompile(`(?i)\bchown\s+.*\s+/`),                        // chown 根目录
+	regexp.MustCompile(`(?i)\bsetuid\b`),                              // setuid
+	regexp.MustCompile(`(?i)\bsetcap\b`),                              // setcap
 
 	// 系统控制
 	regexp.MustCompile(`(?i)(^|\s|;|&&|\|\||\|)(shutdown|poweroff|halt|reboot|init\s+[06])\b`),
@@ -60,7 +60,7 @@ var dangerousPatterns = []*regexp.Regexp{
 
 	// 磁盘/分区操作
 	regexp.MustCompile(`(?i)\b(mkfs|mke2fs|mkswap|fdisk|parted|gdisk)\b`),
-	regexp.MustCompile(`(?i)\bdd\s+.*\bof=/dev/`),                // dd 写入设备
+	regexp.MustCompile(`(?i)\bdd\s+.*\bof=/dev/`),                 // dd 写入设备
 	regexp.MustCompile(`(?i)\b(>\s*|tee\s+)/dev/(sd|hd|nvme|vd)`), // 重定向到磁盘设备
 	regexp.MustCompile(`(?i)\bswapon\b`),
 	regexp.MustCompile(`(?i)\bswapoff\b`),
@@ -69,9 +69,9 @@ var dangerousPatterns = []*regexp.Regexp{
 
 	// Fork 炸弹和资源耗尽
 	regexp.MustCompile(`:\s*\(\s*\)\s*\{\s*:\s*\|\s*:\s*&\s*\}\s*;\s*:`), // fork bomb
-	regexp.MustCompile(`(?i)\byes\s*\|`),                                  // yes | 无限输出
-	regexp.MustCompile(`(?i)\bwhile\s+true\s*;\s*do`),                     // 无限循环
-	regexp.MustCompile(`(?i)\bfor\s*\(\s*;\s*;\s*\)`),                     // C风格无限循环
+	regexp.MustCompile(`(?i)\byes\s*\|`),                                 // yes | 无限输出
+	regexp.MustCompile(`(?i)\bwhile\s+true\s*;\s*do`),                    // 无限循环
+	regexp.MustCompile(`(?i)\bfor\s*\(\s*;\s*;\s*\)`),                    // C风格无限循环
 
 	// 远程代码执行
 	regexp.MustCompile(`(?i)\bcurl\s+.*\|\s*(ba)?sh`),                       // curl | sh
@@ -178,14 +178,14 @@ type LocalSandbox struct {
 	excludedCommands []string
 
 	// 增强安全配置
-	securityLevel    SecurityLevel
-	auditLog         []AuditEntry
-	auditMu          sync.RWMutex
-	maxAuditEntries  int
-	resourceLimits   *ResourceLimits
-	blockedCommands  map[string]bool
-	commandStats     map[string]*CommandStats
-	statsMu          sync.RWMutex
+	securityLevel   SecurityLevel
+	auditLog        []AuditEntry
+	auditMu         sync.RWMutex
+	maxAuditEntries int
+	resourceLimits  *ResourceLimits
+	blockedCommands map[string]bool
+	commandStats    map[string]*CommandStats
+	statsMu         sync.RWMutex
 }
 
 // AuditEntry 审计日志条目
@@ -309,18 +309,18 @@ func NewLocalSandbox(config *LocalSandboxConfig) (*LocalSandbox, error) {
 	}
 
 	ls := &LocalSandbox{
-		workDir:          workDir,
-		enforceBoundary:  config.EnforceBoundary,
-		allowPaths:       allowPaths,
-		watchEnabled:     config.WatchFiles,
-		watchers:         make(map[string]*fileWatcher),
-		settings:         config.Settings,
-		securityLevel:    securityLevel,
-		auditLog:         make([]AuditEntry, 0),
-		maxAuditEntries:  maxAuditEntries,
-		resourceLimits:   resourceLimits,
-		blockedCommands:  blockedCommands,
-		commandStats:     make(map[string]*CommandStats),
+		workDir:         workDir,
+		enforceBoundary: config.EnforceBoundary,
+		allowPaths:      allowPaths,
+		watchEnabled:    config.WatchFiles,
+		watchers:        make(map[string]*fileWatcher),
+		settings:        config.Settings,
+		securityLevel:   securityLevel,
+		auditLog:        make([]AuditEntry, 0),
+		maxAuditEntries: maxAuditEntries,
+		resourceLimits:  resourceLimits,
+		blockedCommands: blockedCommands,
+		commandStats:    make(map[string]*CommandStats),
 	}
 
 	// 应用 Claude Agent SDK 风格的安全配置
@@ -564,8 +564,8 @@ func (ls *LocalSandbox) buildSecureEnv(opts *ExecOptions) []string {
 // isDangerousEnvVar 检查是否为危险环境变量
 func (ls *LocalSandbox) isDangerousEnvVar(key string) bool {
 	dangerousVars := map[string]bool{
-		"LD_PRELOAD":      true,
-		"LD_LIBRARY_PATH": true,
+		"LD_PRELOAD":            true,
+		"LD_LIBRARY_PATH":       true,
 		"DYLD_INSERT_LIBRARIES": true,
 		"DYLD_LIBRARY_PATH":     true,
 		"PYTHONPATH":            true, // 可能被滥用
@@ -603,13 +603,13 @@ func (ls *LocalSandbox) checkDangerousCommand(cmd string) string {
 func (ls *LocalSandbox) hasCommandInjection(cmd string) bool {
 	// 检测常见的命令注入模式
 	injectionPatterns := []string{
-		"`",           // 反引号命令替换
-		"$(",          // 命令替换
-		"$((",         // 算术扩展
-		"${",          // 参数扩展（可能危险）
-		"\n",          // 换行符注入
-		"\r",          // 回车符注入
-		"\x00",        // 空字节注入
+		"`",    // 反引号命令替换
+		"$(",   // 命令替换
+		"$((",  // 算术扩展
+		"${",   // 参数扩展（可能危险）
+		"\n",   // 换行符注入
+		"\r",   // 回车符注入
+		"\x00", // 空字节注入
 	}
 
 	for _, pattern := range injectionPatterns {

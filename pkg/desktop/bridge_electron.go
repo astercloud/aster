@@ -40,23 +40,23 @@ import (
 //	// In renderer.js
 //	window.aster.chat(agentId, message);
 type ElectronBridge struct {
-	app        *App
-	handler    MessageHandler
-	agents     map[string]*agent.Agent
-	agentsMu   sync.RWMutex
-	server     *http.Server
-	port       int
-	wsClients  map[string]*wsClient
-	wsMu       sync.RWMutex
-	ctx        context.Context
-	cancel     context.CancelFunc
+	app       *App
+	handler   MessageHandler
+	agents    map[string]*agent.Agent
+	agentsMu  sync.RWMutex
+	server    *http.Server
+	port      int
+	wsClients map[string]*wsClient
+	wsMu      sync.RWMutex
+	ctx       context.Context
+	cancel    context.CancelFunc
 }
 
 // wsClient represents a WebSocket client
 type wsClient struct {
-	id       string
-	eventCh  chan *FrontendEvent
-	closeCh  chan struct{}
+	id      string
+	eventCh chan *FrontendEvent
+	closeCh chan struct{}
 }
 
 // NewElectronBridge creates a new Electron bridge
@@ -101,7 +101,7 @@ func (b *ElectronBridge) Start(ctx context.Context) error {
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"status":    "ok",
 			"framework": "electron",
 			"port":      b.port,
@@ -122,7 +122,7 @@ func (b *ElectronBridge) Start(ctx context.Context) error {
 		if err != nil {
 			return
 		}
-		b.server.Serve(ln)
+		_ = b.server.Serve(ln) // Server error logged by http.Server
 	}()
 
 	return nil

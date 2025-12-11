@@ -159,12 +159,12 @@ func (m *SummarizationMiddleware) WrapModelCall(ctx context.Context, req *ModelR
 	m.summarizationCount++
 
 	sumLog.Info(ctx, "summarization complete", map[string]any{
-		"before":              len(messages),
-		"after":               len(newMessages),
-		"tokens_before":       totalTokens,
-		"tokens_after":        newTokens,
-		"tokens_saved":        tokensSaved,
-		"compression_ratio":   compressionRatio,
+		"before":               len(messages),
+		"after":                len(newMessages),
+		"tokens_before":        totalTokens,
+		"tokens_after":         newTokens,
+		"tokens_saved":         tokensSaved,
+		"compression_ratio":    compressionRatio,
 		"total_summarizations": m.summarizationCount,
 	})
 

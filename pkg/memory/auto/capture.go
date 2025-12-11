@@ -330,12 +330,12 @@ func NewDefaultTagExtractor() *DefaultTagExtractor {
 			"doc":       "documentation",
 
 			// 状态相关
-			"完成":        "completed",
-			"complete":  "completed",
-			"done":      "completed",
-			"进行中":       "in_progress",
-			"待办":        "todo",
-			"todo":      "todo",
+			"完成":       "completed",
+			"complete": "completed",
+			"done":     "completed",
+			"进行中":      "in_progress",
+			"待办":       "todo",
+			"todo":     "todo",
 
 			// 领域相关
 			"前端":       "frontend",

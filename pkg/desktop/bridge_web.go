@@ -71,7 +71,7 @@ func (b *WebBridge) Start(ctx context.Context) error {
 
 	// Health check
 	mux.HandleFunc("/health", func(w http.ResponseWriter, r *http.Request) {
-		json.NewEncoder(w).Encode(map[string]any{
+		_ = json.NewEncoder(w).Encode(map[string]any{
 			"status":    "ok",
 			"framework": "web",
 			"port":      b.port,
@@ -93,7 +93,7 @@ func (b *WebBridge) Start(ctx context.Context) error {
 		if err != nil {
 			return
 		}
-		b.server.Serve(ln)
+		_ = b.server.Serve(ln) // Server error logged by http.Server
 	}()
 
 	return nil

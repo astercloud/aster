@@ -73,7 +73,6 @@ func (t *WebFetchTool) InputSchema() map[string]any {
 	}
 }
 
-
 func (t *WebFetchTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	url, ok := input["url"].(string)
 	if !ok || url == "" {

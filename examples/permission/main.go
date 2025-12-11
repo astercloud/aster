@@ -24,7 +24,7 @@ func main() {
 	if err != nil {
 		log.Fatalf("创建临时目录失败: %v", err)
 	}
-	defer os.RemoveAll(tmpDir)
+	defer func() { _ = os.RemoveAll(tmpDir) }()
 
 	// 演示三种模式
 	demonstrateAutoApprove(ctx, tmpDir)
