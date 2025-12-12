@@ -342,10 +342,31 @@ func (a *Agent) executeTools(ctx context.Context, toolUses []*types.ToolUseBlock
 	a.mu.Unlock()
 
 	if currentIter > maxIter {
-		procLog.Error(ctx, "iteration limit exceeded", map[string]any{
+		procLog.Warn(ctx, "iteration limit reached, waiting for user confirmation", map[string]any{
 			"agent_id": a.id, "iteration": currentIter, "max": maxIter,
 		})
-		return fmt.Errorf("iteration limit exceeded: %d > %d, possible infinite loop detected", currentIter, maxIter)
+		
+		// 发送迭代限制事件，等待用户确认是否继续
+		a.eventBus.EmitControl(&types.ControlIterationLimitEvent{
+			CurrentIteration: currentIter,
+			MaxIteration:     maxIter,
+			Message:          fmt.Sprintf("已执行 %d 次迭代，达到安全上限。是否继续？", currentIter),
+		})
+		
+		// 等待用户决策
+		select {
+		case decision := <-a.iterationContinueCh:
+			if !decision {
+				return fmt.Errorf("iteration stopped by user after %d iterations", currentIter)
+			}
+			// 用户确认继续，重置迭代计数并继续
+			a.mu.Lock()
+			a.iterationCount = 0
+			a.mu.Unlock()
+			procLog.Info(ctx, "user confirmed to continue, resetting iteration count", map[string]any{"agent_id": a.id})
+		case <-ctx.Done():
+			return ctx.Err()
+		}
 	}
 	procLog.Debug(ctx, "streaming iteration", map[string]any{"agent_id": a.id, "iteration": currentIter, "max": maxIter})
 

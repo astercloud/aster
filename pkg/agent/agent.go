@@ -12,14 +12,18 @@ import (
 	"github.com/astercloud/aster/pkg/commands"
 	"github.com/astercloud/aster/pkg/events"
 	"github.com/astercloud/aster/pkg/logging"
+	"github.com/astercloud/aster/pkg/memory"
 	"github.com/astercloud/aster/pkg/middleware"
+	"github.com/astercloud/aster/pkg/multitenancy"
 	"github.com/astercloud/aster/pkg/permission"
 	"github.com/astercloud/aster/pkg/provider"
 	"github.com/astercloud/aster/pkg/router"
 	"github.com/astercloud/aster/pkg/sandbox"
 	"github.com/astercloud/aster/pkg/skills"
 	"github.com/astercloud/aster/pkg/tools"
+	"github.com/astercloud/aster/pkg/tools/builtin"
 	"github.com/astercloud/aster/pkg/types"
+	"github.com/astercloud/aster/pkg/vector"
 	"github.com/google/uuid"
 )
 
@@ -47,6 +51,9 @@ type Agent struct {
 	commandExecutor *commands.Executor
 	skillInjector   *skills.Injector
 
+	// RAG 和语义记忆支持
+	semanticMemory *memory.SemanticMemory
+
 	// 状态管理
 	mu           sync.RWMutex
 	state        types.AgentRuntimeState
@@ -68,8 +75,12 @@ type Agent struct {
 	// Plan 模式管理
 	planMode *PlanModeManager
 
+	// 执行计划管理
+	executionPlanMgr *ExecutionPlanManager
+
 	// 控制信号
-	stopCh chan struct{}
+	stopCh              chan struct{}
+	iterationContinueCh chan bool // 迭代限制确认 channel
 }
 
 // runningToolHandle 保存可中断工具的句柄
@@ -82,6 +93,23 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 	// 生成AgentID
 	if config.AgentID == "" {
 		config.AgentID = generateAgentID()
+	}
+
+	// === 多租户支持 ===
+	// 如果启用了多租户，将租户信息添加到上下文中
+	if config.Multitenancy != nil && config.Multitenancy.Enabled {
+		if config.Multitenancy.OrgID != "" {
+			ctx = multitenancy.WithOrgID(ctx, config.Multitenancy.OrgID)
+			agentLog.Debug(ctx, "multitenancy enabled - OrgID set", map[string]any{
+				"org_id": config.Multitenancy.OrgID,
+			})
+		}
+		if config.Multitenancy.TenantID != "" {
+			ctx = multitenancy.WithTenantID(ctx, config.Multitenancy.TenantID)
+			agentLog.Debug(ctx, "multitenancy enabled - TenantID set", map[string]any{
+				"tenant_id": config.Multitenancy.TenantID,
+			})
+		}
 	}
 
 	// 获取模板
@@ -188,6 +216,77 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 		agentLog.Debug(ctx, "tool loaded", map[string]any{"name": name, "has_prompt": tool.Prompt() != ""})
 	}
 	agentLog.Debug(ctx, "total tools loaded", map[string]any{"count": len(toolMap), "names": toolNames})
+
+	// 初始化语义记忆和 RAG（如果配置了）
+	var semanticMem *memory.SemanticMemory
+	if config.Memory != nil && config.Memory.Enabled {
+		// 检查工厂是否可用
+		if deps.VectorStoreFactory != nil && deps.EmbedderFactory != nil {
+			// 创建向量存储
+			var vectorStore vector.VectorStore
+			if config.Memory.VectorStore != nil {
+				vectorStore, err = deps.VectorStoreFactory.Create(
+					config.Memory.VectorStore.Type,
+					config.Memory.VectorStore.Config,
+				)
+				if err != nil {
+					agentLog.Warn(ctx, "failed to create vector store", map[string]any{"error": err})
+				}
+			}
+
+			// 创建嵌入器
+			var embedder vector.Embedder
+			if config.Memory.Embedder != nil {
+				embedder, err = deps.EmbedderFactory.Create(
+					config.Memory.Embedder.Provider,
+					config.Memory.Embedder.Config,
+				)
+				if err != nil {
+					agentLog.Warn(ctx, "failed to create embedder", map[string]any{"error": err})
+				}
+			}
+
+			// 创建 SemanticMemory
+			if vectorStore != nil && embedder != nil {
+				semanticMem = memory.NewSemanticMemory(memory.SemanticMemoryConfig{
+					Store:          vectorStore,
+					Embedder:       embedder,
+					NamespaceScope: config.Memory.Namespace,
+					TopK:           config.Memory.TopK,
+				})
+				agentLog.Info(ctx, "semantic memory initialized", map[string]any{
+					"store_type":      config.Memory.VectorStore.Type,
+					"embedder":        config.Memory.Embedder.Provider,
+					"namespace_scope": config.Memory.Namespace,
+					"top_k":           config.Memory.TopK,
+				})
+
+				// 动态注册 RAG 检索工具
+				ragTool, err := builtin.NewRAGSearchTool(map[string]any{
+					"semantic_memory": semanticMem,
+				})
+				if err == nil {
+					toolMap["rag_search"] = ragTool
+					agentLog.Info(ctx, "RAG search tool registered", nil)
+				} else {
+					agentLog.Warn(ctx, "failed to create RAG search tool", map[string]any{"error": err})
+				}
+
+				// 也注册 semantic_search 工具（返回原始结果）
+				semanticSearchTool, err := builtin.NewSemanticSearchTool(map[string]any{
+					"semantic_memory": semanticMem,
+				})
+				if err == nil {
+					toolMap["semantic_search"] = semanticSearchTool
+					agentLog.Info(ctx, "semantic search tool registered", nil)
+				} else {
+					agentLog.Warn(ctx, "failed to create semantic search tool", map[string]any{"error": err})
+				}
+			}
+		} else {
+			agentLog.Warn(ctx, "memory enabled but vector store or embedder factory not available", nil)
+		}
+	}
 
 	// 初始化 Slash Commands & Skills（如果配置了）
 	var cmdExecutor *commands.Executor
@@ -348,16 +447,18 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 		middlewareStack:    middlewareStack,
 		commandExecutor:    cmdExecutor,
 		skillInjector:      skillInjector,
-		state:              types.AgentStateReady,
-		breakpoint:         types.BreakpointReady,
-		messages:           []types.Message{},
-		toolRecords:        make(map[string]*types.ToolCallRecord),
-		runningTools:       make(map[string]*runningToolHandle),
-		pendingPermissions: make(map[string]chan string),
-		planMode:           NewPlanModeManager(),
-		maxIterations:      50,  // 默认最大迭代50次
-		createdAt:          time.Now(),
-		stopCh:             make(chan struct{}),
+		semanticMemory:      semanticMem,
+		state:               types.AgentStateReady,
+		breakpoint:          types.BreakpointReady,
+		messages:            []types.Message{},
+		toolRecords:         make(map[string]*types.ToolCallRecord),
+		runningTools:        make(map[string]*runningToolHandle),
+		pendingPermissions:  make(map[string]chan string),
+		planMode:            NewPlanModeManager(),
+		maxIterations:       50, // 默认最大迭代50次
+		createdAt:           time.Now(),
+		stopCh:              make(chan struct{}),
+		iterationContinueCh: make(chan bool, 1),
 	}
 
 	// 初始化 EnhancedInspector (Claude SDK 风格的权限检查器)
@@ -790,6 +891,18 @@ func (a *Agent) ID() string {
 	return a.id
 }
 
+// ExecutionPlan 返回执行计划管理器
+// 首次调用时延迟初始化
+func (a *Agent) ExecutionPlan() *ExecutionPlanManager {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+
+	if a.executionPlanMgr == nil {
+		a.executionPlanMgr = NewExecutionPlanManager(a)
+	}
+	return a.executionPlanMgr
+}
+
 // Send 发送消息
 func (a *Agent) Send(ctx context.Context, text string) error {
 	a.mu.Lock()
@@ -1026,6 +1139,16 @@ func (a *Agent) HasPendingPermission(callID string) bool {
 	defer a.mu.RUnlock()
 	_, exists := a.pendingPermissions[callID]
 	return exists
+}
+
+// RespondToIterationLimit 响应迭代限制事件
+// continueExecution: true 表示继续执行，false 表示停止
+func (a *Agent) RespondToIterationLimit(continueExecution bool) {
+	select {
+	case a.iterationContinueCh <- continueExecution:
+	default:
+		// channel 已满或没有等待者，忽略
+	}
 }
 
 // Close 关闭Agent

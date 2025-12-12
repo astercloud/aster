@@ -397,3 +397,57 @@ func (sm *SemanticMemory) UpdateMetadata(ctx context.Context, docID string, meta
 
 	return fmt.Errorf("UpdateMetadata not fully implemented yet")
 }
+
+// SearchAndFormat 执行向量检索并格式化为 Markdown，用于 RAG 场景。
+// 返回的字符串可以直接注入到 Prompt 中作为上下文。
+func (sm *SemanticMemory) SearchAndFormat(ctx context.Context, query string, meta map[string]any, topK int) (string, error) {
+	if sm == nil || sm.cfg.Store == nil || sm.cfg.Embedder == nil {
+		return "", nil
+	}
+
+	// 执行检索
+	hits, err := sm.Search(ctx, query, meta, topK)
+	if err != nil {
+		return "", fmt.Errorf("search: %w", err)
+	}
+
+	if len(hits) == 0 {
+		return "", nil
+	}
+
+	// 格式化为 Markdown
+	var result string
+	result += "## Relevant Context\n\n"
+	result += fmt.Sprintf("Found %d relevant documents:\n\n", len(hits))
+
+	for i, hit := range hits {
+		// 获取文本内容
+		text := ""
+		if t, ok := hit.Metadata["text"].(string); ok {
+			text = t
+		}
+
+		// 格式化分数（0-1 范围）
+		score := hit.Score
+		scorePercent := int(score * 100)
+
+		result += fmt.Sprintf("### %d. (Relevance: %d%%)\n\n", i+1, scorePercent)
+
+		if text != "" {
+			result += text + "\n\n"
+		}
+
+		// 添加元数据（可选）
+		if len(hit.Metadata) > 1 { // 除了 text 之外还有其他元数据
+			result += "**Metadata:**\n"
+			for k, v := range hit.Metadata {
+				if k != "text" { // 跳过已显示的 text
+					result += fmt.Sprintf("- %s: %v\n", k, v)
+				}
+			}
+			result += "\n"
+		}
+	}
+
+	return result, nil
+}

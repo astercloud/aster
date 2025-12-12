@@ -7,6 +7,7 @@ import (
 	"github.com/astercloud/aster/pkg/store"
 	"github.com/astercloud/aster/pkg/tools"
 	"github.com/astercloud/aster/pkg/types"
+	"github.com/astercloud/aster/pkg/vector/factory"
 )
 
 // Dependencies Agent依赖
@@ -26,6 +27,12 @@ type Dependencies struct {
 	// RecoveryHook 可选的会话恢复钩子
 	// 应用层可以注册此钩子来实现自定义的会话恢复逻辑
 	RecoveryHook types.RecoveryHook
+
+	// VectorStoreFactory 向量存储工厂（用于 RAG 和语义记忆）
+	VectorStoreFactory *factory.StoreFactory
+
+	// EmbedderFactory 嵌入模型工厂（用于 RAG 和语义记忆）
+	EmbedderFactory *factory.EmbedderFactory
 }
 
 // TemplateRegistry 模板注册表

@@ -109,6 +109,23 @@ type TokenUsage struct {
 	TimeToFirstToken int64 `json:"time_to_first_token,omitempty"` // 首 token 时间 (ms)
 }
 
+// ResponseFormatType 响应格式类型
+type ResponseFormatType string
+
+const (
+	ResponseFormatText       ResponseFormatType = "text"
+	ResponseFormatJSON       ResponseFormatType = "json_object"
+	ResponseFormatJSONSchema ResponseFormatType = "json_schema"
+)
+
+// ResponseFormat 响应格式配置（用于结构化输出）
+type ResponseFormat struct {
+	Type   ResponseFormatType `json:"type"`
+	Name   string             `json:"name,omitempty"`   // JSON Schema 名称（仅用于 json_schema 类型）
+	Schema map[string]any     `json:"schema,omitempty"` // JSON Schema 定义（仅用于 json_schema 类型）
+	Strict bool               `json:"strict,omitempty"` // 是否严格模式（OpenAI）
+}
+
 // StreamOptions 流式请求选项
 type StreamOptions struct {
 	Tools       []ToolSchema
@@ -119,6 +136,10 @@ type StreamOptions struct {
 	// ToolChoice 工具选择策略（Anthropic API 支持）
 	// 可选值: nil (默认), "auto", "any", 或指定工具名
 	ToolChoice *ToolChoiceOption `json:"tool_choice,omitempty"`
+
+	// ResponseFormat 响应格式（用于结构化输出）
+	// 支持 JSON Schema 强制输出特定格式的响应
+	ResponseFormat *ResponseFormat `json:"response_format,omitempty"`
 }
 
 // ToolChoiceOption 工具选择选项
@@ -175,10 +196,11 @@ type ProviderCapabilities struct {
 	SupportVideo  bool // 是否支持视频
 
 	// 高级能力
-	SupportReasoning    bool // 是否支持推理模型（o1/o3/R1）
-	SupportPromptCache  bool // 是否支持 Prompt Caching
-	SupportJSONMode     bool // 是否支持 JSON 模式
-	SupportFunctionCall bool // 是否支持 Function Calling
+	SupportReasoning       bool // 是否支持推理模型（o1/o3/R1）
+	SupportPromptCache     bool // 是否支持 Prompt Caching
+	SupportJSONMode        bool // 是否支持 JSON 模式
+	SupportFunctionCall    bool // 是否支持 Function Calling
+	SupportStructuredOutput bool // 是否支持结构化输出（JSON Schema）
 
 	// 限制
 	MaxTokens       int // 最大 token 数

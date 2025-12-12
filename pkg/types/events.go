@@ -214,6 +214,16 @@ type ControlPermissionDecidedEvent struct {
 func (e *ControlPermissionDecidedEvent) Channel() AgentChannel { return ChannelControl }
 func (e *ControlPermissionDecidedEvent) EventType() string     { return "permission_decided" }
 
+// ControlIterationLimitEvent 迭代限制事件
+type ControlIterationLimitEvent struct {
+	CurrentIteration int    `json:"current_iteration"`
+	MaxIteration     int    `json:"max_iteration"`
+	Message          string `json:"message"`
+}
+
+func (e *ControlIterationLimitEvent) Channel() AgentChannel { return ChannelControl }
+func (e *ControlIterationLimitEvent) EventType() string     { return "iteration_limit" }
+
 // ControlToolControlEvent 工具控制指令事件（入站）
 type ControlToolControlEvent struct {
 	CallID string `json:"call_id"`

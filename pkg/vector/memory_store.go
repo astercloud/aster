@@ -118,6 +118,29 @@ func (s *MemoryStore) Query(_ context.Context, q Query) ([]Hit, error) {
 		if !ok || len(doc.Embedding) == 0 {
 			continue
 		}
+
+		// 多租户过滤
+		if q.OrgID != "" && doc.OrgID != q.OrgID {
+			continue
+		}
+		if q.TenantID != "" && doc.TenantID != q.TenantID {
+			continue
+		}
+
+		// 自定义过滤
+		if len(q.Filter) > 0 {
+			match := true
+			for k, v := range q.Filter {
+				if docVal, ok := doc.Metadata[k]; !ok || docVal != v {
+					match = false
+					break
+				}
+			}
+			if !match {
+				continue
+			}
+		}
+
 		score := cosineSimilarity(q.Vector, doc.Embedding)
 		if math.IsNaN(score) {
 			continue

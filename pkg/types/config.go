@@ -167,6 +167,84 @@ type StoreConfig struct {
 	AutoTrim bool `json:"auto_trim,omitempty"`
 }
 
+// MultitenancyConfig 多租户配置
+type MultitenancyConfig struct {
+	// Enabled 是否启用多租户支持
+	Enabled bool `json:"enabled" yaml:"enabled"`
+
+	// OrgID 组织 ID，用于顶层租户隔离
+	OrgID string `json:"org_id,omitempty" yaml:"org_id,omitempty"`
+
+	// TenantID 租户 ID，用于组织内的二级隔离
+	TenantID string `json:"tenant_id,omitempty" yaml:"tenant_id,omitempty"`
+
+	// Isolation 隔离级别
+	// - "none": 不隔离（仅标记）
+	// - "data": 数据隔离（向量存储、消息等）
+	// - "full": 完全隔离（包括工具、资源等）
+	// 默认值: "data"
+	Isolation string `json:"isolation,omitempty" yaml:"isolation,omitempty"`
+}
+
+// VectorStoreConfig 向量存储配置
+type VectorStoreConfig struct {
+	// Type 向量存储类型
+	// - "memory": 内存向量存储
+	// - "weaviate": Weaviate 向量数据库
+	// - "pgvector": PostgreSQL pgvector 扩展
+	// - "qdrant": Qdrant 向量数据库
+	Type string `json:"type" yaml:"type"`
+
+	// Config 特定存储的配置参数（map）
+	// 不同的存储类型有不同的配置需求
+	Config map[string]any `json:"config,omitempty" yaml:"config,omitempty"`
+}
+
+// EmbedderConfig 嵌入模型配置
+type EmbedderConfig struct {
+	// Provider 嵌入模型提供商
+	// - "openai": OpenAI Embeddings
+	// - "gemini": Google Gemini Embeddings
+	// - "local": 本地嵌入模型
+	Provider string `json:"provider" yaml:"provider"`
+
+	// Model 嵌入模型名称
+	// OpenAI: "text-embedding-3-small", "text-embedding-3-large", "text-embedding-ada-002"
+	// Gemini: "text-embedding-004", "text-multilingual-embedding-002"
+	Model string `json:"model" yaml:"model"`
+
+	// APIKey API 密钥
+	APIKey string `json:"api_key,omitempty" yaml:"api_key,omitempty"`
+
+	// Dimensions 嵌入向量维度（仅 v3 模型支持）
+	// text-embedding-3-small: 可选 512, 1536
+	// text-embedding-3-large: 可选 256, 1024, 3072
+	Dimensions int `json:"dimensions,omitempty" yaml:"dimensions,omitempty"`
+
+	// Config 特定提供商的额外配置
+	Config map[string]any `json:"config,omitempty" yaml:"config,omitempty"`
+}
+
+// MemoryConfig 记忆系统配置
+type MemoryConfig struct {
+	// Enabled 是否启用记忆系统
+	Enabled bool `json:"enabled" yaml:"enabled"`
+
+	// VectorStore 向量存储配置
+	VectorStore *VectorStoreConfig `json:"vector_store,omitempty" yaml:"vector_store,omitempty"`
+
+	// Embedder 嵌入模型配置
+	Embedder *EmbedderConfig `json:"embedder,omitempty" yaml:"embedder,omitempty"`
+
+	// TopK 检索时返回的最相关结果数量
+	// 默认值: 5
+	TopK int `json:"top_k,omitempty" yaml:"top_k,omitempty"`
+
+	// Namespace 命名空间（可选）
+	// 用于在同一向量存储中隔离不同的知识库
+	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
+}
+
 
 // AgentTemplateRuntime Agent模板运行时配置
 type AgentTemplateRuntime struct {
@@ -195,11 +273,11 @@ type AgentTemplateDefinition struct {
 
 // ModelConfig 模型配置
 type ModelConfig struct {
-	Provider      string        `json:"provider"` // "anthropic", "openai", etc.
-	Model         string        `json:"model"`
-	APIKey        string        `json:"api_key,omitempty"`
-	BaseURL       string        `json:"base_url,omitempty"`
-	ExecutionMode ExecutionMode `json:"execution_mode,omitempty"` // 执行模式：streaming/non-streaming/auto
+	Provider      string        `json:"provider" yaml:"provider"`                             // "anthropic", "openai", etc.
+	Model         string        `json:"model" yaml:"model"`
+	APIKey        string        `json:"api_key,omitempty" yaml:"api_key,omitempty"`
+	BaseURL       string        `json:"base_url,omitempty" yaml:"base_url,omitempty"`
+	ExecutionMode ExecutionMode `json:"execution_mode,omitempty" yaml:"execution_mode,omitempty"` // 执行模式：streaming/non-streaming/auto
 }
 
 // SandboxKind 沙箱类型
@@ -275,23 +353,33 @@ type SkillsPackageConfig struct {
 
 // AgentConfig Agent创建配置
 type AgentConfig struct {
-	AgentID          string                    `json:"agent_id,omitempty"`
-	TemplateID       string                    `json:"template_id"`
-	TemplateVersion  string                    `json:"template_version,omitempty"`
-	ModelConfig      *ModelConfig              `json:"model_config,omitempty"`
-	Sandbox          *SandboxConfig            `json:"sandbox,omitempty"`
-	Store            *StoreConfig              `json:"store,omitempty"` // Store 存储配置
-	Tools            []string                  `json:"tools,omitempty"`
-	Middlewares      []string                  `json:"middlewares,omitempty"`       // Middleware 列表 (Phase 6C)
-	MiddlewareConfig map[string]map[string]any `json:"middleware_config,omitempty"` // 各中间件的自定义配置
-	ExposeThinking   bool                      `json:"expose_thinking,omitempty"`
+	AgentID          string                    `json:"agent_id,omitempty" yaml:"agent_id,omitempty"`
+	TemplateID       string                    `json:"template_id" yaml:"template_id"`
+	TemplateVersion  string                    `json:"template_version,omitempty" yaml:"template_version,omitempty"`
+	ModelConfig      *ModelConfig              `json:"model_config,omitempty" yaml:"model_config,omitempty"`
+	Sandbox          *SandboxConfig            `json:"sandbox,omitempty" yaml:"sandbox,omitempty"`
+	Store            *StoreConfig              `json:"store,omitempty" yaml:"store,omitempty"` // Store 存储配置
+	Tools            []string                  `json:"tools,omitempty" yaml:"tools,omitempty"`
+	Middlewares      []string                  `json:"middlewares,omitempty" yaml:"middlewares,omitempty"`             // Middleware 列表 (Phase 6C)
+	MiddlewareConfig map[string]map[string]any `json:"middleware_config,omitempty" yaml:"middleware_config,omitempty"` // 各中间件的自定义配置
+	ExposeThinking   bool                      `json:"expose_thinking,omitempty" yaml:"expose_thinking,omitempty"`
 	// RoutingProfile 可选的路由配置标识，例如 "quality-first"、"cost-first"。
 	// 当配置了 Router 时，可以根据该字段选择不同的模型路由策略。
-	RoutingProfile string                 `json:"routing_profile,omitempty"`
-	Overrides      *AgentConfigOverrides  `json:"overrides,omitempty"`
-	Context        *ContextManagerOptions `json:"context,omitempty"`
-	SkillsPackage  *SkillsPackageConfig   `json:"skills_package,omitempty"` // Skills 包配置
-	Metadata       map[string]any         `json:"metadata,omitempty"`
+	RoutingProfile string                 `json:"routing_profile,omitempty" yaml:"routing_profile,omitempty"`
+	Overrides      *AgentConfigOverrides  `json:"overrides,omitempty" yaml:"overrides,omitempty"`
+	Context        *ContextManagerOptions `json:"context,omitempty" yaml:"context,omitempty"`
+	SkillsPackage  *SkillsPackageConfig   `json:"skills_package,omitempty" yaml:"skills_package,omitempty"` // Skills 包配置
+	Metadata       map[string]any         `json:"metadata,omitempty" yaml:"metadata,omitempty"`
+
+	// === 多租户支持 ===
+
+	// Multitenancy 多租户配置
+	Multitenancy *MultitenancyConfig `json:"multitenancy,omitempty" yaml:"multitenancy,omitempty"`
+
+	// === 记忆系统（RAG）===
+
+	// Memory 记忆系统配置（包含向量存储和嵌入模型）
+	Memory *MemoryConfig `json:"memory,omitempty" yaml:"memory,omitempty"`
 
 	// === Claude Agent SDK 风格的权限控制 ===
 
