@@ -54,7 +54,9 @@ type Agent struct {
 	messages     []types.Message
 	toolRecords  map[string]*types.ToolCallRecord
 	runningTools map[string]*runningToolHandle
-	stepCount    int
+	stepCount      int
+	iterationCount int  // 当前会话的模型调用次数
+	maxIterations  int  // 最大迭代次数限制（默认50）
 	lastSfpIndex int
 	lastBookmark *types.Bookmark
 	createdAt    time.Time
@@ -353,6 +355,7 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 		runningTools:       make(map[string]*runningToolHandle),
 		pendingPermissions: make(map[string]chan string),
 		planMode:           NewPlanModeManager(),
+		maxIterations:      50,  // 默认最大迭代50次
 		createdAt:          time.Now(),
 		stopCh:             make(chan struct{}),
 	}
@@ -832,9 +835,20 @@ func (a *Agent) Send(ctx context.Context, text string) error {
 	}
 
 	a.messages = append(a.messages, message)
+
+	// ✅ 修复：保存前在内存中修剪
+	if a.shouldTrimMessages() {
+		a.messages = a.trimMessagesInMemory(a.messages, a.config.Store.MaxMessages)
+		agentLog.Debug(ctx, "messages trimmed in memory before save (user message)", map[string]any{
+			"agent_id":     a.id,
+			"max_messages": a.config.Store.MaxMessages,
+			"actual_count": len(a.messages),
+		})
+	}
+
 	a.stepCount++
 
-	// 持久化
+	// 持久化（已修剪的消息）
 	if err := a.deps.Store.SaveMessages(ctx, a.id, a.messages); err != nil {
 		return fmt.Errorf("save messages: %w", err)
 	}
@@ -984,6 +998,34 @@ type ToolCallResult struct {
 	Success bool   `json:"success"`
 	Result  any    `json:"result,omitempty"`
 	Error   string `json:"error,omitempty"`
+}
+
+// RespondToPermissionRequest 响应权限请求
+// approved: true 表示批准，false 表示拒绝
+func (a *Agent) RespondToPermissionRequest(callID string, approved bool) error {
+	a.mu.Lock()
+	ch, exists := a.pendingPermissions[callID]
+	a.mu.Unlock()
+	
+	if !exists {
+		return fmt.Errorf("no pending permission request for call ID: %s", callID)
+	}
+	
+	if approved {
+		ch <- "approved"
+	} else {
+		ch <- "rejected"
+	}
+	
+	return nil
+}
+
+// HasPendingPermission 检查是否有待处理的权限请求
+func (a *Agent) HasPendingPermission(callID string) bool {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	_, exists := a.pendingPermissions[callID]
+	return exists
 }
 
 // Close 关闭Agent
@@ -1516,4 +1558,24 @@ func (a *Agent) removeIncompleteToolCalls(messages []types.Message) []types.Mess
 
 	// 所有消息都是完整的
 	return messages
+}
+
+// SetMaxIterations 设置最大迭代次数
+// 用于防止 AI 进入无限循环消耗 token
+// 默认值为 50，设置为 0 表示使用默认值
+func (a *Agent) SetMaxIterations(max int) {
+	a.mu.Lock()
+	defer a.mu.Unlock()
+	if max <= 0 {
+		a.maxIterations = 50
+	} else {
+		a.maxIterations = max
+	}
+}
+
+// GetIterationCount 获取当前迭代次数
+func (a *Agent) GetIterationCount() int {
+	a.mu.RLock()
+	defer a.mu.RUnlock()
+	return a.iterationCount
 }

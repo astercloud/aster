@@ -172,8 +172,12 @@ func NewInspector(mode Mode, opts ...InspectorOption) *Inspector {
 			"web_search":      RiskLevelLow,
 			"get_file_info":   RiskLevelLow,
 			"semantic_search": RiskLevelLow,
+			"AskUserQuestion": RiskLevelLow,    // User interaction - no side effects
+			"Glob":            RiskLevelLow,  // File pattern matching - read only
+			"Read":            RiskLevelLow,  // Read file content - read only
 
 			// Medium risk - write operations
+			"ExitPlanMode":    RiskLevelMedium, // Plan submission requires approval
 			"write_file":       RiskLevelMedium,
 			"create_file":      RiskLevelMedium,
 			"edit_file":        RiskLevelMedium,

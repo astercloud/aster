@@ -137,6 +137,36 @@ func (js *JSONStore) LoadMessages(ctx context.Context, agentID string) ([]types.
 	return messages, nil
 }
 
+// TrimMessages 修剪消息列表，保留最近的 N 条消息
+// 如果 maxMessages <= 0，则不修剪
+func (js *JSONStore) TrimMessages(ctx context.Context, agentID string, maxMessages int) error {
+	if maxMessages <= 0 {
+		return nil // 不修剪
+	}
+
+	js.mu.Lock()
+	defer js.mu.Unlock()
+
+	// 加载现有消息
+	var messages []types.Message
+	path := filepath.Join(js.agentDir(agentID), "messages.json")
+	if err := js.loadJSON(path, &messages); err != nil {
+		return err
+	}
+
+	// 如果消息数量未超过限制，不需要修剪
+	if len(messages) <= maxMessages {
+		return nil
+	}
+
+	// 保留最近的 maxMessages 条消息
+	trimmedMessages := messages[len(messages)-maxMessages:]
+
+	// 保存修剪后的消息
+	return js.saveJSON(path, trimmedMessages)
+}
+
+
 // SaveToolCallRecords 保存工具调用记录
 func (js *JSONStore) SaveToolCallRecords(ctx context.Context, agentID string, records []types.ToolCallRecord) error {
 	js.mu.Lock()

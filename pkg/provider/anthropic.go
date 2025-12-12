@@ -7,8 +7,10 @@ import (
 	"encoding/json"
 	"fmt"
 	"io"
+	"net"
 	"net/http"
 	"strings"
+	"time"
 
 	"github.com/astercloud/aster/pkg/logging"
 	"github.com/astercloud/aster/pkg/types"
@@ -42,9 +44,26 @@ func NewAnthropicProvider(config *types.ModelConfig) (*AnthropicProvider, error)
 		baseURL = defaultAnthropicBaseURL
 	}
 
+	// 配置 HTTP 客户端超时，避免无限等待
+	client := &http.Client{
+		Timeout: 120 * time.Second, // 全局超时 120 秒
+		Transport: &http.Transport{
+			DialContext: (&net.Dialer{
+				Timeout:   30 * time.Second, // 连接超时 30 秒
+				KeepAlive: 30 * time.Second,
+			}).DialContext,
+			TLSHandshakeTimeout:   10 * time.Second, // TLS 握手超时
+			ResponseHeaderTimeout: 30 * time.Second, // 响应头超时
+			ExpectContinueTimeout: 1 * time.Second,
+			MaxIdleConns:          100,
+			MaxIdleConnsPerHost:   10,
+			IdleConnTimeout:       90 * time.Second,
+		},
+	}
+
 	return &AnthropicProvider{
 		config:  config,
-		client:  &http.Client{},
+		client:  client,
 		baseURL: baseURL,
 		version: defaultAnthropicVersion,
 	}, nil

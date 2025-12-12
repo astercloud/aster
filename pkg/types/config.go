@@ -144,6 +144,30 @@ type ConversationCompressionConfig struct {
 	UseLLMSummarizer bool `json:"use_llm_summarizer,omitempty"`
 }
 
+// StoreConfig Store 存储配置
+// 控制持久化层的消息管理策略
+type StoreConfig struct {
+	// MaxMessages 持久化最多保留的消息数
+	// 0 = 无限制（默认值，保持向后兼容）
+	// > 0 = 限制消息数，超过后自动修剪最旧的消息
+	//
+	// 注意：这与 ConversationCompressionConfig 是互补的：
+	// - ConversationCompression 是运行时的智能压缩（内存中）
+	// - StoreConfig.MaxMessages 是持久化层的硬限制（磁盘上）
+	//
+	// 推荐值：
+	// - 短期对话/测试环境：20
+	// - 生产环境/长期对话：0（无限制）或 100
+	MaxMessages int `json:"max_messages,omitempty"`
+
+	// AutoTrim 是否在每次保存消息后自动修剪
+	// true = 每次 SaveMessages 后自动调用 TrimMessages
+	// false = 需要手动调用 TrimMessages
+	// 默认值: true
+	AutoTrim bool `json:"auto_trim,omitempty"`
+}
+
+
 // AgentTemplateRuntime Agent模板运行时配置
 type AgentTemplateRuntime struct {
 	ExposeThinking          bool                           `json:"expose_thinking,omitempty"`
@@ -256,6 +280,7 @@ type AgentConfig struct {
 	TemplateVersion  string                    `json:"template_version,omitempty"`
 	ModelConfig      *ModelConfig              `json:"model_config,omitempty"`
 	Sandbox          *SandboxConfig            `json:"sandbox,omitempty"`
+	Store            *StoreConfig              `json:"store,omitempty"` // Store 存储配置
 	Tools            []string                  `json:"tools,omitempty"`
 	Middlewares      []string                  `json:"middlewares,omitempty"`       // Middleware 列表 (Phase 6C)
 	MiddlewareConfig map[string]map[string]any `json:"middleware_config,omitempty"` // 各中间件的自定义配置

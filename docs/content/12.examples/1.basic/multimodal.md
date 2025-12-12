@@ -88,6 +88,107 @@ func main() {
 }
 ```
 
+## Claude Vision (完整示例)
+
+```go
+package main
+
+import (
+    "context"
+    "encoding/base64"
+    "fmt"
+    "io"
+    "net/http"
+    "os"
+
+    "github.com/astercloud/aster/pkg/provider"
+    "github.com/astercloud/aster/pkg/types"
+)
+
+func main() {
+    ctx := context.Background()
+
+    // 创建 Claude Provider
+    cp, err := provider.NewCustomClaudeProvider(&types.ModelConfig{
+        Provider: "anthropic",
+        Model:    "claude-sonnet-4-5-20250929",
+        APIKey:   os.Getenv("CLAUDE_API_KEY"),
+        BaseURL:  os.Getenv("CLAUDE_BASE_URL"), // 支持中继服务
+    })
+    if err != nil {
+        panic(err)
+    }
+    defer cp.Close()
+
+    // 方式 1: 从 URL 下载并转 Base64
+    imageURL := "https://avatars.githubusercontent.com/u/1?v=4"
+    resp, _ := http.Get(imageURL)
+    defer resp.Body.Close()
+
+    imageData, _ := io.ReadAll(resp.Body)
+    base64Data := base64.StdEncoding.EncodeToString(imageData)
+
+    // 构造多模态消息
+    messages := []types.Message{
+        {
+            Role: types.MessageRoleUser,
+            ContentBlocks: []types.ContentBlock{
+                &types.ImageContent{
+                    Type:     "base64",
+                    Source:   base64Data,
+                    MimeType: "image/png",
+                },
+                &types.TextBlock{
+                    Text: "这张图片里有什么？请详细描述。",
+                },
+            },
+        },
+    }
+
+    // 调用 Vision API
+    opts := &provider.StreamOptions{MaxTokens: 500}
+    response, err := cp.Complete(ctx, messages, opts)
+    if err != nil {
+        panic(err)
+    }
+
+    fmt.Printf("Claude Vision 识别结果:\n%s\n", response.Message.Content)
+
+    // 方式 2: 直接使用本地图片
+    localImage, _ := os.ReadFile("screenshot.png")
+    base64Local := base64.StdEncoding.EncodeToString(localImage)
+
+    messages2 := []types.Message{
+        {
+            Role: types.MessageRoleUser,
+            ContentBlocks: []types.ContentBlock{
+                &types.ImageContent{
+                    Type:     "base64",
+                    Source:   base64Local,
+                    MimeType: "image/png",
+                },
+                &types.TextBlock{
+                    Text: "分析这个截图，提取其中的文字和主要元素。",
+                },
+            },
+        },
+    }
+
+    response2, _ := cp.Complete(ctx, messages2, opts)
+    fmt.Printf("\n本地图片分析:\n%s\n", response2.Message.Content)
+}
+```
+
+**测试结果示例:**
+```
+Claude Vision 识别结果:
+这张图片是 GitHub 用户头像的默认图标。图片呈现为一个圆形的标识...
+具体特征包括：
+1. 圆形的外轮廓
+2. 深色调为主
+3. GitHub 的默认头像设计
+```
+
 ## 视频理解（Gemini）
 
 ```go

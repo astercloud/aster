@@ -18,13 +18,18 @@ var procLog = logging.ForComponent("AgentProcessor")
 
 // processMessages 处理消息队列
 func (a *Agent) processMessages(ctx context.Context) {
+	procLog.Info(ctx, "processMessages started", map[string]any{"agent_id": a.id})
+
 	a.mu.Lock()
 	if a.state != types.AgentStateReady {
+		procLog.Warn(ctx, "agent not ready, skipping", map[string]any{"agent_id": a.id, "state": a.state})
 		a.mu.Unlock()
 		return // 已经在处理中
 	}
 	a.state = types.AgentStateWorking
+	a.iterationCount = 0 // 重置迭代计数
 	initialMsgCount := len(a.messages)
+	procLog.Info(ctx, "agent state changed to working", map[string]any{"agent_id": a.id, "message_count": initialMsgCount})
 	a.mu.Unlock()
 
 	defer func() {
@@ -54,14 +59,19 @@ func (a *Agent) processMessages(ctx context.Context) {
 	// 设置断点
 	a.setBreakpoint(types.BreakpointPreModel)
 
+	procLog.Info(ctx, "calling runModelStep", map[string]any{"agent_id": a.id})
+
 	// 调用模型
 	if err := a.runModelStep(ctx); err != nil {
+		procLog.Error(ctx, "runModelStep failed", map[string]any{"agent_id": a.id, "error": err.Error()})
 		a.eventBus.EmitMonitor(&types.MonitorErrorEvent{
 			Severity: "error",
 			Phase:    "model",
 			Message:  err.Error(),
 		})
 	}
+
+	procLog.Info(ctx, "runModelStep completed, sending done event", map[string]any{"agent_id": a.id})
 
 	// 发送完成事件
 	a.eventBus.EmitProgress(&types.ProgressDoneEvent{
@@ -77,14 +87,16 @@ func (a *Agent) processMessages(ctx context.Context) {
 
 // runModelStep 运行模型步骤
 func (a *Agent) runModelStep(ctx context.Context) error {
+	procLog.Info(ctx, "runModelStep started", map[string]any{"agent_id": a.id})
+
 	// 检查执行模式
 	executionMode := a.getExecutionMode()
 	if executionMode == types.ExecutionModeNonStreaming {
-		procLog.Debug(ctx, "using NON-STREAMING mode (fast execution)", nil)
+		procLog.Info(ctx, "using NON-STREAMING mode (fast execution)", map[string]any{"agent_id": a.id})
 		return a.runNonStreamingStep(ctx)
 	}
 
-	procLog.Debug(ctx, "using STREAMING mode (real-time feedback)", nil)
+	procLog.Info(ctx, "using STREAMING mode (real-time feedback)", map[string]any{"agent_id": a.id})
 	a.setBreakpoint(types.BreakpointStreamingModel)
 
 	// 准备工具Schema（包含使用示例）
@@ -145,8 +157,11 @@ func (a *Agent) runModelStep(ctx context.Context) error {
 	var assistantMessage types.Message
 	var modelErr error
 
+	procLog.Info(ctx, "preparing to call LLM", map[string]any{"agent_id": a.id, "message_count": len(messages), "has_middleware": a.middlewareStack != nil})
+
 	if a.middlewareStack != nil {
 		// 使用 middleware stack
+		procLog.Info(ctx, "using middleware stack for LLM call", map[string]any{"agent_id": a.id})
 		req := &middleware.ModelRequest{
 			Messages:     messages,
 			SystemPrompt: currentSystemPrompt,
@@ -171,6 +186,7 @@ func (a *Agent) runModelStep(ctx context.Context) error {
 
 		// 定义 finalHandler: 实际调用 Provider
 		finalHandler := func(ctx context.Context, req *middleware.ModelRequest) (*middleware.ModelResponse, error) {
+			procLog.Info(ctx, "finalHandler: calling provider.Stream", map[string]any{"agent_id": a.id, "message_count": len(req.Messages)})
 			streamOpts := &provider.StreamOptions{
 				Tools:     toolSchemas,
 				MaxTokens: 4096,
@@ -179,8 +195,10 @@ func (a *Agent) runModelStep(ctx context.Context) error {
 
 			stream, err := a.provider.Stream(ctx, req.Messages, streamOpts)
 			if err != nil {
+				procLog.Error(ctx, "provider.Stream failed", map[string]any{"agent_id": a.id, "error": err.Error()})
 				return nil, fmt.Errorf("stream model: %w", err)
 			}
+			procLog.Info(ctx, "provider.Stream returned, processing response", map[string]any{"agent_id": a.id})
 
 			// 处理流式响应
 			message, err := a.handleStreamResponse(ctx, stream)
@@ -195,10 +213,13 @@ func (a *Agent) runModelStep(ctx context.Context) error {
 		}
 
 		// 通过 middleware stack 执行
+		procLog.Info(ctx, "calling middlewareStack.ExecuteModelCall", map[string]any{"agent_id": a.id})
 		resp, err := a.middlewareStack.ExecuteModelCall(ctx, req, finalHandler)
 		if err != nil {
+			procLog.Error(ctx, "middlewareStack.ExecuteModelCall failed", map[string]any{"agent_id": a.id, "error": err.Error()})
 			modelErr = err
 		} else {
+			procLog.Info(ctx, "middlewareStack.ExecuteModelCall succeeded", map[string]any{"agent_id": a.id})
 			assistantMessage = resp.Message
 		}
 	} else {
@@ -228,9 +249,19 @@ func (a *Agent) runModelStep(ctx context.Context) error {
 	// 保存助手消息
 	a.mu.Lock()
 	a.messages = append(a.messages, assistantMessage)
+
+	// ✅ 修复：保存前在内存中修剪，避免 Store 出现超限状态
+	if a.shouldTrimMessages() {
+		a.messages = a.trimMessagesInMemory(a.messages, a.config.Store.MaxMessages)
+		procLog.Debug(ctx, "messages trimmed in memory before save", map[string]any{
+			"agent_id":     a.id,
+			"max_messages": a.config.Store.MaxMessages,
+			"actual_count": len(a.messages),
+		})
+	}
 	a.mu.Unlock()
 
-	// 持久化
+	// 持久化（已修剪的消息）
 	if err := a.deps.Store.SaveMessages(ctx, a.id, a.messages); err != nil {
 		return fmt.Errorf("save messages: %w", err)
 	}
@@ -272,10 +303,21 @@ func (a *Agent) executeTools(ctx context.Context, toolUses []*types.ToolUseBlock
 		Role:          types.MessageRoleUser,
 		ContentBlocks: toolResults,
 	})
+
+	// ✅ 修复：保存前在内存中修剪
+	if a.shouldTrimMessages() {
+		a.messages = a.trimMessagesInMemory(a.messages, a.config.Store.MaxMessages)
+		procLog.Debug(ctx, "messages trimmed in memory before save (after tool execution)", map[string]any{
+			"agent_id":     a.id,
+			"max_messages": a.config.Store.MaxMessages,
+			"actual_count": len(a.messages),
+		})
+	}
+
 	a.stepCount++
 	a.mu.Unlock()
 
-	// 持久化
+	// 持久化（已修剪的消息）
 	if err := a.deps.Store.SaveMessages(ctx, a.id, a.messages); err != nil {
 		return fmt.Errorf("save messages: %w", err)
 	}
@@ -288,6 +330,24 @@ func (a *Agent) executeTools(ctx context.Context, toolUses []*types.ToolUseBlock
 	if err := a.deps.Store.SaveToolCallRecords(ctx, a.id, records); err != nil {
 		return fmt.Errorf("save tool records: %w", err)
 	}
+
+	// 检查迭代限制（防止无限循环）
+	a.mu.Lock()
+	a.iterationCount++
+	currentIter := a.iterationCount
+	maxIter := a.maxIterations
+	if maxIter <= 0 {
+		maxIter = 50
+	}
+	a.mu.Unlock()
+
+	if currentIter > maxIter {
+		procLog.Error(ctx, "iteration limit exceeded", map[string]any{
+			"agent_id": a.id, "iteration": currentIter, "max": maxIter,
+		})
+		return fmt.Errorf("iteration limit exceeded: %d > %d, possible infinite loop detected", currentIter, maxIter)
+	}
+	procLog.Debug(ctx, "streaming iteration", map[string]any{"agent_id": a.id, "iteration": currentIter, "max": maxIter})
 
 	// 继续处理
 	return a.runModelStep(ctx)
@@ -351,6 +411,12 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 
 			if !checkResult.Allowed {
 				if checkResult.NeedsApproval {
+					// 创建等待 channel
+					decisionCh := make(chan string, 1)
+					a.mu.Lock()
+					a.pendingPermissions[tu.ID] = decisionCh
+					a.mu.Unlock()
+
 					// 发送权限请求事件到 Control Channel
 					a.eventBus.EmitControl(&types.ControlPermissionRequiredEvent{
 						Call: types.ToolCallSnapshot{
@@ -359,29 +425,54 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 							Arguments: tu.Input,
 						},
 					})
-					// 等待用户决策（简化处理：暂时拒绝）
-					errorMsg := fmt.Sprintf("Permission required for tool: %s (decided by: %s)", tu.Name, checkResult.DecidedBy)
+
+					// 等待用户决策
+					select {
+					case decision := <-decisionCh:
+						// 清理 pending map
+						a.mu.Lock()
+						delete(a.pendingPermissions, tu.ID)
+						a.mu.Unlock()
+
+						if decision != "approved" {
+							// 用户拒绝
+							errorMsg := fmt.Sprintf("Permission rejected by user for tool: %s", tu.Name)
+							return &types.ToolResultBlock{
+								ToolUseID: tu.ID,
+								Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
+								IsError:   true,
+							}
+						}
+						// 用户批准，继续执行工具（跳出权限检查）
+					case <-ctx.Done():
+						// 上下文取消
+						a.mu.Lock()
+						delete(a.pendingPermissions, tu.ID)
+						a.mu.Unlock()
+						errorMsg := "Permission request cancelled"
+						return &types.ToolResultBlock{
+							ToolUseID: tu.ID,
+							Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
+							IsError:   true,
+						}
+					}
+				} else {
+					// 直接拒绝（NeedsApproval 为 false）
+					errorMsg := fmt.Sprintf("Permission denied: %s (decided by: %s)", checkResult.Message, checkResult.DecidedBy)
+					a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
+						Call: types.ToolCallSnapshot{
+							ID:        tu.ID,
+							Name:      tu.Name,
+							State:     types.ToolCallStateFailed,
+							Arguments: tu.Input,
+						},
+						Error: errorMsg,
+					})
 					return &types.ToolResultBlock{
 						ToolUseID: tu.ID,
-						Content:   fmt.Sprintf(`{"ok":false,"error":"%s","needs_approval":true}`, errorMsg),
+						Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
 						IsError:   true,
 					}
-				}
-				// 直接拒绝
-				errorMsg := fmt.Sprintf("Permission denied: %s (decided by: %s)", checkResult.Message, checkResult.DecidedBy)
-				a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
-					Call: types.ToolCallSnapshot{
-						ID:        tu.ID,
-						Name:      tu.Name,
-						State:     types.ToolCallStateFailed,
-						Arguments: tu.Input,
-					},
-					Error: errorMsg,
-				})
-				return &types.ToolResultBlock{
-					ToolUseID: tu.ID,
-					Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
-					IsError:   true,
 				}
 			}
 		}
@@ -1091,6 +1182,23 @@ func (a *Agent) runNonStreamingStep(ctx context.Context) error {
 			return fmt.Errorf("execute tools failed: %w", err)
 		}
 
+		// 检查迭代限制（防止无限循环）
+		a.mu.Lock()
+		a.iterationCount++
+		currentIter := a.iterationCount
+		maxIter := a.maxIterations
+		if maxIter <= 0 {
+			maxIter = 50
+		}
+		a.mu.Unlock()
+
+		if currentIter > maxIter {
+			procLog.Error(ctx, "iteration limit exceeded in non-streaming mode", map[string]any{
+				"agent_id": a.id, "iteration": currentIter, "max": maxIter,
+			})
+			return fmt.Errorf("iteration limit exceeded: %d > %d", currentIter, maxIter)
+		}
+
 		// 递归调用继续处理
 		return a.runNonStreamingStep(ctx)
 	}
@@ -1104,3 +1212,21 @@ func (a *Agent) runNonStreamingStep(ctx context.Context) error {
 
 	return nil
 }
+
+// shouldTrimMessages 检查是否应该修剪消息
+func (a *Agent) shouldTrimMessages() bool {
+	return a.config.Store != nil &&
+		a.config.Store.MaxMessages > 0 &&
+		a.config.Store.AutoTrim
+}
+
+// trimMessagesInMemory 在内存中修剪消息（FIFO策略）
+// 必须在持有 a.mu 锁的情况下调用
+func (a *Agent) trimMessagesInMemory(messages []types.Message, maxMessages int) []types.Message {
+	if len(messages) <= maxMessages {
+		return messages
+	}
+	// 保留最近的 maxMessages 条消息
+	return messages[len(messages)-maxMessages:]
+}
+

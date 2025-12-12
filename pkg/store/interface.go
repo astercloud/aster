@@ -14,6 +14,10 @@ type Store interface {
 	// LoadMessages 加载消息列表
 	LoadMessages(ctx context.Context, agentID string) ([]types.Message, error)
 
+	// TrimMessages 修剪消息列表，保留最近的 N 条消息
+	// 如果 maxMessages <= 0，则不修剪
+	TrimMessages(ctx context.Context, agentID string, maxMessages int) error
+
 	// SaveToolCallRecords 保存工具调用记录
 	SaveToolCallRecords(ctx context.Context, agentID string, records []types.ToolCallRecord) error
 
