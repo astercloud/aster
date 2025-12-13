@@ -327,3 +327,120 @@ func (s *Server) registerA2ARoutes(rg *gin.RouterGroup) {
 	// 注册路由 (直接在 v1 group 上注册以获取正确的路径)
 	h.RegisterRoutes(rg)
 }
+
+// registerDashboardRoutes registers all dashboard-related routes (with auth)
+func (s *Server) registerDashboardRoutes(rg *gin.RouterGroup) {
+	// Create dashboard handler with agent registry
+	h := handlers.NewDashboardHandlerWithRegistry(s.agentRegistry, s.store)
+
+	// Create dashboard event stream handler
+	eventHandler := handlers.NewDashboardEventHandler(s.agentRegistry)
+
+	dashboard := rg.Group("/dashboard")
+	{
+		// Overview
+		dashboard.GET("/overview", h.GetOverview)
+
+		// Traces
+		dashboard.GET("/traces", h.ListTraces)
+		dashboard.GET("/traces/:id", h.GetTrace)
+
+		// Metrics
+		metrics := dashboard.Group("/metrics")
+		{
+			metrics.GET("/tokens", h.GetTokenUsage)
+			metrics.GET("/costs", h.GetCosts)
+			metrics.GET("/performance", h.GetPerformance)
+		}
+
+		// Events
+		events := dashboard.Group("/events")
+		{
+			events.GET("", h.GetRecentEvents)
+			events.GET("/since/:cursor", h.GetEventsSince)
+			// WebSocket endpoint for real-time event streaming
+			events.GET("/stream", eventHandler.HandleEventStream)
+			events.GET("/stats", eventHandler.GetStats)
+		}
+
+		// Insights
+		dashboard.GET("/insights", h.GetInsights)
+
+		// Pricing configuration
+		pricing := dashboard.Group("/pricing")
+		{
+			pricing.GET("", h.GetPricing)
+			pricing.PUT("", h.UpdatePricing)
+		}
+
+		// Sessions
+		sessions := dashboard.Group("/sessions")
+		{
+			sessions.GET("", h.ListSessions)
+			sessions.GET("/:id", h.GetSession)
+		}
+	}
+}
+
+// registerDashboardRoutesNoAuth registers dashboard routes without authentication (for Studio UI)
+func (s *Server) registerDashboardRoutesNoAuth(dashboard *gin.RouterGroup) {
+	// Create dashboard handler with agent registry
+	h := handlers.NewDashboardHandlerWithRegistry(s.agentRegistry, s.store)
+
+	// Create dashboard event stream handler
+	eventHandler := handlers.NewDashboardEventHandler(s.agentRegistry)
+
+	// Overview
+	dashboard.GET("/overview", h.GetOverview)
+
+	// Traces
+	dashboard.GET("/traces", h.ListTraces)
+	dashboard.GET("/traces/:id", h.GetTrace)
+
+	// Metrics
+	metrics := dashboard.Group("/metrics")
+	{
+		metrics.GET("/tokens", h.GetTokenUsage)
+		metrics.GET("/costs", h.GetCosts)
+		metrics.GET("/performance", h.GetPerformance)
+	}
+
+	// Events
+	events := dashboard.Group("/events")
+	{
+		events.GET("", h.GetRecentEvents)
+		events.GET("/since/:cursor", h.GetEventsSince)
+		// WebSocket endpoint for real-time event streaming
+		events.GET("/stream", eventHandler.HandleEventStream)
+		events.GET("/stats", eventHandler.GetStats)
+	}
+
+	// Insights
+	dashboard.GET("/insights", h.GetInsights)
+
+	// Pricing configuration
+	pricing := dashboard.Group("/pricing")
+	{
+		pricing.GET("", h.GetPricing)
+		pricing.PUT("", h.UpdatePricing)
+	}
+
+	// Sessions
+	sessions := dashboard.Group("/sessions")
+	{
+		sessions.GET("", h.ListSessions)
+		sessions.GET("/:id", h.GetSession)
+	}
+}
+
+// registerRemoteAgentRoutes registers remote agent routes
+func (s *Server) registerRemoteAgentRoutes(rg *gin.RouterGroup) {
+	// Create remote agent handler with store for persistence
+	h := handlers.NewRemoteAgentHandler(s.agentRegistry, s.store)
+
+	remoteAgents := rg.Group("/remote-agents")
+	{
+		remoteAgents.GET("/connect", h.HandleConnect)
+		remoteAgents.GET("/stats", h.GetStats)
+	}
+}

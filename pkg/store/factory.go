@@ -11,11 +11,12 @@ type StoreType string
 const (
 	StoreTypeJSON  StoreType = "json"
 	StoreTypeRedis StoreType = "redis"
+	StoreTypeMySQL StoreType = "mysql"
 )
 
 // Config Store 配置
 type Config struct {
-	Type StoreType `json:"type" yaml:"type"` // Store 类型: json, redis
+	Type StoreType `json:"type" yaml:"type"` // Store 类型: json, redis, mysql
 
 	// JSON Store 配置
 	DataDir string `json:"data_dir,omitempty" yaml:"data_dir,omitempty"` // 数据目录
@@ -26,6 +27,12 @@ type Config struct {
 	RedisDB       int           `json:"redis_db,omitempty" yaml:"redis_db,omitempty"`             // Redis 数据库
 	RedisPrefix   string        `json:"redis_prefix,omitempty" yaml:"redis_prefix,omitempty"`     // Redis Key 前缀
 	RedisTTL      time.Duration `json:"redis_ttl,omitempty" yaml:"redis_ttl,omitempty"`           // Redis 数据过期时间
+
+	// MySQL Store 配置
+	MySQLDSN          string        `json:"mysql_dsn,omitempty" yaml:"mysql_dsn,omitempty"`                       // MySQL DSN
+	MySQLMaxOpenConns int           `json:"mysql_max_open_conns,omitempty" yaml:"mysql_max_open_conns,omitempty"` // 最大打开连接数
+	MySQLMaxIdleConns int           `json:"mysql_max_idle_conns,omitempty" yaml:"mysql_max_idle_conns,omitempty"` // 最大空闲连接数
+	MySQLMaxLifetime  time.Duration `json:"mysql_max_lifetime,omitempty" yaml:"mysql_max_lifetime,omitempty"`     // 连接最大生命周期
 }
 
 // NewStore 创建 Store（工厂方法）
@@ -53,6 +60,20 @@ func NewStore(config Config) (Store, error) {
 		}
 
 		return NewRedisStore(redisConfig)
+
+	case StoreTypeMySQL:
+		if config.MySQLDSN == "" {
+			return nil, fmt.Errorf("mysql_dsn is required for mysql store")
+		}
+
+		mysqlConfig := MySQLConfig{
+			DSN:          config.MySQLDSN,
+			MaxOpenConns: config.MySQLMaxOpenConns,
+			MaxIdleConns: config.MySQLMaxIdleConns,
+			MaxLifetime:  config.MySQLMaxLifetime,
+		}
+
+		return NewMySQLStore(mysqlConfig)
 
 	default:
 		return nil, fmt.Errorf("unknown store type: %s", config.Type)

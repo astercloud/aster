@@ -15,6 +15,7 @@ import (
 	"github.com/astercloud/aster/server/handlers"
 	"github.com/astercloud/aster/server/observability"
 	"github.com/astercloud/aster/server/ratelimit"
+	"github.com/astercloud/aster/server/studio"
 	"github.com/gin-gonic/gin"
 )
 
@@ -239,6 +240,10 @@ func (s *Server) setupRoutes() {
 	wsHandler := handlers.NewWebSocketHandler(s.store, s.deps.AgentDeps, s.agentRegistry)
 	s.router.GET("/v1/ws", wsHandler.HandleWebSocket)
 
+	// Dashboard routes (no auth required for Studio UI)
+	dashboardGroup := s.router.Group("/v1/dashboard")
+	s.registerDashboardRoutesNoAuth(dashboardGroup)
+
 	// API v1 routes (with authentication)
 	v1 := s.router.Group("/v1")
 
@@ -272,6 +277,11 @@ func (s *Server) setupRoutes() {
 	s.registerEvalRoutes(v1)
 	s.registerMCPRoutes(v1)
 	s.registerA2ARoutes(v1)
+	s.registerRemoteAgentRoutes(v1)
+	// Dashboard routes are registered without auth above for Studio UI
+
+	// Register Studio routes (embedded dashboard UI)
+	studio.RegisterRoutes(s.router)
 }
 
 // Start starts the HTTP server
@@ -290,6 +300,9 @@ func (s *Server) Start() error {
 	fmt.Printf("📊 Health check: http://%s%s\n", addr, s.config.Observability.HealthCheck.Endpoint)
 	if s.config.Observability.Metrics.Enabled {
 		fmt.Printf("📈 Metrics: http://%s%s\n", addr, s.config.Observability.Metrics.Endpoint)
+	}
+	if studio.Enabled {
+		fmt.Printf("🎨 Studio: http://%s/studio\n", addr)
 	}
 
 	// Start server

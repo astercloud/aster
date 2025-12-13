@@ -378,6 +378,60 @@ func (r *Registry) registerBuiltin() {
 		}), nil
 	})
 
+	// Telemetry Middleware (OpenTelemetry GenAI Semantic Conventions)
+	r.Register("telemetry", func(config *MiddlewareFactoryConfig) (Middleware, error) {
+		// 默认配置
+		agentID := config.AgentID
+		agentName := ""
+		providerName := ""
+		model := ""
+		conversationID := ""
+		recordPrompts := false
+		recordCompletions := false
+
+		// 从自定义配置读取
+		if config.CustomConfig != nil {
+			if an, ok := config.CustomConfig["agent_name"].(string); ok {
+				agentName = an
+			}
+			if pn, ok := config.CustomConfig["provider"].(string); ok {
+				providerName = pn
+			}
+			if m, ok := config.CustomConfig["model"].(string); ok {
+				model = m
+			}
+			if cid, ok := config.CustomConfig["conversation_id"].(string); ok {
+				conversationID = cid
+			}
+			if rp, ok := config.CustomConfig["record_prompts"].(bool); ok {
+				recordPrompts = rp
+			}
+			if rc, ok := config.CustomConfig["record_completions"].(bool); ok {
+				recordCompletions = rc
+			}
+		}
+
+		// 从 Metadata 中获取会话 ID
+		if config.Metadata != nil {
+			if cid, ok := config.Metadata["conversation_id"].(string); ok && conversationID == "" {
+				conversationID = cid
+			}
+			if sid, ok := config.Metadata["session_id"].(string); ok && conversationID == "" {
+				conversationID = sid
+			}
+		}
+
+		return NewTelemetryMiddleware(&TelemetryMiddlewareConfig{
+			AgentID:           agentID,
+			AgentName:         agentName,
+			Provider:          providerName,
+			Model:             model,
+			ConversationID:    conversationID,
+			RecordPrompts:     recordPrompts,
+			RecordCompletions: recordCompletions,
+		}), nil
+	})
+
 	regLog.Info(context.Background(), "built-in middlewares registered", map[string]any{"middlewares": r.List()})
 }
 

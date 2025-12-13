@@ -1,4 +1,4 @@
-.PHONY: help install-hooks lint fmt vet test test-integration clean build
+.PHONY: help install-hooks lint fmt vet test test-integration clean build build-studio
 
 help: ## 显示帮助信息
 	@echo "可用命令:"
@@ -54,11 +54,24 @@ clean: ## 清理构建产物
 	@go clean
 	@echo "✓ 清理完成"
 
-build: ## 构建项目
+build: ## 构建项目 (不包含 Studio)
 	@echo "构建项目..."
 	@go build -o bin/aster ./cmd/aster
 	@go build -o bin/aster-server ./cmd/aster-server
 	@echo "✓ 构建完成: bin/aster, bin/aster-server"
+
+build-studio: ## 构建前端 Studio
+	@echo "构建 Studio 前端..."
+	@cd studio && npm install && npm run build
+	@rm -rf server/studio/dist
+	@cp -r studio/dist server/studio/dist
+	@echo "✓ Studio 构建完成并复制到 server/studio/dist"
+
+build-with-studio: build-studio ## 构建项目 (包含 Studio)
+	@echo "构建项目 (包含 Studio)..."
+	@go build -tags studio -o bin/aster ./cmd/aster
+	@go build -tags studio -o bin/aster-server ./cmd/aster-server
+	@echo "✓ 构建完成 (包含 Studio): bin/aster, bin/aster-server"
 
 check: fmt vet lint ## 运行所有检查 (fmt + vet + lint)
 	@echo ""

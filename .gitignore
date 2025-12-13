@@ -198,6 +198,7 @@ proto/gen/
 # 编译产物
 /aster
 /aster-server
+/aster-server-studio
 examples/*/agent
 examples/*/agent-*
 examples/*/*-demo

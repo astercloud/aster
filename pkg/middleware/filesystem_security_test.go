@@ -317,8 +317,9 @@ func TestFilesystemMiddleware_SystemPromptOverride(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			middleware := NewFilesystemMiddleware(&FilesystemMiddlewareConfig{
-				Backend:              backend,
-				SystemPromptOverride: tt.systemPromptOverride,
+				Backend:                 backend,
+				SystemPromptOverride:    tt.systemPromptOverride,
+				HasSystemPromptOverride: tt.systemPromptOverride != "",
 			})
 
 			req := &ModelRequest{

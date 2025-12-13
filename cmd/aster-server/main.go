@@ -110,7 +110,53 @@ func main() {
 	fmt.Println("================================")
 
 	// Initialize store
-	st, err := store.NewJSONStore(".data")
+	// 支持通过环境变量配置存储类型: json (默认), mysql, redis
+	var st store.Store
+	var err error
+
+	storeType := os.Getenv("ASTER_STORE_TYPE")
+	switch storeType {
+	case "mysql":
+		mysqlDSN := os.Getenv("ASTER_MYSQL_DSN")
+		if mysqlDSN == "" {
+			log.Fatalf("ASTER_MYSQL_DSN is required when ASTER_STORE_TYPE=mysql")
+		}
+		fmt.Printf("📁 Using MySQL store\n")
+		st, err = store.NewMySQLStore(store.MySQLConfig{
+			DSN: mysqlDSN,
+		})
+
+	case "redis":
+		redisAddr := os.Getenv("ASTER_REDIS_ADDR")
+		if redisAddr == "" {
+			redisAddr = "localhost:6379"
+		}
+		redisPassword := os.Getenv("ASTER_REDIS_PASSWORD")
+		redisDB := 0
+		if dbStr := os.Getenv("ASTER_REDIS_DB"); dbStr != "" {
+			fmt.Sscanf(dbStr, "%d", &redisDB)
+		}
+		redisPrefix := os.Getenv("ASTER_REDIS_PREFIX")
+		if redisPrefix == "" {
+			redisPrefix = "aster:"
+		}
+		fmt.Printf("📁 Using Redis store: %s\n", redisAddr)
+		st, err = store.NewRedisStore(store.RedisConfig{
+			Addr:     redisAddr,
+			Password: redisPassword,
+			DB:       redisDB,
+			Prefix:   redisPrefix,
+		})
+
+	default:
+		// 默认使用 JSON Store
+		dataDir := os.Getenv("ASTER_DATA_DIR")
+		if dataDir == "" {
+			dataDir = ".data"
+		}
+		fmt.Printf("📁 Using JSON store: %s\n", dataDir)
+		st, err = store.NewJSONStore(dataDir)
+	}
 	if err != nil {
 		log.Fatalf("Failed to create store: %v", err)
 	}

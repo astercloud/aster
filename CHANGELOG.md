@@ -1,5 +1,38 @@
 # Changelog
 
+## [v0.32.0] - 2025-12-13
+
+### Added
+
+- **Aster Studio 可观测性增强**
+  - 新增 MySQL 存储后端 (`pkg/store/mysql.go`)，支持持久化 Agent 数据
+  - 支持三种存储类型：JSON（默认）、MySQL、Redis
+  - 通过环境变量配置存储：`ASTER_STORE_TYPE`、`ASTER_MYSQL_DSN`、`ASTER_REDIS_ADDR`
+
+- **事件流筛选功能**
+  - 支持按通道筛选（progress/control/monitor）
+  - 支持按事件类型筛选（error/token_usage/state_changed 等）
+  - 修复远程 Agent 事件的筛选逻辑
+
+- **远程 Agent 事件改进**
+  - 修复 `map[string]any` 类型事件的 channel/type 提取
+  - 改进 `shouldForward` 函数支持远程 Agent 事件筛选
+
+- **文档更新**
+  - 新增 Aster Studio 文档 (`docs/content/10.observability/5.studio/`)
+  - 包含：概览、事件流、远程 Agent 集成指南
+
+### Changed
+
+- **Store Factory**: 添加 MySQL 存储类型支持
+- **main.go**: 支持通过环境变量配置存储后端
+- **dashboard_events.go**: 增强事件筛选逻辑
+
+### Fixed
+
+- **aggregator.go**: 修复 `Cost` 类型名为 `CostAmount`
+- **事件筛选**: 修复远程 Agent 事件无法筛选的问题
+
 ## [v0.28.0] - 2025-12-10
 
 ### Added

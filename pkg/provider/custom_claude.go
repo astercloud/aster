@@ -404,7 +404,8 @@ func (cp *CustomClaudeProvider) processStream(body io.ReadCloser, chunkCh chan<-
 		eventType, _ := event["type"].(string)
 		
 		// 记录所有事件的完整内容（用于调试中转站格式）
-		customClaudeLog.Info(context.Background(), "SSE EVENT", map[string]any{
+		// 使用 Debug 级别避免生产环境日志过于冗长
+		customClaudeLog.Debug(context.Background(), "SSE EVENT", map[string]any{
 			"line_num":   lineCount,
 			"event_type": eventType,
 			"event":      event,
@@ -421,11 +422,10 @@ func (cp *CustomClaudeProvider) processStream(body io.ReadCloser, chunkCh chan<-
 					}
 					partialJSON, _ := delta["partial_json"].(string)
 					toolInputBuffers[index] += partialJSON
-					customClaudeLog.Info(context.Background(), "TOOL INPUT ACCUMULATING", map[string]any{
+					// 使用 Debug 级别，避免每个 delta 都输出大量日志
+					customClaudeLog.Debug(context.Background(), "TOOL INPUT ACCUMULATING", map[string]any{
 						"index":           index,
-						"partial_json":    partialJSON,
 						"accumulated_len": len(toolInputBuffers[index]),
-						"accumulated":     toolInputBuffers[index],
 					})
 				}
 			}
@@ -438,11 +438,11 @@ func (cp *CustomClaudeProvider) processStream(body io.ReadCloser, chunkCh chan<-
 				index = int(idx)
 			}
 			if accumulated, exists := toolInputBuffers[index]; exists {
-				customClaudeLog.Info(context.Background(), "TOOL INPUT FINAL", map[string]any{
-					"index":       index,
-					"final_json":  accumulated,
-					"json_len":    len(accumulated),
-					"is_valid":    json.Valid([]byte(accumulated)),
+				// 只在工具输入完成时记录一次，使用 Debug 级别
+				customClaudeLog.Debug(context.Background(), "TOOL INPUT FINAL", map[string]any{
+					"index":    index,
+					"json_len": len(accumulated),
+					"is_valid": json.Valid([]byte(accumulated)),
 				})
 			}
 		}
@@ -533,15 +533,7 @@ func (cp *CustomClaudeProvider) parseStreamEvent(event map[string]any) *StreamCh
 				})
 			}
 
-			// 特别记录 input_json_delta
-			if deltaType == "input_json_delta" {
-				partialJSON, _ := delta["partial_json"].(string)
-				customClaudeLog.Info(context.Background(), "input_json_delta received", map[string]any{
-					"index":        chunk.Index,
-					"partial_json": partialJSON,
-					"json_len":     len(partialJSON),
-				})
-			}
+			// input_json_delta 已在 processStreamResponse 中追踪，这里不再重复记录
 		} else {
 			customClaudeLog.Warn(context.Background(), "content_block_delta missing delta field", map[string]any{
 				"event": event,

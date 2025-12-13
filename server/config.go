@@ -150,7 +150,7 @@ func DefaultConfig() *Config {
 		},
 		Auth: AuthConfig{
 			APIKey: APIKeyConfig{
-				Enabled:    true,
+				Enabled:    false, // Disabled for local development
 				HeaderName: "X-API-Key",
 				Keys:       []string{"dev-key-12345"},
 			},

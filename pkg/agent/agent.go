@@ -1028,6 +1028,11 @@ func (a *Agent) Unsubscribe(ch <-chan types.AgentEventEnvelope) {
 	a.eventBus.Unsubscribe(ch)
 }
 
+// GetEventBus 获取 EventBus（用于 Dashboard 聚合）
+func (a *Agent) GetEventBus() *events.EventBus {
+	return a.eventBus
+}
+
 // Status 获取状态
 func (a *Agent) Status() *types.AgentStatus {
 	a.mu.RLock()

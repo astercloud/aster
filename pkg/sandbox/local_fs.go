@@ -31,14 +31,25 @@ func (lfs *LocalFS) Resolve(path string) string {
 }
 
 // IsInside 检查路径是否在沙箱内
+// 如果传入的是绝对路径，直接检查该路径是否在 workDir 或白名单内
+// 如果传入的是相对路径，先解析为绝对路径再检查
 func (lfs *LocalFS) IsInside(path string) bool {
-	resolved, err := filepath.Abs(lfs.Resolve(path))
+	var resolved string
+	var err error
+
+	// 如果是绝对路径，直接使用（不经过 Resolve 转换）
+	if filepath.IsAbs(path) {
+		resolved, err = filepath.Abs(path)
+	} else {
+		resolved, err = filepath.Abs(lfs.Resolve(path))
+	}
 	if err != nil {
 		return false
 	}
 
 	// 1. 检查是否在workDir内
-	relativeToWork, err := filepath.Rel(lfs.workDir, resolved)
+	workDirAbs, _ := filepath.Abs(lfs.workDir)
+	relativeToWork, err := filepath.Rel(workDirAbs, resolved)
 	if err == nil && !strings.HasPrefix(relativeToWork, "..") && !filepath.IsAbs(relativeToWork) {
 		return true
 	}
