@@ -5,6 +5,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -316,17 +317,8 @@ func (c *DashboardEventConnection) subscribeToAgent(ag *agent.Agent) {
 	agentID := ag.ID()
 
 	// Check if filters allow this agent
-	if len(c.filters.AgentIDs) > 0 {
-		found := false
-		for _, id := range c.filters.AgentIDs {
-			if id == agentID {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return
-		}
+	if len(c.filters.AgentIDs) > 0 && !slices.Contains(c.filters.AgentIDs, agentID) {
+		return
 	}
 
 	c.subMu.Lock()
@@ -383,17 +375,8 @@ func (c *DashboardEventConnection) subscribeToRemoteAgent(ra *agent.RemoteAgent)
 	agentID := ra.ID()
 
 	// Check if filters allow this agent
-	if len(c.filters.AgentIDs) > 0 {
-		found := false
-		for _, id := range c.filters.AgentIDs {
-			if id == agentID {
-				found = true
-				break
-			}
-		}
-		if !found {
-			return
-		}
+	if len(c.filters.AgentIDs) > 0 && !slices.Contains(c.filters.AgentIDs, agentID) {
+		return
 	}
 
 	c.subMu.Lock()
@@ -604,7 +587,7 @@ func (c *DashboardEventConnection) shouldForward(envelope types.AgentEventEnvelo
 func (c *DashboardEventConnection) extractEventInfo(agentID string, envelope types.AgentEventEnvelope) map[string]any {
 	// 将 Unix 秒级时间戳转换为 ISO 8601 格式字符串
 	timestamp := time.Unix(envelope.Bookmark.Timestamp, 0).Format(time.RFC3339)
-	
+
 	info := map[string]any{
 		"cursor":    envelope.Cursor,
 		"timestamp": timestamp,
@@ -641,14 +624,14 @@ func (c *DashboardEventConnection) extractEventInfo(agentID string, envelope typ
 		}
 	case *types.MonitorToolExecutedEvent:
 		info["data"] = map[string]any{
-			"agent_id":   agentID,
-			"tool_id":    e.Call.ID,
-			"tool_name":  e.Call.Name,
-			"state":      string(e.Call.State),
-			"progress":   e.Call.Progress,
-			"error":      e.Call.Error,
-			"arguments":  e.Call.Arguments,
-			"result":     e.Call.Result,
+			"agent_id":  agentID,
+			"tool_id":   e.Call.ID,
+			"tool_name": e.Call.Name,
+			"state":     string(e.Call.State),
+			"progress":  e.Call.Progress,
+			"error":     e.Call.Error,
+			"arguments": e.Call.Arguments,
+			"result":    e.Call.Result,
 		}
 	case *types.MonitorStepCompleteEvent:
 		info["data"] = map[string]any{
@@ -699,10 +682,10 @@ func (c *DashboardEventConnection) extractEventInfo(agentID string, envelope typ
 		}
 	case *types.ProgressToolEndEvent:
 		info["data"] = map[string]any{
-			"tool_id":  e.Call.ID,
-			"state":    string(e.Call.State),
-			"result":   e.Call.Result,
-			"error":    e.Call.Error,
+			"tool_id": e.Call.ID,
+			"state":   string(e.Call.State),
+			"result":  e.Call.Result,
+			"error":   e.Call.Error,
 		}
 	case *types.ProgressToolProgressEvent:
 		info["data"] = map[string]any{

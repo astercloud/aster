@@ -3,6 +3,7 @@ package server
 import (
 	"fmt"
 	"net/http"
+	"slices"
 	"strings"
 	"time"
 
@@ -86,14 +87,7 @@ func apiKeyAuthMiddleware(config APIKeyConfig) gin.HandlerFunc {
 			c.Abort()
 			return
 		}
-		valid := false
-		for _, key := range config.Keys {
-			if key == apiKey {
-				valid = true
-				break
-			}
-		}
-		if !valid {
+		if !slices.Contains(config.Keys, apiKey) {
 			c.JSON(http.StatusUnauthorized, gin.H{"success": false, "error": gin.H{"code": "invalid_api_key"}})
 			c.Abort()
 			return
@@ -104,7 +98,7 @@ func apiKeyAuthMiddleware(config APIKeyConfig) gin.HandlerFunc {
 }
 
 // jwtAuthMiddleware validates JWT tokens
-func jwtAuthMiddleware(config JWTConfig) gin.HandlerFunc {
+func jwtAuthMiddleware(_ JWTConfig) gin.HandlerFunc {
 	return func(c *gin.Context) {
 		authHeader := c.GetHeader("Authorization")
 		if authHeader == "" {

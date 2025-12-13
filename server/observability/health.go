@@ -2,6 +2,7 @@ package observability
 
 import (
 	"context"
+	"maps"
 	"sync"
 	"time"
 )
@@ -66,10 +67,8 @@ func (h *HealthChecker) RegisterCheck(check HealthCheck) {
 // Check 执行所有健康检查
 func (h *HealthChecker) Check(ctx context.Context) *HealthInfo {
 	h.mu.RLock()
-	checks := make(map[string]HealthCheck)
-	for name, check := range h.checks {
-		checks[name] = check
-	}
+	checks := make(map[string]HealthCheck, len(h.checks))
+	maps.Copy(checks, h.checks)
 	h.mu.RUnlock()
 
 	info := &HealthInfo{

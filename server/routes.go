@@ -328,7 +328,10 @@ func (s *Server) registerA2ARoutes(rg *gin.RouterGroup) {
 	h.RegisterRoutes(rg)
 }
 
-// registerDashboardRoutes registers all dashboard-related routes (with auth)
+// registerDashboardRoutes registers all dashboard-related routes (with auth).
+// Reserved for future use when dashboard authentication is enabled.
+//
+//nolint:unused
 func (s *Server) registerDashboardRoutes(rg *gin.RouterGroup) {
 	// Create dashboard handler with agent registry
 	h := handlers.NewDashboardHandlerWithRegistry(s.agentRegistry, s.store)

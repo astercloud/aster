@@ -134,7 +134,7 @@ func main() {
 		redisPassword := os.Getenv("ASTER_REDIS_PASSWORD")
 		redisDB := 0
 		if dbStr := os.Getenv("ASTER_REDIS_DB"); dbStr != "" {
-			fmt.Sscanf(dbStr, "%d", &redisDB)
+			_, _ = fmt.Sscanf(dbStr, "%d", &redisDB)
 		}
 		redisPrefix := os.Getenv("ASTER_REDIS_PREFIX")
 		if redisPrefix == "" {

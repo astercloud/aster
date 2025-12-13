@@ -691,7 +691,7 @@ func TestOnStepFailedCallback(t *testing.T) {
 	ctx := context.Background()
 	toolCtx := &tools.ToolContext{AgentID: "test-agent"}
 
-	executor.Execute(ctx, plan, toolCtx)
+	_ = executor.Execute(ctx, plan, toolCtx)
 
 	if failedStep == nil {
 		t.Fatal("OnStepFailed callback not called")
@@ -784,7 +784,7 @@ func TestDependencyNotSatisfied(t *testing.T) {
 	ctx := context.Background()
 	toolCtx := &tools.ToolContext{AgentID: "test-agent"}
 
-	executor.Execute(ctx, plan, toolCtx)
+	_ = executor.Execute(ctx, plan, toolCtx)
 
 	// Step 2 should be skipped because its dependency failed
 	if plan.Steps[1].Status != StepStatusSkipped {

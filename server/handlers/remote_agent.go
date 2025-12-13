@@ -49,8 +49,8 @@ type RegisterSessionPayload struct {
 
 // EventPayload 事件消息的 Payload
 type EventPayload struct {
-	AgentID  string                    `json:"agent_id"`
-	Envelope types.AgentEventEnvelope  `json:"envelope"`
+	AgentID  string                   `json:"agent_id"`
+	Envelope types.AgentEventEnvelope `json:"envelope"`
 }
 
 // NewRemoteAgentHandler 创建 RemoteAgentHandler
@@ -92,7 +92,7 @@ func (h *RemoteAgentHandler) HandleConnect(c *gin.Context) {
 func (h *RemoteAgentHandler) handleConnection(ctx context.Context, conn *websocket.Conn) {
 	defer func() {
 		h.cleanupConnection(conn)
-		conn.Close()
+		_ = conn.Close()
 	}()
 
 	// 设置读取超时

@@ -21,6 +21,15 @@ import (
 
 var sandboxLogger = logging.ForComponent("sandbox")
 
+// getShell returns the preferred shell for command execution.
+// Prefers bash (which supports all ulimit options), falls back to /bin/sh.
+func getShell() string {
+	if shell, err := exec.LookPath("bash"); err == nil {
+		return shell
+	}
+	return "/bin/sh"
+}
+
 // SecurityLevel 安全级别
 type SecurityLevel int
 
@@ -447,7 +456,7 @@ func (ls *LocalSandbox) execWithLimits(ctx context.Context, cmd string, opts *Ex
 
 	// 构建命令（带资源限制）
 	shellCmd := ls.buildSecureCommand(cmd)
-	command := exec.CommandContext(execCtx, "sh", "-c", shellCmd)
+	command := exec.CommandContext(execCtx, getShell(), "-c", shellCmd)
 
 	// 设置工作目录
 	workDir := ls.workDir
@@ -1078,7 +1087,7 @@ func (ls *LocalSandbox) execDirect(ctx context.Context, cmd string, opts *ExecOp
 	execCtx, cancel := context.WithTimeout(ctx, timeout)
 	defer cancel()
 
-	command := exec.CommandContext(execCtx, "sh", "-c", cmd)
+	command := exec.CommandContext(execCtx, getShell(), "-c", cmd)
 
 	workDir := ls.workDir
 	if opts != nil && opts.WorkDir != "" {

@@ -42,10 +42,10 @@ func TestNewLoaderWithOptions(t *testing.T) {
 
 func TestExpandVariables(t *testing.T) {
 	// Set test environment variables
-	os.Setenv("TEST_VAR", "test_value")
-	os.Setenv("ANOTHER_VAR", "another_value")
-	defer os.Unsetenv("TEST_VAR")
-	defer os.Unsetenv("ANOTHER_VAR")
+	_ = os.Setenv("TEST_VAR", "test_value")
+	_ = os.Setenv("ANOTHER_VAR", "another_value")
+	defer func() { _ = os.Unsetenv("TEST_VAR") }()
+	defer func() { _ = os.Unsetenv("ANOTHER_VAR") }()
 
 	loader := NewLoader()
 
@@ -107,8 +107,8 @@ func TestExpandVariables(t *testing.T) {
 }
 
 func TestExpandVariablesWithPrefix(t *testing.T) {
-	os.Setenv("APP_TEST_VAR", "prefixed_value")
-	defer os.Unsetenv("APP_TEST_VAR")
+	_ = os.Setenv("APP_TEST_VAR", "prefixed_value")
+	defer func() { _ = os.Unsetenv("APP_TEST_VAR") }()
 
 	loader := NewLoader(WithEnvPrefix("APP_"))
 
@@ -129,8 +129,8 @@ func TestExpandVariablesWithCustomVariables(t *testing.T) {
 	}
 
 	// Custom variables should take precedence over environment
-	os.Setenv("CUSTOM_VAR", "env_value")
-	defer os.Unsetenv("CUSTOM_VAR")
+	_ = os.Setenv("CUSTOM_VAR", "env_value")
+	defer func() { _ = os.Unsetenv("CUSTOM_VAR") }()
 
 	result = loader.expandVariables("${CUSTOM_VAR}")
 	if result != "custom_value" {
@@ -139,8 +139,8 @@ func TestExpandVariablesWithCustomVariables(t *testing.T) {
 }
 
 func TestExpandVariablesDisabled(t *testing.T) {
-	os.Setenv("TEST_VAR", "test_value")
-	defer os.Unsetenv("TEST_VAR")
+	_ = os.Setenv("TEST_VAR", "test_value")
+	defer func() { _ = os.Unsetenv("TEST_VAR") }()
 
 	loader := NewLoader(WithEnvExpansion(false))
 
@@ -153,8 +153,8 @@ func TestExpandVariablesDisabled(t *testing.T) {
 }
 
 func TestLoadFromString(t *testing.T) {
-	os.Setenv("API_KEY", "sk-test-key")
-	defer os.Unsetenv("API_KEY")
+	_ = os.Setenv("API_KEY", "sk-test-key")
+	defer func() { _ = os.Unsetenv("API_KEY") }()
 
 	loader := NewLoader()
 
@@ -225,10 +225,10 @@ model_config:
 }
 
 func TestLoadAgentConfigWithEnvVars(t *testing.T) {
-	os.Setenv("TEST_API_KEY", "sk-env-key")
-	os.Setenv("TEST_MODEL", "claude-3-opus")
-	defer os.Unsetenv("TEST_API_KEY")
-	defer os.Unsetenv("TEST_MODEL")
+	_ = os.Setenv("TEST_API_KEY", "sk-env-key")
+	_ = os.Setenv("TEST_MODEL", "claude-3-opus")
+	defer func() { _ = os.Unsetenv("TEST_API_KEY") }()
+	defer func() { _ = os.Unsetenv("TEST_MODEL") }()
 
 	tmpDir := t.TempDir()
 	configPath := filepath.Join(tmpDir, "agent.yaml")
