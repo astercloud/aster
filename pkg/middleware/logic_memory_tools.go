@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -89,7 +90,7 @@ func (t *LogicMemoryQueryTool) Execute(ctx context.Context, input map[string]any
 		}
 	}
 	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+		return nil, errors.New("namespace is required")
 	}
 
 	switch action {
@@ -157,7 +158,7 @@ func (t *LogicMemoryQueryTool) list(ctx context.Context, namespace string, input
 func (t *LogicMemoryQueryTool) get(ctx context.Context, namespace string, input map[string]any) (string, error) {
 	key, ok := input["key"].(string)
 	if !ok || key == "" {
-		return "", fmt.Errorf("key is required for 'get' action")
+		return "", errors.New("key is required for 'get' action")
 	}
 
 	memory, err := t.manager.GetMemory(ctx, namespace, key)
@@ -171,7 +172,7 @@ func (t *LogicMemoryQueryTool) get(ctx context.Context, namespace string, input 
 func (t *LogicMemoryQueryTool) search(ctx context.Context, namespace string, input map[string]any) (string, error) {
 	memoryType, ok := input["type"].(string)
 	if !ok || memoryType == "" {
-		return "", fmt.Errorf("type is required for 'search' action")
+		return "", errors.New("type is required for 'search' action")
 	}
 
 	filters := []logic.Filter{logic.WithType(memoryType)}
@@ -367,12 +368,12 @@ func (t *LogicMemoryUpdateTool) Execute(ctx context.Context, input map[string]an
 		}
 	}
 	if namespace == "" {
-		return nil, fmt.Errorf("namespace is required")
+		return nil, errors.New("namespace is required")
 	}
 
 	key, _ := input["key"].(string)
 	if key == "" {
-		return nil, fmt.Errorf("key is required")
+		return nil, errors.New("key is required")
 	}
 
 	switch action {
@@ -433,7 +434,7 @@ func (t *LogicMemoryUpdateTool) record(ctx context.Context, namespace, key strin
 
 	description, _ := input["description"].(string)
 	if description == "" {
-		return "", fmt.Errorf("description is required for recording memories")
+		return "", errors.New("description is required for recording memories")
 	}
 
 	value := input["value"]

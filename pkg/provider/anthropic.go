@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -36,7 +37,7 @@ type AnthropicProvider struct {
 // NewAnthropicProvider 创建Anthropic提供商
 func NewAnthropicProvider(config *types.ModelConfig) (*AnthropicProvider, error) {
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("anthropic api key is required")
+		return nil, errors.New("anthropic api key is required")
 	}
 
 	baseURL := config.BaseURL
@@ -82,15 +83,15 @@ func (ap *AnthropicProvider) Complete(ctx context.Context, messages []types.Mess
 	}
 
 	// 创建HTTP请求
-	req, err := http.NewRequestWithContext(ctx, "POST", ap.baseURL+"/v1/messages", bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ap.baseURL+"/v1/messages", bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	// 设置请求头
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", ap.config.APIKey)
-	req.Header.Set("anthropic-version", ap.version)
+	req.Header.Set("X-Api-Key", ap.config.APIKey)
+	req.Header.Set("Anthropic-Version", ap.version)
 
 	// 发送请求
 	resp, err := ap.client.Do(req)
@@ -161,15 +162,15 @@ func (ap *AnthropicProvider) Stream(ctx context.Context, messages []types.Messag
 	}
 
 	// 创建HTTP请求
-	req, err := http.NewRequestWithContext(ctx, "POST", ap.baseURL+"/v1/messages", bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, ap.baseURL+"/v1/messages", bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	// 设置请求头
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", ap.config.APIKey)
-	req.Header.Set("anthropic-version", ap.version)
+	req.Header.Set("X-Api-Key", ap.config.APIKey)
+	req.Header.Set("Anthropic-Version", ap.version)
 
 	// 发送请求
 	resp, err := ap.client.Do(req)
@@ -518,7 +519,7 @@ func (ap *AnthropicProvider) parseCompleteResponse(apiResp map[string]any) (type
 	// Anthropic 响应格式: content 是一个数组
 	content, ok := apiResp["content"].([]any)
 	if !ok || len(content) == 0 {
-		return types.Message{}, fmt.Errorf("no content in response")
+		return types.Message{}, errors.New("no content in response")
 	}
 
 	// 遍历所有 content blocks

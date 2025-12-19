@@ -38,11 +38,11 @@ type SequentialConfig struct {
 // NewSequentialAgent 创建顺序 Agent
 func NewSequentialAgent(cfg SequentialConfig) (*SequentialAgent, error) {
 	if cfg.Name == "" {
-		return nil, fmt.Errorf("agent name is required")
+		return nil, errors.New("agent name is required")
 	}
 
 	if len(cfg.SubAgents) == 0 {
-		return nil, fmt.Errorf("at least one sub-agent is required")
+		return nil, errors.New("at least one sub-agent is required")
 	}
 
 	// SequentialAgent 是 LoopAgent 迭代 1 次的特例

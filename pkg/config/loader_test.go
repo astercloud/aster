@@ -577,10 +577,3 @@ func TestRequiredVariableError(t *testing.T) {
 func containsErrorMarker(s string) bool {
 	return len(s) > 0 && s[:min(9, len(s))] == "__ERROR__"
 }
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
-}

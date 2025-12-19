@@ -46,9 +46,9 @@ func NewStudioClient(studioURL, agentID string) (*StudioClient, error) {
     if err != nil {
         return nil, err
     }
-    
+
     client := &StudioClient{conn: conn, agentID: agentID}
-    
+
     // 注册 Agent
     client.Send(map[string]any{
         "type": "register",
@@ -58,7 +58,7 @@ func NewStudioClient(studioURL, agentID string) (*StudioClient, error) {
             "status": "ready",
         },
     })
-    
+
     return client, nil
 }
 

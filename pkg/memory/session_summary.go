@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -130,7 +131,7 @@ func (m *SessionSummaryManager) GenerateSummary(
 	messages []types.Message,
 ) (*SessionSummary, error) {
 	if !m.config.Enabled {
-		return nil, fmt.Errorf("session summary is disabled")
+		return nil, errors.New("session summary is disabled")
 	}
 
 	// 构建提示词
@@ -184,7 +185,7 @@ func (m *SessionSummaryManager) UpdateSummary(
 	newMessages []types.Message,
 ) (*SessionSummary, error) {
 	if !m.config.Enabled {
-		return nil, fmt.Errorf("session summary is disabled")
+		return nil, errors.New("session summary is disabled")
 	}
 
 	// 获取现有摘要
@@ -296,30 +297,38 @@ func (m *SessionSummaryManager) GetSummaryText(sessionID string) string {
 
 	if len(summary.Topics) > 0 {
 		text += "\n讨论主题：\n"
+		var textSb299 strings.Builder
 		for _, topic := range summary.Topics {
-			text += fmt.Sprintf("- %s\n", topic)
+			textSb299.WriteString(fmt.Sprintf("- %s\n", topic))
 		}
+		text += textSb299.String()
 	}
 
 	if len(summary.KeyPoints) > 0 {
 		text += "\n关键要点：\n"
+		var textSb306 strings.Builder
 		for _, point := range summary.KeyPoints {
-			text += fmt.Sprintf("- %s\n", point)
+			textSb306.WriteString(fmt.Sprintf("- %s\n", point))
 		}
+		text += textSb306.String()
 	}
 
 	if len(summary.Decisions) > 0 {
 		text += "\n决策：\n"
+		var textSb313 strings.Builder
 		for _, decision := range summary.Decisions {
-			text += fmt.Sprintf("- %s\n", decision)
+			textSb313.WriteString(fmt.Sprintf("- %s\n", decision))
 		}
+		text += textSb313.String()
 	}
 
 	if len(summary.ActionItems) > 0 {
 		text += "\n行动项：\n"
+		var textSb320 strings.Builder
 		for _, item := range summary.ActionItems {
-			text += fmt.Sprintf("- %s\n", item)
+			textSb320.WriteString(fmt.Sprintf("- %s\n", item))
 		}
+		text += textSb320.String()
 	}
 
 	return text
@@ -330,9 +339,11 @@ func (m *SessionSummaryManager) GetSummaryText(sessionID string) string {
 func (m *SessionSummaryManager) buildPrompt(messages []types.Message) string {
 	// 格式化消息
 	messagesText := ""
+	var messagesTextSb333 strings.Builder
 	for i, msg := range messages {
-		messagesText += fmt.Sprintf("[%d] %s: %s\n", i+1, msg.Role, msg.Content)
+		messagesTextSb333.WriteString(fmt.Sprintf("[%d] %s: %s\n", i+1, msg.Role, msg.Content))
 	}
+	messagesText += messagesTextSb333.String()
 
 	// 替换占位符
 	prompt := m.config.SummaryPrompt
@@ -353,9 +364,11 @@ func (m *SessionSummaryManager) buildIncrementalPrompt(existingSummary *SessionS
 
 	// 格式化新消息
 	newMessagesText := ""
+	var newMessagesTextSb356 strings.Builder
 	for i, msg := range newMessages {
-		newMessagesText += fmt.Sprintf("[%d] %s: %s\n", i+1, msg.Role, msg.Content)
+		newMessagesTextSb356.WriteString(fmt.Sprintf("[%d] %s: %s\n", i+1, msg.Role, msg.Content))
 	}
+	newMessagesText += newMessagesTextSb356.String()
 
 	prompt := fmt.Sprintf(`现有的会话摘要：
 %s

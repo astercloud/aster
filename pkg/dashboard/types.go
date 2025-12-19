@@ -8,15 +8,15 @@ import (
 
 // OverviewStats 概览统计
 type OverviewStats struct {
-	ActiveAgents    int              `json:"active_agents"`
-	ActiveSessions  int              `json:"active_sessions"`
-	TotalRequests   int64            `json:"total_requests"`
-	TokenUsage      TokenCount       `json:"token_usage"`
-	Cost            CostAmount       `json:"cost"`
-	ErrorRate       float64          `json:"error_rate"`
-	AvgLatencyMs    int64            `json:"avg_latency_ms"`
-	Period          string           `json:"period"` // "24h", "7d", "30d"
-	UpdatedAt       time.Time        `json:"updated_at"`
+	ActiveAgents   int        `json:"active_agents"`
+	ActiveSessions int        `json:"active_sessions"`
+	TotalRequests  int64      `json:"total_requests"`
+	TokenUsage     TokenCount `json:"token_usage"`
+	Cost           CostAmount `json:"cost"`
+	ErrorRate      float64    `json:"error_rate"`
+	AvgLatencyMs   int64      `json:"avg_latency_ms"`
+	Period         string     `json:"period"` // "24h", "7d", "30d"
+	UpdatedAt      time.Time  `json:"updated_at"`
 }
 
 // TokenCount Token 计数
@@ -34,15 +34,15 @@ type CostAmount struct {
 
 // TraceNode 追踪节点
 type TraceNode struct {
-	ID         string            `json:"id"`
-	Name       string            `json:"name"`
-	Type       TraceNodeType     `json:"type"`
-	StartTime  time.Time         `json:"start_time"`
-	EndTime    *time.Time        `json:"end_time,omitempty"`
-	DurationMs int64             `json:"duration_ms"`
-	Status     TraceStatus       `json:"status"`
-	Attributes map[string]any    `json:"attributes,omitempty"`
-	Children   []*TraceNode      `json:"children,omitempty"`
+	ID         string         `json:"id"`
+	Name       string         `json:"name"`
+	Type       TraceNodeType  `json:"type"`
+	StartTime  time.Time      `json:"start_time"`
+	EndTime    *time.Time     `json:"end_time,omitempty"`
+	DurationMs int64          `json:"duration_ms"`
+	Status     TraceStatus    `json:"status"`
+	Attributes map[string]any `json:"attributes,omitempty"`
+	Children   []*TraceNode   `json:"children,omitempty"`
 }
 
 // TraceNodeType 追踪节点类型
@@ -81,6 +81,7 @@ type TraceSummary struct {
 // TraceDetail 追踪详情
 type TraceDetail struct {
 	TraceSummary
+
 	RootSpan   *TraceNode `json:"root_span"`
 	TokenUsage TokenCount `json:"token_usage"`
 	Cost       CostAmount `json:"cost"`
@@ -105,12 +106,12 @@ type TraceListResult struct {
 
 // TokenUsageStats Token 使用统计
 type TokenUsageStats struct {
-	Period   string                `json:"period"` // "hour", "day", "week", "month"
-	Total    TokenCount            `json:"total"`
-	ByAgent  map[string]TokenCount `json:"by_agent,omitempty"`
-	ByModel  map[string]TokenCount `json:"by_model,omitempty"`
-	Trend    []TokenTrendPoint     `json:"trend,omitempty"`
-	Cost     CostAmount            `json:"cost"`
+	Period  string                `json:"period"` // "hour", "day", "week", "month"
+	Total   TokenCount            `json:"total"`
+	ByAgent map[string]TokenCount `json:"by_agent,omitempty"`
+	ByModel map[string]TokenCount `json:"by_model,omitempty"`
+	Trend   []TokenTrendPoint     `json:"trend,omitempty"`
+	Cost    CostAmount            `json:"cost"`
 }
 
 // TokenTrendPoint Token 趋势数据点
@@ -131,11 +132,11 @@ type TokenQueryOpts struct {
 
 // CostBreakdown 成本分解
 type CostBreakdown struct {
-	Period    string                `json:"period"`
-	Total     CostAmount            `json:"total"`
-	ByAgent   map[string]CostAmount `json:"by_agent,omitempty"`
-	ByModel   map[string]CostAmount `json:"by_model,omitempty"`
-	Trend     []CostTrendPoint      `json:"trend,omitempty"`
+	Period  string                `json:"period"`
+	Total   CostAmount            `json:"total"`
+	ByAgent map[string]CostAmount `json:"by_agent,omitempty"`
+	ByModel map[string]CostAmount `json:"by_model,omitempty"`
+	Trend   []CostTrendPoint      `json:"trend,omitempty"`
 }
 
 // CostTrendPoint 成本趋势数据点
@@ -211,21 +212,21 @@ type EventStreamMessage struct {
 
 // EventSubscription 事件订阅配置
 type EventSubscription struct {
-	Channels   []string `json:"channels"`   // "monitor", "progress", "control"
+	Channels   []string `json:"channels"` // "monitor", "progress", "control"
 	AgentID    string   `json:"agent_id,omitempty"`
 	EventTypes []string `json:"event_types,omitempty"`
 }
 
 // PerformanceStats 性能统计
 type PerformanceStats struct {
-	Period        string                    `json:"period"`
-	TTFT          LatencyPercentiles        `json:"ttft"`           // Time to First Token
-	TPOT          LatencyPercentiles        `json:"tpot"`           // Time Per Output Token
-	ToolLatency   map[string]LatencyPercentiles `json:"tool_latency"` // 按工具
-	AvgLoopCount  float64                   `json:"avg_loop_count"` // 平均循环次数
-	RequestCount  int64                     `json:"request_count"`
-	ErrorCount    int64                     `json:"error_count"`
-	ErrorRate     float64                   `json:"error_rate"`
+	Period       string                        `json:"period"`
+	TTFT         LatencyPercentiles            `json:"ttft"`           // Time to First Token
+	TPOT         LatencyPercentiles            `json:"tpot"`           // Time Per Output Token
+	ToolLatency  map[string]LatencyPercentiles `json:"tool_latency"`   // 按工具
+	AvgLoopCount float64                       `json:"avg_loop_count"` // 平均循环次数
+	RequestCount int64                         `json:"request_count"`
+	ErrorCount   int64                         `json:"error_count"`
+	ErrorRate    float64                       `json:"error_rate"`
 }
 
 // LatencyPercentiles 延迟百分位数
@@ -253,10 +254,10 @@ type Insight struct {
 type InsightType string
 
 const (
-	InsightTypePerformance  InsightType = "performance"
-	InsightTypeCost         InsightType = "cost"
-	InsightTypeReliability  InsightType = "reliability"
-	InsightTypeUsage        InsightType = "usage"
+	InsightTypePerformance InsightType = "performance"
+	InsightTypeCost        InsightType = "cost"
+	InsightTypeReliability InsightType = "reliability"
+	InsightTypeUsage       InsightType = "usage"
 )
 
 // SessionTimelineEntry 会话时间线条目
@@ -268,9 +269,9 @@ type SessionTimelineEntry struct {
 
 // SessionTimeline 会话时间线
 type SessionTimeline struct {
-	SessionID string                  `json:"session_id"`
-	AgentID   string                  `json:"agent_id"`
-	Entries   []SessionTimelineEntry  `json:"entries"`
-	StartTime time.Time               `json:"start_time"`
-	EndTime   *time.Time              `json:"end_time,omitempty"`
+	SessionID string                 `json:"session_id"`
+	AgentID   string                 `json:"agent_id"`
+	Entries   []SessionTimelineEntry `json:"entries"`
+	StartTime time.Time              `json:"start_time"`
+	EndTime   *time.Time             `json:"end_time,omitempty"`
 }

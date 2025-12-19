@@ -222,11 +222,11 @@ func TestSystem_ConcurrentMessages(t *testing.T) {
 	numGoroutines := 100
 	messagesPerGoroutine := 100
 
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for j := 0; j < messagesPerGoroutine; j++ {
+			for range messagesPerGoroutine {
 				system.Send(pid, &CountMsg{Value: 1})
 			}
 		}()
@@ -367,8 +367,7 @@ func BenchmarkSystem_Send(b *testing.B) {
 	counter := &CounterActor{}
 	pid := system.Spawn(counter, "counter")
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		system.Send(pid, &CountMsg{Value: 1})
 	}
 }
@@ -379,8 +378,7 @@ func BenchmarkSystem_RequestResponse(b *testing.B) {
 
 	pid := system.Spawn(&EchoActor{}, "echo")
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		_, _ = system.Request(pid, &PingMsg{Count: i}, time.Second)
 	}
 }
@@ -389,8 +387,7 @@ func BenchmarkSystem_SpawnStop(b *testing.B) {
 	system := NewSystem("bench")
 	defer system.Shutdown()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pid := system.Spawn(&EchoActor{}, "actor")
 		system.Stop(pid)
 		time.Sleep(time.Microsecond) // 确保清理完成

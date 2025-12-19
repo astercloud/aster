@@ -213,7 +213,7 @@ func TestPatchToolCallsMiddleware_FailedCallsTracking(t *testing.T) {
 	})
 
 	// 生成多个失败调用
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		req := &ToolCallRequest{
 			ToolCallID: "test",
 			ToolName:   "fail_tool",

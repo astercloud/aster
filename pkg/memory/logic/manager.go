@@ -2,7 +2,8 @@ package logic
 
 import (
 	"context"
-	"fmt"
+	"errors"
+	"maps"
 	"time"
 
 	"github.com/astercloud/aster/pkg/memory"
@@ -46,11 +47,11 @@ type ManagerConfig struct {
 // NewManager 创建 Logic Memory Manager
 func NewManager(config *ManagerConfig) (*Manager, error) {
 	if config == nil {
-		return nil, fmt.Errorf("config is required")
+		return nil, errors.New("config is required")
 	}
 
 	if config.Store == nil {
-		return nil, fmt.Errorf("store is required")
+		return nil, errors.New("store is required")
 	}
 
 	// 设置默认值
@@ -241,9 +242,7 @@ func (m *Manager) mergeMemory(existing, new *LogicMemory) {
 		if existing.Metadata == nil {
 			existing.Metadata = make(map[string]any)
 		}
-		for k, v := range new.Metadata {
-			existing.Metadata[k] = v
-		}
+		maps.Copy(existing.Metadata, new.Metadata)
 	}
 
 	// 6. 更新时间

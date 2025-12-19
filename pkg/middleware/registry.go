@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -87,7 +88,7 @@ func (r *Registry) registerBuiltin() {
 	// Summarization Middleware
 	r.Register("summarization", func(config *MiddlewareFactoryConfig) (Middleware, error) {
 		if config.Provider == nil {
-			return nil, fmt.Errorf("summarization middleware requires provider")
+			return nil, errors.New("summarization middleware requires provider")
 		}
 
 		// 自定义配置(可选) - 优化: 降低默认阈值以更早触发压缩
@@ -127,7 +128,7 @@ func (r *Registry) registerBuiltin() {
 	// Filesystem Middleware (默认使用 Sandbox 文件系统)
 	r.Register("filesystem", func(config *MiddlewareFactoryConfig) (Middleware, error) {
 		if config.Sandbox == nil {
-			return nil, fmt.Errorf("filesystem middleware requires sandbox")
+			return nil, errors.New("filesystem middleware requires sandbox")
 		}
 
 		fsBackend := backends.NewFilesystemBackend(config.Sandbox.FS())
@@ -190,7 +191,7 @@ func (r *Registry) registerBuiltin() {
 	// AgentMemory Middleware (默认使用 Sandbox 文件系统, /memories/ 作为记忆根目录)
 	r.Register("agent_memory", func(config *MiddlewareFactoryConfig) (Middleware, error) {
 		if config.Sandbox == nil {
-			return nil, fmt.Errorf("agent_memory middleware requires sandbox")
+			return nil, errors.New("agent_memory middleware requires sandbox")
 		}
 
 		fsBackend := backends.NewFilesystemBackend(config.Sandbox.FS())
@@ -206,7 +207,7 @@ func (r *Registry) registerBuiltin() {
 		baseNamespace := ""
 		if config.Metadata != nil {
 			if userID, ok := config.Metadata["user_id"].(string); ok && userID != "" {
-				baseNamespace = fmt.Sprintf("users/%s", userID)
+				baseNamespace = "users/" + userID
 			}
 		}
 
@@ -220,7 +221,7 @@ func (r *Registry) registerBuiltin() {
 	// WorkingMemory Middleware (跨会话状态管理)
 	r.Register("working_memory", func(config *MiddlewareFactoryConfig) (Middleware, error) {
 		if config.Sandbox == nil {
-			return nil, fmt.Errorf("working_memory middleware requires sandbox")
+			return nil, errors.New("working_memory middleware requires sandbox")
 		}
 
 		fsBackend := backends.NewFilesystemBackend(config.Sandbox.FS())
@@ -295,7 +296,7 @@ func (r *Registry) registerBuiltin() {
 	// Reasoning Middleware (推理链)
 	r.Register("reasoning", func(config *MiddlewareFactoryConfig) (Middleware, error) {
 		if config.Provider == nil {
-			return nil, fmt.Errorf("reasoning middleware requires provider")
+			return nil, errors.New("reasoning middleware requires provider")
 		}
 
 		// 默认配置

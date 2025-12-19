@@ -15,6 +15,7 @@ var scLog = logging.ForComponent("SimplicityChecker")
 // 检测过度工程和未请求的功能添加，发出警告但不阻断执行
 type SimplicityCheckerMiddleware struct {
 	*BaseMiddleware
+
 	config *SimplicityCheckerConfig
 
 	// 会话级统计

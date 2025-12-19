@@ -129,7 +129,7 @@ func TestBasicPolicyEngine_ListPolicies(t *testing.T) {
 	engine := NewBasicPolicyEngine(nil, &mockAuditLog{})
 
 	// 添加多个策略
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		policy := &SecurityPolicy{
 			ID:      fmt.Sprintf("policy%d", i),
 			Name:    fmt.Sprintf("Policy %d", i),

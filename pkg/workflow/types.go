@@ -131,7 +131,7 @@ const (
 	RunStatusRunning   RunStatus = "running"
 	RunStatusCompleted RunStatus = "completed"
 	RunStatusFailed    RunStatus = "failed"
-	RunStatusCancelled RunStatus = "cancelled"
+	RunStatusCancelled RunStatus = "canceled"
 )
 
 // WorkflowSession Workflow 会话
@@ -172,7 +172,7 @@ const (
 	EventStepSkipped       WorkflowEventType = "step_skipped"
 	EventWorkflowCompleted WorkflowEventType = "workflow_completed"
 	EventWorkflowFailed    WorkflowEventType = "workflow_failed"
-	EventWorkflowCancelled WorkflowEventType = "workflow_cancelled"
+	EventWorkflowCancelled WorkflowEventType = "workflow_canceled"
 )
 
 // RunEvent Workflow 运行事件

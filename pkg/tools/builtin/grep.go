@@ -2,7 +2,10 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
+	"strconv"
 	"strings"
 	"time"
 
@@ -114,18 +117,12 @@ func (t *GrepTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	multiline := t.getBoolParam(input, "multiline", false)
 
 	if pattern == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("pattern cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("pattern cannot be empty")), nil
 	}
 
 	// 验证输出模式
 	validModes := []string{"content", "files_with_matches", "count"}
-	modeValid := false
-	for _, mode := range validModes {
-		if outputMode == mode {
-			modeValid = true
-			break
-		}
-	}
+	modeValid := slices.Contains(validModes, outputMode)
 	if !modeValid {
 		return NewClaudeErrorResponse(
 			fmt.Errorf("invalid output_mode: %s", outputMode),
@@ -136,7 +133,7 @@ func (t *GrepTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	// 验证搜索路径
 	if err := t.validatePath(path); err != nil {
 		return NewClaudeErrorResponse(
-			fmt.Errorf("invalid search path: %v", err),
+			fmt.Errorf("invalid search path: %w", err),
 			"使用相对路径或允许的绝对路径",
 			"确保路径不包含 '..' 避免路径遍历攻击",
 		), nil
@@ -264,7 +261,7 @@ func (t *GrepTool) getBoolParam(input map[string]any, key string, defaultValue b
 
 func (t *GrepTool) validatePath(path string) error {
 	if strings.Contains(path, "..") {
-		return fmt.Errorf("path traversal not allowed")
+		return errors.New("path traversal not allowed")
 	}
 	return nil
 }
@@ -299,7 +296,7 @@ func (t *GrepTool) buildGrepCommand(pattern, path, glob, fileType, outputMode st
 
 	// 上下文行数
 	if contextLines > 0 {
-		parts = append(parts, "-C", fmt.Sprintf("%d", contextLines))
+		parts = append(parts, "-C", strconv.Itoa(contextLines))
 	}
 
 	// 输出模式
@@ -322,7 +319,7 @@ func (t *GrepTool) buildGrepCommand(pattern, path, glob, fileType, outputMode st
 
 	// 结果限制
 	if maxResults > 0 && outputMode == "content" {
-		parts = append(parts, "-m", fmt.Sprintf("%d", maxResults))
+		parts = append(parts, "-m", strconv.Itoa(maxResults))
 	}
 
 	// 搜索模式
@@ -438,12 +435,7 @@ func (t *GrepTool) parseCountOutput(lines []string, result *GrepResult) {
 }
 
 func (t *GrepTool) containsString(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 // 数据结构

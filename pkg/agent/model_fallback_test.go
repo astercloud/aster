@@ -450,11 +450,13 @@ func TestModelFallbackManager_Stream(t *testing.T) {
 
 	// 读取流
 	var content string
+	var contentSb453 strings.Builder
 	for chunk := range stream {
 		if chunk.Type == "text" {
-			content += chunk.TextDelta
+			contentSb453.WriteString(chunk.TextDelta)
 		}
 	}
+	content += contentSb453.String()
 
 	if content != "mock stream from anthropic/claude-3" {
 		t.Errorf("Expected stream from claude-3, got: %s", content)

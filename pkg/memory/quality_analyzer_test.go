@@ -336,7 +336,7 @@ func TestGenerateReport(t *testing.T) {
 
 	// 评估一些记忆
 	memories := []MemoryWithScore{}
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		prov := NewProvenance(SourceUserInput, "user-1")
 		prov.Confidence = float64(i+1) * 0.15
 

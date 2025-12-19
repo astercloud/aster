@@ -2,7 +2,9 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 
 	"github.com/astercloud/aster/pkg/session"
@@ -36,7 +38,7 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 	cfg *LongTermBridgeConfig,
 ) error {
 	if b == nil || b.Sessions == nil || b.SemanticMemory == nil || !b.SemanticMemory.Enabled() {
-		return fmt.Errorf("long-term bridge is not properly configured")
+		return errors.New("long-term bridge is not properly configured")
 	}
 
 	// 加载 Session 事件
@@ -49,11 +51,11 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 		return fmt.Errorf("get session: %w", err)
 	}
 	if sess == nil {
-		return fmt.Errorf("session not found")
+		return errors.New("session not found")
 	}
 
 	if sess.Events() == nil || sess.Events().Len() == 0 {
-		return fmt.Errorf("session has no events")
+		return errors.New("session has no events")
 	}
 
 	events := sess.Events()
@@ -71,14 +73,14 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 	}
 
 	if len(lines) == 0 {
-		return fmt.Errorf("no textual content to save")
+		return errors.New("no textual content to save")
 	}
 
 	joined := strings.Join(lines, "\n")
 
 	if cfg != nil && cfg.MinTokens > 0 {
 		if tokenCount(joined) < cfg.MinTokens {
-			return fmt.Errorf("session content too short, skip saving")
+			return errors.New("session content too short, skip saving")
 		}
 	}
 
@@ -86,9 +88,7 @@ func (b *LongTermBridge) SaveSessionToSemanticMemory(
 	docID := fmt.Sprintf("%s/%s/%s", appName, userID, sessionID)
 
 	meta := make(map[string]any, len(scopeMeta)+2)
-	for k, v := range scopeMeta {
-		meta[k] = v
-	}
+	maps.Copy(meta, scopeMeta)
 	meta["app_name"] = appName
 	meta["session_id"] = sessionID
 

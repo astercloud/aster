@@ -2,7 +2,7 @@
   <div class="ask-user-card">
     <!-- Header -->
     <div class="card-header">
-      <div 
+      <div
         class="header-icon"
         :class="isSubmitted && isSubmitting ? 'submitting' : (isSubmitted ? 'submitted' : (isCompleted ? 'completed' : 'pending'))"
       >
@@ -26,8 +26,8 @@
 
     <!-- Questions -->
     <div class="questions-list">
-      <div 
-        v-for="(question, idx) in questions" 
+      <div
+        v-for="(question, idx) in questions"
         :key="idx"
         class="question-card"
       >
@@ -37,7 +37,7 @@
         </div>
 
         <!-- Question Text -->
-        <h4 
+        <h4
           class="question-text"
           :class="{ 'answered': isQuestionAnswered(idx) }"
         >
@@ -57,13 +57,13 @@
             :disabled="isQuestionAnswered(idx) || isSubmitted"
             @click="handleOptionSelect(idx, option.label)"
           >
-            <div 
+            <div
               class="option-label"
               :class="{ 'selected': getSelectedValue(idx) === option.label }"
             >
-              <svg 
-                v-if="getSelectedValue(idx) === option.label" 
-                class="w-4 h-4" 
+              <svg
+                v-if="getSelectedValue(idx) === option.label"
+                class="w-4 h-4"
                 fill="currentColor"
                 viewBox="0 0 24 24"
               >
@@ -191,7 +191,7 @@ const isCompleted = computed(() => {
 const handleOptionSelect = (questionIdx: number, value: string) => {
   if (isSubmitted.value) return
   if (answers.value[questionIdx]) return
-  
+
   answers.value = { ...answers.value, [questionIdx]: value }
   checkAndSubmit()
 }
@@ -200,7 +200,7 @@ const handleTextSubmit = (questionIdx: number) => {
   if (isSubmitted.value) return
   const text = textInputs.value[questionIdx]?.trim()
   if (!text || answers.value[questionIdx]) return
-  
+
   answers.value = { ...answers.value, [questionIdx]: text }
   checkAndSubmit()
 }

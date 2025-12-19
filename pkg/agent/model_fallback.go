@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -58,7 +59,7 @@ type FallbackStats struct {
 // NewModelFallbackManager 创建模型降级管理器
 func NewModelFallbackManager(fallbacks []*ModelFallback, deps *Dependencies) (*ModelFallbackManager, error) {
 	if len(fallbacks) == 0 {
-		return nil, fmt.Errorf("at least one model fallback is required")
+		return nil, errors.New("at least one model fallback is required")
 	}
 
 	// 按优先级排序
@@ -66,8 +67,8 @@ func NewModelFallbackManager(fallbacks []*ModelFallback, deps *Dependencies) (*M
 	copy(sortedFallbacks, fallbacks)
 
 	// 简单的冒泡排序（因为通常模型数量不多）
-	for i := 0; i < len(sortedFallbacks)-1; i++ {
-		for j := 0; j < len(sortedFallbacks)-i-1; j++ {
+	for i := range len(sortedFallbacks) - 1 {
+		for j := range len(sortedFallbacks) - i - 1 {
 			if sortedFallbacks[j].Priority > sortedFallbacks[j+1].Priority {
 				sortedFallbacks[j], sortedFallbacks[j+1] = sortedFallbacks[j+1], sortedFallbacks[j]
 			}

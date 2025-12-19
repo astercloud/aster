@@ -62,7 +62,7 @@ func TestCleanupBySize(t *testing.T) {
 	defer eb.Close()
 
 	// Emit 10 events
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 
@@ -169,7 +169,7 @@ func TestGetTimelineRange(t *testing.T) {
 	defer eb.Close()
 
 	// 添加 10 个事件
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 
@@ -204,7 +204,7 @@ func TestGetTimelineSince(t *testing.T) {
 	defer eb.Close()
 
 	// 添加事件
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 
@@ -221,7 +221,7 @@ func TestGetTimelineFiltered(t *testing.T) {
 	defer eb.Close()
 
 	// 添加不同类型的事件
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 	eb.EmitProgress(&types.ProgressDoneEvent{})
@@ -246,7 +246,7 @@ func TestGetTimelineCount(t *testing.T) {
 		t.Error("initial count should be 0")
 	}
 
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 
@@ -266,7 +266,7 @@ func TestAutoCleanupWorker(t *testing.T) {
 	defer eb.Close()
 
 	// 添加 10 个事件
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		eb.EmitProgress(&types.ProgressTextChunkEvent{Step: i, Delta: "test"})
 	}
 
@@ -293,9 +293,9 @@ func TestMemoryStability(t *testing.T) {
 	batches := 100
 	eventsPerBatch := 100
 
-	for batch := 0; batch < batches; batch++ {
+	for batch := range batches {
 		// 快速发送一批事件
-		for i := 0; i < eventsPerBatch; i++ {
+		for i := range eventsPerBatch {
 			eb.EmitProgress(&types.ProgressTextChunkEvent{
 				Step:  batch*eventsPerBatch + i,
 				Delta: "test data",

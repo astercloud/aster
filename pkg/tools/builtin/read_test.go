@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -281,7 +281,7 @@ func TestReadTool_ConcurrentReads(t *testing.T) {
 		}
 		result := ExecuteToolWithRealFS(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("Tool execution failed")
+			return errors.New("Tool execution failed")
 		}
 		return nil
 	})

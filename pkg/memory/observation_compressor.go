@@ -4,6 +4,7 @@ import (
 	"context"
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -475,7 +476,7 @@ func (c *DefaultObservationCompressor) CanRecover(compressed *CompressedObservat
 // 注意：这需要外部工具（如文件系统访问）的支持
 func (c *DefaultObservationCompressor) Recover(ctx context.Context, compressed *CompressedObservation) (string, error) {
 	if !compressed.Recoverable {
-		return "", fmt.Errorf("content is not recoverable")
+		return "", errors.New("content is not recoverable")
 	}
 
 	// 对于文件引用，返回如何恢复的指令
@@ -485,7 +486,7 @@ func (c *DefaultObservationCompressor) Recover(ctx context.Context, compressed *
 		}
 	}
 
-	return "", fmt.Errorf("no recovery method available")
+	return "", errors.New("no recovery method available")
 }
 
 // 辅助函数

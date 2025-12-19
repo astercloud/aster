@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -53,7 +54,7 @@ type SearchResult struct {
 // SearchHistory 搜索历史消息
 func (s *Searcher) SearchHistory(ctx context.Context, opts SearchOptions) ([]SearchResult, error) {
 	if opts.Query == "" {
-		return nil, fmt.Errorf("search query cannot be empty")
+		return nil, errors.New("search query cannot be empty")
 	}
 
 	if opts.Limit <= 0 {
@@ -142,7 +143,7 @@ func (s *Searcher) SearchHistory(ctx context.Context, opts SearchOptions) ([]Sea
 // SearchAcrossSessions 跨 Session 搜索
 func (s *Searcher) SearchAcrossSessions(ctx context.Context, agentIDs []string, query string, limit int) ([]SearchResult, error) {
 	if query == "" {
-		return nil, fmt.Errorf("search query cannot be empty")
+		return nil, errors.New("search query cannot be empty")
 	}
 
 	if limit <= 0 {
@@ -262,8 +263,8 @@ func generateSnippet(content, query string, maxLen int) string {
 func sortByRelevance(results []SearchResult) {
 	// 简单的冒泡排序（对于小数据集足够）
 	n := len(results)
-	for i := 0; i < n-1; i++ {
-		for j := 0; j < n-i-1; j++ {
+	for i := range n - 1 {
+		for j := range n - i - 1 {
 			if results[j].Relevance < results[j+1].Relevance {
 				results[j], results[j+1] = results[j+1], results[j]
 			}

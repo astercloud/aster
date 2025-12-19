@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -263,7 +264,7 @@ func TestSessionSummaryManager_ListSummaries(t *testing.T) {
 	}
 
 	// 生成多个摘要
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		sessionID := fmt.Sprintf("test-session-%d", i)
 		_, err := manager.GenerateSummary(ctx, sessionID, messages)
 		if err != nil {
@@ -488,11 +489,11 @@ func TestSessionSummaryManager_ConcurrentAccess(t *testing.T) {
 	done := make(chan bool, numGoroutines)
 	errors := make(chan error, numGoroutines*numSessions)
 
-	for i := 0; i < numGoroutines; i++ {
+	for i := range numGoroutines {
 		go func(goroutineID int) {
 			defer func() { done <- true }()
 
-			for j := 0; j < numSessions; j++ {
+			for j := range numSessions {
 				sessionID := fmt.Sprintf("session-%d-%d", goroutineID, j)
 
 				// 生成摘要
@@ -520,7 +521,7 @@ func TestSessionSummaryManager_ConcurrentAccess(t *testing.T) {
 	}
 
 	// 等待所有 goroutine 完成
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		<-done
 	}
 	close(errors)
@@ -549,11 +550,11 @@ func TestSessionSummaryManager_ConcurrentAccess(t *testing.T) {
 	done = make(chan bool, numGoroutines)
 	errors = make(chan error, numGoroutines*numSessions)
 
-	for i := 0; i < numGoroutines; i++ {
+	for i := range numGoroutines {
 		go func(goroutineID int) {
 			defer func() { done <- true }()
 
-			for j := 0; j < numSessions; j++ {
+			for j := range numSessions {
 				sessionID := fmt.Sprintf("session-%d-%d", goroutineID, j)
 				err := manager.DeleteSummary(sessionID)
 				if err != nil {
@@ -564,7 +565,7 @@ func TestSessionSummaryManager_ConcurrentAccess(t *testing.T) {
 	}
 
 	// 等待所有 goroutine 完成
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		<-done
 	}
 	close(errors)
@@ -620,7 +621,7 @@ func TestSessionSummaryManager_InvalidJSON(t *testing.T) {
 func TestSessionSummaryManager_ProviderError(t *testing.T) {
 	// 创建一个会返回错误的 mock provider
 	mockProvider := &MockProviderWithError{
-		err: fmt.Errorf("provider connection failed"),
+		err: errors.New("provider connection failed"),
 	}
 
 	config := SessionSummaryConfig{

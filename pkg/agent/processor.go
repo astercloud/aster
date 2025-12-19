@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -27,7 +28,7 @@ func (a *Agent) processMessages(ctx context.Context) {
 		return // 已经在处理中
 	}
 	a.state = types.AgentStateWorking
-	a.iterationCount = 0       // 重置迭代计数
+	a.iterationCount = 0          // 重置迭代计数
 	a.initialThinkingSent = false // 重置初始思考事件标志，允许新用户消息触发新的"任务规划"
 	initialMsgCount := len(a.messages)
 	procLog.Info(ctx, "agent state changed to working", map[string]any{"agent_id": a.id, "message_count": initialMsgCount})
@@ -349,14 +350,14 @@ func (a *Agent) executeTools(ctx context.Context, toolUses []*types.ToolUseBlock
 		procLog.Warn(ctx, "iteration limit reached, waiting for user confirmation", map[string]any{
 			"agent_id": a.id, "iteration": currentIter, "max": maxIter,
 		})
-		
+
 		// 发送迭代限制事件，等待用户确认是否继续
 		a.eventBus.EmitControl(&types.ControlIterationLimitEvent{
 			CurrentIteration: currentIter,
 			MaxIteration:     maxIter,
 			Message:          fmt.Sprintf("已执行 %d 次迭代，达到安全上限。是否继续？", currentIter),
 		})
-		
+
 		// 等待用户决策
 		select {
 		case decision := <-a.iterationContinueCh:
@@ -411,7 +412,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 	if a.planMode != nil && a.planMode.IsActive() {
 		allowed, reason := a.planMode.ValidateToolCall(tu.Name, tu.Input)
 		if !allowed {
-			errorMsg := fmt.Sprintf("Plan Mode restriction: %s", reason)
+			errorMsg := "Plan Mode restriction: " + reason
 			a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
 				Call: types.ToolCallSnapshot{
 					ID:        tu.ID,
@@ -429,7 +430,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 		}
 	}
 
-	//权限检查
+	// 权限检查
 	if a.permissionInspector != nil {
 		call := &types.ToolCallSnapshot{
 			ID:        tu.ID,
@@ -488,7 +489,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 
 						if decision != "approved" {
 							// 用户拒绝
-							errorMsg := fmt.Sprintf("Permission rejected by user for tool: %s", tu.Name)
+							errorMsg := "Permission rejected by user for tool: " + tu.Name
 							return &types.ToolResultBlock{
 								ToolUseID: tu.ID,
 								Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
@@ -501,7 +502,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 						a.mu.Lock()
 						delete(a.pendingPermissions, tu.ID)
 						a.mu.Unlock()
-						errorMsg := "Permission request cancelled"
+						errorMsg := "Permission request canceled"
 						return &types.ToolResultBlock{
 							ToolUseID: tu.ID,
 							Content:   fmt.Sprintf(`{"ok":false,"error":"%s"}`, errorMsg),
@@ -540,7 +541,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 	tool, ok := a.toolMap[tu.Name]
 	if !ok {
 		// 工具未找到
-		errorMsg := fmt.Sprintf("tool not found: %s", tu.Name)
+		errorMsg := "tool not found: " + tu.Name
 		a.updateToolRecord(tu.ID, types.ToolCallStateFailed, errorMsg)
 		a.eventBus.EmitProgress(&types.ProgressToolErrorEvent{
 			Call: types.ToolCallSnapshot{
@@ -659,7 +660,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 						if status.Error != nil {
 							taskErr = status.Error
 						} else {
-							taskErr = fmt.Errorf("task failed")
+							taskErr = errors.New("task failed")
 						}
 						execResult = &tools.ExecuteResult{
 							Success:    false,
@@ -672,7 +673,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 						if status.State == tools.TaskStateCancelled {
 							a.eventBus.EmitProgress(&types.ProgressToolCancelledEvent{
 								Call:   a.snapshotToolCall(tu.ID),
-								Reason: "cancelled",
+								Reason: "canceled",
 							})
 						}
 					}
@@ -696,7 +697,7 @@ func (a *Agent) executeSingleTool(ctx context.Context, tu *types.ToolUseBlock) t
 					_ = lrTool.Cancel(context.Background(), taskID)
 					a.eventBus.EmitProgress(&types.ProgressToolCancelledEvent{
 						Call:   a.snapshotToolCall(tu.ID),
-						Reason: "cancelled",
+						Reason: "canceled",
 					})
 					goto longRunningDone
 				case <-ticker.C:
@@ -874,8 +875,8 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 	currentBlockIndex := -1
 	textBuffers := make(map[int]string)
 	inputJSONBuffers := make(map[int]string)
-	reasoningStarted := false // 追踪是否已发送思考开始事件
-	reasoningBuffer := ""     // 累积思考内容
+	reasoningStarted := false           // 追踪是否已发送思考开始事件
+	var reasoningBuffer strings.Builder // 累积思考内容
 
 	// 只在用户消息后的第一次 LLM 调用时发送初始的任务规划思考事件
 	// 使用 initialThinkingSent 标志而不是 iterationCount，因为：
@@ -917,7 +918,7 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 						procLog.Debug(ctx, "reasoning started", map[string]any{"step": a.stepCount})
 					}
 					// 累积并发送思考内容增量
-					reasoningBuffer += content
+					reasoningBuffer.WriteString(content)
 					a.eventBus.EmitProgress(&types.ProgressThinkChunkEvent{
 						Step:  a.stepCount,
 						Stage: types.ThinkingStageReasoning,
@@ -1042,7 +1043,7 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 					thinking, _ := delta["thinking"].(string)
 					if thinking != "" {
 						// 累积思考内容
-						reasoningBuffer += thinking
+						reasoningBuffer.WriteString(thinking)
 						// 发送思考增量事件
 						a.eventBus.EmitProgress(&types.ProgressThinkChunkEvent{
 							Step:  a.stepCount,
@@ -1213,8 +1214,8 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 							"raw_length": len(jsonStr),
 						})
 						tu.Input = map[string]any{
-							"__parse_error__": true,
-							"__error_message__": fmt.Sprintf("工具参数解析失败，流式响应可能被截断。原始数据: %s", jsonStr),
+							"__parse_error__":   true,
+							"__error_message__": "工具参数解析失败，流式响应可能被截断。原始数据: " + jsonStr,
 						}
 					}
 				} else {
@@ -1222,7 +1223,7 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 					if len(tu.Input) == 0 {
 						procLog.Warn(ctx, "empty input buffer for tool block", map[string]any{"block": i, "tool": tu.Name, "exists": exists, "json_str": jsonStr})
 						tu.Input = map[string]any{
-							"__parse_error__": true,
+							"__parse_error__":   true,
 							"__error_message__": "工具参数为空，流式响应可能未正确传输参数数据",
 						}
 					}
@@ -1236,7 +1237,7 @@ func (a *Agent) handleStreamResponse(ctx context.Context, stream <-chan provider
 		a.eventBus.EmitProgress(&types.ProgressThinkChunkEndEvent{
 			Step: a.stepCount,
 		})
-		procLog.Debug(ctx, "reasoning ended", map[string]any{"step": a.stepCount, "total_length": len(reasoningBuffer)})
+		procLog.Debug(ctx, "reasoning ended", map[string]any{"step": a.stepCount, "total_length": len(reasoningBuffer.String())})
 	}
 
 	return types.Message{
@@ -1365,4 +1366,3 @@ func (a *Agent) trimMessagesInMemory(messages []types.Message, maxMessages int) 
 	// 保留最近的 maxMessages 条消息
 	return messages[len(messages)-maxMessages:]
 }
-

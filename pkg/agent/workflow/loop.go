@@ -47,15 +47,15 @@ type LoopConfig struct {
 // NewLoopAgent 创建循环 Agent
 func NewLoopAgent(cfg LoopConfig) (*LoopAgent, error) {
 	if cfg.Name == "" {
-		return nil, fmt.Errorf("agent name is required")
+		return nil, errors.New("agent name is required")
 	}
 
 	if len(cfg.SubAgents) == 0 {
-		return nil, fmt.Errorf("at least one sub-agent is required")
+		return nil, errors.New("at least one sub-agent is required")
 	}
 
 	if cfg.MaxIterations == 0 && cfg.StopCondition == nil {
-		return nil, fmt.Errorf("either MaxIterations or StopCondition must be specified")
+		return nil, errors.New("either MaxIterations or StopCondition must be specified")
 	}
 
 	// 默认停止条件：检查 Escalate 标志

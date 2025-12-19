@@ -48,7 +48,7 @@ func (h *Handler) GetAgentCard(c *gin.Context) {
 			"success": false,
 			"error": gin.H{
 				"code":    "not_found",
-				"message": fmt.Sprintf("Agent not found: %s", err.Error()),
+				"message": "Agent not found: " + err.Error(),
 			},
 		})
 		return

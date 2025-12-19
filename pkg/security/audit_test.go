@@ -299,7 +299,7 @@ func TestInMemoryAuditLog_ConcurrentWrites(t *testing.T) {
 
 	// 并发写入事件
 	done := make(chan bool)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(id int) {
 			event := AuditEvent{
 				Type:    AuditTypeUserLogin,
@@ -312,7 +312,7 @@ func TestInMemoryAuditLog_ConcurrentWrites(t *testing.T) {
 	}
 
 	// 等待所有操作完成
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		<-done
 	}
 

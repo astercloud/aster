@@ -25,7 +25,7 @@ func (a *SimpleAgent) Receive(ctx *actor.Context, msg actor.Message) {
 		time.Sleep(100 * time.Millisecond)
 
 		// 生成响应
-		response := fmt.Sprintf("你好!我收到了你的消息: %s", m.Text)
+		response := "你好!我收到了你的消息: " + m.Text
 
 		result := &pkgagent.ChatResultMsg{
 			Result: &types.CompleteResult{

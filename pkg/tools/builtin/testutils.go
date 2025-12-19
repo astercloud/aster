@@ -2,7 +2,7 @@ package builtin
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -208,11 +208,11 @@ func (cs *CustomWorkDirSandbox) FS() sandbox.SandboxFS {
 }
 
 func (cs *CustomWorkDirSandbox) Exec(ctx context.Context, cmd string, opts *sandbox.ExecOptions) (*sandbox.ExecResult, error) {
-	return nil, fmt.Errorf("exec not supported in test sandbox")
+	return nil, errors.New("exec not supported in test sandbox")
 }
 
 func (cs *CustomWorkDirSandbox) Watch(paths []string, listener sandbox.FileChangeListener) (string, error) {
-	return "", fmt.Errorf("watch not supported in test sandbox")
+	return "", errors.New("watch not supported in test sandbox")
 }
 
 func (cs *CustomWorkDirSandbox) Unwatch(watchID string) error {
@@ -239,11 +239,11 @@ func (rs *RealSandbox) FS() sandbox.SandboxFS {
 }
 
 func (rs *RealSandbox) Exec(ctx context.Context, cmd string, opts *sandbox.ExecOptions) (*sandbox.ExecResult, error) {
-	return nil, fmt.Errorf("exec not supported in test sandbox")
+	return nil, errors.New("exec not supported in test sandbox")
 }
 
 func (rs *RealSandbox) Watch(paths []string, listener sandbox.FileChangeListener) (string, error) {
-	return "", fmt.Errorf("watch not supported in test sandbox")
+	return "", errors.New("watch not supported in test sandbox")
 }
 
 func (rs *RealSandbox) Unwatch(watchID string) error {
@@ -467,7 +467,7 @@ func BenchmarkTool(b *testing.B, tool tools.Tool, input map[string]any) {
 	}
 
 	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for range b.N {
 		_, err := tool.Execute(ctx, input, tc)
 		if err != nil {
 			b.Fatalf("Tool execution failed: %v", err)

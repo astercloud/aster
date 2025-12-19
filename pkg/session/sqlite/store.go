@@ -7,8 +7,10 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"iter"
+	"maps"
 	"sync"
 	"time"
 
@@ -180,7 +182,7 @@ func (s *Service) Update(ctx context.Context, req *session.UpdateRequest) error 
 		req.SessionID,
 	).Scan(&existingJSON)
 
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return session.ErrSessionNotFound
 	}
 	if err != nil {
@@ -195,9 +197,7 @@ func (s *Service) Update(ctx context.Context, req *session.UpdateRequest) error 
 		}
 	}
 
-	for k, v := range req.Metadata {
-		existing[k] = v
-	}
+	maps.Copy(existing, req.Metadata)
 
 	newJSON, err := json.Marshal(existing)
 	if err != nil {
@@ -279,7 +279,7 @@ func (s *Service) AppendEvent(ctx context.Context, sessionID string, event *sess
 	// Check session exists
 	var exists bool
 	err := s.db.QueryRowContext(ctx, `SELECT 1 FROM sessions WHERE id = ?`, sessionID).Scan(&exists)
-	if err == sql.ErrNoRows {
+	if errors.Is(err, sql.ErrNoRows) {
 		return session.ErrSessionNotFound
 	}
 	if err != nil {

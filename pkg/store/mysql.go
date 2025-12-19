@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -49,7 +50,6 @@ type AgentSnapshot struct {
 	Data       string    `gorm:"type:longtext"` // JSON 存储
 	CreatedAt  time.Time `gorm:"autoCreateTime"`
 }
-
 
 type AgentInfo struct {
 	ID        uint      `gorm:"primaryKey"`
@@ -126,7 +126,6 @@ func NewMySQLStore(config MySQLConfig) (*MySQLStore, error) {
 	return &MySQLStore{db: db}, nil
 }
 
-
 // SaveMessages 保存消息列表
 func (s *MySQLStore) SaveMessages(ctx context.Context, agentID string, messages []types.Message) error {
 	data, err := json.Marshal(messages)
@@ -143,7 +142,7 @@ func (s *MySQLStore) SaveMessages(ctx context.Context, agentID string, messages 
 func (s *MySQLStore) LoadMessages(ctx context.Context, agentID string) ([]types.Message, error) {
 	var record AgentMessage
 	if err := s.db.WithContext(ctx).Where("agent_id = ?", agentID).First(&record).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return []types.Message{}, nil
 		}
 		return nil, err
@@ -191,7 +190,7 @@ func (s *MySQLStore) SaveToolCallRecords(ctx context.Context, agentID string, re
 func (s *MySQLStore) LoadToolCallRecords(ctx context.Context, agentID string) ([]types.ToolCallRecord, error) {
 	var record AgentToolRecord
 	if err := s.db.WithContext(ctx).Where("agent_id = ?", agentID).First(&record).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return []types.ToolCallRecord{}, nil
 		}
 		return nil, err
@@ -203,7 +202,6 @@ func (s *MySQLStore) LoadToolCallRecords(ctx context.Context, agentID string) ([
 	}
 	return records, nil
 }
-
 
 // SaveSnapshot 保存快照
 func (s *MySQLStore) SaveSnapshot(ctx context.Context, agentID string, snapshot types.Snapshot) error {
@@ -220,7 +218,7 @@ func (s *MySQLStore) SaveSnapshot(ctx context.Context, agentID string, snapshot 
 func (s *MySQLStore) LoadSnapshot(ctx context.Context, agentID string, snapshotID string) (*types.Snapshot, error) {
 	var record AgentSnapshot
 	if err := s.db.WithContext(ctx).Where("agent_id = ? AND snapshot_id = ?", agentID, snapshotID).First(&record).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -267,7 +265,7 @@ func (s *MySQLStore) SaveInfo(ctx context.Context, agentID string, info types.Ag
 func (s *MySQLStore) LoadInfo(ctx context.Context, agentID string) (*types.AgentInfo, error) {
 	var record AgentInfo
 	if err := s.db.WithContext(ctx).Where("agent_id = ?", agentID).First(&record).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -296,7 +294,7 @@ func (s *MySQLStore) SaveTodos(ctx context.Context, agentID string, todos any) e
 func (s *MySQLStore) LoadTodos(ctx context.Context, agentID string) (any, error) {
 	var record AgentTodo
 	if err := s.db.WithContext(ctx).Where("agent_id = ?", agentID).First(&record).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, nil
 		}
 		return nil, err
@@ -308,7 +306,6 @@ func (s *MySQLStore) LoadTodos(ctx context.Context, agentID string) (any, error)
 	}
 	return todos, nil
 }
-
 
 // DeleteAgent 删除Agent所有数据
 func (s *MySQLStore) DeleteAgent(ctx context.Context, agentID string) error {
@@ -352,7 +349,7 @@ func (s *MySQLStore) ListAgents(ctx context.Context) ([]string, error) {
 func (s *MySQLStore) Get(ctx context.Context, collection, key string, dest any) error {
 	var item CollectionItem
 	if err := s.db.WithContext(ctx).Where("collection = ? AND `key` = ?", collection, key).First(&item).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrNotFound
 		}
 		return err

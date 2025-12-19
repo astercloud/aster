@@ -2,6 +2,8 @@
 // Based on: https://opentelemetry.io/docs/specs/semconv/gen-ai/
 package genai
 
+import "maps"
+
 // Operation names for GenAI spans
 const (
 	// OpInvokeAgent represents an agent invocation operation
@@ -68,10 +70,10 @@ const (
 	AttrErrorType = "error.type"
 
 	// Performance attributes (Aster-specific extensions)
-	AttrLatencyTTFT     = "gen_ai.latency.ttft_ms"       // Time to First Token
-	AttrLatencyTPOT     = "gen_ai.latency.tpot_ms"       // Time Per Output Token
-	AttrLatencyTotal    = "gen_ai.latency.total_ms"      // Total latency
-	AttrIterationCount  = "gen_ai.agent.iteration_count" // Agent loop iterations
+	AttrLatencyTTFT    = "gen_ai.latency.ttft_ms"       // Time to First Token
+	AttrLatencyTPOT    = "gen_ai.latency.tpot_ms"       // Time Per Output Token
+	AttrLatencyTotal   = "gen_ai.latency.total_ms"      // Total latency
+	AttrIterationCount = "gen_ai.agent.iteration_count" // Agent loop iterations
 
 	// Cost attributes (Aster-specific extensions)
 	AttrCostInput    = "gen_ai.cost.input"
@@ -92,24 +94,24 @@ const (
 
 // Error types
 const (
-	ErrorTypeTimeout            = "timeout"
-	ErrorTypeRateLimit          = "rate_limit"
-	ErrorTypeInvalidRequest     = "invalid_request"
-	ErrorTypeAuthentication     = "authentication"
-	ErrorTypePermission         = "permission"
-	ErrorTypeNotFound           = "not_found"
-	ErrorTypeServerError        = "server_error"
-	ErrorTypeContentFilter      = "content_filter"
+	ErrorTypeTimeout               = "timeout"
+	ErrorTypeRateLimit             = "rate_limit"
+	ErrorTypeInvalidRequest        = "invalid_request"
+	ErrorTypeAuthentication        = "authentication"
+	ErrorTypePermission            = "permission"
+	ErrorTypeNotFound              = "not_found"
+	ErrorTypeServerError           = "server_error"
+	ErrorTypeContentFilter         = "content_filter"
 	ErrorTypeContextLengthExceeded = "context_length_exceeded"
 )
 
 // Finish reasons
 const (
-	FinishReasonStop         = "stop"
-	FinishReasonLength       = "length"
-	FinishReasonToolUse      = "tool_use"
+	FinishReasonStop          = "stop"
+	FinishReasonLength        = "length"
+	FinishReasonToolUse       = "tool_use"
 	FinishReasonContentFilter = "content_filter"
-	FinishReasonError        = "error"
+	FinishReasonError         = "error"
 )
 
 // SpanKind constants for GenAI operations
@@ -224,9 +226,7 @@ func (b *AttributeBuilder) WithCost(input, output, total float64, currency strin
 // Build returns the built attributes map
 func (b *AttributeBuilder) Build() map[string]any {
 	result := make(map[string]any, len(b.attrs))
-	for k, v := range b.attrs {
-		result[k] = v
-	}
+	maps.Copy(result, b.attrs)
 	return result
 }
 

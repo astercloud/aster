@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -72,7 +73,7 @@ func (t *KillShellTool) Execute(ctx context.Context, input map[string]any, tc *t
 	cleanup := GetBoolParam(input, "cleanup", true)
 
 	if shellID == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("shell_id cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("shell_id cannot be empty")), nil
 	}
 
 	start := time.Now()
@@ -85,7 +86,7 @@ func (t *KillShellTool) Execute(ctx context.Context, input map[string]any, tc *t
 	if err != nil {
 		return map[string]any{
 			"ok":    false,
-			"error": fmt.Sprintf("background shell not found: %s", shellID),
+			"error": "background shell not found: " + shellID,
 			"recommendations": []string{
 				"确认shell_id是否正确",
 				"检查任务是否已经被终止",
@@ -100,7 +101,7 @@ func (t *KillShellTool) Execute(ctx context.Context, input map[string]any, tc *t
 	if task.Status != "running" {
 		return map[string]any{
 			"ok":          false,
-			"error":       fmt.Sprintf("task is not running, current status: %s", task.Status),
+			"error":       "task is not running, current status: " + task.Status,
 			"shell_id":    shellID,
 			"command":     task.Command,
 			"pid":         task.PID,

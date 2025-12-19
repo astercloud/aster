@@ -5,13 +5,13 @@
       <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
-    
+
     <radialGradient id="iconStarGrad">
       <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
       <stop offset="70%" style="stop-color:#6366f1;stop-opacity:0.9" />
       <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:0.7" />
     </radialGradient>
-    
+
     <filter id="iconGlow">
       <feGaussianBlur stdDeviation="3" result="coloredBlur"/>
       <feMerge>
@@ -19,39 +19,39 @@
         <feMergeNode in="SourceGraphic"/>
       </feMerge>
     </filter>
-    
+
     <!-- 背景渐变 -->
     <radialGradient id="bgGrad">
       <stop offset="0%" style="stop-color:#1e293b;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#0f172a;stop-opacity:1" />
     </radialGradient>
   </defs>
-  
+
   <!-- 背景 -->
   <rect width="256" height="256" fill="url(#bgGrad)" rx="40"/>
-  
+
   <!-- 主图标 -->
   <g transform="translate(128, 128)">
     <!-- 外层发光环 -->
     <circle cx="0" cy="0" r="90" fill="none" stroke="url(#iconGrad)" stroke-width="1" opacity="0.3"/>
     <circle cx="0" cy="0" r="70" fill="none" stroke="url(#iconGrad)" stroke-width="1" opacity="0.4"/>
-    
+
     <!-- 中心六边形 -->
     <g filter="url(#iconGlow)">
-      <polygon points="0,-50 43.3,-25 43.3,25 0,50 -43.3,25 -43.3,-25" 
-               fill="url(#iconGrad)" 
-               stroke="#ffffff" 
+      <polygon points="0,-50 43.3,-25 43.3,25 0,50 -43.3,25 -43.3,-25"
+               fill="url(#iconGrad)"
+               stroke="#ffffff"
                stroke-width="3"
                opacity="0.95"/>
-      
+
       <!-- 内部核心 -->
       <circle cx="0" cy="0" r="22" fill="#ffffff" opacity="0.95"/>
       <circle cx="0" cy="0" r="16" fill="url(#iconGrad)"/>
-      
+
       <!-- 中心点 -->
       <circle cx="0" cy="0" r="6" fill="#ffffff" opacity="0.9"/>
     </g>
-    
+
     <!-- 星尘粒子 - 第一层（较大） -->
     <g opacity="0.9">
       <circle cx="75" cy="-60" r="8" fill="url(#iconStarGrad)">
@@ -67,40 +67,40 @@
         <animate attributeName="r" values="8;10;8" dur="1.9s" repeatCount="indefinite"/>
       </circle>
     </g>
-    
+
     <!-- 星尘粒子 - 第二层（中等） -->
     <g opacity="0.7">
       <circle cx="65" cy="0" r="5" fill="#8b5cf6"/>
       <circle cx="-65" cy="0" r="5" fill="#3b82f6"/>
       <circle cx="0" cy="-68" r="4.5" fill="#6366f1"/>
       <circle cx="0" cy="68" r="4.5" fill="#8b5cf6"/>
-      
+
       <circle cx="55" cy="-45" r="4" fill="#6366f1"/>
       <circle cx="-55" cy="-40" r="4" fill="#8b5cf6"/>
       <circle cx="58" cy="42" r="4" fill="#3b82f6"/>
       <circle cx="-52" cy="45" r="4" fill="#6366f1"/>
     </g>
-    
+
     <!-- 星尘粒子 - 第三层（小） -->
     <g opacity="0.5">
       <circle cx="85" cy="-30" r="3" fill="#6366f1"/>
       <circle cx="-85" cy="-25" r="3" fill="#8b5cf6"/>
       <circle cx="82" cy="32" r="3" fill="#3b82f6"/>
       <circle cx="-82" cy="35" r="3" fill="#6366f1"/>
-      
+
       <circle cx="45" cy="-55" r="2.5" fill="#8b5cf6"/>
       <circle cx="-45" cy="-50" r="2.5" fill="#3b82f6"/>
       <circle cx="48" cy="52" r="2.5" fill="#6366f1"/>
       <circle cx="-48" cy="48" r="2.5" fill="#8b5cf6"/>
     </g>
-    
+
     <!-- 连接线 - 汇聚到中心 -->
     <g opacity="0.3">
       <line x1="75" y1="-60" x2="43.3" y2="-25" stroke="url(#iconGrad)" stroke-width="2"/>
       <line x1="-75" y1="-55" x2="-43.3" y2="-25" stroke="url(#iconGrad)" stroke-width="2"/>
       <line x1="80" y1="55" x2="43.3" y2="25" stroke="url(#iconGrad)" stroke-width="2"/>
       <line x1="-72" y1="60" x2="-43.3" y2="25" stroke="url(#iconGrad)" stroke-width="2"/>
-      
+
       <line x1="65" y1="0" x2="43.3" y2="0" stroke="url(#iconGrad)" stroke-width="1.5"/>
       <line x1="-65" y1="0" x2="-43.3" y2="0" stroke="url(#iconGrad)" stroke-width="1.5"/>
       <line x1="0" y1="-68" x2="0" y2="-50" stroke="url(#iconGrad)" stroke-width="1.5"/>

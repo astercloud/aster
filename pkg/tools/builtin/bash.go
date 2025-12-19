@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -122,7 +123,7 @@ func (t *BashTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	}
 
 	if command == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("command cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("command cannot be empty")), nil
 	}
 
 	// Git 安全检查
@@ -160,7 +161,7 @@ func (t *BashTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	// 验证命令安全性
 	if err := t.validateCommand(command); err != nil {
 		return NewClaudeErrorResponse(
-			fmt.Errorf("command validation failed: %v", err),
+			fmt.Errorf("command validation failed: %w", err),
 			"避免使用危险命令如 rm -rf /, sudo rm 等",
 			"如需执行敏感操作，请确认安全性",
 		), nil

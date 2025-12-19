@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"fmt"
+	"errors"
 	"strings"
 	"testing"
 )
@@ -427,16 +427,16 @@ func TestGlobTool_ConcurrentOperations(t *testing.T) {
 
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("Glob operation failed")
+			return errors.New("Glob operation failed")
 		}
 
 		// 验证基本响应
 		if _, exists := result["matches"]; !exists {
-			return fmt.Errorf("Missing matches in result")
+			return errors.New("Missing matches in result")
 		}
 
 		if _, exists := result["count"]; !exists {
-			return fmt.Errorf("Missing count in result")
+			return errors.New("Missing count in result")
 		}
 
 		return nil

@@ -179,7 +179,7 @@ type RedactionResult struct {
 // GetSummary 获取脱敏摘要
 func (r *RedactionResult) GetSummary() string {
 	if r.Error != "" {
-		return fmt.Sprintf("Error during redaction: %s", r.Error)
+		return "Error during redaction: " + r.Error
 	}
 
 	if !r.PIIFound {

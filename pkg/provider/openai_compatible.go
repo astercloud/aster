@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -69,10 +70,10 @@ type OpenAICompatibleOptions struct {
 // 用于用户自带 API Key 场景，如 new-api、API2D 等
 func NewCustomProvider(config *types.ModelConfig) (*OpenAICompatibleProvider, error) {
 	if config.BaseURL == "" {
-		return nil, fmt.Errorf("custom provider: base_url is required")
+		return nil, errors.New("custom provider: base_url is required")
 	}
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("custom provider: api_key is required")
+		return nil, errors.New("custom provider: api_key is required")
 	}
 
 	providerName := "custom"
@@ -192,11 +193,11 @@ func (p *OpenAICompatibleProvider) Stream(
 				// 处理特定错误类型
 				switch errType {
 				case "engine_overloaded_error":
-					return nil, fmt.Errorf("server_overloaded: 服务器当前负载过高，请稍后重试")
+					return nil, errors.New("server_overloaded: 服务器当前负载过高，请稍后重试")
 				case "rate_limit_error":
-					return nil, fmt.Errorf("rate_limited: 请求过于频繁，请稍后重试")
+					return nil, errors.New("rate_limited: 请求过于频繁，请稍后重试")
 				case "invalid_api_key":
-					return nil, fmt.Errorf("auth_error: API Key 无效或已过期")
+					return nil, errors.New("auth_error: API Key 无效或已过期")
 				default:
 					if errMsg != "" {
 						return nil, fmt.Errorf("%s: %s", errType, errMsg)
@@ -514,7 +515,7 @@ func (p *OpenAICompatibleProvider) createHTTPRequest(ctx context.Context, reques
 	}
 
 	url := p.baseURL + "/chat/completions"
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(bodyBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -561,7 +562,7 @@ func (p *OpenAICompatibleProvider) doRequestWithRetry(req *http.Request) (*http.
 
 		// 检查是否需要重试
 		shouldRetry := false
-		if resp.StatusCode == 429 && p.options.RetryOn429 {
+		if resp.StatusCode == http.StatusTooManyRequests && p.options.RetryOn429 {
 			shouldRetry = true
 		} else if resp.StatusCode >= 500 && p.options.RetryOn500 {
 			shouldRetry = true
@@ -745,13 +746,13 @@ func (p *OpenAICompatibleProvider) parseStreamChunk(chunk map[string]any) []Stre
 func (p *OpenAICompatibleProvider) parseCompleteResponse(apiResp map[string]any) (types.Message, error) {
 	choices, ok := apiResp["choices"].([]any)
 	if !ok || len(choices) == 0 {
-		return types.Message{}, fmt.Errorf("no choices in response")
+		return types.Message{}, errors.New("no choices in response")
 	}
 
 	choice := choices[0].(map[string]any)
 	message, ok := choice["message"].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("no message in choice")
+		return types.Message{}, errors.New("no message in choice")
 	}
 
 	// 解析角色

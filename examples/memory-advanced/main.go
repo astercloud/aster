@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -43,7 +44,7 @@ func (t *userPreferenceTool) InputSchema() map[string]any {
 func (t *userPreferenceTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	rawPref, _ := input["preference"].(string)
 	if rawPref == "" {
-		return nil, fmt.Errorf("preference is required")
+		return nil, errors.New("preference is required")
 	}
 
 	scope := memory.Scope{
@@ -103,7 +104,7 @@ func (t *projectFactTool) InputSchema() map[string]any {
 func (t *projectFactTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	fact, _ := input["fact"].(string)
 	if fact == "" {
-		return nil, fmt.Errorf("fact is required")
+		return nil, errors.New("fact is required")
 	}
 
 	scope := memory.Scope{
@@ -165,7 +166,7 @@ func (t *resourceNoteTool) InputSchema() map[string]any {
 func (t *resourceNoteTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	note, _ := input["note"].(string)
 	if note == "" {
-		return nil, fmt.Errorf("note is required")
+		return nil, errors.New("note is required")
 	}
 
 	scope := memory.Scope{

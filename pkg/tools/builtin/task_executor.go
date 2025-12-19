@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -34,7 +35,7 @@ type SubAgentExecutorFactory interface {
 type TaskExecutionHandle struct {
 	TaskID       string
 	AgentType    string
-	Status       string // "pending", "running", "completed", "failed", "cancelled"
+	Status       string // "pending", "running", "completed", "failed", "canceled"
 	StartTime    time.Time
 	EndTime      *time.Time
 	Result       *types.SubAgentResult
@@ -63,7 +64,7 @@ func (te *TaskExecutor) Execute(ctx context.Context, agentType, prompt string, o
 	te.mu.RUnlock()
 
 	if factory == nil {
-		return nil, fmt.Errorf("executor factory not configured, subagent execution not available")
+		return nil, errors.New("executor factory not configured, subagent execution not available")
 	}
 
 	// 创建执行器
@@ -132,7 +133,7 @@ func (te *TaskExecutor) ExecuteAsync(ctx context.Context, agentType, prompt stri
 	te.mu.RUnlock()
 
 	if factory == nil {
-		return nil, fmt.Errorf("executor factory not configured")
+		return nil, errors.New("executor factory not configured")
 	}
 
 	// 创建执行器

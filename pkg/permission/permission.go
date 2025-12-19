@@ -172,12 +172,12 @@ func NewInspector(mode Mode, opts ...InspectorOption) *Inspector {
 			"web_search":      RiskLevelLow,
 			"get_file_info":   RiskLevelLow,
 			"semantic_search": RiskLevelLow,
-			"AskUserQuestion": RiskLevelLow,    // User interaction - no side effects
-			"Glob":            RiskLevelLow,  // File pattern matching - read only
-			"Read":            RiskLevelLow,  // Read file content - read only
+			"AskUserQuestion": RiskLevelLow, // User interaction - no side effects
+			"Glob":            RiskLevelLow, // File pattern matching - read only
+			"Read":            RiskLevelLow, // Read file content - read only
 
 			// Medium risk - write operations
-			"ExitPlanMode":    RiskLevelMedium, // Plan submission requires approval
+			"ExitPlanMode":     RiskLevelMedium, // Plan submission requires approval
 			"write_file":       RiskLevelMedium,
 			"create_file":      RiskLevelMedium,
 			"edit_file":        RiskLevelMedium,
@@ -388,12 +388,12 @@ func (i *Inspector) matchPattern(pattern, toolName string) bool {
 	if pattern == toolName {
 		return true
 	}
-	if strings.HasSuffix(pattern, "*") {
-		prefix := strings.TrimSuffix(pattern, "*")
+	if before, ok := strings.CutSuffix(pattern, "*"); ok {
+		prefix := before
 		return strings.HasPrefix(toolName, prefix)
 	}
-	if strings.HasPrefix(pattern, "*") {
-		suffix := strings.TrimPrefix(pattern, "*")
+	if after, ok := strings.CutPrefix(pattern, "*"); ok {
+		suffix := after
 		return strings.HasSuffix(toolName, suffix)
 	}
 	return false
@@ -490,7 +490,7 @@ func (i *Inspector) RecordDecision(req *Request, decision Decision, note string)
 			Decision:  DecisionAllow,
 			RiskLevel: req.RiskLevel,
 			CreatedAt: time.Now(),
-			Note:      fmt.Sprintf("Auto-created from allow_always decision: %s", note),
+			Note:      "Auto-created from allow_always decision: " + note,
 		})
 	case DecisionDenyAlways:
 		i.AddRule(Rule{
@@ -498,7 +498,7 @@ func (i *Inspector) RecordDecision(req *Request, decision Decision, note string)
 			Decision:  DecisionDeny,
 			RiskLevel: req.RiskLevel,
 			CreatedAt: time.Now(),
-			Note:      fmt.Sprintf("Auto-created from deny_always decision: %s", note),
+			Note:      "Auto-created from deny_always decision: " + note,
 		})
 	}
 

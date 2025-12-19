@@ -1,13 +1,4 @@
 repos:
-  - repo: https://github.com/tekwizely/pre-commit-golang
-    rev: v1.0.0-rc.1
-    hooks:
-      - id: go-fmt
-        args: [-w]
-      - id: go-vet-repo-mod
-      - id: golangci-lint-repo-mod
-        args: [--timeout=5m]
-
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
     hooks:
@@ -18,3 +9,13 @@ repos:
       - id: check-added-large-files
         args: ["--maxkb=1000"]
       - id: check-merge-conflict
+
+  - repo: local
+    hooks:
+      - id: golangci-lint
+        name: golangci-lint
+        description: Run golangci-lint to lint and fix Go code
+        entry: golangci-lint run --new --fix
+        types: [go]
+        language: system
+        pass_filenames: false

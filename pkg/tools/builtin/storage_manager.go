@@ -106,17 +106,17 @@ func (fsm *FileStorageManager) StoreData(key string, data any) error {
 	// 创建目录
 	dir := filepath.Dir(filepath.Join(fsm.dataDir, key))
 	if err := os.MkdirAll(dir, 0755); err != nil {
-		return fmt.Errorf("failed to create directory: %v", err)
+		return fmt.Errorf("failed to create directory: %w", err)
 	}
 
 	// 序列化数据
 	jsonData, err := json.MarshalIndent(data, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal data: %v", err)
+		return fmt.Errorf("failed to marshal data: %w", err)
 	}
 
 	// 写入文件
-	filePath := filepath.Join(fsm.dataDir, fmt.Sprintf("%s.json", key))
+	filePath := filepath.Join(fsm.dataDir, key+".json")
 	return os.WriteFile(filePath, jsonData, 0644)
 }
 
@@ -125,10 +125,10 @@ func (fsm *FileStorageManager) LoadData(key string, target any) error {
 	fsm.mu.RLock()
 	defer fsm.mu.RUnlock()
 
-	filePath := filepath.Join(fsm.dataDir, fmt.Sprintf("%s.json", key))
+	filePath := filepath.Join(fsm.dataDir, key+".json")
 	data, err := os.ReadFile(filePath)
 	if err != nil {
-		return fmt.Errorf("failed to read file: %v", err)
+		return fmt.Errorf("failed to read file: %w", err)
 	}
 
 	return json.Unmarshal(data, target)
@@ -139,10 +139,10 @@ func (fsm *FileStorageManager) DeleteData(key string) error {
 	fsm.mu.Lock()
 	defer fsm.mu.Unlock()
 
-	filePath := filepath.Join(fsm.dataDir, fmt.Sprintf("%s.json", key))
+	filePath := filepath.Join(fsm.dataDir, key+".json")
 	err := os.Remove(filePath)
 	if err != nil && !os.IsNotExist(err) {
-		return fmt.Errorf("failed to delete file: %v", err)
+		return fmt.Errorf("failed to delete file: %w", err)
 	}
 
 	return nil
@@ -150,7 +150,7 @@ func (fsm *FileStorageManager) DeleteData(key string) error {
 
 // Exists 检查数据是否存在
 func (fsm *FileStorageManager) Exists(key string) bool {
-	filePath := filepath.Join(fsm.dataDir, fmt.Sprintf("%s.json", key))
+	filePath := filepath.Join(fsm.dataDir, key+".json")
 	_, err := os.Stat(filePath)
 	return err == nil
 }
@@ -167,7 +167,7 @@ func (fsm *FileStorageManager) Backup(backupPath string) error {
 
 	// 创建备份目录
 	if err := os.MkdirAll(filepath.Dir(backupPath), 0755); err != nil {
-		return fmt.Errorf("failed to create backup directory: %v", err)
+		return fmt.Errorf("failed to create backup directory: %w", err)
 	}
 
 	// 创建备份压缩文件
@@ -185,7 +185,7 @@ func (fsm *FileStorageManager) Restore(backupPath string) error {
 
 	// 创建数据目录
 	if err := os.MkdirAll(fsm.dataDir, 0755); err != nil {
-		return fmt.Errorf("failed to create data directory: %v", err)
+		return fmt.Errorf("failed to create data directory: %w", err)
 	}
 
 	// 从备份恢复
@@ -207,14 +207,14 @@ func NewFilePlanManager(storageMgr StorageManager) *FilePlanManager {
 
 // StorePlan 存储计划
 func (fpm *FilePlanManager) StorePlan(plan *PlanRecord) error {
-	key := fmt.Sprintf("plans/%s", plan.ID)
+	key := "plans/" + plan.ID
 	return fpm.storageManager.StoreData(key, plan)
 }
 
 // LoadPlan 加载计划
 func (fpm *FilePlanManager) LoadPlan(planID string) (*PlanRecord, error) {
 	var plan PlanRecord
-	key := fmt.Sprintf("plans/%s", planID)
+	key := "plans/" + planID
 	err := fpm.storageManager.LoadData(key, &plan)
 	return &plan, err
 }
@@ -223,7 +223,7 @@ func (fpm *FilePlanManager) LoadPlan(planID string) (*PlanRecord, error) {
 func (fpm *FilePlanManager) UpdatePlanStatus(planID string, status string) error {
 	plan, err := fpm.LoadPlan(planID)
 	if err != nil {
-		return fmt.Errorf("failed to load plan: %v", err)
+		return fmt.Errorf("failed to load plan: %w", err)
 	}
 
 	plan.Status = status
@@ -281,7 +281,7 @@ func (fpm *FilePlanManager) ListPlans() ([]*PlanRecord, error) {
 
 // DeletePlan 删除计划
 func (fpm *FilePlanManager) DeletePlan(planID string) error {
-	key := fmt.Sprintf("plans/%s", planID)
+	key := "plans/" + planID
 	return fpm.storageManager.DeleteData(key)
 }
 
@@ -299,14 +299,14 @@ func NewFileTodoManager(storageMgr StorageManager) *FileTodoManager {
 
 // StoreTodoList 存储任务列表
 func (ftm *FileTodoManager) StoreTodoList(list *TodoList) error {
-	key := fmt.Sprintf("todos/%s", list.Name)
+	key := "todos/" + list.Name
 	return ftm.storageManager.StoreData(key, list)
 }
 
 // LoadTodoList 加载任务列表
 func (ftm *FileTodoManager) LoadTodoList(listName string) (*TodoList, error) {
 	var list TodoList
-	key := fmt.Sprintf("todos/%s", listName)
+	key := "todos/" + listName
 	err := ftm.storageManager.LoadData(key, &list)
 	return &list, err
 }
@@ -329,7 +329,7 @@ func (ftm *FileTodoManager) ListTodoLists() ([]string, error) {
 
 // DeleteTodoList 删除任务列表
 func (ftm *FileTodoManager) DeleteTodoList(listName string) error {
-	key := fmt.Sprintf("todos/%s", listName)
+	key := "todos/" + listName
 	return ftm.storageManager.DeleteData(key)
 }
 
@@ -356,7 +356,7 @@ func (ftm *FileTodoManager) BackupTodoLists() (map[string]*TodoList, error) {
 func (ftm *FileTodoManager) RestoreTodoLists(backup map[string]*TodoList) error {
 	for listName, list := range backup {
 		if err := ftm.StoreTodoList(list); err != nil {
-			return fmt.Errorf("failed to restore todo list %s: %v", listName, err)
+			return fmt.Errorf("failed to restore todo list %s: %w", listName, err)
 		}
 	}
 	return nil

@@ -1,7 +1,9 @@
 package config
 
 import (
+	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"regexp"
 	"strings"
@@ -174,7 +176,7 @@ func (l *Loader) expandVariables(content string) string {
 
 		if required && val == "" {
 			// 返回错误标记，后续验证会捕获
-			return fmt.Sprintf("__ERROR__: %s", errorMsg)
+			return "__ERROR__: " + errorMsg
 		}
 
 		return defaultValue
@@ -219,12 +221,12 @@ func (l *Loader) expandVariables(content string) string {
 func (l *Loader) validateAgentConfig(config *types.AgentConfig) error {
 	// 检查必需字段
 	if config.TemplateID == "" {
-		return fmt.Errorf("template_id is required")
+		return errors.New("template_id is required")
 	}
 
 	// 检查是否有未展开的必需变量
 	if strings.Contains(fmt.Sprintf("%v", config), "__ERROR__:") {
-		return fmt.Errorf("config contains unexpanded required variables")
+		return errors.New("config contains unexpanded required variables")
 	}
 
 	// 验证 ModelConfig
@@ -237,7 +239,7 @@ func (l *Loader) validateAgentConfig(config *types.AgentConfig) error {
 	// 验证 Multitenancy
 	if config.Multitenancy != nil && config.Multitenancy.Enabled {
 		if config.Multitenancy.OrgID == "" && config.Multitenancy.TenantID == "" {
-			return fmt.Errorf("multitenancy enabled but neither org_id nor tenant_id specified")
+			return errors.New("multitenancy enabled but neither org_id nor tenant_id specified")
 		}
 	}
 
@@ -247,10 +249,10 @@ func (l *Loader) validateAgentConfig(config *types.AgentConfig) error {
 // validateModelConfig 验证 ModelConfig
 func (l *Loader) validateModelConfig(config *types.ModelConfig) error {
 	if config.Provider == "" {
-		return fmt.Errorf("provider is required")
+		return errors.New("provider is required")
 	}
 	if config.Model == "" {
-		return fmt.Errorf("model is required")
+		return errors.New("model is required")
 	}
 	return nil
 }
@@ -314,9 +316,7 @@ func MergeConfigs(base *types.AgentConfig, overlays ...*types.AgentConfig) *type
 			if base.Metadata == nil {
 				base.Metadata = make(map[string]any)
 			}
-			for k, v := range overlay.Metadata {
-				base.Metadata[k] = v
-			}
+			maps.Copy(base.Metadata, overlay.Metadata)
 		}
 	}
 

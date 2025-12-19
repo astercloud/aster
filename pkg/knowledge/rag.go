@@ -199,7 +199,7 @@ func (r *RAG) RetrieveMultiHop(ctx context.Context, query string, maxHops int) (
 	var allContextItems []*KnowledgeItem
 	var expandedQuery = query
 
-	for hop := 0; hop < maxHops; hop++ {
+	for range maxHops {
 		result, err := r.Retrieve(ctx, expandedQuery, WithMaxResults(r.config.MaxRetrievalResults/2))
 		if err != nil {
 			break
@@ -575,7 +575,7 @@ func (r *RAG) formatContextItem(item *KnowledgeItem) string {
 	var parts []string
 
 	if item.Title != "" {
-		parts = append(parts, fmt.Sprintf("## %s", item.Title))
+		parts = append(parts, "## "+item.Title)
 	}
 
 	if item.Description != "" {
@@ -587,11 +587,11 @@ func (r *RAG) formatContextItem(item *KnowledgeItem) string {
 	}
 
 	if len(item.Tags) > 0 {
-		parts = append(parts, fmt.Sprintf("Tags: %s", strings.Join(item.Tags, ", ")))
+		parts = append(parts, "Tags: "+strings.Join(item.Tags, ", "))
 	}
 
 	if item.Source != "" {
-		parts = append(parts, fmt.Sprintf("Source: %s", item.Source))
+		parts = append(parts, "Source: "+item.Source)
 	}
 
 	return strings.Join(parts, "\n")
@@ -618,8 +618,8 @@ func (r *RAG) enhanceQuery(originalQuery string, items []*RetrievalItem) string 
 	keywords := make(map[string]bool)
 	for _, item := range items[:min(3, len(items))] {
 		if item.Item.Title != "" {
-			words := strings.Fields(item.Item.Title)
-			for _, word := range words {
+			words := strings.FieldsSeq(item.Item.Title)
+			for word := range words {
 				if len(word) > 2 {
 					keywords[strings.ToLower(word)] = true
 				}
@@ -679,14 +679,6 @@ func (r *RAG) deduplicate(items []*RetrievalItem) []*RetrievalItem {
 	}
 
 	return result
-}
-
-// 辅助函数
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 func containsItem(items []*KnowledgeItem, target *KnowledgeItem) bool {

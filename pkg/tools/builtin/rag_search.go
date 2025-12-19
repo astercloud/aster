@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/memory"
@@ -78,13 +79,13 @@ func (t *RAGSearchTool) InputSchema() map[string]any {
 func (t *RAGSearchTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	// 检查 SemanticMemory 是否已配置
 	if t.sm == nil || !t.sm.Enabled() {
-		return nil, fmt.Errorf("semantic memory not configured or enabled")
+		return nil, errors.New("semantic memory not configured or enabled")
 	}
 
 	// 提取查询文本
 	rawQuery, ok := input["query"].(string)
 	if !ok || rawQuery == "" {
-		return nil, fmt.Errorf("query is required and must be a non-empty string")
+		return nil, errors.New("query is required and must be a non-empty string")
 	}
 
 	// 可选参数：top_k

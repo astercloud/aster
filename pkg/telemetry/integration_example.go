@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -105,7 +106,7 @@ func ExampleWithError() {
 	defer span.End()
 
 	// 模拟错误
-	err := fmt.Errorf("model API timeout")
+	err := errors.New("model API timeout")
 	span.RecordError(err)
 	span.SetStatus(StatusCodeError, err.Error())
 

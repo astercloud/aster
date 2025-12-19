@@ -399,8 +399,8 @@ func TestIsTextFile(t *testing.T) {
 // BenchmarkFormatContentWithLineNumbers 性能测试
 func BenchmarkFormatContentWithLineNumbers(b *testing.B) {
 	content := strings.Repeat("line of text\n", 1000)
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		FormatContentWithLineNumbers(content, 1)
 	}
 }
@@ -408,8 +408,8 @@ func BenchmarkFormatContentWithLineNumbers(b *testing.B) {
 // BenchmarkSanitizeToolCallID 性能测试
 func BenchmarkSanitizeToolCallID(b *testing.B) {
 	id := "../../../dangerous/path/to/file.txt"
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+
+	for b.Loop() {
 		SanitizeToolCallID(id)
 	}
 }

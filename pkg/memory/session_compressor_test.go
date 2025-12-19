@@ -172,7 +172,7 @@ func TestMultiLevelCompressor_SummarizeSession(t *testing.T) {
 	for _, tt := range tests {
 		t.Run(tt.name, func(t *testing.T) {
 			messages := make([]agentext.Message, tt.messageCount)
-			for i := 0; i < tt.messageCount; i++ {
+			for i := range tt.messageCount {
 				role := "user"
 				if i%2 == 1 {
 					role = "assistant"

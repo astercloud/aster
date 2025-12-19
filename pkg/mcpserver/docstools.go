@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -22,7 +23,7 @@ type DocsToolConfig struct {
 // normalizeBaseDir 确保 baseDir 是绝对路径并移除尾部斜杠
 func normalizeBaseDir(baseDir string) (string, error) {
 	if baseDir == "" {
-		return "", fmt.Errorf("baseDir is required")
+		return "", errors.New("baseDir is required")
 	}
 	abs, err := filepath.Abs(baseDir)
 	if err != nil {
@@ -69,12 +70,12 @@ func (t *DocsGetTool) InputSchema() map[string]any {
 func (t *DocsGetTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	relPath, _ := input["path"].(string)
 	if relPath == "" {
-		return nil, fmt.Errorf("path is required")
+		return nil, errors.New("path is required")
 	}
 
 	// 防止路径遍历
 	if strings.Contains(relPath, "..") {
-		return nil, fmt.Errorf("path traversal is not allowed")
+		return nil, errors.New("path traversal is not allowed")
 	}
 
 	fullPath := filepath.Join(t.baseDir, filepath.FromSlash(relPath))
@@ -84,7 +85,7 @@ func (t *DocsGetTool) Execute(ctx context.Context, input map[string]any, tc *too
 	}
 
 	if !strings.HasPrefix(abs, t.baseDir) {
-		return nil, fmt.Errorf("path outside baseDir is not allowed")
+		return nil, errors.New("path outside baseDir is not allowed")
 	}
 
 	data, err := os.ReadFile(abs)
@@ -152,7 +153,7 @@ func (t *DocsSearchTool) InputSchema() map[string]any {
 func (t *DocsSearchTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	query, _ := input["query"].(string)
 	if strings.TrimSpace(query) == "" {
-		return nil, fmt.Errorf("query cannot be empty")
+		return nil, errors.New("query cannot be empty")
 	}
 	queryLower := strings.ToLower(query)
 
@@ -167,7 +168,7 @@ func (t *DocsSearchTool) Execute(ctx context.Context, input map[string]any, tc *
 	root := t.baseDir
 	if subdir != "" {
 		if strings.Contains(subdir, "..") {
-			return nil, fmt.Errorf("subdir path traversal is not allowed")
+			return nil, errors.New("subdir path traversal is not allowed")
 		}
 		root = filepath.Join(t.baseDir, filepath.FromSlash(subdir))
 	}
@@ -177,7 +178,7 @@ func (t *DocsSearchTool) Execute(ctx context.Context, input map[string]any, tc *
 		return nil, fmt.Errorf("resolve root: %w", err)
 	}
 	if !strings.HasPrefix(rootAbs, t.baseDir) {
-		return nil, fmt.Errorf("subdir outside baseDir is not allowed")
+		return nil, errors.New("subdir outside baseDir is not allowed")
 	}
 
 	type Match struct {
@@ -227,7 +228,7 @@ func (t *DocsSearchTool) Execute(ctx context.Context, input map[string]any, tc *
 					Line:       line,
 				})
 				if len(matches) >= maxResults {
-					return fmt.Errorf("max_results_reached")
+					return errors.New("max_results_reached")
 				}
 			}
 		}

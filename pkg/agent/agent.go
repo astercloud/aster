@@ -2,8 +2,10 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
+	"slices"
 	"sort"
 	"strings"
 	"sync"
@@ -55,19 +57,19 @@ type Agent struct {
 	semanticMemory *memory.SemanticMemory
 
 	// 状态管理
-	mu           sync.RWMutex
-	state        types.AgentRuntimeState
-	breakpoint   types.BreakpointState
-	messages     []types.Message
-	toolRecords  map[string]*types.ToolCallRecord
-	runningTools map[string]*runningToolHandle
-	stepCount              int
-	iterationCount         int  // 当前会话的模型调用次数
-	maxIterations          int  // 最大迭代次数限制（默认50）
-	initialThinkingSent    bool // 是否已发送初始思考事件（用于防止重复发送"任务规划"）
-	lastSfpIndex int
-	lastBookmark *types.Bookmark
-	createdAt    time.Time
+	mu                  sync.RWMutex
+	state               types.AgentRuntimeState
+	breakpoint          types.BreakpointState
+	messages            []types.Message
+	toolRecords         map[string]*types.ToolCallRecord
+	runningTools        map[string]*runningToolHandle
+	stepCount           int
+	iterationCount      int  // 当前会话的模型调用次数
+	maxIterations       int  // 最大迭代次数限制（默认50）
+	initialThinkingSent bool // 是否已发送初始思考事件（用于防止重复发送"任务规划"）
+	lastSfpIndex        int
+	lastBookmark        *types.Bookmark
+	createdAt           time.Time
 
 	// 权限管理
 	pendingPermissions  map[string]chan string        // callID -> decision channel
@@ -158,7 +160,7 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 	}
 
 	if modelConfig == nil {
-		return nil, fmt.Errorf("model config is required")
+		return nil, errors.New("model config is required")
 	}
 
 	prov, err := deps.ProviderFactory.Create(modelConfig)
@@ -351,13 +353,7 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 	if template.Runtime != nil && template.Runtime.ConversationCompression != nil &&
 		template.Runtime.ConversationCompression.Enabled {
 		// 检查是否已配置 summarization
-		hasSummarization := false
-		for _, name := range middlewareNames {
-			if name == "summarization" {
-				hasSummarization = true
-				break
-			}
-		}
+		hasSummarization := slices.Contains(middlewareNames, "summarization")
 		if !hasSummarization {
 			middlewareNames = append(middlewareNames, "summarization")
 			agentLog.Debug(ctx, "auto-enabled summarization middleware from template ConversationCompression config", nil)
@@ -436,18 +432,18 @@ func Create(ctx context.Context, config *types.AgentConfig, deps *Dependencies) 
 
 	// 创建Agent
 	agent := &Agent{
-		id:                 config.AgentID,
-		template:           template,
-		config:             config,
-		deps:               deps,
-		eventBus:           events.NewEventBus(),
-		provider:           prov,
-		sandbox:            sb,
-		executor:           executor,
-		toolMap:            toolMap,
-		middlewareStack:    middlewareStack,
-		commandExecutor:    cmdExecutor,
-		skillInjector:      skillInjector,
+		id:                  config.AgentID,
+		template:            template,
+		config:              config,
+		deps:                deps,
+		eventBus:            events.NewEventBus(),
+		provider:            prov,
+		sandbox:             sb,
+		executor:            executor,
+		toolMap:             toolMap,
+		middlewareStack:     middlewareStack,
+		commandExecutor:     cmdExecutor,
+		skillInjector:       skillInjector,
 		semanticMemory:      semanticMem,
 		state:               types.AgentStateReady,
 		breakpoint:          types.BreakpointReady,
@@ -1125,17 +1121,17 @@ func (a *Agent) RespondToPermissionRequest(callID string, approved bool) error {
 	a.mu.Lock()
 	ch, exists := a.pendingPermissions[callID]
 	a.mu.Unlock()
-	
+
 	if !exists {
 		return fmt.Errorf("no pending permission request for call ID: %s", callID)
 	}
-	
+
 	if approved {
 		ch <- "approved"
 	} else {
 		ch <- "rejected"
 	}
-	
+
 	return nil
 }
 
@@ -1230,7 +1226,7 @@ func (a *Agent) buildToolContext(ctx context.Context) *tools.ToolContext {
 func (a *Agent) handleSlashCommand(ctx context.Context, text string) error {
 	if a.commandExecutor == nil {
 		agentLog.Error(ctx, "slash commands not enabled", map[string]any{"agent_id": a.id})
-		return fmt.Errorf("slash commands not enabled")
+		return errors.New("slash commands not enabled")
 	}
 
 	// 解析命令和参数
@@ -1307,10 +1303,10 @@ type longRunningInterruptible struct {
 }
 
 func (l *longRunningInterruptible) Pause() error {
-	return fmt.Errorf("pause not supported for long-running task")
+	return errors.New("pause not supported for long-running task")
 }
 func (l *longRunningInterruptible) Resume() error {
-	return fmt.Errorf("resume not supported for long-running task")
+	return errors.New("resume not supported for long-running task")
 }
 func (l *longRunningInterruptible) Cancel() error {
 	return l.tool.Cancel(context.Background(), l.taskID)
@@ -1344,7 +1340,7 @@ func (a *Agent) ControlTool(callID, action, note string) error {
 	if ok && action == "cancel" {
 		a.eventBus.EmitProgress(&types.ProgressToolCancelledEvent{
 			Call:   a.snapshotToolCall(callID),
-			Reason: "cancelled",
+			Reason: "canceled",
 		})
 	}
 
@@ -1357,7 +1353,7 @@ func (a *Agent) controlRunningTool(callID, action string) error {
 	a.mu.RUnlock()
 
 	if !ok || handle == nil || handle.interruptible == nil {
-		return fmt.Errorf("tool not interruptible or not running")
+		return errors.New("tool not interruptible or not running")
 	}
 
 	switch action {
@@ -1608,13 +1604,7 @@ func (a *Agent) validateMessageHistory(messages []types.Message) bool {
 
 			// 验证每个 tool_call ID 都有对应的 tool_result
 			for _, toolCallID := range toolCallIDs {
-				found := false
-				for _, resultID := range toolResultIDs {
-					if resultID == toolCallID {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(toolResultIDs, toolCallID)
 				if !found {
 					return false
 				}
@@ -1668,13 +1658,7 @@ func (a *Agent) removeIncompleteToolCalls(messages []types.Message) []types.Mess
 			// 验证所有 tool_call 都有对应的 tool_result
 			allMatched := true
 			for _, toolCallID := range toolCallIDs {
-				found := false
-				for _, resultID := range toolResultIDs {
-					if resultID == toolCallID {
-						found = true
-						break
-					}
-				}
+				found := slices.Contains(toolResultIDs, toolCallID)
 				if !found {
 					allMatched = false
 					break

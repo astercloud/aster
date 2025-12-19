@@ -4,6 +4,7 @@ import (
 	"net/http"
 	"sort"
 	"strconv"
+	"strings"
 	"time"
 
 	"github.com/astercloud/aster/pkg/dashboard"
@@ -317,8 +318,8 @@ func (h *DashboardHandler) GetRecentEvents(c *gin.Context) {
 		c.JSON(http.StatusOK, gin.H{
 			"success": true,
 			"data": gin.H{
-				"events": []gin.H{},
-				"cursor": int64(0),
+				"events":  []gin.H{},
+				"cursor":  int64(0),
 				"message": "Registry not available, real-time events disabled",
 			},
 		})
@@ -509,15 +510,15 @@ func (h *DashboardHandler) UpdatePricing(c *gin.Context) {
 
 // SessionSummary represents a session summary for dashboard
 type SessionSummary struct {
-	ID          string         `json:"id"`
-	AgentID     string         `json:"agent_id,omitempty"`
-	AgentName   string         `json:"agent_name,omitempty"`
-	Status      string         `json:"status"`
-	MessageCount int           `json:"message_count"`
-	TokenUsage  TokenCount     `json:"token_usage"`
-	CreatedAt   time.Time      `json:"created_at"`
-	UpdatedAt   time.Time      `json:"updated_at"`
-	Metadata    map[string]any `json:"metadata,omitempty"`
+	ID           string         `json:"id"`
+	AgentID      string         `json:"agent_id,omitempty"`
+	AgentName    string         `json:"agent_name,omitempty"`
+	Status       string         `json:"status"`
+	MessageCount int            `json:"message_count"`
+	TokenUsage   TokenCount     `json:"token_usage"`
+	CreatedAt    time.Time      `json:"created_at"`
+	UpdatedAt    time.Time      `json:"updated_at"`
+	Metadata     map[string]any `json:"metadata,omitempty"`
 }
 
 // TokenCount represents token counts
@@ -633,6 +634,7 @@ func (h *DashboardHandler) ListSessions(c *gin.Context) {
 // SessionDetail represents detailed session info
 type SessionDetail struct {
 	SessionSummary
+
 	Messages []MessageSummary `json:"messages"`
 }
 
@@ -670,11 +672,13 @@ func (h *DashboardHandler) GetSession(c *gin.Context) {
 		content := msg.Content
 		if content == "" && len(msg.ContentBlocks) > 0 {
 			// 从 ContentBlocks 提取文本
+			var contentSb673 strings.Builder
 			for _, block := range msg.ContentBlocks {
 				if textBlock, ok := block.(*types.TextBlock); ok {
-					content += textBlock.Text
+					contentSb673.WriteString(textBlock.Text)
 				}
 			}
+			content += contentSb673.String()
 		}
 
 		// 使用消息索引作为时间戳的偏移

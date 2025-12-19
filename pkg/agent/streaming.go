@@ -124,7 +124,7 @@ func (a *Agent) Stream(ctx context.Context, message string, opts ...Option) *str
 			Actions: session.EventActions{},
 		}
 		if writer.Send(taskPlanEvent, nil) {
-			streamLog.Debug(ctx, "client cancelled stream during task planning", nil)
+			streamLog.Debug(ctx, "client canceled stream during task planning", nil)
 			return
 		}
 		streamLog.Debug(ctx, "sent task planning event", nil)
@@ -194,7 +194,7 @@ func StreamFirst(reader *stream.Reader[*session.Event]) (*session.Event, error) 
 	event, err := reader.Recv()
 	if err != nil {
 		if errors.Is(err, io.EOF) {
-			return nil, fmt.Errorf("no events in stream")
+			return nil, errors.New("no events in stream")
 		}
 		return nil, err
 	}
@@ -224,7 +224,7 @@ func StreamLast(reader *stream.Reader[*session.Event]) (*session.Event, error) {
 		return lastEvent, lastErr
 	}
 	if lastEvent == nil {
-		return nil, fmt.Errorf("no events in stream")
+		return nil, errors.New("no events in stream")
 	}
 	return lastEvent, nil
 }
@@ -266,7 +266,7 @@ type Option func(*streamConfig)
 // validateMessage 验证消息
 func (a *Agent) validateMessage(message string) error {
 	if message == "" {
-		return fmt.Errorf("message cannot be empty")
+		return errors.New("message cannot be empty")
 	}
 	return nil
 }
@@ -470,7 +470,7 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 
 					// 立即发送事件到流
 					if writer.Send(event, nil) {
-						streamLog.Debug(ctx, "client cancelled stream during text streaming", nil)
+						streamLog.Debug(ctx, "client canceled stream during text streaming", nil)
 						return true, nil
 					}
 				}
@@ -491,7 +491,7 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 
 					// 立即发送事件到流
 					if writer.Send(event, nil) {
-						streamLog.Debug(ctx, "client cancelled stream during reasoning streaming", nil)
+						streamLog.Debug(ctx, "client canceled stream during reasoning streaming", nil)
 						return true, nil
 					}
 				}
@@ -520,7 +520,7 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 
 								// 立即发送事件到流
 								if writer.Send(event, nil) {
-									streamLog.Debug(ctx, "client cancelled stream during text streaming", nil)
+									streamLog.Debug(ctx, "client canceled stream during text streaming", nil)
 									return true, nil
 								}
 							}
@@ -630,7 +630,7 @@ func (a *Agent) runModelStepStreaming(ctx context.Context, writer *stream.Writer
 
 	// 8. 发送事件到流
 	if writer.Send(event, nil) {
-		streamLog.Debug(ctx, "client cancelled stream during event yield", nil)
+		streamLog.Debug(ctx, "client canceled stream during event yield", nil)
 		return true, nil
 	}
 

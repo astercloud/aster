@@ -162,7 +162,7 @@ func (r *RuntimeAgentRegistry) GetEventBuses() []*events.EventBus {
 	defer r.mu.RUnlock()
 
 	buses := make([]*events.EventBus, 0, len(r.agents)+len(r.remoteAgents))
-	
+
 	// 本地 Agent 的 EventBus
 	for _, ag := range r.agents {
 		if ag != nil {
@@ -171,7 +171,7 @@ func (r *RuntimeAgentRegistry) GetEventBuses() []*events.EventBus {
 			}
 		}
 	}
-	
+
 	// 远程 Agent 的 EventBus
 	for _, ra := range r.remoteAgents {
 		if ra != nil {
@@ -180,6 +180,6 @@ func (r *RuntimeAgentRegistry) GetEventBuses() []*events.EventBus {
 			}
 		}
 	}
-	
+
 	return buses
 }

@@ -3,6 +3,8 @@ package agent
 import (
 	"context"
 	"fmt"
+	"maps"
+	"slices"
 	"sync"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -99,12 +101,7 @@ func (tm *ToolManager) Initialize(toolNames []string, activeByDefault bool) erro
 
 // isCoreToolLocked 检查是否是核心工具（需要持有锁）
 func (tm *ToolManager) isCoreToolLocked(name string) bool {
-	for _, core := range tm.coreTools {
-		if core == name {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(tm.coreTools, name)
 }
 
 // IsCoreTools 检查是否是核心工具
@@ -120,9 +117,7 @@ func (tm *ToolManager) GetActiveTools() map[string]tools.Tool {
 	defer tm.mu.RUnlock()
 
 	result := make(map[string]tools.Tool, len(tm.activeTools))
-	for k, v := range tm.activeTools {
-		result[k] = v
-	}
+	maps.Copy(result, tm.activeTools)
 	return result
 }
 

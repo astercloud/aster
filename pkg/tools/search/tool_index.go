@@ -3,6 +3,7 @@ package search
 import (
 	"encoding/json"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -350,10 +351,8 @@ func (ti *ToolIndex) addToCategory(category, toolName string) {
 		ti.categories[category] = make([]string, 0)
 	}
 	// 检查是否已存在
-	for _, name := range ti.categories[category] {
-		if name == toolName {
-			return
-		}
+	if slices.Contains(ti.categories[category], toolName) {
+		return
 	}
 	ti.categories[category] = append(ti.categories[category], toolName)
 }

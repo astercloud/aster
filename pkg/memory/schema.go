@@ -2,7 +2,9 @@ package memory
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"slices"
 )
 
 // JSONSchema JSON Schema 定义
@@ -21,7 +23,7 @@ type JSONSchema struct {
 // Validate 验证 Schema 本身是否合法
 func (s *JSONSchema) Validate() error {
 	if s == nil {
-		return fmt.Errorf("schema cannot be nil")
+		return errors.New("schema cannot be nil")
 	}
 
 	validTypes := map[string]bool{
@@ -100,13 +102,7 @@ func (s *JSONSchema) validateValue(value any) error {
 
 	// 验证枚举
 	if len(s.Enum) > 0 {
-		found := false
-		for _, enumVal := range s.Enum {
-			if value == enumVal {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(s.Enum, value)
 		if !found {
 			return fmt.Errorf("value %v is not in enum: %v", value, s.Enum)
 		}

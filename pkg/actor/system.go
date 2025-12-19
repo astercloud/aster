@@ -2,6 +2,7 @@ package actor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"runtime/debug"
 	"sync"
@@ -293,7 +294,7 @@ func (s *System) SendWithSender(target *PID, msg Message, sender *PID) {
 // Request 同步请求（等待响应）
 func (s *System) Request(target *PID, msg Message, timeout time.Duration) (Message, error) {
 	if !s.isRunning.Load() {
-		return nil, fmt.Errorf("actor system is not running")
+		return nil, errors.New("actor system is not running")
 	}
 
 	// 使用 context 来取消请求

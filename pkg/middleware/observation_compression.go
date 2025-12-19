@@ -15,6 +15,7 @@ var ocLog = logging.ForComponent("ObservationCompression")
 // 这是 Manus 团队"文件系统作为上下文"理念的实现
 type ObservationCompressionMiddleware struct {
 	*BaseMiddleware
+
 	compressor        memory.ObservationCompressor
 	referenceRegistry memory.ReferenceRegistry
 

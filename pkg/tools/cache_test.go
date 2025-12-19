@@ -241,7 +241,7 @@ func TestToolCache_MaxMemoryItems(t *testing.T) {
 	ctx := context.Background()
 
 	// 添加4个条目，应该驱逐最旧的
-	for i := 0; i < 4; i++ {
+	for i := range 4 {
 		key := cache.GenerateKey("tool", map[string]any{"index": i})
 		err := cache.Set(ctx, key, i, config.TTL)
 		if err != nil {
@@ -315,7 +315,7 @@ func TestToolCache_Clear(t *testing.T) {
 	ctx := context.Background()
 
 	// 添加多个条目
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		key := cache.GenerateKey("tool", map[string]any{"index": i})
 		err := cache.Set(ctx, key, i, config.TTL)
 		if err != nil {
@@ -516,7 +516,7 @@ func TestToolCache_Cleanup(t *testing.T) {
 	ctx := context.Background()
 
 	// 添加多个条目
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		key := cache.GenerateKey("tool", map[string]any{"index": i})
 		err := cache.Set(ctx, key, i, config.TTL)
 		if err != nil {

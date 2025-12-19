@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -268,7 +269,7 @@ func (a *AgentActor) handleSend(ctx *actor.Context, msg *SendMsg) {
 	go func() {
 		err := a.agent.Send(execCtx, msg.Text)
 
-		if err != nil && err != context.Canceled {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			a.recordError(err)
 			if ctx.Sender != nil {
 				ctx.Reply(&ErrorMsg{Error: err, Context: "send"})
@@ -290,7 +291,7 @@ func (a *AgentActor) handleChat(ctx *actor.Context, msg *ChatMsg) {
 			Error:  err,
 		}
 
-		if err != nil && err != context.Canceled {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			a.recordError(err)
 		}
 
@@ -385,7 +386,7 @@ func (a *AgentActor) handleDirectToolCall(ctx *actor.Context, msg *DirectToolCal
 			Error:    err,
 		}
 
-		if err != nil && err != context.Canceled {
+		if err != nil && !errors.Is(err, context.Canceled) {
 			a.recordError(err)
 		}
 

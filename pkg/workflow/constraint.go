@@ -1,6 +1,7 @@
 package workflow
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
 	"strconv"
@@ -10,7 +11,7 @@ import (
 // Constraint 约束接口
 type Constraint interface {
 	Name() string
-	Validate(value interface{}) (bool, string) // 返回 (是否满足, 错误信息)
+	Validate(value any) (bool, string) // 返回 (是否满足, 错误信息)
 }
 
 // ConstraintSet 约束集合
@@ -26,19 +27,19 @@ func NewConstraintSet() *ConstraintSet {
 
 func (cs *ConstraintSet) Add(constraint Constraint) error {
 	if constraint == nil {
-		return fmt.Errorf("constraint cannot be nil")
+		return errors.New("constraint cannot be nil")
 	}
 	cs.constraints[constraint.Name()] = constraint
 	return nil
 }
 
-func (cs *ConstraintSet) Validate(values map[string]interface{}) (bool, []string) {
+func (cs *ConstraintSet) Validate(values map[string]any) (bool, []string) {
 	violations := make([]string, 0)
 
 	for name, constraint := range cs.constraints {
 		value, exists := values[name]
 		if !exists {
-			violations = append(violations, fmt.Sprintf("required value missing: %s", name))
+			violations = append(violations, "required value missing: "+name)
 			continue
 		}
 
@@ -77,9 +78,9 @@ func NewRangeConstraint(name string, min, max int64) *RangeConstraint {
 
 func (c *RangeConstraint) Name() string { return c.name }
 
-func (c *RangeConstraint) Validate(value interface{}) (bool, string) {
+func (c *RangeConstraint) Validate(value any) (bool, string) {
 	if value == nil {
-		return false, fmt.Sprintf("%s: value is nil", c.name)
+		return false, c.name + ": value is nil"
 	}
 
 	var num int64
@@ -97,7 +98,7 @@ func (c *RangeConstraint) Validate(value interface{}) (bool, string) {
 		var err error
 		num, err = strconv.ParseInt(v, 10, 64)
 		if err != nil {
-			return false, fmt.Sprintf("%s: invalid number format", c.name)
+			return false, c.name + ": invalid number format"
 		}
 	default:
 		return false, fmt.Sprintf("%s: unsupported type %T", c.name, value)
@@ -128,14 +129,14 @@ func NewStringLengthConstraint(name string, minLen, maxLen int) *StringLengthCon
 
 func (c *StringLengthConstraint) Name() string { return c.name }
 
-func (c *StringLengthConstraint) Validate(value interface{}) (bool, string) {
+func (c *StringLengthConstraint) Validate(value any) (bool, string) {
 	if value == nil {
-		return false, fmt.Sprintf("%s: value is nil", c.name)
+		return false, c.name + ": value is nil"
 	}
 
 	str, ok := value.(string)
 	if !ok {
-		return false, fmt.Sprintf("%s: value is not string", c.name)
+		return false, c.name + ": value is not string"
 	}
 
 	length := len(str)
@@ -169,14 +170,14 @@ func NewPatternConstraint(name string, pattern string) (*PatternConstraint, erro
 
 func (c *PatternConstraint) Name() string { return c.name }
 
-func (c *PatternConstraint) Validate(value interface{}) (bool, string) {
+func (c *PatternConstraint) Validate(value any) (bool, string) {
 	if value == nil {
-		return false, fmt.Sprintf("%s: value is nil", c.name)
+		return false, c.name + ": value is nil"
 	}
 
 	str, ok := value.(string)
 	if !ok {
-		return false, fmt.Sprintf("%s: value is not string", c.name)
+		return false, c.name + ": value is not string"
 	}
 
 	if !c.regex.MatchString(str) {
@@ -208,14 +209,14 @@ func (c *ChoiceConstraint) WithCaseInsensitive() *ChoiceConstraint {
 
 func (c *ChoiceConstraint) Name() string { return c.name }
 
-func (c *ChoiceConstraint) Validate(value interface{}) (bool, string) {
+func (c *ChoiceConstraint) Validate(value any) (bool, string) {
 	if value == nil {
-		return false, fmt.Sprintf("%s: value is nil", c.name)
+		return false, c.name + ": value is nil"
 	}
 
 	str, ok := value.(string)
 	if !ok {
-		return false, fmt.Sprintf("%s: value is not string", c.name)
+		return false, c.name + ": value is not string"
 	}
 
 	compareStr := str
@@ -249,19 +250,19 @@ func NewNotEmptyConstraint(name string) *NotEmptyConstraint {
 
 func (c *NotEmptyConstraint) Name() string { return c.name }
 
-func (c *NotEmptyConstraint) Validate(value interface{}) (bool, string) {
+func (c *NotEmptyConstraint) Validate(value any) (bool, string) {
 	if value == nil {
-		return false, fmt.Sprintf("%s: value is nil", c.name)
+		return false, c.name + ": value is nil"
 	}
 
 	switch v := value.(type) {
 	case string:
 		if len(strings.TrimSpace(v)) == 0 {
-			return false, fmt.Sprintf("%s: value is empty", c.name)
+			return false, c.name + ": value is empty"
 		}
-	case []interface{}:
+	case []any:
 		if len(v) == 0 {
-			return false, fmt.Sprintf("%s: list is empty", c.name)
+			return false, c.name + ": list is empty"
 		}
 	}
 
@@ -272,10 +273,10 @@ func (c *NotEmptyConstraint) Validate(value interface{}) (bool, string) {
 
 type CustomConstraint struct {
 	name       string
-	validateFn func(value interface{}) (bool, string)
+	validateFn func(value any) (bool, string)
 }
 
-func NewCustomConstraint(name string, validateFn func(value interface{}) (bool, string)) *CustomConstraint {
+func NewCustomConstraint(name string, validateFn func(value any) (bool, string)) *CustomConstraint {
 	return &CustomConstraint{
 		name:       name,
 		validateFn: validateFn,
@@ -284,9 +285,9 @@ func NewCustomConstraint(name string, validateFn func(value interface{}) (bool, 
 
 func (c *CustomConstraint) Name() string { return c.name }
 
-func (c *CustomConstraint) Validate(value interface{}) (bool, string) {
+func (c *CustomConstraint) Validate(value any) (bool, string) {
 	if c.validateFn == nil {
-		return false, fmt.Sprintf("%s: validation function not defined", c.name)
+		return false, c.name + ": validation function not defined"
 	}
 	return c.validateFn(value)
 }

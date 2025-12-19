@@ -28,6 +28,7 @@ type A2AInterfaceOptions struct {
 // 支持消息传递、状态查询和协作。
 type A2AInterface struct {
 	*asteros.BaseInterface
+
 	opts *A2AInterfaceOptions
 	os   *asteros.AsterOS
 

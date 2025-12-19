@@ -3,6 +3,7 @@ package workflow
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"regexp"
 	"strings"
@@ -269,7 +270,7 @@ const (
 	StatusPaused    WorkflowStatus = "paused"    // 暂停
 	StatusCompleted WorkflowStatus = "completed" // 完成
 	StatusFailed    WorkflowStatus = "failed"    // 失败
-	StatusCancelled WorkflowStatus = "cancelled" // 取消
+	StatusCancelled WorkflowStatus = "canceled"  // 取消
 	StatusTimeout   WorkflowStatus = "timeout"   // 超时
 )
 
@@ -491,7 +492,7 @@ func ParseFromJSON(data []byte) (*WorkflowDefinition, error) {
 // ParseFromYAML 从YAML解析工作流定义
 func ParseFromYAML(data []byte) (*WorkflowDefinition, error) {
 	// TODO: 实现YAML解析
-	return nil, fmt.Errorf("YAML parsing not yet implemented")
+	return nil, errors.New("YAML parsing not yet implemented")
 }
 
 // ToJSON 转换为JSON
@@ -502,21 +503,21 @@ func (w *WorkflowDefinition) ToJSON() ([]byte, error) {
 // ToYAML 转换为YAML
 func (w *WorkflowDefinition) ToYAML() ([]byte, error) {
 	// TODO: 实现YAML转换
-	return nil, fmt.Errorf("YAML conversion not yet implemented")
+	return nil, errors.New("YAML conversion not yet implemented")
 }
 
 // validateWorkflowDefinition 验证工作流定义
 func validateWorkflowDefinition(def *WorkflowDefinition) error {
 	if def.ID == "" {
-		return fmt.Errorf("workflow ID is required")
+		return errors.New("workflow ID is required")
 	}
 
 	if def.Name == "" {
-		return fmt.Errorf("workflow name is required")
+		return errors.New("workflow name is required")
 	}
 
 	if len(def.Nodes) == 0 {
-		return fmt.Errorf("workflow must have at least one node")
+		return errors.New("workflow must have at least one node")
 	}
 
 	// 检查是否有开始和结束节点
@@ -526,7 +527,7 @@ func validateWorkflowDefinition(def *WorkflowDefinition) error {
 
 	for _, node := range def.Nodes {
 		if node.ID == "" {
-			return fmt.Errorf("node ID is required")
+			return errors.New("node ID is required")
 		}
 
 		if nodeIds[node.ID] {
@@ -543,17 +544,17 @@ func validateWorkflowDefinition(def *WorkflowDefinition) error {
 	}
 
 	if !hasStart {
-		return fmt.Errorf("workflow must have a start node")
+		return errors.New("workflow must have a start node")
 	}
 
 	if !hasEnd {
-		return fmt.Errorf("workflow must have an end node")
+		return errors.New("workflow must have an end node")
 	}
 
 	// 验证边的引用
 	for _, edge := range def.Edges {
 		if edge.From == "" || edge.To == "" {
-			return fmt.Errorf("edge source and target are required")
+			return errors.New("edge source and target are required")
 		}
 
 		if !nodeIds[edge.From] {
@@ -589,8 +590,8 @@ func (e *ExpressionEvaluator) EvaluateBool(expression string) (bool, error) {
 
 	// 处理逻辑操作
 	if strings.Contains(expression, "&&") {
-		parts := strings.Split(expression, "&&")
-		for _, part := range parts {
+		parts := strings.SplitSeq(expression, "&&")
+		for part := range parts {
 			if result, err := e.EvaluateBool(strings.TrimSpace(part)); err != nil {
 				return false, err
 			} else if !result {
@@ -601,8 +602,8 @@ func (e *ExpressionEvaluator) EvaluateBool(expression string) (bool, error) {
 	}
 
 	if strings.Contains(expression, "||") {
-		parts := strings.Split(expression, "||")
-		for _, part := range parts {
+		parts := strings.SplitSeq(expression, "||")
+		for part := range parts {
 			if result, err := e.EvaluateBool(strings.TrimSpace(part)); err != nil {
 				return false, err
 			} else if result {
@@ -657,12 +658,12 @@ func (e *ExpressionEvaluator) evaluateComparison(expression string) (bool, error
 func (e *ExpressionEvaluator) compareNumbers(aVal, bVal any, compare func(float64, float64) bool) (bool, error) {
 	a, err := e.toFloat64(aVal)
 	if err != nil {
-		return false, fmt.Errorf("cannot convert left operand to number: %v", err)
+		return false, fmt.Errorf("cannot convert left operand to number: %w", err)
 	}
 
 	b, err := e.toFloat64(bVal)
 	if err != nil {
-		return false, fmt.Errorf("cannot convert right operand to number: %v", err)
+		return false, fmt.Errorf("cannot convert right operand to number: %w", err)
 	}
 
 	return compare(a, b), nil

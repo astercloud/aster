@@ -3,6 +3,7 @@ package builtin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -155,19 +156,19 @@ func (tm *FileTaskManager) StartTask(ctx context.Context, cmd string, opts *Task
 	}
 
 	// 创建输出文件
-	outputFile := filepath.Join(opts.OutputDir, fmt.Sprintf("%s.stdout", taskID))
-	errorFile := filepath.Join(opts.OutputDir, fmt.Sprintf("%s.stderr", taskID))
+	outputFile := filepath.Join(opts.OutputDir, taskID+".stdout")
+	errorFile := filepath.Join(opts.OutputDir, taskID+".stderr")
 
 	if opts.CaptureOutput {
 		outFile, err := os.Create(outputFile)
 		if err != nil {
-			return nil, fmt.Errorf("failed to create output file: %v", err)
+			return nil, fmt.Errorf("failed to create output file: %w", err)
 		}
 
 		errFile, err := os.Create(errorFile)
 		if err != nil {
 			_ = outFile.Close()
-			return nil, fmt.Errorf("failed to create error file: %v", err)
+			return nil, fmt.Errorf("failed to create error file: %w", err)
 		}
 
 		cmdObj.Stdout = outFile
@@ -183,7 +184,7 @@ func (tm *FileTaskManager) StartTask(ctx context.Context, cmd string, opts *Task
 	// 启动进程
 	err := cmdObj.Start()
 	if err != nil {
-		return nil, fmt.Errorf("failed to start command: %v", err)
+		return nil, fmt.Errorf("failed to start command: %w", err)
 	}
 
 	// 更新任务信息
@@ -225,19 +226,19 @@ func (tm *FileTaskManager) GetTaskOutput(taskID string, filter string, lines int
 		return "", "", err
 	}
 
-	outputFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stdout", taskID))
-	errorFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stderr", taskID))
+	outputFile := filepath.Join(task.Options.OutputDir, taskID+".stdout")
+	errorFile := filepath.Join(task.Options.OutputDir, taskID+".stderr")
 
 	// 读取标准输出
 	stdout, err := os.ReadFile(outputFile)
 	if err != nil && !os.IsNotExist(err) {
-		return "", "", fmt.Errorf("failed to read stdout: %v", err)
+		return "", "", fmt.Errorf("failed to read stdout: %w", err)
 	}
 
 	// 读取错误输出
 	stderr, err := os.ReadFile(errorFile)
 	if err != nil && !os.IsNotExist(err) {
-		return "", "", fmt.Errorf("failed to read stderr: %v", err)
+		return "", "", fmt.Errorf("failed to read stderr: %w", err)
 	}
 
 	stdoutStr := string(stdout)
@@ -278,12 +279,12 @@ func (tm *FileTaskManager) KillTask(taskID string, signal string, timeout int) e
 	// 发送信号
 	proc, err := os.FindProcess(task.PID)
 	if err != nil {
-		return fmt.Errorf("failed to find process %d: %v", task.PID, err)
+		return fmt.Errorf("failed to find process %d: %w", task.PID, err)
 	}
 
 	err = proc.Signal(syscall.Signal(signalNum))
 	if err != nil {
-		return fmt.Errorf("failed to send signal %s to process %d: %v", signal, task.PID, err)
+		return fmt.Errorf("failed to send signal %s to process %d: %w", signal, task.PID, err)
 	}
 
 	// 等待进程退出
@@ -337,8 +338,8 @@ func (tm *FileTaskManager) CleanupTask(taskID string) error {
 	}
 
 	// 删除输出文件
-	outputFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stdout", taskID))
-	errorFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stderr", taskID))
+	outputFile := filepath.Join(task.Options.OutputDir, taskID+".stdout")
+	errorFile := filepath.Join(task.Options.OutputDir, taskID+".stderr")
 
 	_ = os.Remove(outputFile)
 	_ = os.Remove(errorFile)
@@ -347,7 +348,7 @@ func (tm *FileTaskManager) CleanupTask(taskID string) error {
 	delete(tm.tasks, taskID)
 
 	// 删除任务文件
-	taskFile := filepath.Join(tm.dataDir, fmt.Sprintf("%s.json", taskID))
+	taskFile := filepath.Join(tm.dataDir, taskID+".json")
 	_ = os.Remove(taskFile)
 
 	return nil
@@ -399,7 +400,8 @@ func (tm *FileTaskManager) monitorTask(ctx context.Context, task *TaskInfo, cmd 
 	task.LastUpdate = now
 
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			task.ExitCode = exitErr.ExitCode()
 			task.Status = "failed"
 		} else {
@@ -465,11 +467,11 @@ func (tm *FileTaskManager) waitForProcessExit(task *TaskInfo, timeout int) {
 
 // saveTask 保存任务信息到文件
 func (tm *FileTaskManager) saveTask(task *TaskInfo) error {
-	taskFile := filepath.Join(tm.dataDir, fmt.Sprintf("%s.json", task.ID))
+	taskFile := filepath.Join(tm.dataDir, task.ID+".json")
 
 	data, err := json.MarshalIndent(task, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal task: %v", err)
+		return fmt.Errorf("failed to marshal task: %w", err)
 	}
 
 	return os.WriteFile(taskFile, data, 0644)
@@ -479,7 +481,7 @@ func (tm *FileTaskManager) saveTask(task *TaskInfo) error {
 func (tm *FileTaskManager) loadTasks() error {
 	files, err := os.ReadDir(tm.dataDir)
 	if err != nil {
-		return fmt.Errorf("failed to read data directory: %v", err)
+		return fmt.Errorf("failed to read data directory: %w", err)
 	}
 
 	for _, file := range files {
@@ -528,7 +530,7 @@ func (tm *FileTaskManager) cleanupCompletedTasks() {
 			if time.Since(*task.EndTime) > time.Hour {
 				delete(tm.tasks, task.ID)
 
-				taskFile := filepath.Join(tm.dataDir, fmt.Sprintf("%s.json", task.ID))
+				taskFile := filepath.Join(tm.dataDir, task.ID+".json")
 				_ = os.Remove(taskFile)
 			}
 		}
@@ -620,16 +622,16 @@ func (tm *FileTaskManager) cleanupOutputFiles(taskID string) error {
 		return fmt.Errorf("task not found: %s", taskID)
 	}
 
-	outputFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stdout", taskID))
-	errorFile := filepath.Join(task.Options.OutputDir, fmt.Sprintf("%s.stderr", taskID))
+	outputFile := filepath.Join(task.Options.OutputDir, taskID+".stdout")
+	errorFile := filepath.Join(task.Options.OutputDir, taskID+".stderr")
 
 	// 清空文件内容
 	if err := os.WriteFile(outputFile, []byte{}, 0644); err != nil {
-		return fmt.Errorf("failed to clear output file: %v", err)
+		return fmt.Errorf("failed to clear output file: %w", err)
 	}
 
 	if err := os.WriteFile(errorFile, []byte{}, 0644); err != nil {
-		return fmt.Errorf("failed to clear error file: %v", err)
+		return fmt.Errorf("failed to clear error file: %w", err)
 	}
 
 	return nil

@@ -2,7 +2,10 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
+	"slices"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -110,7 +113,7 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]any, tc *t
 	// 获取任务项数据
 	todosData, ok := input["todos"].([]any)
 	if !ok {
-		return NewClaudeErrorResponse(fmt.Errorf("todos must be an array")), nil
+		return NewClaudeErrorResponse(errors.New("todos must be an array")), nil
 	}
 
 	// 转换为TodoItem
@@ -119,7 +122,7 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]any, tc *t
 	for i, todoData := range todosData {
 		todoMap, ok := todoData.(map[string]any)
 		if !ok {
-			return NewClaudeErrorResponse(fmt.Errorf("each todo must be an object")), nil
+			return NewClaudeErrorResponse(errors.New("each todo must be an object")), nil
 		}
 
 		content := GetStringParam(todoMap, "content", "")
@@ -128,22 +131,16 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]any, tc *t
 		priority := GetIntParam(todoMap, "priority", 0)
 
 		if content == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("todo content cannot be empty")), nil
+			return NewClaudeErrorResponse(errors.New("todo content cannot be empty")), nil
 		}
 
 		if activeForm == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("todo activeForm cannot be empty")), nil
+			return NewClaudeErrorResponse(errors.New("todo activeForm cannot be empty")), nil
 		}
 
 		// 验证状态
 		validStatuses := []string{"pending", "in_progress", "completed"}
-		statusValid := false
-		for _, validStatus := range validStatuses {
-			if status == validStatus {
-				statusValid = true
-				break
-			}
-		}
+		statusValid := slices.Contains(validStatuses, status)
 		if !statusValid {
 			return NewClaudeErrorResponse(
 				fmt.Errorf("invalid status: %s", status),
@@ -219,13 +216,13 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]any, tc *t
 		operationErr = todoManager.StoreTodoList(todoList)
 	case "update":
 		if todoID == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("todo_id is required for update action")), nil
+			return NewClaudeErrorResponse(errors.New("todo_id is required for update action")), nil
 		}
 		result = t.updateTodo(todoList, todoID, todos[0])
 		operationErr = todoManager.StoreTodoList(todoList)
 	case "delete":
 		if todoID == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("todo_id is required for delete action")), nil
+			return NewClaudeErrorResponse(errors.New("todo_id is required for delete action")), nil
 		}
 		result = t.deleteTodo(todoList, todoID)
 		operationErr = todoManager.StoreTodoList(todoList)
@@ -273,9 +270,7 @@ func (t *TodoWriteTool) Execute(ctx context.Context, input map[string]any, tc *t
 
 	// 添加操作结果
 	if resultMap, ok := result.(map[string]any); ok {
-		for k, v := range resultMap {
-			response[k] = v
-		}
+		maps.Copy(response, resultMap)
 	}
 
 	// 发送 Todo 更新事件到 Progress 通道

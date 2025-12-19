@@ -7,6 +7,7 @@ import (
 	_ "image/jpeg"
 	_ "image/png"
 	"os"
+	"slices"
 )
 
 // Processor 媒体处理器
@@ -54,13 +55,7 @@ func (p *Processor) ValidateImage(img *Image) error {
 
 	// 检查类型
 	if img.MimeType != "" {
-		valid := false
-		for _, allowed := range p.AllowedImageTypes {
-			if img.MimeType == allowed {
-				valid = true
-				break
-			}
-		}
+		valid := slices.Contains(p.AllowedImageTypes, img.MimeType)
 		if !valid {
 			return fmt.Errorf("image type %s not allowed", img.MimeType)
 		}
@@ -94,13 +89,7 @@ func (p *Processor) ValidateVideo(video *Video) error {
 
 	// 检查类型
 	if video.MimeType != "" {
-		valid := false
-		for _, allowed := range p.AllowedVideoTypes {
-			if video.MimeType == allowed {
-				valid = true
-				break
-			}
-		}
+		valid := slices.Contains(p.AllowedVideoTypes, video.MimeType)
 		if !valid {
 			return fmt.Errorf("video type %s not allowed", video.MimeType)
 		}
@@ -118,13 +107,7 @@ func (p *Processor) ValidateAudio(audio *Audio) error {
 
 	// 检查类型
 	if audio.MimeType != "" {
-		valid := false
-		for _, allowed := range p.AllowedAudioTypes {
-			if audio.MimeType == allowed {
-				valid = true
-				break
-			}
-		}
+		valid := slices.Contains(p.AllowedAudioTypes, audio.MimeType)
 		if !valid {
 			return fmt.Errorf("audio type %s not allowed", audio.MimeType)
 		}

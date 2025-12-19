@@ -27,29 +27,18 @@ jobs:
   lint:
     name: Lint
     runs-on: ubuntu-latest
-    timeout-minutes: 5
-    env:
-      GOMAXPROCS: 2
-      GOMEMLIMIT: 256MiB
     steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-        with:
-          fetch-depth: 0
+      - uses: actions/checkout@v4
 
       - name: Setup Go
         uses: actions/setup-go@v5
         with:
-          go-version: "1.24"
-          cache: true
+          go-version: "1.25"
 
       - name: golangci-lint
-        timeout-minutes: 4
-        uses: golangci/golangci-lint-action@v7
+        uses: golangci/golangci-lint-action@v9
         with:
-          version: v2.1.6
-          args: --timeout=2m --disable=errcheck --enable=govet,ineffassign,staticcheck,unused --new-from-rev=origin/main ./pkg/...
-          skip-cache: false
+          version: v2.7.2
 
   build:
     name: Build

@@ -33,8 +33,7 @@ func BenchmarkSummarizationMiddleware_NoSummarization(b *testing.B) {
 		}, nil
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = middleware.WrapModelCall(ctx, req, handler)
 	}
 }
@@ -68,8 +67,7 @@ func BenchmarkSummarizationMiddleware_WithSummarization(b *testing.B) {
 		}, nil
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = middleware.WrapModelCall(ctx, req, handler)
 	}
 }
@@ -100,8 +98,7 @@ func BenchmarkAgentMemoryMiddleware_LazyLoad(b *testing.B) {
 		}, nil
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		// 第一次会触发加载,后续直接使用缓存
 		_, _ = middleware.WrapModelCall(ctx, req, handler)
 	}
@@ -138,8 +135,7 @@ func BenchmarkAgentMemoryMiddleware_AlreadyLoaded(b *testing.B) {
 		}, nil
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = middleware.WrapModelCall(ctx, req, handler)
 	}
 }
@@ -153,8 +149,7 @@ func BenchmarkDefaultTokenCounter(b *testing.B) {
 		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Of course! What would you like to know?"}}},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = defaultTokenCounter(messages)
 	}
 }
@@ -172,8 +167,7 @@ func BenchmarkDefaultSummarizer(b *testing.B) {
 		{Role: types.MessageRoleAssistant, ContentBlocks: []types.ContentBlock{&types.TextBlock{Text: "Sure, what do you need?"}}},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = defaultSummarizer(ctx, messages)
 	}
 }
@@ -220,8 +214,7 @@ func BenchmarkPhase4Stack(b *testing.B) {
 		return summarizationMW.WrapModelCall(ctx, req, handler)
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = memoryMW.WrapModelCall(ctx, req, summarizationHandler)
 	}
 }
@@ -237,8 +230,7 @@ func BenchmarkExtractMessageContent(b *testing.B) {
 		},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = extractMessageContent(msg)
 	}
 }

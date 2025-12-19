@@ -29,7 +29,7 @@ func (e *MockEmbedder) EmbedText(_ context.Context, texts []string) ([][]float32
 			result[i] = vec
 			continue
 		}
-		for j := 0; j < e.Dim; j++ {
+		for j := range e.Dim {
 			b := t[j%len(t)]
 			vec[j] = float32(int(b%97)) / 100.0 // 稍微分布一下
 		}

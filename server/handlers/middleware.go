@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"time"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -100,7 +101,7 @@ func (h *MiddlewareHandler) Get(c *gin.Context) {
 
 	var mw MiddlewareRecord
 	if err := h.store.Get(ctx, "middlewares", id, &mw); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "middleware not found"}})
 			return
 		}
@@ -131,7 +132,7 @@ func (h *MiddlewareHandler) Update(c *gin.Context) {
 
 	var mw MiddlewareRecord
 	if err := h.store.Get(ctx, "middlewares", id, &mw); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "middleware not found"}})
 			return
 		}
@@ -173,7 +174,7 @@ func (h *MiddlewareHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := h.store.Delete(ctx, "middlewares", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "middleware not found"}})
 			return
 		}
@@ -192,7 +193,7 @@ func (h *MiddlewareHandler) Enable(c *gin.Context) {
 
 	var mw MiddlewareRecord
 	if err := h.store.Get(ctx, "middlewares", id, &mw); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "middleware not found"}})
 			return
 		}
@@ -219,7 +220,7 @@ func (h *MiddlewareHandler) Disable(c *gin.Context) {
 
 	var mw MiddlewareRecord
 	if err := h.store.Get(ctx, "middlewares", id, &mw); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "middleware not found"}})
 			return
 		}

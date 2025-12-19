@@ -23,27 +23,27 @@
   <!-- Layer 1: Client Layer -->
   <rect x="50" y="60" width="800" height="160" rx="8" class="layer-box"/>
   <text x="450" y="80" text-anchor="middle" class="subtitle">Client Layer</text>
-  
+
   <rect x="70" y="95" width="760" height="110" rx="6" class="inner-box"/>
   <text x="450" y="112" text-anchor="middle" class="text">Client SDKs (多语言、多框架支持)</text>
-  
+
   <!-- Client components -->
   <rect x="150" y="125" width="110" height="50" rx="4" class="component-box"/>
   <text x="205" y="142" text-anchor="middle" class="text">client-js</text>
   <text x="205" y="158" text-anchor="middle" class="small-text">(核心)</text>
-  
+
   <rect x="280" y="125" width="110" height="50" rx="4" class="component-box"/>
   <text x="335" y="142" text-anchor="middle" class="text">React</text>
   <text x="335" y="158" text-anchor="middle" class="small-text">(集成)</text>
-  
+
   <rect x="410" y="125" width="110" height="50" rx="4" class="component-box"/>
   <text x="465" y="142" text-anchor="middle" class="text">AI SDK</text>
   <text x="465" y="158" text-anchor="middle" class="small-text">(Vercel)</text>
-  
+
   <rect x="540" y="125" width="110" height="50" rx="4" class="component-box"/>
   <text x="595" y="142" text-anchor="middle" class="text">Vue</text>
   <text x="595" y="158" text-anchor="middle" class="small-text">(未来)</text>
-  
+
   <text x="450" y="195" text-anchor="middle" class="small-text">15 个资源模块 • 事件驱动 • 类型安全</text>
 
   <!-- Arrow 1 -->
@@ -53,27 +53,27 @@
   <!-- Layer 2: Server Layer -->
   <rect x="50" y="260" width="800" height="160" rx="8" class="layer-box highlight"/>
   <text x="450" y="280" text-anchor="middle" class="subtitle">✨ Server Layer (server/) - 生产级</text>
-  
+
   <rect x="70" y="295" width="760" height="110" rx="6" class="inner-box"/>
   <text x="450" y="312" text-anchor="middle" class="text">Production Server (企业级特性)</text>
-  
+
   <!-- Server components -->
   <rect x="120" y="325" width="130" height="55" rx="4" class="component-box"/>
   <text x="185" y="343" text-anchor="middle" class="text">Auth &amp; RBAC</text>
   <text x="185" y="362" text-anchor="middle" class="small-text">(API Key+JWT)</text>
-  
+
   <rect x="270" y="325" width="130" height="55" rx="4" class="component-box"/>
   <text x="335" y="343" text-anchor="middle" class="text">Observability</text>
   <text x="335" y="362" text-anchor="middle" class="small-text">(Metrics+Tracing)</text>
-  
+
   <rect x="420" y="325" width="130" height="55" rx="4" class="component-box"/>
   <text x="485" y="343" text-anchor="middle" class="text">Rate Limiting</text>
   <text x="485" y="362" text-anchor="middle" class="small-text">(Token/SW)</text>
-  
+
   <rect x="570" y="325" width="130" height="55" rx="4" class="component-box"/>
   <text x="635" y="350" text-anchor="middle" class="text">Handlers</text>
   <text x="635" y="368" text-anchor="middle" class="small-text">(8 core)</text>
-  
+
   <text x="450" y="395" text-anchor="middle" class="small-text">认证授权 • Prometheus • OpenTelemetry • 健康检查</text>
 
   <!-- Arrow 2 -->
@@ -83,10 +83,10 @@
   <!-- Layer 3: HTTP Layer -->
   <rect x="50" y="460" width="800" height="140" rx="8" class="layer-box"/>
   <text x="450" y="480" text-anchor="middle" class="subtitle">HTTP Layer (cmd/aster) - 开发工具</text>
-  
+
   <rect x="70" y="495" width="760" height="90" rx="6" class="inner-box"/>
   <text x="450" y="512" text-anchor="middle" class="text">Development Server (快速启动)</text>
-  
+
   <text x="450" y="532" text-anchor="middle" class="small-text">Gin HTTP Server • REST API • WebSocket</text>
   <text x="450" y="548" text-anchor="middle" class="small-text">可替换为任何框架 (Echo, Chi, 标准库等)</text>
   <text x="450" y="564" text-anchor="middle" class="small-text">简化配置 • 无认证 • 快速迭代</text>
@@ -98,23 +98,23 @@
   <!-- Layer 4: Core Layer -->
   <rect x="50" y="640" width="800" height="250" rx="8" class="layer-box"/>
   <text x="450" y="660" text-anchor="middle" class="subtitle">Core Layer (pkg/)</text>
-  
+
   <rect x="70" y="675" width="760" height="200" rx="6" class="inner-box"/>
   <text x="450" y="692" text-anchor="middle" class="text">aster 核心</text>
-  
+
   <!-- Core components -->
   <rect x="100" y="705" width="680" height="45" rx="4" class="component-box"/>
   <text x="440" y="720" text-anchor="middle" class="text">Agent Types (灵活编排)</text>
   <text x="440" y="736" text-anchor="middle" class="small-text">Basic Agent • Workflow • SubAgent</text>
-  
+
   <rect x="100" y="760" width="680" height="45" rx="4" class="component-box"/>
   <text x="440" y="775" text-anchor="middle" class="text">Middleware Stack (洋葱模型)</text>
   <text x="440" y="791" text-anchor="middle" class="small-text">Summarization • Filesystem • SubAgent</text>
-  
+
   <rect x="100" y="815" width="680" height="45" rx="4" class="component-box"/>
   <text x="440" y="830" text-anchor="middle" class="text">Backend Abstraction (存储抽象)</text>
   <text x="440" y="846" text-anchor="middle" class="small-text">State • Store • Filesystem • Composite</text>
-  
+
   <text x="450" y="870" text-anchor="middle" class="small-text">零 HTTP 框架依赖 • 纯业务逻辑 • 可被任何项目导入</text>
 
 </svg>

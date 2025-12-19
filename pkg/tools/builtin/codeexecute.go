@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -137,12 +138,12 @@ func (t *CodeExecuteTool) Execute(ctx context.Context, input map[string]any, tc 
 	// 解析参数
 	langStr, ok := input["language"].(string)
 	if !ok {
-		return nil, fmt.Errorf("language must be a string")
+		return nil, errors.New("language must be a string")
 	}
 
 	code, ok := input["code"].(string)
 	if !ok || code == "" {
-		return nil, fmt.Errorf("code must be a non-empty string")
+		return nil, errors.New("code must be a non-empty string")
 	}
 
 	// 转换语言类型
@@ -157,7 +158,7 @@ func (t *CodeExecuteTool) Execute(ctx context.Context, input map[string]any, tc 
 	default:
 		return map[string]any{
 			"success": false,
-			"error":   fmt.Sprintf("unsupported language: %s", langStr),
+			"error":   "unsupported language: " + langStr,
 		}, nil
 	}
 

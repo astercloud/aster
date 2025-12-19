@@ -3,6 +3,7 @@ package bridge
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -258,7 +259,7 @@ func (s *HTTPBridgeServer) Start() error {
 // StartAsync 异步启动服务器
 func (s *HTTPBridgeServer) StartAsync() error {
 	go func() {
-		if err := s.Start(); err != nil && err != http.ErrServerClosed {
+		if err := s.Start(); err != nil && !errors.Is(err, http.ErrServerClosed) {
 			fmt.Printf("HTTP Bridge Server error: %v\n", err)
 		}
 	}()

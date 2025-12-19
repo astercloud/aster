@@ -188,7 +188,7 @@ func TestLogicMemoryMiddleware_WrapModelCall(t *testing.T) {
 		require.NoError(t, err)
 
 		// 验证 Memory 在开头
-		assert.True(t, len(capturedSystemPrompt) > len("Original prompt."))
+		assert.Greater(t, len(capturedSystemPrompt), len("Original prompt."))
 		// Memory 应该在原始 prompt 之前
 		assert.Contains(t, capturedSystemPrompt, "User Preferences")
 	})
@@ -446,7 +446,7 @@ func TestDefaultNamespaceExtractor(t *testing.T) {
 			Metadata: nil,
 		}
 		ns := defaultNamespaceExtractor(req)
-		assert.Equal(t, "", ns)
+		assert.Empty(t, ns)
 	})
 
 	t.Run("priority: namespace > user_id > tenant_id > agent_id", func(t *testing.T) {
@@ -510,7 +510,7 @@ func TestBuildMemorySection(t *testing.T) {
 
 	t.Run("empty memories", func(t *testing.T) {
 		section := mw.buildMemorySection([]*logic.LogicMemory{})
-		assert.Equal(t, "", section)
+		assert.Empty(t, section)
 	})
 
 	t.Run("nil provenance", func(t *testing.T) {

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -65,7 +66,7 @@ func (rc *RemoteClient) Call(ctx context.Context, method, path string, body any)
 	// 设置通用请求头
 	req.Header.Set("Content-Type", "application/json")
 	if rc.apiKey != "" {
-		req.Header.Set("X-API-Key", rc.apiKey)
+		req.Header.Set("X-Api-Key", rc.apiKey)
 	}
 
 	// 设置自定义请求头
@@ -169,7 +170,7 @@ func (rs *RemoteSandbox) Kind() string {
 
 // Exec 执行命令 (需要子类实现具体的 API 调用)
 func (rs *RemoteSandbox) Exec(ctx context.Context, cmd string, opts *ExecOptions) (*ExecResult, error) {
-	return nil, fmt.Errorf("exec not implemented in base RemoteSandbox")
+	return nil, errors.New("exec not implemented in base RemoteSandbox")
 }
 
 // FS 返回文件系统接口
@@ -184,12 +185,12 @@ func (rs *RemoteSandbox) WorkDir() string {
 
 // Watch 监听文件变化 (远程沙箱通常不支持)
 func (rs *RemoteSandbox) Watch(paths []string, listener FileChangeListener) (string, error) {
-	return "", fmt.Errorf("watch not supported in remote sandbox")
+	return "", errors.New("watch not supported in remote sandbox")
 }
 
 // Unwatch 取消监听 (远程沙箱通常不支持)
 func (rs *RemoteSandbox) Unwatch(watchID string) error {
-	return fmt.Errorf("unwatch not supported in remote sandbox")
+	return errors.New("unwatch not supported in remote sandbox")
 }
 
 // Dispose 清理资源
@@ -228,12 +229,12 @@ func (rfs *RemoteFS) IsInside(path string) bool {
 
 // Read 读取文件 (需要子类实现)
 func (rfs *RemoteFS) Read(ctx context.Context, path string) (string, error) {
-	return "", fmt.Errorf("read not implemented in base RemoteFS")
+	return "", errors.New("read not implemented in base RemoteFS")
 }
 
 // Write 写入文件 (需要子类实现)
 func (rfs *RemoteFS) Write(ctx context.Context, path string, content string) error {
-	return fmt.Errorf("write not implemented in base RemoteFS")
+	return errors.New("write not implemented in base RemoteFS")
 }
 
 // Temp 生成临时文件路径
@@ -243,10 +244,10 @@ func (rfs *RemoteFS) Temp(name string) string {
 
 // Stat 获取文件信息 (需要子类实现)
 func (rfs *RemoteFS) Stat(ctx context.Context, path string) (FileInfo, error) {
-	return FileInfo{}, fmt.Errorf("stat not implemented in base RemoteFS")
+	return FileInfo{}, errors.New("stat not implemented in base RemoteFS")
 }
 
 // Glob 匹配文件 (需要子类实现)
 func (rfs *RemoteFS) Glob(ctx context.Context, pattern string, opts *GlobOptions) ([]string, error) {
-	return nil, fmt.Errorf("glob not implemented in base RemoteFS")
+	return nil, errors.New("glob not implemented in base RemoteFS")
 }

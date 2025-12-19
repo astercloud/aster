@@ -152,7 +152,7 @@ type ProgressToolCancelledEvent struct {
 }
 
 func (e *ProgressToolCancelledEvent) Channel() AgentChannel { return ChannelProgress }
-func (e *ProgressToolCancelledEvent) EventType() string     { return "tool:cancelled" }
+func (e *ProgressToolCancelledEvent) EventType() string     { return "tool:canceled" }
 
 // ProgressToolErrorEvent 工具执行错误事件
 type ProgressToolErrorEvent struct {

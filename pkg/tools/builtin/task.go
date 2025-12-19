@@ -2,7 +2,10 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
+	"strconv"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -107,13 +110,13 @@ func (t *TaskTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	case "status":
 		taskID := GetStringParam(input, "task_id", "")
 		if taskID == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("task_id is required for status action")), nil
+			return NewClaudeErrorResponse(errors.New("task_id is required for status action")), nil
 		}
 		return t.getTaskStatus(taskID)
 	case "cancel":
 		taskID := GetStringParam(input, "task_id", "")
 		if taskID == "" {
-			return NewClaudeErrorResponse(fmt.Errorf("task_id is required for cancel action")), nil
+			return NewClaudeErrorResponse(errors.New("task_id is required for cancel action")), nil
 		}
 		return t.cancelTask(taskID)
 	case "run":
@@ -223,21 +226,15 @@ func (t *TaskTool) runTask(ctx context.Context, input map[string]any) (any, erro
 	async := GetBoolParam(input, "async", true)
 
 	if subagentType == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("subagent_type is required for run action")), nil
+		return NewClaudeErrorResponse(errors.New("subagent_type is required for run action")), nil
 	}
 	if prompt == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("prompt is required for run action")), nil
+		return NewClaudeErrorResponse(errors.New("prompt is required for run action")), nil
 	}
 
 	// 验证子代理类型
 	validSubagents := []string{"general-purpose", "Explore", "Plan"}
-	subagentValid := false
-	for _, valid := range validSubagents {
-		if subagentType == valid {
-			subagentValid = true
-			break
-		}
-	}
+	subagentValid := slices.Contains(validSubagents, subagentType)
 	if !subagentValid {
 		return NewClaudeErrorResponse(
 			fmt.Errorf("invalid subagent_type: %s", subagentType),
@@ -365,9 +362,9 @@ func (t *TaskTool) executeWithSubagentManager(ctx context.Context, subagentType,
 			Model:   model,
 			Timeout: time.Duration(timeoutMinutes) * time.Minute,
 			Metadata: map[string]string{
-				"priority": fmt.Sprintf("%d", priority),
-				"async":    fmt.Sprintf("%t", async),
-				"created":  fmt.Sprintf("%d", time.Now().Unix()),
+				"priority": strconv.Itoa(priority),
+				"async":    strconv.FormatBool(async),
+				"created":  strconv.FormatInt(time.Now().Unix(), 10),
 			},
 		}
 

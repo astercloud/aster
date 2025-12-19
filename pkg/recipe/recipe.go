@@ -4,6 +4,7 @@
 package recipe
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -195,11 +196,11 @@ func LoadFromBytes(data []byte) (*Recipe, error) {
 // Validate checks if the recipe is valid.
 func (r *Recipe) Validate() error {
 	if r.Title == "" {
-		return fmt.Errorf("title is required")
+		return errors.New("title is required")
 	}
 
 	if r.Description == "" {
-		return fmt.Errorf("description is required")
+		return errors.New("description is required")
 	}
 
 	// At least one of instructions or prompt should be set for a useful recipe
@@ -225,21 +226,21 @@ func (r *Recipe) Validate() error {
 // Validate checks if the parameter is valid.
 func (p *Parameter) Validate() error {
 	if p.Key == "" {
-		return fmt.Errorf("key is required")
+		return errors.New("key is required")
 	}
 
 	if p.Type == "" {
-		return fmt.Errorf("input_type is required")
+		return errors.New("input_type is required")
 	}
 
 	// File type cannot have default values (security)
 	if p.Type == ParamTypeFile && p.Default != "" {
-		return fmt.Errorf("file parameters cannot have default values")
+		return errors.New("file parameters cannot have default values")
 	}
 
 	// Select type requires options
 	if p.Type == ParamTypeSelect && len(p.Options) == 0 {
-		return fmt.Errorf("select parameters require options")
+		return errors.New("select parameters require options")
 	}
 
 	return nil
@@ -248,21 +249,21 @@ func (p *Parameter) Validate() error {
 // Validate checks if the extension is valid.
 func (e *ExtensionConfig) Validate() error {
 	if e.Name == "" {
-		return fmt.Errorf("name is required")
+		return errors.New("name is required")
 	}
 
 	if e.Type == "" {
-		return fmt.Errorf("type is required")
+		return errors.New("type is required")
 	}
 
 	switch e.Type {
 	case "stdio":
 		if e.Cmd == "" {
-			return fmt.Errorf("cmd is required for stdio extensions")
+			return errors.New("cmd is required for stdio extensions")
 		}
 	case "sse":
 		if e.URL == "" {
-			return fmt.Errorf("url is required for sse extensions")
+			return errors.New("url is required for sse extensions")
 		}
 	case "builtin":
 		// No additional validation needed

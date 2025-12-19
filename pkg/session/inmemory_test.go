@@ -88,7 +88,7 @@ func TestInMemoryService_List(t *testing.T) {
 		service := NewInMemoryService()
 		// 准备测试数据
 		userID := "user-list-test"
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			if _, err := service.Create(ctx, &CreateRequest{
 				AppName: "test-app",
 				UserID:  userID,
@@ -108,7 +108,7 @@ func TestInMemoryService_List(t *testing.T) {
 	t.Run("限制返回数量", func(t *testing.T) {
 		service := NewInMemoryService()
 		userID := "user-list-test"
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			if _, err := service.Create(ctx, &CreateRequest{
 				AppName: "test-app",
 				UserID:  userID,
@@ -129,7 +129,7 @@ func TestInMemoryService_List(t *testing.T) {
 	t.Run("使用偏移量", func(t *testing.T) {
 		service := NewInMemoryService()
 		userID := "user-list-test"
-		for i := 0; i < 5; i++ {
+		for range 5 {
 			if _, err := service.Create(ctx, &CreateRequest{
 				AppName: "test-app",
 				UserID:  userID,
@@ -182,7 +182,7 @@ func TestInMemoryService_List(t *testing.T) {
 			UserID: "non-existent-user",
 		})
 		require.NoError(t, err)
-		assert.Len(t, sessions, 0)
+		assert.Empty(t, sessions)
 	})
 }
 
@@ -250,7 +250,7 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 	})
 
 	t.Run("追加多个事件", func(t *testing.T) {
-		for i := 0; i < 3; i++ {
+		for i := range 3 {
 			event := &Event{
 				ID:           "evt-" + string(rune('2'+i)),
 				Timestamp:    time.Now(),
@@ -298,7 +298,7 @@ func TestInMemoryService_AppendEvent(t *testing.T) {
 		// 验证状态已更新（通过GetEvents验证）
 		events, err := service.GetEvents(ctx, sess.ID(), nil)
 		require.NoError(t, err)
-		assert.True(t, len(events) > 0)
+		assert.Positive(t, len(events))
 	})
 
 	t.Run("事件带工件变更", func(t *testing.T) {
@@ -349,7 +349,7 @@ func TestInMemoryService_GetEvents(t *testing.T) {
 	})
 
 	// 准备测试数据
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		event := &Event{
 			ID:           "evt-" + string(rune('0'+i)),
 			Timestamp:    time.Now(),
@@ -555,9 +555,9 @@ func TestInMemoryService_Concurrency(t *testing.T) {
 		numGoroutines := 10
 		eventsPerGoroutine := 10
 
-		for i := 0; i < numGoroutines; i++ {
+		for i := range numGoroutines {
 			go func(id int) {
-				for j := 0; j < eventsPerGoroutine; j++ {
+				for j := range eventsPerGoroutine {
 					event := &Event{
 						ID:           "evt-concurrent-" + string(rune('0'+id)) + "-" + string(rune('0'+j)),
 						Timestamp:    time.Now(),
@@ -575,7 +575,7 @@ func TestInMemoryService_Concurrency(t *testing.T) {
 		}
 
 		// 等待所有 goroutine 完成
-		for i := 0; i < numGoroutines; i++ {
+		for range numGoroutines {
 			<-done
 		}
 

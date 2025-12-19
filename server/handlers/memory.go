@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -182,7 +183,7 @@ func (h *MemoryHandler) GetWorkingMemory(c *gin.Context) {
 
 	var memory WorkingMemoryRecord
 	if err := (*h.store).Get(ctx, "working_memory", id, &memory); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -244,7 +245,7 @@ func (h *MemoryHandler) UpdateWorkingMemory(c *gin.Context) {
 
 	var memory WorkingMemoryRecord
 	if err := (*h.store).Get(ctx, "working_memory", id, &memory); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -309,7 +310,7 @@ func (h *MemoryHandler) DeleteWorkingMemory(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "working_memory", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

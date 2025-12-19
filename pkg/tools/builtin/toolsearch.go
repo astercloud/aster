@@ -2,7 +2,7 @@ package builtin
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -78,7 +78,7 @@ func (t *ToolSearchTool) Execute(ctx context.Context, input map[string]any, tc *
 	activateTools := GetStringSlice(input, "activate")
 
 	if query == "" && category == "" && len(activateTools) == 0 {
-		return NewClaudeErrorResponse(fmt.Errorf("query, category or activate is required")), nil
+		return NewClaudeErrorResponse(errors.New("query, category or activate is required")), nil
 	}
 
 	start := time.Now()

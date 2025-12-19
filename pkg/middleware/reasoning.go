@@ -3,6 +3,7 @@ package middleware
 import (
 	"context"
 	"fmt"
+	"strings"
 
 	"github.com/astercloud/aster/pkg/logging"
 	"github.com/astercloud/aster/pkg/provider"
@@ -16,6 +17,7 @@ var reasonLog = logging.ForComponent("ReasoningMiddleware")
 // ReasoningMiddleware 推理中间件
 type ReasoningMiddleware struct {
 	*BaseMiddleware
+
 	engine   *reasoning.Engine
 	enabled  bool
 	priority int
@@ -130,11 +132,13 @@ func (rm *ReasoningMiddleware) containsReasoningMarkersInResponse(response *Mode
 
 	// 从 Message 的 ContentBlocks 中提取文本
 	text := ""
+	var textSb133 strings.Builder
 	for _, block := range response.Message.ContentBlocks {
 		if textBlock, ok := block.(*types.TextBlock); ok {
-			text += textBlock.Text
+			textSb133.WriteString(textBlock.Text)
 		}
 	}
+	text += textSb133.String()
 
 	if text == "" {
 		return false

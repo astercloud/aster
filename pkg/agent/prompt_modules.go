@@ -2,6 +2,7 @@ package agent
 
 import (
 	"fmt"
+	"slices"
 	"sort"
 	"strings"
 
@@ -32,13 +33,13 @@ func (m *EnvironmentModule) Build(ctx *PromptContext) (string, error) {
 	var lines []string
 	lines = append(lines, "## Environment Information")
 	lines = append(lines, "")
-	lines = append(lines, fmt.Sprintf("- Working Directory: %s", env.WorkingDir))
-	lines = append(lines, fmt.Sprintf("- Platform: %s", env.Platform))
-	lines = append(lines, fmt.Sprintf("- Date: %s", env.Date.Format("2006-01-02")))
+	lines = append(lines, "- Working Directory: "+env.WorkingDir)
+	lines = append(lines, "- Platform: "+env.Platform)
+	lines = append(lines, "- Date: "+env.Date.Format("2006-01-02"))
 
 	// 精简 Git 信息，只保留关键内容以减少 token 消耗
 	if env.GitRepo != nil && env.GitRepo.IsRepo {
-		lines = append(lines, fmt.Sprintf("- Git Branch: %s", env.GitRepo.CurrentBranch))
+		lines = append(lines, "- Git Branch: "+env.GitRepo.CurrentBranch)
 		// 不再输出 git status 和 recent commits，这些可以通过工具获取
 	}
 
@@ -120,12 +121,12 @@ func (m *SandboxModule) Build(ctx *PromptContext) (string, error) {
 	lines = append(lines, "## Sandbox Environment")
 	lines = append(lines, "")
 	lines = append(lines, fmt.Sprintf("- Type: %s", sb.Kind))
-	lines = append(lines, fmt.Sprintf("- Working Directory: %s", sb.WorkDir))
+	lines = append(lines, "- Working Directory: "+sb.WorkDir)
 
 	if len(sb.AllowPaths) > 0 {
 		lines = append(lines, "- Allowed Paths:")
 		for _, path := range sb.AllowPaths {
-			lines = append(lines, fmt.Sprintf("  - %s", path))
+			lines = append(lines, "  - "+path)
 		}
 	}
 
@@ -257,14 +258,14 @@ func (m *CollaborationModule) Build(ctx *PromptContext) (string, error) {
 	var lines []string
 	lines = append(lines, "## Multi-Agent Collaboration")
 	lines = append(lines, "")
-	lines = append(lines, fmt.Sprintf("You are working in a collaborative room: %s", m.RoomInfo.RoomID))
+	lines = append(lines, "You are working in a collaborative room: "+m.RoomInfo.RoomID)
 	lines = append(lines, fmt.Sprintf("Total members: %d", m.RoomInfo.MemberCount))
 
 	if len(m.RoomInfo.Members) > 0 {
 		lines = append(lines, "")
 		lines = append(lines, "Room members:")
 		for _, member := range m.RoomInfo.Members {
-			lines = append(lines, fmt.Sprintf("- %s", member))
+			lines = append(lines, "- "+member)
 		}
 	}
 
@@ -303,15 +304,15 @@ func (m *WorkflowModule) Build(ctx *PromptContext) (string, error) {
 	var lines []string
 	lines = append(lines, "## Workflow Context")
 	lines = append(lines, "")
-	lines = append(lines, fmt.Sprintf("Workflow ID: %s", info.WorkflowID))
+	lines = append(lines, "Workflow ID: "+info.WorkflowID)
 	lines = append(lines, fmt.Sprintf("Current Step: %s (Step %d of %d)", info.CurrentStep, info.StepIndex+1, info.TotalSteps))
 
 	if info.PreviousStep != "" {
-		lines = append(lines, fmt.Sprintf("Previous Step: %s", info.PreviousStep))
+		lines = append(lines, "Previous Step: "+info.PreviousStep)
 	}
 
 	if info.NextStep != "" {
-		lines = append(lines, fmt.Sprintf("Next Step: %s", info.NextStep))
+		lines = append(lines, "Next Step: "+info.NextStep)
 	}
 
 	lines = append(lines, "")
@@ -331,7 +332,7 @@ func (m *CustomInstructionsModule) Condition(ctx *PromptContext) bool {
 	return m.Instructions != ""
 }
 func (m *CustomInstructionsModule) Build(ctx *PromptContext) (string, error) {
-	return fmt.Sprintf("## Custom Instructions\n\n%s", m.Instructions), nil
+	return "## Custom Instructions\n\n" + m.Instructions, nil
 }
 
 // CapabilitiesModule Agent 能力说明模块
@@ -378,7 +379,7 @@ func (m *CapabilitiesModule) Build(ctx *PromptContext) (string, error) {
 	lines = append(lines, "")
 	lines = append(lines, "You can:")
 	for _, cap := range capabilities {
-		lines = append(lines, fmt.Sprintf("- %s", cap))
+		lines = append(lines, "- "+cap)
 	}
 
 	return strings.Join(lines, "\n"), nil
@@ -438,7 +439,7 @@ func (m *ContextWindowModule) Build(ctx *PromptContext) (string, error) {
 	lines = append(lines, fmt.Sprintf("Maximum context tokens: %d", m.MaxTokens))
 
 	if m.Strategy != "" {
-		lines = append(lines, fmt.Sprintf("Compression strategy: %s", m.Strategy))
+		lines = append(lines, "Compression strategy: "+m.Strategy)
 	}
 
 	lines = append(lines, "")
@@ -600,10 +601,5 @@ CRITICAL: Follow these git safety rules:
 
 // 辅助函数
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }

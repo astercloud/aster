@@ -2,7 +2,9 @@ package weaviate
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"time"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -37,10 +39,10 @@ type Store struct {
 // NewStore 创建 Weaviate 存储实例
 func NewStore(cfg *Config) (*Store, error) {
 	if cfg.Host == "" {
-		return nil, fmt.Errorf("weaviate host is required")
+		return nil, errors.New("weaviate host is required")
 	}
 	if cfg.ClassName == "" {
-		return nil, fmt.Errorf("weaviate class name is required")
+		return nil, errors.New("weaviate class name is required")
 	}
 
 	scheme := cfg.Scheme
@@ -176,9 +178,7 @@ func (s *Store) Upsert(ctx context.Context, docs []vector.Document) error {
 		}
 
 		// 添加自定义元数据
-		for k, v := range doc.Metadata {
-			properties[k] = v
-		}
+		maps.Copy(properties, doc.Metadata)
 
 		// 添加对象到批处理
 		obj := &models.Object{
@@ -221,7 +221,7 @@ func (s *Store) Upsert(ctx context.Context, docs []vector.Document) error {
 // Query 向量检索
 func (s *Store) Query(ctx context.Context, q vector.Query) ([]vector.Hit, error) {
 	if len(q.Vector) == 0 {
-		return nil, fmt.Errorf("vector is required for query")
+		return nil, errors.New("vector is required for query")
 	}
 
 	startTime := time.Now()

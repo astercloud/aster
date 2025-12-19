@@ -75,7 +75,7 @@ func (qa *QualityAnalyzer) detectContradictions(memories []MemoryWithScore) []In
 	inconsistencies := []Inconsistency{}
 
 	// 简化版：检查内容中的否定关系
-	for i := range len(memories) {
+	for i := range memories {
 		for j := i + 1; j < len(memories); j++ {
 			if qa.areContradictory(memories[i], memories[j]) {
 				severity := qa.calculateContradictionSeverity(memories[i], memories[j])
@@ -148,7 +148,7 @@ func (qa *QualityAnalyzer) calculateContradictionSeverity(mem1, mem2 MemoryWithS
 func (qa *QualityAnalyzer) detectDuplicates(memories []MemoryWithScore) []Inconsistency {
 	inconsistencies := []Inconsistency{}
 
-	for i := range len(memories) {
+	for i := range memories {
 		for j := i + 1; j < len(memories); j++ {
 			similarity := qa.calculateSimilarity(memories[i].Text, memories[j].Text)
 

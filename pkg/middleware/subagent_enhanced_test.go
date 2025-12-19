@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"slices"
 	"testing"
 )
 
@@ -56,13 +57,7 @@ func TestSubAgentMiddleware_GeneralPurpose(t *testing.T) {
 		}
 
 		// 验证 general-purpose 存在
-		found := false
-		for _, name := range agents {
-			if name == "general-purpose" {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(agents, "general-purpose")
 		if !found {
 			t.Error("Expected 'general-purpose' agent to be present")
 		}

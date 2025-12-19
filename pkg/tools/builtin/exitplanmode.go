@@ -1,12 +1,13 @@
 package builtin
 
 import (
-"context"
-"fmt"
-"strings"
-"time"
+	"context"
+	"errors"
+	"fmt"
+	"strings"
+	"time"
 
-"github.com/astercloud/aster/pkg/tools"
+	"github.com/astercloud/aster/pkg/tools"
 )
 
 // ExitPlanModeTool 规划模式退出工具
@@ -100,9 +101,9 @@ func (t *ExitPlanModeTool) Execute(ctx context.Context, input map[string]any, tc
 
 			if len(plans) == 0 {
 				return NewClaudeErrorResponse(
-fmt.Errorf("no plan content provided and no plan files found"),
-"Please provide the plan content directly using the 'plan' parameter",
-), nil
+					errors.New("no plan content provided and no plan files found"),
+					"Please provide the plan content directly using the 'plan' parameter",
+				), nil
 			}
 
 			latestPlan := plans[len(plans)-1]
@@ -122,16 +123,16 @@ fmt.Errorf("no plan content provided and no plan files found"),
 		maxRetries := 3
 		retryDelay := 500 * time.Millisecond
 
-		for i := 0; i < maxRetries; i++ {
+		for i := range maxRetries {
 			if !planManager.Exists(planFilePath) {
 				if i < maxRetries-1 {
 					time.Sleep(retryDelay)
 					continue
 				}
 				return NewClaudeErrorResponse(
-fmt.Errorf("plan file not found: %s", planFilePath),
-"Please provide the plan content directly using the 'plan' parameter",
-), nil
+					fmt.Errorf("plan file not found: %s", planFilePath),
+					"Please provide the plan content directly using the 'plan' parameter",
+				), nil
 			}
 
 			var err error
@@ -150,9 +151,9 @@ fmt.Errorf("plan file not found: %s", planFilePath),
 					continue
 				}
 				return NewClaudeErrorResponse(
-fmt.Errorf("plan file is empty: %s", planFilePath),
-"Please provide the plan content directly using the 'plan' parameter",
-), nil
+					fmt.Errorf("plan file is empty: %s", planFilePath),
+					"Please provide the plan content directly using the 'plan' parameter",
+				), nil
 			}
 
 			break

@@ -3,6 +3,7 @@ package vector
 import (
 	"context"
 	"math"
+	"slices"
 	"sync"
 )
 
@@ -39,13 +40,7 @@ func (s *MemoryStore) Upsert(_ context.Context, docs []Document) error {
 			ns = "default"
 		}
 		ids := s.index[ns]
-		found := false
-		for _, id := range ids {
-			if id == d.ID {
-				found = true
-				break
-			}
-		}
+		found := slices.Contains(ids, d.ID)
 		if !found {
 			s.index[ns] = append(ids, d.ID)
 		}

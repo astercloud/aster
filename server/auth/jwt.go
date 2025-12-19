@@ -10,11 +10,12 @@ import (
 
 // JWTClaims JWT 声明
 type JWTClaims struct {
+	jwt.RegisteredClaims
+
 	UserID   string   `json:"user_id"`
 	Username string   `json:"username"`
 	Email    string   `json:"email"`
 	Roles    []string `json:"roles"`
-	jwt.RegisteredClaims
 }
 
 // JWTAuthenticator JWT 认证器

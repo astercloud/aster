@@ -6,6 +6,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -480,7 +481,7 @@ func (e *Engine) executeWorkflow(execution *WorkflowExecution) {
 	// 查找开始节点
 	startNodes := e.findStartNodes(execution.Definition)
 	if len(startNodes) == 0 {
-		e.markExecutionFailed(execution, fmt.Errorf("no start node found"))
+		e.markExecutionFailed(execution, errors.New("no start node found"))
 		return
 	}
 
@@ -611,9 +612,7 @@ func (e *Engine) executeStartNode(execution *WorkflowExecution, node *NodeDef, r
 // executeEndNode 执行结束节点
 func (e *Engine) executeEndNode(execution *WorkflowExecution, node *NodeDef, result *NodeResult) error {
 	// 收集工作流输出
-	for key, value := range execution.Context.Variables {
-		execution.Context.Outputs[key] = value
-	}
+	maps.Copy(execution.Context.Outputs, execution.Context.Variables)
 
 	result.Outputs["completed_at"] = time.Now()
 	result.Outputs["outputs"] = execution.Context.Outputs
@@ -623,7 +622,7 @@ func (e *Engine) executeEndNode(execution *WorkflowExecution, node *NodeDef, res
 // executeTaskNode 执行任务节点
 func (e *Engine) executeTaskNode(execution *WorkflowExecution, node *NodeDef, result *NodeResult) error {
 	if node.Agent == nil {
-		return fmt.Errorf("task node requires agent configuration")
+		return errors.New("task node requires agent configuration")
 	}
 
 	// 创建Agent
@@ -669,7 +668,7 @@ func (e *Engine) executeTaskNode(execution *WorkflowExecution, node *NodeDef, re
 // executeConditionNode 执行条件节点
 func (e *Engine) executeConditionNode(execution *WorkflowExecution, node *NodeDef, result *NodeResult) error {
 	if node.Condition == nil {
-		return fmt.Errorf("condition node requires condition configuration")
+		return errors.New("condition node requires condition configuration")
 	}
 
 	// 评估条件
@@ -685,7 +684,7 @@ func (e *Engine) executeConditionNode(execution *WorkflowExecution, node *NodeDe
 // executeLoopNode 执行循环节点
 func (e *Engine) executeLoopNode(execution *WorkflowExecution, node *NodeDef, result *NodeResult) error {
 	if node.Loop == nil {
-		return fmt.Errorf("loop node requires loop configuration")
+		return errors.New("loop node requires loop configuration")
 	}
 
 	// TODO: 实现循环逻辑
@@ -696,7 +695,7 @@ func (e *Engine) executeLoopNode(execution *WorkflowExecution, node *NodeDef, re
 // executeParallelNode 执行并行节点
 func (e *Engine) executeParallelNode(execution *WorkflowExecution, node *NodeDef, result *NodeResult) error {
 	if node.Parallel == nil {
-		return fmt.Errorf("parallel node requires parallel configuration")
+		return errors.New("parallel node requires parallel configuration")
 	}
 
 	// TODO: 实现并行逻辑
@@ -812,9 +811,7 @@ func (e *Engine) processAgentEvent(event *session.Event, outputs map[string]any)
 	}
 
 	if event.Metadata != nil {
-		for key, value := range event.Metadata {
-			outputs[key] = value
-		}
+		maps.Copy(outputs, event.Metadata)
 	}
 
 	return outputs

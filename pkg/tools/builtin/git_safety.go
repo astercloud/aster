@@ -311,16 +311,20 @@ func (c *GitSafetyCheck) FormatCheckResult() string {
 
 		if len(c.Warnings) > 0 {
 			msg += "\nWarnings:\n"
+			var msgSb314 strings.Builder
 			for _, w := range c.Warnings {
-				msg += fmt.Sprintf("  • %s\n", w)
+				msgSb314.WriteString(fmt.Sprintf("  • %s\n", w))
 			}
+			msg += msgSb314.String()
 		}
 
 		if len(c.Recommendations) > 0 {
 			msg += "\nRecommendations:\n"
+			var msgSb321 strings.Builder
 			for _, r := range c.Recommendations {
-				msg += fmt.Sprintf("  • %s\n", r)
+				msgSb321.WriteString(fmt.Sprintf("  • %s\n", r))
 			}
+			msg += msgSb321.String()
 		}
 
 		msg += "\nThis command requires user approval before execution."

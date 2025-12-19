@@ -95,7 +95,7 @@ func TestInMemoryReferenceRegistry_ListRecent(t *testing.T) {
 	ctx := context.Background()
 
 	// 注册多个引用
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ref := Reference{
 			Type:  ReferenceTypeFilePath,
 			Value: "/file" + string(rune('0'+i)) + ".go",
@@ -197,7 +197,7 @@ func TestInMemoryReferenceRegistry_MaxSize(t *testing.T) {
 	ctx := context.Background()
 
 	// 注册超过最大数量的引用
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		ref := Reference{
 			Type:  ReferenceTypeFilePath,
 			Value: "/file" + string(rune('0'+i)) + ".go",

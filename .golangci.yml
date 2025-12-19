@@ -1,33 +1,108 @@
-# golangci-lint configuration (v2.x)
 version: "2"
 
-run:
-  timeout: 5m
-  tests: true
-  go: "1.21"
-
 linters:
-  enable:
-    - errcheck
-    - govet
-    - ineffassign
-    - staticcheck
-    - unused
+  default: all
+  disable:
+    # 过于严格/不适用
+    - depguard # 需要配置依赖白名单
+    - wrapcheck # 要求所有错误都 wrap
+    - exhaustruct # 要求所有字段都初始化
+    - ireturn # 禁止返回接口
+    - varnamelen # 变量名长度限制
+    - nlreturn # return 前必须空行
+    - wsl_v5 # 空行规则过严
+    - funlen # 函数长度限制
+    - gocognit # 认知复杂度
+    - cyclop # 圈复杂度
+    - lll # 行长度限制
+    - godox # 禁止 TODO/FIXME
+    - godot # 注释句号结尾
+    - mnd # magic number
+    - err113 # 错误定义规则过严
+    - gochecknoglobals # 禁止全局变量
+    - gochecknoinits # 禁止 init 函数
+    - nonamedreturns # 禁止命名返回
+    - interfacebloat # 接口方法数限制
+    - maintidx # 可维护性指数
+    - nestif # 嵌套 if 检测
+    - goconst # 常量提取
+    - dupl # 重复代码
+    - inamedparam # 接口参数命名
+    - tagliatelle # struct tag 命名风格
+    - tagalign # struct tag 对齐
+    - musttag # 强制 struct tag
+    - goheader # 文件头检查
+    - gomoddirectives # go.mod 指令检查
+    - gomodguard # go.mod 依赖检查
+    - grouper # 表达式分组
+    - decorder # 声明顺序
+    - funcorder # 函数顺序
+    - containedctx # context 包含检查
+    - contextcheck # context 检查
+    - noinlineerr # 禁止内联错误处理
+    - paralleltest # 要求 t.Parallel()
+    - testpackage # 要求 _test 包
+    - tparallel # t.Parallel 检查
+    # 特定框架
+    - arangolint # ArangoDB
+    - ginkgolinter # Ginkgo
+    - zerologlint # zerolog
+    - loggercheck # logger 检查
+    - spancheck # OpenTelemetry
+    - promlinter # Prometheus
+    - protogetter # protobuf
+    - gosmopolitan # i18n
+    # 已弃用
+    - wsl
+    # 注释要求过严
+    - revive # 与 staticcheck 重复，规则过严
+    - errname # 错误命名规则
+    - goprintffuncname # printf 函数命名
+    # 过于严格的额外检查
+    - forbidigo # 禁止 fmt.Print* 等函数（示例代码大量使用）
+    - forcetypeassert # 强制类型断言检查（大量使用 any 类型）
+    - gosec # 安全检查过严
+    - unparam # 未使用参数检查
+    - godoclint # 注释格式过严
+    - prealloc # 切片预分配建议
+    - nilnil # nil 返回检查
+    - noctx # http 请求 context 检查
+    - nilerr # nil error 检查
+    - exhaustive # switch 穷尽检查
+    - gocyclo # 圈复杂度（已有 cyclop）
+    - errchkjson # JSON 错误检查（示例代码忽略错误）
+    - errcheck # 错误检查（CI 配置禁用）
+    # 测试相关的过严检查
+    - testifylint # testify 用法检查
+    - thelper # t.Helper() 检查
+    - usetesting # testing 包使用建议
+    # 其他过严检查
+    - predeclared # 预定义标识符遮蔽
+    - intrange # 整数范围迭代建议
+    - modernize # 现代化建议
+    - gocritic # 代码风格建议
+    - rowserrcheck # sql.Rows 错误检查
+    - wastedassign # 无用赋值检查
+    - iface # 接口检查
+
   settings:
-    errcheck:
-      check-type-assertions: false
-      check-blank: false
-      exclude-functions:
-        - fmt.Fprintf
-        - fmt.Fprintln
-        - fmt.Printf
-        - fmt.Println
-        - (io.Closer).Close
     govet:
       enable-all: true
       disable:
         - fieldalignment
-        - shadow
+        - shadow # 变量遮蔽检查（Go 常见模式）
+    misspell:
+      locale: US
+    nakedret:
+      max-func-lines: 30
+    gocritic: {}
+    exhaustive:
+      default-signifies-exhaustive: true
+
+formatters:
+  enable:
+    - gofmt
+    - goimports
 
 issues:
   max-issues-per-linter: 0

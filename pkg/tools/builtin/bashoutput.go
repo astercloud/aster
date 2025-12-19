@@ -2,8 +2,10 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os/exec"
+	"strconv"
 	"strings"
 	"time"
 
@@ -91,7 +93,7 @@ func (t *BashOutputTool) Execute(ctx context.Context, input map[string]any, tc *
 	clearCache := GetBoolParam(input, "clear_cache", false)
 
 	if bashID == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("bash_id cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("bash_id cannot be empty")), nil
 	}
 
 	start := time.Now()
@@ -104,7 +106,7 @@ func (t *BashOutputTool) Execute(ctx context.Context, input map[string]any, tc *
 	if err != nil {
 		return map[string]any{
 			"ok":    false,
-			"error": fmt.Sprintf("background task not found: %s", bashID),
+			"error": "background task not found: " + bashID,
 			"recommendations": []string{
 				"确认bash_id是否正确",
 				"检查任务是否还在运行",
@@ -334,7 +336,7 @@ func (t *BashOutputTool) getResourceUsage(pid int) *ResourceUsage {
 	}
 
 	// 使用ps命令获取资源使用情况
-	cmd := exec.Command("ps", "-p", fmt.Sprintf("%d", pid), "-o", "%cpu,rss,vsz", "--no-headers")
+	cmd := exec.Command("ps", "-p", strconv.Itoa(pid), "-o", "%cpu,rss,vsz", "--no-headers")
 	output, err := cmd.Output()
 	if err != nil {
 		return nil

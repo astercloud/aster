@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -202,7 +203,7 @@ func (c *EnhancedPromptCompressor) compressSimple(prompt string, opts *CompressO
 // compressLLM LLM 驱动的压缩
 func (c *EnhancedPromptCompressor) compressLLM(ctx context.Context, prompt string, opts *CompressOptions) (string, error) {
 	if c.llmCompressor == nil {
-		return prompt, fmt.Errorf("LLM compressor not available")
+		return prompt, errors.New("LLM compressor not available")
 	}
 
 	targetLen := opts.TargetLength
@@ -283,7 +284,7 @@ func (c *EnhancedPromptCompressor) scoreSections(sections []string, preserveSect
 	}
 
 	// 按评分排序（高分在前）
-	for i := 0; i < len(result)-1; i++ {
+	for i := range len(result) - 1 {
 		for j := i + 1; j < len(result); j++ {
 			if result[j].Score > result[i].Score {
 				result[i], result[j] = result[j], result[i]
@@ -544,8 +545,8 @@ func AnalyzePrompt(prompt string) *PromptStats {
 	}
 
 	// 统计段落数（以 ## 开头的行）
-	lines := strings.Split(prompt, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(prompt, "\n")
+	for line := range lines {
 		if strings.HasPrefix(strings.TrimSpace(line), "##") {
 			stats.SectionCount++
 		}

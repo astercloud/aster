@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/astercloud/aster/pkg/config"
 )
@@ -131,8 +132,10 @@ func demonstrateEnsureDir() {
 
 func repeatStr(s string, n int) string {
 	result := ""
+	var resultSb134 strings.Builder
 	for i := 0; i < n; i++ {
-		result += s
+		resultSb134.WriteString(s)
 	}
+	result += resultSb134.String()
 	return result
 }

@@ -3,6 +3,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"time"
@@ -41,7 +42,7 @@ func (t *ExpensiveTool) Prompt() string {
 func (t *ExpensiveTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	number, ok := input["number"].(float64)
 	if !ok {
-		return nil, fmt.Errorf("invalid input: number must be a number")
+		return nil, errors.New("invalid input: number must be a number")
 	}
 
 	fmt.Printf("  [ExpensiveTool] 开始计算 %v...\n", number)

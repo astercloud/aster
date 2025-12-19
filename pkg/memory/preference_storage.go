@@ -61,7 +61,7 @@ func (fs *FilePreferenceStorage) Save(
 	}
 
 	// 写入文件
-	filePath := filepath.Join(fs.dir, fmt.Sprintf("%s.json", userID))
+	filePath := filepath.Join(fs.dir, userID+".json")
 	if err := os.WriteFile(filePath, data, 0644); err != nil {
 		return fmt.Errorf("failed to write file: %w", err)
 	}
@@ -78,7 +78,7 @@ func (fs *FilePreferenceStorage) Load(
 	defer fs.mu.RUnlock()
 
 	// 读取文件
-	filePath := filepath.Join(fs.dir, fmt.Sprintf("%s.json", userID))
+	filePath := filepath.Join(fs.dir, userID+".json")
 	data, err := os.ReadFile(filePath)
 	if err != nil {
 		if os.IsNotExist(err) {
@@ -101,7 +101,7 @@ func (fs *FilePreferenceStorage) Delete(ctx context.Context, userID string) erro
 	fs.mu.Lock()
 	defer fs.mu.Unlock()
 
-	filePath := filepath.Join(fs.dir, fmt.Sprintf("%s.json", userID))
+	filePath := filepath.Join(fs.dir, userID+".json")
 	if err := os.Remove(filePath); err != nil {
 		if os.IsNotExist(err) {
 			return nil // 文件不存在视为成功
@@ -142,6 +142,7 @@ func (fs *FilePreferenceStorage) List(ctx context.Context) ([]string, error) {
 // PersistentPreferenceManager 带持久化的偏好管理器
 type PersistentPreferenceManager struct {
 	*PreferenceManager
+
 	storage PreferenceStorage
 }
 

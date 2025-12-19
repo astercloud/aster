@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/astercloud/aster/pkg/session"
@@ -194,7 +195,7 @@ func queryOptimizationExample(ctx context.Context, service *mysql.Service, userI
 // 辅助函数
 
 func generateID() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
 // MySQL 8.0+ JSON 高级用法

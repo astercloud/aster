@@ -495,7 +495,7 @@ func TestLocalSandbox_CommandStats(t *testing.T) {
 	}
 
 	// Execute echo multiple times
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		_, _ = sb.Exec(context.Background(), "echo test", nil)
 	}
 

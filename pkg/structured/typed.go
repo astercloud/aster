@@ -3,6 +3,7 @@ package structured
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"reflect"
 )
@@ -29,13 +30,13 @@ func NewTypedParser(schema *JSONSchema) *TypedParser {
 // ParseInto 解析并绑定到目标 struct
 func (tp *TypedParser) ParseInto(ctx context.Context, text string, target any) error {
 	if target == nil {
-		return fmt.Errorf("target cannot be nil")
+		return errors.New("target cannot be nil")
 	}
 
 	// 检查 target 是否为指针
 	rv := reflect.ValueOf(target)
 	if rv.Kind() != reflect.Ptr {
-		return fmt.Errorf("target must be a pointer")
+		return errors.New("target must be a pointer")
 	}
 
 	// 提取 JSON
@@ -118,7 +119,7 @@ func ParseTyped(ctx context.Context, text string, spec TypedOutputSpec) (*TypedP
 
 	// 创建目标实例
 	if spec.StructType == nil {
-		return nil, fmt.Errorf("struct type is required")
+		return nil, errors.New("struct type is required")
 	}
 
 	targetType := reflect.TypeOf(spec.StructType)
@@ -195,7 +196,7 @@ func GenerateSchema(structType any) (*JSONSchema, error) {
 
 		// 解析 json tag
 		fieldName := jsonTag
-		for idx := 0; idx < len(jsonTag); idx++ {
+		for idx := range len(jsonTag) {
 			if jsonTag[idx] == ',' {
 				fieldName = jsonTag[:idx]
 				break

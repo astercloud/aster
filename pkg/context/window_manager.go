@@ -2,6 +2,7 @@ package context
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"sync"
@@ -194,7 +195,7 @@ func (m *ContextWindowManager) Compress(ctx context.Context) error {
 // compress 内部压缩方法（需要持有锁）
 func (m *ContextWindowManager) compress(ctx context.Context) error {
 	if m.compressionStrategy == nil {
-		return fmt.Errorf("compression strategy not configured")
+		return errors.New("compression strategy not configured")
 	}
 
 	beforeMessages := len(m.messages)

@@ -256,7 +256,7 @@ func (h *DashboardEventHandler) handleMessage(wsConn *DashboardEventConnection, 
 	case "ping":
 		h.sendMessage(wsConn, "pong", nil)
 	default:
-		h.sendError(wsConn, "unknown_action", fmt.Sprintf("Unknown action: %s", msg.Action))
+		h.sendError(wsConn, "unknown_action", "Unknown action: "+msg.Action)
 	}
 }
 
@@ -723,7 +723,7 @@ func (c *DashboardEventConnection) extractEventInfo(agentID string, envelope typ
 
 // sendMessage sends a message to the WebSocket client
 func (h *DashboardEventHandler) sendMessage(wsConn *DashboardEventConnection, msgType string, payload any) {
-	// Check if context is cancelled
+	// Check if context is canceled
 	if wsConn.ctx.Err() != nil {
 		return
 	}

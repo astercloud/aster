@@ -86,7 +86,7 @@ func (m *HITLManager) CreateApprovalHandler(connID string) middleware.ApprovalHa
 			case <-ctx.Done():
 				decisions[i] = middleware.Decision{
 					Type:   middleware.DecisionReject,
-					Reason: "Context cancelled",
+					Reason: "Context canceled",
 				}
 			case <-time.After(5 * time.Minute): // 5分钟超时
 				decisions[i] = middleware.Decision{

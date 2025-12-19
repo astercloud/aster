@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -337,7 +338,7 @@ func (h *EvalHandler) GetEval(c *gin.Context) {
 
 	var eval EvalRecord
 	if err := (*h.store).Get(ctx, "evals", id, &eval); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -369,7 +370,7 @@ func (h *EvalHandler) DeleteEval(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "evals", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -483,7 +484,7 @@ func (h *EvalHandler) GetBenchmark(c *gin.Context) {
 
 	var benchmark BenchmarkRecord
 	if err := (*h.store).Get(ctx, "benchmarks", id, &benchmark); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -515,7 +516,7 @@ func (h *EvalHandler) DeleteBenchmark(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "benchmarks", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -549,7 +550,7 @@ func (h *EvalHandler) RunBenchmark(c *gin.Context) {
 
 	var benchmark BenchmarkRecord
 	if err := (*h.store).Get(ctx, "benchmarks", id, &benchmark); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -572,7 +573,7 @@ func (h *EvalHandler) RunBenchmark(c *gin.Context) {
 	// TODO: Actually run the benchmark
 	// For now, generate sample results
 	results := make([]map[string]float64, benchmark.Runs)
-	for i := 0; i < benchmark.Runs; i++ {
+	for i := range benchmark.Runs {
 		results[i] = map[string]float64{
 			"score":    0.90 + float64(i)*0.01,
 			"duration": 100 + float64(i)*10,

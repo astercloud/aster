@@ -118,7 +118,7 @@ func TestQualityMetrics_GetAll(t *testing.T) {
 	qm := NewQualityMetrics(config)
 
 	// 添加多个质量评估
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		memory := &MemoryWithScore{
 			DocID:      string(rune('A' + i)),
 			Text:       "Test content",
@@ -204,7 +204,7 @@ func TestQualityMetrics_Clear(t *testing.T) {
 	qm := NewQualityMetrics(config)
 
 	// 添加多个
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		memory := &MemoryWithScore{
 			DocID:      string(rune('A' + i)),
 			Text:       "Test",

@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
@@ -155,7 +156,7 @@ func (r *PythonRuntime) Execute(ctx context.Context, code string, input map[stri
 		if execCtx.Err() == context.DeadlineExceeded {
 			result.Error = "execution timeout"
 			result.ExitCode = -1
-		} else if exitErr, ok := err.(*exec.ExitError); ok {
+		} else if exitErr := (&exec.ExitError{}); errors.As(err, &exitErr) {
 			result.ExitCode = exitErr.ExitCode()
 			result.Error = stderr.String()
 		} else {
@@ -422,7 +423,7 @@ func (r *NodeJSRuntime) Execute(ctx context.Context, code string, input map[stri
 		if execCtx.Err() == context.DeadlineExceeded {
 			result.Error = "execution timeout"
 			result.ExitCode = -1
-		} else if exitErr, ok := err.(*exec.ExitError); ok {
+		} else if exitErr := (&exec.ExitError{}); errors.As(err, &exitErr) {
 			result.ExitCode = exitErr.ExitCode()
 			result.Error = stderr.String()
 		} else {
@@ -552,7 +553,7 @@ func (r *BashRuntime) Execute(ctx context.Context, code string, input map[string
 		if execCtx.Err() == context.DeadlineExceeded {
 			result.Error = "execution timeout"
 			result.ExitCode = -1
-		} else if exitErr, ok := err.(*exec.ExitError); ok {
+		} else if exitErr := (&exec.ExitError{}); errors.As(err, &exitErr) {
 			result.ExitCode = exitErr.ExitCode()
 			result.Error = stderr.String()
 		} else {

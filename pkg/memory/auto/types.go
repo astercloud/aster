@@ -3,6 +3,7 @@
 package auto
 
 import (
+	"slices"
 	"time"
 )
 
@@ -102,10 +103,8 @@ func (m *Memory) AddTag(tag string) {
 		tag = "#" + tag
 	}
 	// 检查重复
-	for _, t := range m.Tags {
-		if t == tag {
-			return
-		}
+	if slices.Contains(m.Tags, tag) {
+		return
 	}
 	m.Tags = append(m.Tags, tag)
 	m.UpdatedAt = time.Now()
@@ -116,12 +115,7 @@ func (m *Memory) HasTag(tag string) bool {
 	if len(tag) > 0 && tag[0] != '#' {
 		tag = "#" + tag
 	}
-	for _, t := range m.Tags {
-		if t == tag {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(m.Tags, tag)
 }
 
 // MarkAccessed 标记访问

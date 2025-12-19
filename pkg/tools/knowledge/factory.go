@@ -2,7 +2,9 @@ package knowledge
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"time"
 
 	"github.com/astercloud/aster/pkg/knowledge/core"
@@ -34,7 +36,7 @@ func NewFactory(p *core.Pipeline) *Factory {
 // KnowledgeAddTool 将文本写入核心管线。
 func (f *Factory) KnowledgeAddTool() (tools.Tool, error) {
 	if f.Pipeline == nil {
-		return nil, fmt.Errorf("knowledge tool: pipeline is nil")
+		return nil, errors.New("knowledge tool: pipeline is nil")
 	}
 	return &addTool{pipe: f.Pipeline}, nil
 }
@@ -42,7 +44,7 @@ func (f *Factory) KnowledgeAddTool() (tools.Tool, error) {
 // KnowledgeSearchTool 在核心管线中执行向量检索。
 func (f *Factory) KnowledgeSearchTool() (tools.Tool, error) {
 	if f.Pipeline == nil {
-		return nil, fmt.Errorf("knowledge tool: pipeline is nil")
+		return nil, errors.New("knowledge tool: pipeline is nil")
 	}
 	return &searchTool{pipe: f.Pipeline}, nil
 }
@@ -83,9 +85,7 @@ func (t *addTool) Execute(ctx context.Context, input map[string]any, _ *tools.To
 
 	meta := map[string]any{}
 	if m, ok := input["metadata"].(map[string]any); ok {
-		for k, v := range m {
-			meta[k] = v
-		}
+		maps.Copy(meta, m)
 	}
 	if ns != "" {
 		meta["namespace"] = ns
@@ -148,9 +148,7 @@ func (t *searchTool) Execute(ctx context.Context, input map[string]any, _ *tools
 	ns, _ := input["namespace"].(string)
 	meta := map[string]any{}
 	if m, ok := input["metadata"].(map[string]any); ok {
-		for k, v2 := range m {
-			meta[k] = v2
-		}
+		maps.Copy(meta, m)
 	}
 	if ns != "" {
 		meta["namespace"] = ns

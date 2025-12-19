@@ -59,7 +59,8 @@ func demoSafeAgent(ctx context.Context) {
 
 		err := guardChain.Check(ctx, guardInput)
 		if err != nil {
-			if guardErr, ok := err.(*guardrails.GuardrailError); ok {
+			guardErr := &guardrails.GuardrailError{}
+			if errors.As(err, &guardErr) {
 				fmt.Printf("  ⚠️  被 %s 拦截: %s\n", guardErr.GuardrailName, guardErr.Message)
 				if guardErr.ShouldMask {
 					fmt.Printf("  掩码后: %s\n", guardErr.MaskedContent)

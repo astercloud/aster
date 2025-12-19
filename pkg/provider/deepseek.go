@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -34,7 +35,7 @@ type DeepseekProvider struct {
 // NewDeepseekProvider 创建 Deepseek 提供商
 func NewDeepseekProvider(config *types.ModelConfig) (*DeepseekProvider, error) {
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("deepseek api key is required")
+		return nil, errors.New("deepseek api key is required")
 	}
 
 	baseURL := config.BaseURL
@@ -80,7 +81,7 @@ func (dp *DeepseekProvider) Complete(ctx context.Context, messages []types.Messa
 	fullURL := dp.baseURL + endpoint
 	deepseekLog.Info(ctx, "API endpoint", map[string]any{"url": fullURL})
 
-	req, err := http.NewRequestWithContext(ctx, "POST", fullURL, bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, fullURL, bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -169,7 +170,7 @@ func (dp *DeepseekProvider) Stream(ctx context.Context, messages []types.Message
 			endpoint = "/v1/chat/completions"
 		}
 	}
-	req, err := http.NewRequestWithContext(ctx, "POST", dp.baseURL+endpoint, bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, dp.baseURL+endpoint, bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -595,17 +596,17 @@ func (dp *DeepseekProvider) parseCompleteResponse(apiResp map[string]any) (types
 	// 获取第一个choice
 	choices, ok := apiResp["choices"].([]any)
 	if !ok || len(choices) == 0 {
-		return types.Message{}, fmt.Errorf("no choices in response")
+		return types.Message{}, errors.New("no choices in response")
 	}
 
 	choice, ok := choices[0].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("invalid choice format")
+		return types.Message{}, errors.New("invalid choice format")
 	}
 
 	message, ok := choice["message"].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("no message in choice")
+		return types.Message{}, errors.New("no message in choice")
 	}
 
 	// 解析文本内容

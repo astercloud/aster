@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 
@@ -48,7 +49,8 @@ func testPIIDetection(ctx context.Context) {
 
 	err := piiGuard.Check(ctx, input)
 	if err != nil {
-		if guardErr, ok := err.(*guardrails.GuardrailError); ok {
+		guardErr := &guardrails.GuardrailError{}
+		if errors.As(err, &guardErr) {
 			fmt.Printf("  ✅ 检测到 PII: %v\n", guardErr.Details["detected_pii"])
 			fmt.Printf("  错误: %s\n", guardErr.Message)
 		}
@@ -68,7 +70,8 @@ func testPIIMasking(ctx context.Context) {
 
 	err := piiGuard.Check(ctx, input)
 	if err != nil {
-		if guardErr, ok := err.(*guardrails.GuardrailError); ok {
+		guardErr := &guardrails.GuardrailError{}
+		if errors.As(err, &guardErr) {
 			fmt.Printf("  ✅ PII 已掩码\n")
 			fmt.Printf("  原文: %s\n", input.Content)
 			fmt.Printf("  掩码后: %s\n", guardErr.MaskedContent)
@@ -118,7 +121,8 @@ func testPromptInjection(ctx context.Context) {
 		if detected == tc.shouldDetect {
 			fmt.Printf("  ✅ %s: %v\n", tc.name, detected)
 			if detected {
-				if guardErr, ok := err.(*guardrails.GuardrailError); ok {
+				guardErr := &guardrails.GuardrailError{}
+				if errors.As(err, &guardErr) {
 					fmt.Printf("     检测到: %v\n", guardErr.Details["detected_patterns"])
 				}
 			}
@@ -151,7 +155,8 @@ func testGuardrailChain(ctx context.Context) {
 
 		err := chain.Check(ctx, input)
 		if err != nil {
-			if guardErr, ok := err.(*guardrails.GuardrailError); ok {
+			guardErr := &guardrails.GuardrailError{}
+			if errors.As(err, &guardErr) {
 				fmt.Printf("  ⚠️  %s: 被 %s 拦截\n", tc.name, guardErr.GuardrailName)
 			}
 		} else {

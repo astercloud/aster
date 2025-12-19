@@ -382,7 +382,7 @@ func (s *DefaultCompressionService) scoreSections(sections []string, preserveSec
 	}
 
 	// 按评分排序（高分在前）
-	for i := 0; i < len(result)-1; i++ {
+	for i := range len(result) - 1 {
 		for j := i + 1; j < len(result); j++ {
 			if result[j].score > result[i].score {
 				result[i], result[j] = result[j], result[i]

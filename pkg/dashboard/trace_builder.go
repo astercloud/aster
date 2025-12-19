@@ -134,9 +134,9 @@ func (tb *TraceBuilder) buildTraceSummary(sessionID string, events []types.Agent
 	traceID := uuid.New().String()
 
 	return &TraceSummary{
-		ID:        traceID,
-		Name:      "agent.run",
-		StartTime: startTime,
+		ID:         traceID,
+		Name:       "agent.run",
+		StartTime:  startTime,
 		DurationMs: endTime.Sub(startTime).Milliseconds(),
 		Status:     status,
 		SpanCount:  spanCount,

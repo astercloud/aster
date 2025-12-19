@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/astercloud/aster/pkg/actor"
@@ -20,6 +19,7 @@ import (
 
 type ActorSuite struct {
 	suite.Suite
+
 	system *actor.System
 }
 
@@ -48,12 +48,12 @@ func (s *ActorSuite) TestBasicPingPong() {
 	// 发送 Ping 并等待 Pong
 	resp, err := pid.Request(&PingMsg{Count: 42}, time.Second)
 
-	require.NoError(s.T(), err, "请求不应失败")
-	require.NotNil(s.T(), resp, "响应不应为空")
+	s.Require().NoError(err, "请求不应失败")
+	s.Require().NotNil(resp, "响应不应为空")
 
 	pong, ok := resp.(*PongMsg)
-	require.True(s.T(), ok, "响应应为 PongMsg")
-	assert.Equal(s.T(), 42, pong.Count, "计数应匹配")
+	s.Require().True(ok, "响应应为 PongMsg")
+	s.Equal(42, pong.Count, "计数应匹配")
 }
 
 func (s *ActorSuite) TestCounterConcurrency() {
@@ -77,11 +77,11 @@ func (s *ActorSuite) TestCounterConcurrency() {
 	numGoroutines := 10
 	incrementsPerGoroutine := 100
 
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		wg.Add(1)
 		go func() {
 			defer wg.Done()
-			for j := 0; j < incrementsPerGoroutine; j++ {
+			for range incrementsPerGoroutine {
 				pid.Tell(&IncrementMsg{Value: 1})
 			}
 		}()
@@ -97,7 +97,7 @@ func (s *ActorSuite) TestCounterConcurrency() {
 	select {
 	case count := <-replyCh:
 		expected := numGoroutines * incrementsPerGoroutine
-		assert.Equal(s.T(), expected, count, "并发计数应正确")
+		s.Equal(expected, count, "并发计数应正确")
 	case <-time.After(time.Second):
 		s.T().Fatal("获取计数超时")
 	}
@@ -121,23 +121,23 @@ func (s *ActorSuite) TestSupervisorRestart() {
 
 	// 第一次请求会触发 panic
 	_, err := pid.Request(&PingMsg{Count: 1}, 500*time.Millisecond)
-	assert.Error(s.T(), err, "第一次请求应超时（Actor panic）")
+	s.Error(err, "第一次请求应超时（Actor panic）")
 
 	time.Sleep(100 * time.Millisecond)
 
 	// 第二次请求也会触发 panic
 	_, err = pid.Request(&PingMsg{Count: 2}, 500*time.Millisecond)
-	assert.Error(s.T(), err, "第二次请求应超时（Actor panic）")
+	s.Error(err, "第二次请求应超时（Actor panic）")
 
 	time.Sleep(100 * time.Millisecond)
 
 	// 第三次请求应该成功（Actor 已恢复）
 	resp, err := pid.Request(&PingMsg{Count: 3}, time.Second)
-	require.NoError(s.T(), err, "第三次请求应成功")
+	s.Require().NoError(err, "第三次请求应成功")
 
 	pong, ok := resp.(*PongMsg)
-	require.True(s.T(), ok, "响应应为 PongMsg")
-	assert.Equal(s.T(), 3, pong.Count, "计数应匹配")
+	s.Require().True(ok, "响应应为 PongMsg")
+	s.Equal(3, pong.Count, "计数应匹配")
 }
 
 func (s *ActorSuite) TestPipeline() {
@@ -163,7 +163,7 @@ func (s *ActorSuite) TestPipeline() {
 	select {
 	case result := <-resultCh:
 		expected := "Input -> Stage1 -> Stage2 -> Stage3"
-		assert.Equal(s.T(), expected, result, "流水线结果应正确")
+		s.Equal(expected, result, "流水线结果应正确")
 	case <-time.After(5 * time.Second):
 		s.T().Fatal("流水线处理超时")
 	}
@@ -175,7 +175,7 @@ func (s *ActorSuite) TestBroadcast() {
 	subscribers := make([]*actor.PID, numSubscribers)
 	actorInstances := make([]*SubscriberActor, numSubscribers)
 
-	for i := 0; i < numSubscribers; i++ {
+	for i := range numSubscribers {
 		name := fmt.Sprintf("sub-%d", i)
 		sub := &SubscriberActor{name: name}
 		actorInstances[i] = sub
@@ -199,7 +199,7 @@ func (s *ActorSuite) TestBroadcast() {
 		sub.mu.Lock()
 		count := len(sub.received)
 		sub.mu.Unlock()
-		assert.Equal(s.T(), len(messages), count,
+		s.Equal(len(messages), count,
 			"订阅者 %d 应收到 %d 条消息", i, len(messages))
 	}
 }
@@ -213,7 +213,7 @@ func (s *ActorSuite) TestActorStats() {
 	time.Sleep(50 * time.Millisecond)
 
 	stats := s.system.Stats()
-	assert.Equal(s.T(), int64(3), stats.TotalActors, "应有 3 个 Actor")
+	s.Equal(int64(3), stats.TotalActors, "应有 3 个 Actor")
 }
 
 func (s *ActorSuite) TestActorStop() {
@@ -222,7 +222,7 @@ func (s *ActorSuite) TestActorStop() {
 
 	// Actor 应该存在
 	_, exists := s.system.GetActor("echo")
-	assert.True(s.T(), exists, "Actor 应存在")
+	s.True(exists, "Actor 应存在")
 
 	// 停止 Actor
 	s.system.Stop(pid)
@@ -230,7 +230,7 @@ func (s *ActorSuite) TestActorStop() {
 
 	// Actor 应该不存在
 	_, exists = s.system.GetActor("echo")
-	assert.False(s.T(), exists, "Actor 应已停止")
+	s.False(exists, "Actor 应已停止")
 }
 
 // =============================================================================
@@ -244,8 +244,7 @@ func BenchmarkActorTell(b *testing.B) {
 	counter := &CounterActor{name: "counter"}
 	pid := system.Spawn(counter, "counter")
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		pid.Tell(&IncrementMsg{Value: 1})
 	}
 }
@@ -257,8 +256,7 @@ func BenchmarkActorRequest(b *testing.B) {
 	echo := &EchoActor{name: "echo"}
 	pid := system.Spawn(echo, "echo")
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		_, _ = pid.Request(&PingMsg{Count: i}, time.Second)
 	}
 }
@@ -311,7 +309,7 @@ func TestActorHighThroughput(t *testing.T) {
 	numMessages := 100000
 	start := time.Now()
 
-	for i := 0; i < numMessages; i++ {
+	for range numMessages {
 		pid.Tell(&IncrementMsg{Value: 1})
 	}
 

@@ -368,7 +368,7 @@ func (m *MultiLevelCompressor) compressByTurns(ctx context.Context, messages []a
 		// 添加总结
 		compressed = append(compressed, agentext.Message{
 			Role:    "assistant",
-			Content: fmt.Sprintf("[对话轮次总结] %s", summary),
+			Content: "[对话轮次总结] " + summary,
 		})
 	}
 

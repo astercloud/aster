@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -135,7 +136,7 @@ func (h *RoomHandler) Get(c *gin.Context) {
 
 	var room RoomRecord
 	if err := (*h.store).Get(ctx, "rooms", id, &room); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -171,7 +172,7 @@ func (h *RoomHandler) Delete(c *gin.Context) {
 
 	// Delete from store
 	if err := (*h.store).Delete(ctx, "rooms", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

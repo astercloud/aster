@@ -6,6 +6,7 @@ import (
 	"context"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/astercloud/aster/pkg/session"
@@ -269,7 +270,7 @@ func queryExample(ctx context.Context, service *postgres.Service, userID string)
 // 辅助函数
 
 func generateID() string {
-	return fmt.Sprintf("%d", time.Now().UnixNano())
+	return strconv.FormatInt(time.Now().UnixNano(), 10)
 }
 
 func truncate(s string, maxLen int) string {

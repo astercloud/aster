@@ -2,6 +2,7 @@ package sqlite
 
 import (
 	"context"
+	"errors"
 	"os"
 	"path/filepath"
 	"testing"
@@ -80,7 +81,7 @@ func TestService(t *testing.T) {
 			UserID:    "user-1",
 			SessionID: "non-existent",
 		})
-		if err != session.ErrSessionNotFound {
+		if !errors.Is(err, session.ErrSessionNotFound) {
 			t.Errorf("Expected ErrSessionNotFound, got %v", err)
 		}
 	})
@@ -124,7 +125,7 @@ func TestService(t *testing.T) {
 	// Test List
 	t.Run("List", func(t *testing.T) {
 		// Create multiple sessions
-		for i := 0; i < 3; i++ {
+		for range 3 {
 			_, _ = svc.Create(ctx, &session.CreateRequest{
 				AppName: "list-app",
 				UserID:  "list-user",
@@ -163,7 +164,7 @@ func TestService(t *testing.T) {
 			UserID:    "user-1",
 			SessionID: created.ID(),
 		})
-		if err != session.ErrSessionNotFound {
+		if !errors.Is(err, session.ErrSessionNotFound) {
 			t.Error("Session should be deleted")
 		}
 	})
@@ -294,7 +295,7 @@ func TestState(t *testing.T) {
 	// Test Get not found
 	t.Run("GetNotFound", func(t *testing.T) {
 		_, err := state.Get("non-existent")
-		if err != session.ErrStateKeyNotExist {
+		if !errors.Is(err, session.ErrStateKeyNotExist) {
 			t.Errorf("Expected ErrStateKeyNotExist, got %v", err)
 		}
 	})

@@ -2,7 +2,9 @@ package culture
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -731,9 +733,7 @@ func (cc *CultureContext) Clone() *CultureContext {
 	copy(clone.Resources, cc.Resources)
 	copy(clone.Stakeholders, cc.Stakeholders)
 
-	for k, v := range cc.Attributes {
-		clone.Attributes[k] = v
-	}
+	maps.Copy(clone.Attributes, cc.Attributes)
 
 	return clone
 }
@@ -976,7 +976,7 @@ const (
 	PlanStatusApproved   PlanStatus = "approved"    // 已批准
 	PlanStatusInProgress PlanStatus = "in_progress" // 进行中
 	PlanStatusCompleted  PlanStatus = "completed"   // 已完成
-	PlanStatusCancelled  PlanStatus = "cancelled"   // 已取消
+	PlanStatusCancelled  PlanStatus = "canceled"    // 已取消
 	PlanStatusSuspended  PlanStatus = "suspended"   // 已暂停
 )
 
@@ -1405,11 +1405,11 @@ func (c *Culture) Validate() error {
 	defer c.mu.RUnlock()
 
 	if c.ID == "" {
-		return fmt.Errorf("culture ID is required")
+		return errors.New("culture ID is required")
 	}
 
 	if c.Name == "" {
-		return fmt.Errorf("culture name is required")
+		return errors.New("culture name is required")
 	}
 
 	// 验证维度值范围
@@ -1468,9 +1468,7 @@ func (c *Culture) Clone() *Culture {
 	copy(clone.Tags, c.Tags)
 
 	// 复制map
-	for k, v := range c.Metadata {
-		clone.Metadata[k] = v
-	}
+	maps.Copy(clone.Metadata, c.Metadata)
 
 	if c.Context != nil {
 		clone.Context = c.Context.Clone()

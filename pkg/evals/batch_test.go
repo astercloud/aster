@@ -91,7 +91,7 @@ func TestRunBatchConcurrent(t *testing.T) {
 
 	// 创建多个测试用例
 	testCases := make([]*BatchTestCase, 10)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		testCases[i] = &BatchTestCase{
 			ID: string(rune('A' + i)),
 			Input: &TextEvalInput{
@@ -127,7 +127,7 @@ func TestRunBatch_ProgressCallback(t *testing.T) {
 	}
 
 	testCases := make([]*BatchTestCase, 5)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		testCases[i] = &BatchTestCase{
 			ID:    string(rune('A' + i)),
 			Input: &TextEvalInput{Answer: "测试"},
@@ -181,7 +181,7 @@ func TestRunBatch_StopOnError(t *testing.T) {
 	failingScorer := &failingTestScorer{}
 
 	testCases := make([]*BatchTestCase, 5)
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		testCases[i] = &BatchTestCase{
 			ID:    string(rune('A' + i)),
 			Input: &TextEvalInput{Answer: "测试"},

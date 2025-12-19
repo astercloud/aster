@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 
@@ -202,9 +203,7 @@ func (p *Pool) ForEach(fn func(agentID string, ag *agent.Agent) error) error {
 	p.mu.RLock()
 	// 复制一份避免长时间持锁
 	agents := make(map[string]*agent.Agent, len(p.agents))
-	for id, ag := range p.agents {
-		agents[id] = ag
-	}
+	maps.Copy(agents, p.agents)
 	p.mu.RUnlock()
 
 	for id, ag := range agents {

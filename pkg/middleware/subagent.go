@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 	"sync"
 	"time"
 
@@ -67,6 +69,7 @@ type SubAgentMiddlewareConfig struct {
 // 7. 支持资源监控和限制
 type SubAgentMiddleware struct {
 	*BaseMiddleware
+
 	agents                 map[string]SubAgent
 	factory                SubAgentFactory
 	manager                builtin.SubagentManager
@@ -256,12 +259,12 @@ func (t *TaskTool) InputSchema() map[string]any {
 func (t *TaskTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	description, ok := input["description"].(string)
 	if !ok {
-		return nil, fmt.Errorf("description must be a string")
+		return nil, errors.New("description must be a string")
 	}
 
 	subagentType, ok := input["subagent_type"].(string)
 	if !ok {
-		return nil, fmt.Errorf("subagent_type must be a string")
+		return nil, errors.New("subagent_type must be a string")
 	}
 
 	// 获取上下文(可选)
@@ -361,9 +364,11 @@ func (t *TaskTool) Prompt() string {
 	// 获取可用的子代理列表
 	subagentTypes := t.middleware.ListSubAgents()
 	agentList := "可用的子代理类型:\n"
+	var agentListSb364 strings.Builder
 	for _, name := range subagentTypes {
-		agentList += fmt.Sprintf("  - %s\n", name)
+		agentListSb364.WriteString(fmt.Sprintf("  - %s\n", name))
 	}
+	agentList += agentListSb364.String()
 
 	return fmt.Sprintf(`启动短生命周期的子代理来处理复杂的、多步骤的独立任务,实现上下文隔离。
 
@@ -622,7 +627,7 @@ func (t *QuerySubagentTool) InputSchema() map[string]any {
 func (t *QuerySubagentTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	taskID, ok := input["task_id"].(string)
 	if !ok {
-		return nil, fmt.Errorf("task_id must be a string")
+		return nil, errors.New("task_id must be a string")
 	}
 
 	// 获取子代理实例
@@ -721,7 +726,7 @@ func (t *StopSubagentTool) InputSchema() map[string]any {
 func (t *StopSubagentTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	taskID, ok := input["task_id"].(string)
 	if !ok {
-		return nil, fmt.Errorf("task_id must be a string")
+		return nil, errors.New("task_id must be a string")
 	}
 
 	// 停止子代理
@@ -788,7 +793,7 @@ func (t *ResumeSubagentTool) InputSchema() map[string]any {
 func (t *ResumeSubagentTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	taskID, ok := input["task_id"].(string)
 	if !ok {
-		return nil, fmt.Errorf("task_id must be a string")
+		return nil, errors.New("task_id must be a string")
 	}
 
 	// 恢复子代理

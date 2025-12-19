@@ -48,9 +48,9 @@ func main() {
     app, _ := desktop.NewApp(&desktop.AppConfig{
         Framework: desktop.FrameworkWails,
     })
-    
+
     // ... create and register agent ...
-    
+
     wails.Run(&options.App{
         Title:  "Aster Desktop",
         Width:  1024,
@@ -91,7 +91,7 @@ fn main() {
         .args(["--framework", "tauri", "--port", "9528"])
         .spawn()
         .expect("Failed to start Aster");
-    
+
     tauri::Builder::default()
         .run(tauri::generate_context!())
         .expect("error while running tauri application");
@@ -114,27 +114,27 @@ export async function chat(agentId, message) {
 // SSE for streaming events
 export function subscribeEvents(onEvent) {
     const eventSource = new EventSource(`${API_URL}/api/events`);
-    
+
     eventSource.addEventListener('text_chunk', (e) => {
         const data = JSON.parse(e.data);
         onEvent('text_chunk', data);
     });
-    
+
     eventSource.addEventListener('tool_start', (e) => {
         const data = JSON.parse(e.data);
         onEvent('tool_start', data);
     });
-    
+
     eventSource.addEventListener('tool_end', (e) => {
         const data = JSON.parse(e.data);
         onEvent('tool_end', data);
     });
-    
+
     eventSource.addEventListener('approval_required', (e) => {
         const data = JSON.parse(e.data);
         onEvent('approval_required', data);
     });
-    
+
     return () => eventSource.close();
 }
 ```
@@ -154,7 +154,7 @@ let asterProcess;
 function startAster() {
     const asterPath = path.join(__dirname, 'aster-desktop');
     asterProcess = spawn(asterPath, ['--framework', 'electron', '--port', '9527']);
-    
+
     asterProcess.stdout.on('data', (data) => {
         console.log(`Aster: ${data}`);
     });
@@ -162,7 +162,7 @@ function startAster() {
 
 app.whenReady().then(() => {
     startAster();
-    
+
     const win = new BrowserWindow({
         width: 1024,
         height: 768,
@@ -170,7 +170,7 @@ app.whenReady().then(() => {
             preload: path.join(__dirname, 'preload.js'),
         },
     });
-    
+
     win.loadFile('index.html');
 });
 
@@ -196,7 +196,7 @@ contextBridge.exposeInMainWorld('aster', {
         });
         return res.json();
     },
-    
+
     cancel: async (agentId) => {
         const res = await fetch(`${API_URL}/api/cancel`, {
             method: 'POST',
@@ -205,7 +205,7 @@ contextBridge.exposeInMainWorld('aster', {
         });
         return res.json();
     },
-    
+
     approve: async (agentId, callId, decision, note) => {
         const res = await fetch(`${API_URL}/api/approve`, {
             method: 'POST',
@@ -219,17 +219,17 @@ contextBridge.exposeInMainWorld('aster', {
         });
         return res.json();
     },
-    
+
     subscribeEvents: (onEvent) => {
         const eventSource = new EventSource(`${API_URL}/api/events`);
-        
+
         ['text_chunk', 'tool_start', 'tool_end', 'approval_required', 'error', 'done']
             .forEach(type => {
                 eventSource.addEventListener(type, (e) => {
                     onEvent(type, JSON.parse(e.data));
                 });
             });
-        
+
         return () => eventSource.close();
     },
 });

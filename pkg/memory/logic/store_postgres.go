@@ -4,7 +4,9 @@ import (
 	"context"
 	"database/sql"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strings"
 	"time"
 
 	"github.com/astercloud/aster/pkg/memory"
@@ -32,11 +34,11 @@ type PostgreSQLStoreConfig struct {
 // NewPostgreSQLStore 创建 PostgreSQL 存储
 func NewPostgreSQLStore(config *PostgreSQLStoreConfig) (*PostgreSQLStore, error) {
 	if config == nil {
-		return nil, fmt.Errorf("config is required")
+		return nil, errors.New("config is required")
 	}
 
 	if config.DB == nil {
-		return nil, fmt.Errorf("database connection is required")
+		return nil, errors.New("database connection is required")
 	}
 
 	tableName := config.TableName
@@ -460,9 +462,11 @@ func (s *PostgreSQLStore) Prune(ctx context.Context, criteria PruneCriteria) (in
 		WHERE %s
 	`, s.tableName, conditions[0])
 
+	var querySb463 strings.Builder
 	for i := 1; i < len(conditions); i++ {
-		query += " OR " + conditions[i]
+		querySb463.WriteString(" OR " + conditions[i])
 	}
+	query += querySb463.String()
 
 	result, err := s.db.ExecContext(ctx, query, args...)
 	if err != nil {

@@ -74,6 +74,7 @@ type HumanInTheLoopMiddlewareConfig struct {
 // 4. 灵活的审核配置
 type HumanInTheLoopMiddleware struct {
 	*BaseMiddleware
+
 	interruptConfigs        map[string]*InterruptConfig
 	approvalHandler         ApprovalHandler
 	defaultAllowedDecisions []DecisionType
@@ -231,7 +232,7 @@ func (m *HumanInTheLoopMiddleware) WrapToolCall(ctx context.Context, req *ToolCa
 				"ok":       false,
 				"rejected": true,
 				"reason":   decision.Reason,
-				"message":  fmt.Sprintf("Tool execution rejected by human reviewer: %s", decision.Reason),
+				"message":  "Tool execution rejected by human reviewer: " + decision.Reason,
 			},
 		}, nil
 

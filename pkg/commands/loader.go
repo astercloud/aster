@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -48,7 +49,7 @@ func (cl *CommandLoader) parse(name, content string) (*CommandDefinition, error)
 	// 格式: ---\nyaml\n---\nmarkdown
 	parts := strings.Split(content, "---")
 	if len(parts) < 3 {
-		return nil, fmt.Errorf("invalid command format: missing YAML frontmatter")
+		return nil, errors.New("invalid command format: missing YAML frontmatter")
 	}
 
 	cmd := &CommandDefinition{

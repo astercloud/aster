@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"errors"
 	"fmt"
 	"reflect"
 	"strings"
@@ -12,7 +13,7 @@ import (
 func getFirstTodoID(result map[string]any) (string, error) {
 	todos, exists := result["todos"]
 	if !exists {
-		return "", fmt.Errorf("result does not contain 'todos' field")
+		return "", errors.New("result does not contain 'todos' field")
 	}
 
 	// 使用反射处理不同类型的切片
@@ -22,7 +23,7 @@ func getFirstTodoID(result map[string]any) (string, error) {
 	}
 
 	if reflectVal.Len() == 0 {
-		return "", fmt.Errorf("no todos found")
+		return "", errors.New("no todos found")
 	}
 
 	// 获取第一个元素
@@ -45,7 +46,7 @@ func getFirstTodoID(result map[string]any) (string, error) {
 	// 从map中获取ID
 	id, exists := todoMap["id"]
 	if !exists {
-		return "", fmt.Errorf("todo item does not have 'id' field")
+		return "", errors.New("todo item does not have 'id' field")
 	}
 
 	idStr, ok := id.(string)
@@ -581,13 +582,13 @@ func TestTodoWriteTool_ConcurrentOperations(t *testing.T) {
 
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("TodoWrite operation failed")
+			return errors.New("TodoWrite operation failed")
 		}
 
 		// 验证todo被创建
 		todos := result["todos"].([]any)
 		if len(todos) == 0 {
-			return fmt.Errorf("No todos created")
+			return errors.New("No todos created")
 		}
 
 		return nil

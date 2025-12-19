@@ -567,7 +567,7 @@ func TestConcurrentRequests(t *testing.T) {
 	const numRequests = 10
 	done := make(chan int, numRequests)
 
-	for i := 0; i < numRequests; i++ {
+	for i := range numRequests {
 		go func(id int) {
 			defer func() {
 				if r := recover(); r != nil {

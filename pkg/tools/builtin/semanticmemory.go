@@ -2,7 +2,7 @@ package builtin
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/astercloud/aster/pkg/memory"
 	"github.com/astercloud/aster/pkg/tools"
@@ -73,12 +73,12 @@ func (t *SemanticSearchTool) InputSchema() map[string]any {
 
 func (t *SemanticSearchTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	if t.sm == nil || !t.sm.Enabled() {
-		return nil, fmt.Errorf("semantic memory not configured")
+		return nil, errors.New("semantic memory not configured")
 	}
 
 	rawQuery, _ := input["query"].(string)
 	if rawQuery == "" {
-		return nil, fmt.Errorf("query is required")
+		return nil, errors.New("query is required")
 	}
 
 	// 可选 top_k

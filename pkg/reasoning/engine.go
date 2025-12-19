@@ -179,11 +179,13 @@ func (e *Engine) buildStepPrompt(chain *Chain, basePrompt string) string {
 func (e *Engine) parseStepResponse(response *provider.CompleteResponse) (*Step, error) {
 	// 提取文本内容
 	text := ""
+	var textSb182 strings.Builder
 	for _, block := range response.Message.ContentBlocks {
 		if textBlock, ok := block.(*types.TextBlock); ok {
-			text += textBlock.Text
+			textSb182.WriteString(textBlock.Text)
 		}
 	}
+	text += textSb182.String()
 
 	// 尝试 JSON 解析
 	if e.config.UseJSON {

@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net"
@@ -32,11 +33,11 @@ type CustomClaudeProvider struct {
 // NewCustomClaudeProvider 创建自定义 Claude 提供商
 func NewCustomClaudeProvider(config *types.ModelConfig) (*CustomClaudeProvider, error) {
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("api key is required")
+		return nil, errors.New("api key is required")
 	}
 
 	if config.BaseURL == "" {
-		return nil, fmt.Errorf("base url is required for custom claude provider")
+		return nil, errors.New("base url is required for custom claude provider")
 	}
 
 	// 配置 HTTP 客户端超时，避免无限等待
@@ -74,14 +75,14 @@ func (cp *CustomClaudeProvider) Complete(ctx context.Context, messages []types.M
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", cp.getEndpoint(), bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cp.getEndpoint(), bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", cp.config.APIKey)
-	req.Header.Set("anthropic-version", cp.version)
+	req.Header.Set("X-Api-Key", cp.config.APIKey)
+	req.Header.Set("Anthropic-Version", cp.version)
 
 	resp, err := cp.client.Do(req)
 	if err != nil {
@@ -131,14 +132,14 @@ func (cp *CustomClaudeProvider) Stream(ctx context.Context, messages []types.Mes
 		"preview": string(jsonData[:min(len(jsonData), 2000)]),
 	})
 
-	req, err := http.NewRequestWithContext(ctx, "POST", cp.getEndpoint(), bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, cp.getEndpoint(), bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
 
 	req.Header.Set("Content-Type", "application/json")
-	req.Header.Set("x-api-key", cp.config.APIKey)
-	req.Header.Set("anthropic-version", cp.version)
+	req.Header.Set("X-Api-Key", cp.config.APIKey)
+	req.Header.Set("Anthropic-Version", cp.version)
 
 	resp, err := cp.client.Do(req)
 	if err != nil {
@@ -151,7 +152,7 @@ func (cp *CustomClaudeProvider) Stream(ctx context.Context, messages []types.Mes
 		// 调试：当出错时打印完整请求体
 		// 对于 400 错误，打印更多内容以便诊断 invalid JSON body 问题
 		previewLen := 5000
-		if resp.StatusCode == 400 {
+		if resp.StatusCode == http.StatusBadRequest {
 			previewLen = 20000 // 400 错误时打印更多内容
 		}
 		customClaudeLog.Error(ctx, "API request failed", map[string]any{
@@ -161,7 +162,7 @@ func (cp *CustomClaudeProvider) Stream(ctx context.Context, messages []types.Mes
 			"request_body": string(jsonData[:min(len(jsonData), previewLen)]),
 		})
 		// 如果是 400 错误且包含 invalid JSON，额外打印请求体的最后部分（可能是截断位置）
-		if resp.StatusCode == 400 && len(jsonData) > previewLen {
+		if resp.StatusCode == http.StatusBadRequest && len(jsonData) > previewLen {
 			customClaudeLog.Error(ctx, "API request body tail (for invalid JSON diagnosis)", map[string]any{
 				"tail": string(jsonData[max(0, len(jsonData)-5000):]),
 			})
@@ -384,7 +385,7 @@ func (cp *CustomClaudeProvider) processStream(body io.ReadCloser, chunkCh chan<-
 		data := strings.TrimPrefix(line, "data: ")
 		if data == "[DONE]" {
 			customClaudeLog.Info(context.Background(), "stream done", map[string]any{
-				"total_lines":       lineCount,
+				"total_lines":        lineCount,
 				"tool_input_buffers": toolInputBuffers,
 			})
 			break
@@ -402,7 +403,7 @@ func (cp *CustomClaudeProvider) processStream(body io.ReadCloser, chunkCh chan<-
 
 		// 调试：记录所有事件类型和完整内容
 		eventType, _ := event["type"].(string)
-		
+
 		// 记录所有事件的完整内容（用于调试中转站格式）
 		// 使用 Debug 级别避免生产环境日志过于冗长
 		customClaudeLog.Debug(context.Background(), "SSE EVENT", map[string]any{
@@ -495,11 +496,11 @@ func (cp *CustomClaudeProvider) parseStreamEvent(event map[string]any) *StreamCh
 				// 某些中转站可能不发送 input_json_delta，而是直接在这里提供完整的 input
 				if input, ok := contentBlock["input"].(map[string]any); ok && len(input) > 0 {
 					customClaudeLog.Info(context.Background(), "tool_use block start with input", map[string]any{
-						"index":       chunk.Index,
-						"tool_id":     contentBlock["id"],
-						"tool_name":   contentBlock["name"],
-						"input_keys":  len(input),
-						"has_input":   true,
+						"index":      chunk.Index,
+						"tool_id":    contentBlock["id"],
+						"tool_name":  contentBlock["name"],
+						"input_keys": len(input),
+						"has_input":  true,
 					})
 				} else {
 					customClaudeLog.Debug(context.Background(), "tool_use block start without input", map[string]any{
@@ -593,7 +594,7 @@ func (cp *CustomClaudeProvider) parseCompleteResponse(apiResp map[string]any) (t
 
 	content, ok := apiResp["content"].([]any)
 	if !ok || len(content) == 0 {
-		return types.Message{}, fmt.Errorf("no content in response")
+		return types.Message{}, errors.New("no content in response")
 	}
 
 	for _, item := range content {

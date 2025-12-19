@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -15,6 +16,7 @@ var soLog = logging.ForComponent("StructuredOutputMiddleware")
 // - 若解析失败: 根据配置决定是否回退；错误记录在 Metadata["structured_error"]
 type StructuredOutputMiddleware struct {
 	*BaseMiddleware
+
 	spec       structured.OutputSpec
 	parser     structured.Parser
 	allowError bool
@@ -31,7 +33,7 @@ type StructuredOutputMiddlewareConfig struct {
 // NewStructuredOutputMiddleware 创建中间件实例
 func NewStructuredOutputMiddleware(cfg *StructuredOutputMiddlewareConfig) (*StructuredOutputMiddleware, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("structured output config is nil")
+		return nil, errors.New("structured output config is nil")
 	}
 
 	parser := cfg.Parser

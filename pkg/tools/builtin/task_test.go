@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"errors"
 	"fmt"
 	"strings"
 	"testing"
@@ -267,13 +268,13 @@ func TestTaskTool_ConcurrentSubagentLaunch(t *testing.T) {
 
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("Task launch failed")
+			return errors.New("Task launch failed")
 		}
 
 		// 验证task_id不为空
 		taskID := result["task_id"].(string)
 		if taskID == "" {
-			return fmt.Errorf("Empty task_id returned")
+			return errors.New("Empty task_id returned")
 		}
 
 		return nil

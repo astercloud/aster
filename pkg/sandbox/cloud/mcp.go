@@ -64,7 +64,7 @@ func (mc *MCPClient) CallTool(ctx context.Context, toolName string, params map[s
 	}
 
 	// 创建 HTTP 请求
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", mc.endpoint, bytes.NewReader(reqBody))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, mc.endpoint, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -122,7 +122,7 @@ func (mc *MCPClient) ListTools(ctx context.Context) ([]MCPTool, error) {
 		return nil, fmt.Errorf("marshal request: %w", err)
 	}
 
-	httpReq, err := http.NewRequestWithContext(ctx, "POST", mc.endpoint, bytes.NewReader(reqBody))
+	httpReq, err := http.NewRequestWithContext(ctx, http.MethodPost, mc.endpoint, bytes.NewReader(reqBody))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}

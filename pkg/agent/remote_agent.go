@@ -2,7 +2,9 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -75,7 +77,7 @@ func (r *RemoteAgent) Status() *types.AgentStatus {
 // 这是 RemoteAgent 的核心方法,用于接收来自远程进程的事件
 func (r *RemoteAgent) PushEvent(envelope types.AgentEventEnvelope) error {
 	if envelope.Event == nil {
-		return fmt.Errorf("event is nil")
+		return errors.New("event is nil")
 	}
 
 	// 根据事件类型推送到对应的通道
@@ -201,9 +203,7 @@ func (r *RemoteAgent) GetMetadata() map[string]any {
 	defer r.mu.RUnlock()
 
 	result := make(map[string]any)
-	for k, v := range r.metadata {
-		result[k] = v
-	}
+	maps.Copy(result, r.metadata)
 	return result
 }
 
@@ -222,22 +222,22 @@ func (r *RemoteAgent) SetMetadata(key string, value any) {
 
 // Send 不支持 - RemoteAgent 不执行实际的 LLM 调用
 func (r *RemoteAgent) Send(ctx context.Context, text string) error {
-	return fmt.Errorf("RemoteAgent does not support Send operation")
+	return errors.New("RemoteAgent does not support Send operation")
 }
 
 // Chat 不支持 - RemoteAgent 不执行实际的 LLM 调用
 func (r *RemoteAgent) Chat(ctx context.Context, text string) (*types.CompleteResult, error) {
-	return nil, fmt.Errorf("RemoteAgent does not support Chat operation")
+	return nil, errors.New("RemoteAgent does not support Chat operation")
 }
 
 // ExecuteToolDirect 不支持 - RemoteAgent 不执行工具
 func (r *RemoteAgent) ExecuteToolDirect(ctx context.Context, toolName string, input map[string]any) (any, error) {
-	return nil, fmt.Errorf("RemoteAgent does not support ExecuteToolDirect operation")
+	return nil, errors.New("RemoteAgent does not support ExecuteToolDirect operation")
 }
 
 // RespondToPermissionRequest 不支持 - 权限管理在远程端
 func (r *RemoteAgent) RespondToPermissionRequest(callID string, approved bool) error {
-	return fmt.Errorf("RemoteAgent does not support RespondToPermissionRequest operation")
+	return errors.New("RemoteAgent does not support RespondToPermissionRequest operation")
 }
 
 // HasPendingPermission 不支持 - 权限管理在远程端

@@ -3,7 +3,9 @@ package knowledge
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -95,19 +97,19 @@ func (r *redactionStrategy) Sanitize(item *KnowledgeItem) *KnowledgeItem {
 // NewManager 创建知识管理器
 func NewManager(config *ManagerConfig) (Manager, error) {
 	if config == nil {
-		return nil, fmt.Errorf("knowledge: config cannot be nil")
+		return nil, errors.New("knowledge: config cannot be nil")
 	}
 
 	if config.MemoryManager == nil {
-		return nil, fmt.Errorf("knowledge: memory manager is required")
+		return nil, errors.New("knowledge: memory manager is required")
 	}
 
 	if config.VectorStore == nil {
-		return nil, fmt.Errorf("knowledge: vector store is required")
+		return nil, errors.New("knowledge: vector store is required")
 	}
 
 	if config.Embedder == nil && config.AutoEmbed {
-		return nil, fmt.Errorf("knowledge: embedder is required when auto embed is enabled")
+		return nil, errors.New("knowledge: embedder is required when auto embed is enabled")
 	}
 
 	m := &manager{
@@ -163,7 +165,7 @@ func (m *manager) Start(ctx context.Context) error {
 	defer m.mu.Unlock()
 
 	if m.running {
-		return fmt.Errorf("knowledge: manager is already running")
+		return errors.New("knowledge: manager is already running")
 	}
 
 	m.running = true
@@ -180,7 +182,7 @@ func (m *manager) Stop(ctx context.Context) error {
 	defer m.mu.Unlock()
 
 	if !m.running {
-		return fmt.Errorf("knowledge: manager is not running")
+		return errors.New("knowledge: manager is not running")
 	}
 
 	m.running = false
@@ -198,11 +200,11 @@ func (m *manager) Stop(ctx context.Context) error {
 // Add 添加知识项
 func (m *manager) Add(ctx context.Context, item *KnowledgeItem) error {
 	if item == nil {
-		return fmt.Errorf("knowledge: item cannot be nil")
+		return errors.New("knowledge: item cannot be nil")
 	}
 
 	if item.ID == "" {
-		return fmt.Errorf("knowledge: item ID cannot be empty")
+		return errors.New("knowledge: item ID cannot be empty")
 	}
 
 	m.mu.Lock()
@@ -282,7 +284,7 @@ func (m *manager) Add(ctx context.Context, item *KnowledgeItem) error {
 
 	// 记录审计
 	if m.config.EnableAudit {
-		m.audit("add", "", item.ID, fmt.Sprintf("Added knowledge item: %s", item.Title))
+		m.audit("add", "", item.ID, "Added knowledge item: "+item.Title)
 	}
 
 	return nil
@@ -316,7 +318,7 @@ func (m *manager) Get(ctx context.Context, id string) (*KnowledgeItem, error) {
 
 	// 记录审计
 	if m.config.EnableAudit {
-		m.audit("get", "", item.ID, fmt.Sprintf("Retrieved knowledge item: %s", item.Title))
+		m.audit("get", "", item.ID, "Retrieved knowledge item: "+item.Title)
 	}
 
 	return item, nil
@@ -325,11 +327,11 @@ func (m *manager) Get(ctx context.Context, id string) (*KnowledgeItem, error) {
 // Update 更新知识项
 func (m *manager) Update(ctx context.Context, item *KnowledgeItem) error {
 	if item == nil {
-		return fmt.Errorf("knowledge: item cannot be nil")
+		return errors.New("knowledge: item cannot be nil")
 	}
 
 	if item.ID == "" {
-		return fmt.Errorf("knowledge: item ID cannot be empty")
+		return errors.New("knowledge: item ID cannot be empty")
 	}
 
 	m.mu.Lock()
@@ -400,7 +402,7 @@ func (m *manager) Update(ctx context.Context, item *KnowledgeItem) error {
 
 	// 记录审计
 	if m.config.EnableAudit {
-		m.audit("update", "", item.ID, fmt.Sprintf("Updated knowledge item: %s", item.Title))
+		m.audit("update", "", item.ID, "Updated knowledge item: "+item.Title)
 	}
 
 	return nil
@@ -438,7 +440,7 @@ func (m *manager) Delete(ctx context.Context, id string) error {
 
 	// 记录审计
 	if m.config.EnableAudit {
-		m.audit("delete", "", id, fmt.Sprintf("Deleted knowledge item: %s", item.Title))
+		m.audit("delete", "", id, "Deleted knowledge item: "+item.Title)
 	}
 
 	return nil
@@ -447,15 +449,13 @@ func (m *manager) Delete(ctx context.Context, id string) error {
 // Search 搜索知识
 func (m *manager) Search(ctx context.Context, query *SearchQuery) ([]*SearchResult, error) {
 	if query == nil {
-		return nil, fmt.Errorf("knowledge: search query cannot be nil")
+		return nil, errors.New("knowledge: search query cannot be nil")
 	}
 
 	// 轻量路径：仅使用向量检索，避开复杂策略
 	if m.corePipeline != nil && (query.Strategy == "" || query.Strategy == StrategyVector) {
 		meta := map[string]any{}
-		for k, v := range query.Filters {
-			meta[k] = v
-		}
+		maps.Copy(meta, query.Filters)
 		if query.Namespace != "" {
 			meta["namespace"] = query.Namespace
 		}
@@ -524,7 +524,7 @@ func (m *manager) SearchSimilar(ctx context.Context, id string, maxResults int) 
 	}
 
 	if len(item.Embedding) == 0 && m.corePipeline == nil {
-		return nil, fmt.Errorf("knowledge: item has no embedding for similarity search")
+		return nil, errors.New("knowledge: item has no embedding for similarity search")
 	}
 
 	// 优先使用原有向量
@@ -549,7 +549,7 @@ func (m *manager) SearchSimilar(ctx context.Context, id string, maxResults int) 
 		return convertCoreHits(hits), nil
 	}
 
-	return nil, fmt.Errorf("knowledge: no embedding available for similarity search")
+	return nil, errors.New("knowledge: no embedding available for similarity search")
 }
 
 // AddRelation 添加知识关系
@@ -580,7 +580,7 @@ func (m *manager) AddRelation(ctx context.Context, fromID, toID string, relation
 	// 检查关系是否已存在
 	for _, existing := range fromItem.Relations {
 		if existing.Type == relationType && existing.TargetID == toID {
-			return fmt.Errorf("knowledge: relation already exists")
+			return errors.New("knowledge: relation already exists")
 		}
 	}
 
@@ -622,7 +622,7 @@ func (m *manager) RemoveRelation(ctx context.Context, fromID, toID string, relat
 	}
 
 	if !removed {
-		return fmt.Errorf("knowledge: relation not found")
+		return errors.New("knowledge: relation not found")
 	}
 
 	item.Relations = relations
@@ -764,7 +764,7 @@ func (m *manager) Compress(ctx context.Context, namespace string) error {
 	// 2. 合并相似知识
 	// 3. 删除低质量知识
 	// 4. 更新关系
-	return fmt.Errorf("knowledge: compression not yet implemented")
+	return errors.New("knowledge: compression not yet implemented")
 }
 
 // Reason 知识推理
@@ -774,7 +774,7 @@ func (m *manager) Reason(ctx context.Context, query string, maxSteps int) ([]*Kn
 	// 2. 搜索相关知识
 	// 3. 应用推理规则
 	// 4. 生成推理链
-	return nil, nil, fmt.Errorf("knowledge: reasoning not yet implemented")
+	return nil, nil, errors.New("knowledge: reasoning not yet implemented")
 }
 
 // 辅助方法
@@ -782,7 +782,7 @@ func (m *manager) Reason(ctx context.Context, query string, maxSteps int) ([]*Kn
 // generateEmbedding 生成向量嵌入
 func (m *manager) generateEmbedding(ctx context.Context, item *KnowledgeItem) ([]float32, error) {
 	if m.embedder == nil {
-		return nil, fmt.Errorf("knowledge: no embedder available")
+		return nil, errors.New("knowledge: no embedder available")
 	}
 
 	text := item.Content
@@ -795,7 +795,7 @@ func (m *manager) generateEmbedding(ctx context.Context, item *KnowledgeItem) ([
 		return nil, fmt.Errorf("knowledge: embed failed: %w", err)
 	}
 	if len(embeddings) == 0 {
-		return nil, fmt.Errorf("knowledge: no embedding generated")
+		return nil, errors.New("knowledge: no embedding generated")
 	}
 	embedding := embeddings[0]
 

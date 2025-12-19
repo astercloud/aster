@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -33,6 +34,7 @@ type TodoItem struct {
 // 3. 引导 Agent 使用任务分解策略
 type TodoListMiddleware struct {
 	*BaseMiddleware
+
 	todos       []TodoItem
 	storeGetter func() any       // 获取当前任务列表
 	storeSetter func([]TodoItem) // 设置任务列表
@@ -168,7 +170,7 @@ func (t *WriteTodosTool) Execute(ctx context.Context, input map[string]any, tc *
 	// 解析 todos 列表
 	todosInterface, ok := input["todos"].([]any)
 	if !ok {
-		return nil, fmt.Errorf("todos must be an array")
+		return nil, errors.New("todos must be an array")
 	}
 
 	var todos []TodoItem

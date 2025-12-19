@@ -2,6 +2,7 @@ package evals
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -72,10 +73,10 @@ type BatchConfig struct {
 // RunBatch 批量运行评估
 func RunBatch(ctx context.Context, cfg *BatchConfig) (*BatchEvalResult, error) {
 	if len(cfg.TestCases) == 0 {
-		return nil, fmt.Errorf("no test cases provided")
+		return nil, errors.New("no test cases provided")
 	}
 	if len(cfg.Scorers) == 0 {
-		return nil, fmt.Errorf("no scorers provided")
+		return nil, errors.New("no scorers provided")
 	}
 
 	// 设置默认并发数

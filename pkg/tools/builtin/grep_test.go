@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"fmt"
+	"errors"
 	"reflect"
 	"strings"
 	"testing"
@@ -407,16 +407,16 @@ func TestGrepTool_ConcurrentOperations(t *testing.T) {
 
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("Grep operation failed")
+			return errors.New("Grep operation failed")
 		}
 
 		// 验证基本响应
 		if _, exists := result["matches"]; !exists {
-			return fmt.Errorf("Missing matches in result")
+			return errors.New("Missing matches in result")
 		}
 
 		if _, exists := result["pattern"]; !exists {
-			return fmt.Errorf("Missing pattern in result")
+			return errors.New("Missing pattern in result")
 		}
 
 		return nil

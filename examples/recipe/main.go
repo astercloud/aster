@@ -7,6 +7,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/astercloud/aster/pkg/recipe"
 )
@@ -322,8 +323,10 @@ func demonstratePermissions(tmpDir string) {
 
 func repeatStr(s string, n int) string {
 	result := ""
-	for i := 0; i < n; i++ {
-		result += s
+	var resultSb325 strings.Builder
+	for range n {
+		resultSb325.WriteString(s)
 	}
+	result += resultSb325.String()
 	return result
 }

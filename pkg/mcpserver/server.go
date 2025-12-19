@@ -3,6 +3,7 @@ package mcpserver
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -35,10 +36,10 @@ type Config struct {
 // New 创建一个 MCP Server 实例
 func New(cfg *Config) (*Server, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("mcpserver.Config cannot be nil")
+		return nil, errors.New("mcpserver.Config cannot be nil")
 	}
 	if cfg.Registry == nil {
-		return nil, fmt.Errorf("registry is required")
+		return nil, errors.New("registry is required")
 	}
 
 	executor := cfg.Executor
@@ -127,7 +128,7 @@ func (s *Server) handleToolsCall(w http.ResponseWriter, ctx context.Context, req
 
 	tool, err := s.registry.Create(params.Name, nil)
 	if err != nil {
-		writeError(w, req.ID, -32601, fmt.Sprintf("tool not found: %s", params.Name), err)
+		writeError(w, req.ID, -32601, "tool not found: "+params.Name, err)
 		return
 	}
 

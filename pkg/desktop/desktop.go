@@ -359,7 +359,7 @@ func (a *App) handleChat(msg *FrontendMessage) (*BackendResponse, error) {
 		return &BackendResponse{
 			ID:      msg.ID,
 			Success: false,
-			Error:   fmt.Sprintf("agent not found: %s", msg.AgentID),
+			Error:   "agent not found: " + msg.AgentID,
 		}, nil
 	}
 
@@ -393,7 +393,7 @@ func (a *App) handleCancel(msg *FrontendMessage) (*BackendResponse, error) {
 		return &BackendResponse{
 			ID:      msg.ID,
 			Success: false,
-			Error:   fmt.Sprintf("agent not found: %s", msg.AgentID),
+			Error:   "agent not found: " + msg.AgentID,
 		}, nil
 	}
 
@@ -433,7 +433,7 @@ func (a *App) handleGetStatus(msg *FrontendMessage) (*BackendResponse, error) {
 		return &BackendResponse{
 			ID:      msg.ID,
 			Success: false,
-			Error:   fmt.Sprintf("agent not found: %s", msg.AgentID),
+			Error:   "agent not found: " + msg.AgentID,
 		}, nil
 	}
 
@@ -454,7 +454,7 @@ func (a *App) handleGetHistory(msg *FrontendMessage) (*BackendResponse, error) {
 		return &BackendResponse{
 			ID:      msg.ID,
 			Success: false,
-			Error:   fmt.Sprintf("agent not found: %s", msg.AgentID),
+			Error:   "agent not found: " + msg.AgentID,
 		}, nil
 	}
 
@@ -473,7 +473,7 @@ func (a *App) handleClearHistory(msg *FrontendMessage) (*BackendResponse, error)
 		return &BackendResponse{
 			ID:      msg.ID,
 			Success: false,
-			Error:   fmt.Sprintf("agent not found: %s", msg.AgentID),
+			Error:   "agent not found: " + msg.AgentID,
 		}, nil
 	}
 

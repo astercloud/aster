@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -225,12 +226,12 @@ Please output the compressed paragraph directly:`, targetLength)
 func (c *LLMPromptCompressor) validateCompression(original, compressed string, preserveSections []string) error {
 	// 检查压缩结果不为空
 	if strings.TrimSpace(compressed) == "" {
-		return fmt.Errorf("compressed result is empty")
+		return errors.New("compressed result is empty")
 	}
 
 	// 检查压缩结果不能比原始内容更长
 	if len(compressed) > len(original) {
-		return fmt.Errorf("compressed result is longer than original")
+		return errors.New("compressed result is longer than original")
 	}
 
 	// 检查必须保留的段落是否存在

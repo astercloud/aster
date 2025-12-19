@@ -3,6 +3,7 @@ package handlers
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"sync"
@@ -161,10 +162,10 @@ func (h *RemoteAgentHandler) handleRegister(ctx context.Context, conn *websocket
 
 	// 验证必填字段
 	if reg.AgentID == "" {
-		return fmt.Errorf("agent_id is required")
+		return errors.New("agent_id is required")
 	}
 	if reg.TemplateID == "" {
-		return fmt.Errorf("template_id is required")
+		return errors.New("template_id is required")
 	}
 
 	h.mu.Lock()
@@ -247,10 +248,10 @@ func (h *RemoteAgentHandler) handleRegisterSession(ctx context.Context, conn *we
 
 	// 验证必填字段
 	if reg.SessionID == "" {
-		return fmt.Errorf("session_id is required")
+		return errors.New("session_id is required")
 	}
 	if reg.AgentID == "" {
-		return fmt.Errorf("agent_id is required")
+		return errors.New("agent_id is required")
 	}
 
 	// 同步到 Store，使其在 /v1/sessions API 中可见

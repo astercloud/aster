@@ -1,6 +1,7 @@
 package sandbox
 
 import (
+	"errors"
 	"fmt"
 	"time"
 
@@ -38,23 +39,23 @@ func (f *Factory) Create(config *types.SandboxConfig) (Sandbox, error) {
 		})
 
 	case types.SandboxKindDocker:
-		return nil, fmt.Errorf("docker sandbox not implemented yet")
+		return nil, errors.New("docker sandbox not implemented yet")
 
 	case types.SandboxKindK8s:
-		return nil, fmt.Errorf("k8s sandbox not implemented yet")
+		return nil, errors.New("k8s sandbox not implemented yet")
 
 	case types.SandboxKindAliyun:
 		// 阿里云沙箱需要使用 cloud.NewAliyunSandbox() 直接创建
-		return nil, fmt.Errorf("aliyun sandbox: use cloud.NewAliyunSandbox() directly")
+		return nil, errors.New("aliyun sandbox: use cloud.NewAliyunSandbox() directly")
 
 	case types.SandboxKindVolcengine:
 		// 火山引擎沙箱需要使用 cloud.NewVolcengineSandbox() 直接创建
-		return nil, fmt.Errorf("volcengine sandbox: use cloud.NewVolcengineSandbox() directly")
+		return nil, errors.New("volcengine sandbox: use cloud.NewVolcengineSandbox() directly")
 
 	case types.SandboxKindRemote:
 		// 通用远程沙箱
 		if config.Extra == nil {
-			return nil, fmt.Errorf("remote sandbox requires extra configuration")
+			return nil, errors.New("remote sandbox requires extra configuration")
 		}
 
 		baseURL, _ := config.Extra["base_url"].(string)

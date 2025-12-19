@@ -2,7 +2,9 @@ package core
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"time"
 
@@ -28,10 +30,10 @@ type Pipeline struct {
 // NewPipeline 创建管线实例。
 func NewPipeline(cfg PipelineConfig) (*Pipeline, error) {
 	if cfg.Store == nil {
-		return nil, fmt.Errorf("knowledge core: store is required")
+		return nil, errors.New("knowledge core: store is required")
 	}
 	if cfg.Embedder == nil {
-		return nil, fmt.Errorf("knowledge core: embedder is required")
+		return nil, errors.New("knowledge core: embedder is required")
 	}
 	ns := cfg.Namespace
 	if ns == "" {
@@ -51,7 +53,7 @@ func NewPipeline(cfg PipelineConfig) (*Pipeline, error) {
 // Ingest 将文本切分并写入向量库。
 func (p *Pipeline) Ingest(ctx context.Context, req IngestRequest) ([]Chunk, error) {
 	if strings.TrimSpace(req.Text) == "" {
-		return nil, fmt.Errorf("knowledge core: text is empty")
+		return nil, errors.New("knowledge core: text is empty")
 	}
 	id := strings.TrimSpace(req.ID)
 	if id == "" {
@@ -63,16 +65,14 @@ func (p *Pipeline) Ingest(ctx context.Context, req IngestRequest) ([]Chunk, erro
 	}
 
 	meta := make(map[string]any)
-	for k, v := range req.Metadata {
-		meta[k] = v
-	}
+	maps.Copy(meta, req.Metadata)
 	if ns != "" {
 		meta["namespace"] = ns
 	}
 
 	rawChunks := splitParagraphs(req.Text)
 	if len(rawChunks) == 0 {
-		return nil, fmt.Errorf("knowledge core: no chunks after split")
+		return nil, errors.New("knowledge core: no chunks after split")
 	}
 
 	vecs, err := p.embedder.EmbedText(ctx, rawChunks)
@@ -88,9 +88,7 @@ func (p *Pipeline) Ingest(ctx context.Context, req IngestRequest) ([]Chunk, erro
 	for i, ctext := range rawChunks {
 		chunkID := fmt.Sprintf("%s#%d", id, i)
 		chunkMeta := make(map[string]any, len(meta)+2)
-		for k, v := range meta {
-			chunkMeta[k] = v
-		}
+		maps.Copy(chunkMeta, meta)
 		chunkMeta["text"] = ctext
 		chunkMeta["chunk_index"] = i
 
@@ -119,7 +117,7 @@ func (p *Pipeline) Ingest(ctx context.Context, req IngestRequest) ([]Chunk, erro
 // Search 执行向量检索。
 func (p *Pipeline) Search(ctx context.Context, query string, topK int, metadata map[string]any) ([]SearchHit, error) {
 	if strings.TrimSpace(query) == "" {
-		return nil, fmt.Errorf("knowledge core: query is empty")
+		return nil, errors.New("knowledge core: query is empty")
 	}
 	if topK <= 0 {
 		topK = p.defaultK
@@ -137,7 +135,7 @@ func (p *Pipeline) Search(ctx context.Context, query string, topK int, metadata 
 		return nil, fmt.Errorf("embed query: %w", err)
 	}
 	if len(vecs) == 0 {
-		return nil, fmt.Errorf("embedder returned empty vectors")
+		return nil, errors.New("embedder returned empty vectors")
 	}
 
 	hits, err := p.store.Query(ctx, vector.Query{

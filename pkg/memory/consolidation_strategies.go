@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -45,7 +46,7 @@ func (s *RedundancyStrategy) ShouldConsolidate(ctx context.Context, memories []M
 // Consolidate 执行合并。
 func (s *RedundancyStrategy) Consolidate(ctx context.Context, memories []MemoryWithScore, llm LLMProvider) (*ConsolidatedMemory, error) {
 	if len(memories) == 0 {
-		return nil, fmt.Errorf("no memories to consolidate")
+		return nil, errors.New("no memories to consolidate")
 	}
 
 	// 构建 LLM 提示
@@ -243,7 +244,7 @@ func (s *ConflictResolutionStrategy) detectConflict(memories []MemoryWithScore) 
 // Consolidate 执行合并。
 func (s *ConflictResolutionStrategy) Consolidate(ctx context.Context, memories []MemoryWithScore, llm LLMProvider) (*ConsolidatedMemory, error) {
 	if len(memories) == 0 {
-		return nil, fmt.Errorf("no memories to consolidate")
+		return nil, errors.New("no memories to consolidate")
 	}
 
 	// 构建冲突解决提示
@@ -371,7 +372,7 @@ func (s *SummarizationStrategy) ShouldConsolidate(ctx context.Context, memories 
 // Consolidate 执行合并。
 func (s *SummarizationStrategy) Consolidate(ctx context.Context, memories []MemoryWithScore, llm LLMProvider) (*ConsolidatedMemory, error) {
 	if len(memories) == 0 {
-		return nil, fmt.Errorf("no memories to consolidate")
+		return nil, errors.New("no memories to consolidate")
 	}
 
 	// 构建总结提示

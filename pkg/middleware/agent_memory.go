@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/backends"
@@ -23,6 +24,7 @@ const (
 // 3. 提供长期记忆使用指南
 type AgentMemoryMiddleware struct {
 	*BaseMiddleware
+
 	backend              backends.BackendProtocol
 	memoryPath           string
 	systemPromptTemplate string
@@ -45,11 +47,11 @@ type AgentMemoryMiddlewareConfig struct {
 // NewAgentMemoryMiddleware 创建中间件
 func NewAgentMemoryMiddleware(config *AgentMemoryMiddlewareConfig) (*AgentMemoryMiddleware, error) {
 	if config == nil {
-		return nil, fmt.Errorf("agent memory not configured properly")
+		return nil, errors.New("agent memory not configured properly")
 	}
 
 	if config.Backend == nil {
-		return nil, fmt.Errorf("backend is required")
+		return nil, errors.New("backend is required")
 	}
 
 	if config.MemoryPath == "" {
