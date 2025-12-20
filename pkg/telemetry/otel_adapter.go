@@ -2,6 +2,7 @@ package telemetry
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.opentelemetry.io/otel"
@@ -192,7 +193,7 @@ func (t *OTelTracer) Inject(ctx context.Context, carrier any) error {
 		t.propagator.Inject(ctx, textMapCarrier)
 		return nil
 	}
-	return fmt.Errorf("carrier is not a TextMapCarrier")
+	return errors.New("carrier is not a TextMapCarrier")
 }
 
 // Shutdown 关闭 tracer，刷新所有待处理的 spans

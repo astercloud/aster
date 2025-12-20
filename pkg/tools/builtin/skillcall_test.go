@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"fmt"
+	"errors"
 	"testing"
 )
 
@@ -208,7 +208,7 @@ func TestSkillCallTool_ConcurrentCalls(t *testing.T) {
 
 		// 验证基本响应
 		if _, exists := result["skill"]; !exists {
-			return fmt.Errorf("Missing skill in result")
+			return errors.New("Missing skill in result")
 		}
 
 		return nil

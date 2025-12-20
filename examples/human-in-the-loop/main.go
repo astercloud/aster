@@ -4,6 +4,7 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
 	"os"
@@ -159,7 +160,7 @@ func smartApprovalHandler(ctx context.Context, req *middleware.ReviewRequest) ([
 		}
 	}
 
-	return nil, fmt.Errorf("no decision made")
+	return nil, errors.New("no decision made")
 }
 
 type RiskLevel int

@@ -253,7 +253,7 @@ func (s *TokenBasedStrategy) Compress(
 
 		// 构建测试消息列表
 		testMessages := []Message{}
-		for j := range len(messages) {
+		for j := range messages {
 			if testIndices[j] {
 				testMessages = append(testMessages, messages[j])
 			}

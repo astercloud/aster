@@ -1,6 +1,7 @@
 package logic
 
 import (
+	"maps"
 	"sync"
 	"time"
 )
@@ -150,15 +151,9 @@ func (m *Metrics) GetSnapshot() *MetricsSnapshot {
 	}
 
 	// 复制 map
-	for k, v := range m.memoryTotal {
-		snapshot.MemoryByNamespace[k] = v
-	}
-	for k, v := range m.memoryByType {
-		snapshot.MemoryByType[k] = v
-	}
-	for k, v := range m.memoryByScope {
-		snapshot.MemoryByScope[k] = v
-	}
+	maps.Copy(snapshot.MemoryByNamespace, m.memoryTotal)
+	maps.Copy(snapshot.MemoryByType, m.memoryByType)
+	maps.Copy(snapshot.MemoryByScope, m.memoryByScope)
 
 	// 计算平均耗时
 	snapshot.AvgSaveDuration = m.calculateAvgDuration(m.saveDurations)
@@ -221,8 +216,8 @@ func (m *Metrics) calculateP99Duration(durations []time.Duration) time.Duration 
 	copy(sorted, durations)
 
 	// 简单冒泡排序（样本量小，性能可接受）
-	for i := 0; i < len(sorted)-1; i++ {
-		for j := 0; j < len(sorted)-i-1; j++ {
+	for i := range len(sorted) - 1 {
+		for j := range len(sorted) - i - 1 {
 			if sorted[j] > sorted[j+1] {
 				sorted[j], sorted[j+1] = sorted[j+1], sorted[j]
 			}

@@ -3,7 +3,9 @@ package security
 import (
 	"crypto/sha256"
 	"encoding/hex"
+	"errors"
 	"fmt"
+	"slices"
 	"sync"
 	"time"
 )
@@ -312,7 +314,7 @@ func (ac *AccessController) CreateUser(user *User) error {
 	defer ac.mu.Unlock()
 
 	if user.ID == "" {
-		return fmt.Errorf("user ID is required")
+		return errors.New("user ID is required")
 	}
 
 	if _, exists := ac.users[user.ID]; exists {
@@ -320,7 +322,7 @@ func (ac *AccessController) CreateUser(user *User) error {
 	}
 
 	if user.Username == "" {
-		return fmt.Errorf("username is required")
+		return errors.New("username is required")
 	}
 
 	// 检查用户名是否已存在
@@ -719,10 +721,8 @@ func (ac *AccessController) compareValues(actual any, operator string, expected 
 func (ac *AccessController) valueInList(value string, list any) bool {
 	switch list := list.(type) {
 	case []string:
-		for _, item := range list {
-			if item == value {
-				return true
-			}
+		if slices.Contains(list, value) {
+			return true
 		}
 	case []any:
 		for _, item := range list {
@@ -740,7 +740,7 @@ func (ac *AccessController) sortPoliciesByPriority(policies []*AccessPolicy) []*
 	sorted := make([]*AccessPolicy, len(policies))
 	copy(sorted, policies)
 
-	for i := 0; i < len(sorted)-1; i++ {
+	for i := range len(sorted) - 1 {
 		for j := i + 1; j < len(sorted); j++ {
 			if sorted[i].Priority > sorted[j].Priority {
 				sorted[i], sorted[j] = sorted[j], sorted[i]
@@ -822,7 +822,6 @@ func (ac *AccessController) checkPermissionList(permissionIDs []string, resource
 		// 检查资源和操作匹配
 		if (permission.Resource == "*" || permission.Resource == resource) &&
 			(permission.Action == "*" || permission.Action == action) {
-
 			// 检查权限条件
 			if ac.checkPermissionConditions(permission.Conditions, context) {
 				return true
@@ -1052,12 +1051,7 @@ func (cache *AccessCache) set(key string, decision *AccessDecision, ttl time.Dur
 
 // 辅助函数
 func contains(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }
 
 func removeString(slice []string, item string) []string {

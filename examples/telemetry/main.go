@@ -192,7 +192,7 @@ func toolTracingExample() {
 			telemetry.WithSpanKind(telemetry.SpanKindInternal),
 			telemetry.WithAttributes(
 				telemetry.String(telemetry.AttrToolName, toolName),
-				telemetry.String(telemetry.AttrToolCallID, fmt.Sprintf("call_%s", toolName)),
+				telemetry.String(telemetry.AttrToolCallID, "call_"+toolName),
 			),
 		)
 
@@ -272,12 +272,12 @@ func processMiddleware(ctx context.Context, _ telemetry.Span) {
 	for _, mw := range middlewares {
 		_, span := tracer.StartSpan(
 			ctx,
-			fmt.Sprintf("middleware.%s", mw),
+			"middleware."+mw,
 			telemetry.WithSpanKind(telemetry.SpanKindInternal),
 		)
 
 		time.Sleep(10 * time.Millisecond)
-		span.SetStatus(telemetry.StatusCodeOK, fmt.Sprintf("%s passed", mw))
+		span.SetStatus(telemetry.StatusCodeOK, mw+" passed")
 		span.End()
 	}
 }

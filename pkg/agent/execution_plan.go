@@ -2,6 +2,7 @@ package agent
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/executionplan"
@@ -149,7 +150,7 @@ func (m *ExecutionPlanManager) GeneratePlan(ctx context.Context, request string,
 // ApprovePlan 审批执行计划
 func (m *ExecutionPlanManager) ApprovePlan(approvedBy string) error {
 	if m.currentPlan == nil {
-		return fmt.Errorf("no pending plan to approve")
+		return errors.New("no pending plan to approve")
 	}
 
 	if m.currentPlan.Status != executionplan.StatusPendingApproval {
@@ -174,7 +175,7 @@ func (m *ExecutionPlanManager) ApprovePlan(approvedBy string) error {
 // RejectPlan 拒绝执行计划
 func (m *ExecutionPlanManager) RejectPlan(reason string) error {
 	if m.currentPlan == nil {
-		return fmt.Errorf("no pending plan to reject")
+		return errors.New("no pending plan to reject")
 	}
 
 	m.currentPlan.Reject(reason)
@@ -195,7 +196,7 @@ func (m *ExecutionPlanManager) RejectPlan(reason string) error {
 // ExecutePlan 执行当前计划
 func (m *ExecutionPlanManager) ExecutePlan(ctx context.Context) error {
 	if m.currentPlan == nil {
-		return fmt.Errorf("no plan to execute")
+		return errors.New("no plan to execute")
 	}
 
 	// 创建工具上下文
@@ -259,7 +260,7 @@ func (m *ExecutionPlanManager) FormatCurrentPlan() string {
 // ValidateCurrentPlan 验证当前计划
 func (m *ExecutionPlanManager) ValidateCurrentPlan() []error {
 	if m.currentPlan == nil {
-		return []error{fmt.Errorf("no plan to validate")}
+		return []error{errors.New("no plan to validate")}
 	}
 	return m.generator.ValidatePlan(m.currentPlan)
 }
@@ -271,7 +272,7 @@ func (m *ExecutionPlanManager) CancelPlan(reason string) {
 	}
 	m.executor.Cancel(m.currentPlan, reason)
 
-	agentLog.Info(context.Background(), "execution plan cancelled", map[string]any{
+	agentLog.Info(context.Background(), "execution plan canceled", map[string]any{
 		"plan_id": m.currentPlan.ID,
 		"reason":  reason,
 	})
@@ -280,7 +281,7 @@ func (m *ExecutionPlanManager) CancelPlan(reason string) {
 // ResumePlan 恢复执行当前计划
 func (m *ExecutionPlanManager) ResumePlan(ctx context.Context) error {
 	if m.currentPlan == nil {
-		return fmt.Errorf("no plan to resume")
+		return errors.New("no plan to resume")
 	}
 
 	toolCtx := &tools.ToolContext{

@@ -89,7 +89,7 @@ func TestSimpleTokenCounter_CountBatch(t *testing.T) {
 	}
 
 	// 验证非空字符串返回 > 0
-	for i := 0; i < 3; i++ {
+	for i := range 3 {
 		if counts[i] <= 0 {
 			t.Errorf("CountBatch() for text[%d] = %v, want > 0", i, counts[i])
 		}
@@ -523,8 +523,7 @@ func BenchmarkSimpleTokenCounter_Count(b *testing.B) {
 	text := "This is a sample text for benchmarking token counting performance."
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = counter.Count(ctx, text)
 	}
 }
@@ -538,8 +537,7 @@ func BenchmarkSimpleTokenCounter_EstimateMessages(b *testing.B) {
 	}
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = counter.EstimateMessages(ctx, messages)
 	}
 }

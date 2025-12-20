@@ -2,6 +2,7 @@ package tools
 
 import (
 	"context"
+	"errors"
 	"fmt"
 )
 
@@ -301,19 +302,19 @@ func (b *ConstraintsBuilder) Build() (ToolConstraints, error) {
 	switch b.constraintType {
 	case ConstraintTypeWhitelist:
 		if len(b.tools) == 0 {
-			return nil, fmt.Errorf("whitelist requires at least one tool")
+			return nil, errors.New("whitelist requires at least one tool")
 		}
 		return NewWhitelistConstraints(b.tools), nil
 
 	case ConstraintTypeBlacklist:
 		if len(b.tools) == 0 {
-			return nil, fmt.Errorf("blacklist requires at least one tool")
+			return nil, errors.New("blacklist requires at least one tool")
 		}
 		return NewBlacklistConstraints(b.tools), nil
 
 	case ConstraintTypeRequired:
 		if len(b.tools) != 1 {
-			return nil, fmt.Errorf("required constraint needs exactly one tool")
+			return nil, errors.New("required constraint needs exactly one tool")
 		}
 		return NewRequiredToolConstraints(b.tools[0]), nil
 

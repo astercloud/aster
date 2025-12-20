@@ -3,6 +3,7 @@ package memory
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -64,10 +65,10 @@ type WorkingMemoryData struct {
 // NewWorkingMemoryManager 创建 Working Memory 管理器
 func NewWorkingMemoryManager(cfg *WorkingMemoryConfig) (*WorkingMemoryManager, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("working memory config cannot be nil")
+		return nil, errors.New("working memory config cannot be nil")
 	}
 	if cfg.Backend == nil {
-		return nil, fmt.Errorf("working memory requires a non-nil Backend")
+		return nil, errors.New("working memory requires a non-nil Backend")
 	}
 
 	basePath := cfg.BasePath
@@ -107,7 +108,7 @@ func NewWorkingMemoryManager(cfg *WorkingMemoryConfig) (*WorkingMemoryManager, e
 // - resource scope: /working_memory/resources/<resourceID>.json
 func (wm *WorkingMemoryManager) Get(ctx context.Context, threadID, resourceID string) (string, error) {
 	if threadID == "" && resourceID == "" {
-		return "", fmt.Errorf("threadID and resourceID cannot both be empty")
+		return "", errors.New("threadID and resourceID cannot both be empty")
 	}
 
 	path := wm.resolvePath(threadID, resourceID)
@@ -140,12 +141,12 @@ func (wm *WorkingMemoryManager) Get(ctx context.Context, threadID, resourceID st
 // 如果配置了 Schema，会先进行验证
 func (wm *WorkingMemoryManager) Update(ctx context.Context, threadID, resourceID, content string) error {
 	if threadID == "" && resourceID == "" {
-		return fmt.Errorf("threadID and resourceID cannot both be empty")
+		return errors.New("threadID and resourceID cannot both be empty")
 	}
 
 	content = strings.TrimSpace(content)
 	if content == "" {
-		return fmt.Errorf("content cannot be empty")
+		return errors.New("content cannot be empty")
 	}
 
 	// Schema 验证（如果配置）
@@ -210,7 +211,7 @@ func (wm *WorkingMemoryManager) Update(ctx context.Context, threadID, resourceID
 // 如果 searchString 为空，则追加到末尾
 func (wm *WorkingMemoryManager) FindAndReplace(ctx context.Context, threadID, resourceID, searchString, newContent string) error {
 	if threadID == "" && resourceID == "" {
-		return fmt.Errorf("threadID and resourceID cannot both be empty")
+		return errors.New("threadID and resourceID cannot both be empty")
 	}
 
 	// 读取现有内容
@@ -230,7 +231,7 @@ func (wm *WorkingMemoryManager) FindAndReplace(ctx context.Context, threadID, re
 	} else {
 		// 查找替换模式
 		if !strings.Contains(existing, searchString) {
-			return fmt.Errorf("search string not found in working memory")
+			return errors.New("search string not found in working memory")
 		}
 		updated = strings.Replace(existing, searchString, newContent, 1)
 	}
@@ -241,7 +242,7 @@ func (wm *WorkingMemoryManager) FindAndReplace(ctx context.Context, threadID, re
 // Delete 删除 Working Memory
 func (wm *WorkingMemoryManager) Delete(ctx context.Context, threadID, resourceID string) error {
 	if threadID == "" && resourceID == "" {
-		return fmt.Errorf("threadID and resourceID cannot both be empty")
+		return errors.New("threadID and resourceID cannot both be empty")
 	}
 
 	path := wm.resolvePath(threadID, resourceID)

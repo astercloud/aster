@@ -3,6 +3,7 @@ package cloud
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 // AliyunSandbox 阿里云 AgentBay 沙箱
 type AliyunSandbox struct {
 	*sandbox.RemoteSandbox
+
 	config    *AliyunConfig
 	mcpClient *MCPClient
 }
@@ -43,10 +45,10 @@ type AliyunConfig struct {
 // NewAliyunSandbox 创建阿里云沙箱
 func NewAliyunSandbox(config *AliyunConfig) (*AliyunSandbox, error) {
 	if config.MCPEndpoint == "" {
-		return nil, fmt.Errorf("MCP endpoint is required")
+		return nil, errors.New("MCP endpoint is required")
 	}
 	if config.AccessKeyID == "" || config.AccessKeySecret == "" {
-		return nil, fmt.Errorf("access credentials are required")
+		return nil, errors.New("access credentials are required")
 	}
 
 	// 设置默认值

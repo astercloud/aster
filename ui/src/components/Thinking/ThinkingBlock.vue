@@ -168,19 +168,19 @@ watch(
   ([newPendingApproval, newIsFinished], oldValue) => {
     const oldPendingApproval = oldValue?.[0]
     const oldIsFinished = oldValue?.[1]
-    
+
     // 核心规则：正在运行时必须展开
     if (!newIsFinished) {
       isExpanded.value = true
       return
     }
-    
+
     // 有新的审批请求时展开
     if (newPendingApproval && !oldPendingApproval) {
       isExpanded.value = true
       return
     }
-    
+
     // 刚刚完成时，延迟折叠
     if (newIsFinished && !oldIsFinished && !newPendingApproval) {
       setTimeout(() => {

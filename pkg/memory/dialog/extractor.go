@@ -196,14 +196,8 @@ func (e *Extractor) extractSentence(text, keyword string) string {
 		}
 
 		halfLen := e.config.MaxExtractLength / 2
-		newStart := keywordRuneIdx - halfLen
-		if newStart < 0 {
-			newStart = 0
-		}
-		newEnd := keywordRuneIdx + len(keywordRunes) + halfLen
-		if newEnd > len(sentenceRunes) {
-			newEnd = len(sentenceRunes)
-		}
+		newStart := max(keywordRuneIdx-halfLen, 0)
+		newEnd := min(keywordRuneIdx+len(keywordRunes)+halfLen, len(sentenceRunes))
 		sentence = "..." + strings.TrimSpace(string(sentenceRunes[newStart:newEnd])) + "..."
 	}
 

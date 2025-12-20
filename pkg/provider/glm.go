@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -33,7 +34,7 @@ type GLMProvider struct {
 // NewGLMProvider 创建 GLM 提供商
 func NewGLMProvider(config *types.ModelConfig) (*GLMProvider, error) {
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("glm api key is required")
+		return nil, errors.New("glm api key is required")
 	}
 
 	baseURL := config.BaseURL
@@ -70,7 +71,7 @@ func (gp *GLMProvider) Complete(ctx context.Context, messages []types.Message, o
 			endpoint = "/v4/chat/completions"
 		}
 	}
-	req, err := http.NewRequestWithContext(ctx, "POST", gp.baseURL+endpoint, bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, gp.baseURL+endpoint, bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -150,7 +151,7 @@ func (gp *GLMProvider) Stream(ctx context.Context, messages []types.Message, opt
 			endpoint = "/v4/chat/completions"
 		}
 	}
-	req, err := http.NewRequestWithContext(ctx, "POST", gp.baseURL+endpoint, bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, gp.baseURL+endpoint, bytes.NewReader(jsonData))
 	if err != nil {
 		return nil, fmt.Errorf("create request: %w", err)
 	}
@@ -541,17 +542,17 @@ func (gp *GLMProvider) parseCompleteResponse(apiResp map[string]any) (types.Mess
 	// 获取第一个choice
 	choices, ok := apiResp["choices"].([]any)
 	if !ok || len(choices) == 0 {
-		return types.Message{}, fmt.Errorf("no choices in response")
+		return types.Message{}, errors.New("no choices in response")
 	}
 
 	choice, ok := choices[0].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("invalid choice format")
+		return types.Message{}, errors.New("invalid choice format")
 	}
 
 	message, ok := choice["message"].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("no message in choice")
+		return types.Message{}, errors.New("no message in choice")
 	}
 
 	// 解析文本内容

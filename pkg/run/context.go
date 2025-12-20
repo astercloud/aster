@@ -2,6 +2,7 @@ package run
 
 import (
 	"context"
+	"maps"
 	"time"
 )
 
@@ -130,18 +131,10 @@ func (c *Context) Clone() *Context {
 	}
 
 	// 复制 map
-	for k, v := range c.Metadata {
-		clone.Metadata[k] = v
-	}
-	for k, v := range c.SessionState {
-		clone.SessionState[k] = v
-	}
-	for k, v := range c.KnowledgeFilters {
-		clone.KnowledgeFilters[k] = v
-	}
-	for k, v := range c.Dependencies {
-		clone.Dependencies[k] = v
-	}
+	maps.Copy(clone.Metadata, c.Metadata)
+	maps.Copy(clone.SessionState, c.SessionState)
+	maps.Copy(clone.KnowledgeFilters, c.KnowledgeFilters)
+	maps.Copy(clone.Dependencies, c.Dependencies)
 
 	return clone
 }

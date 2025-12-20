@@ -247,7 +247,7 @@ func (e *ConsolidationEngine) findSimilarGroups(memories []*LogicMemory) [][]*Lo
 	}
 
 	// 计算相似度并合并
-	for i := 0; i < n; i++ {
+	for i := range n {
 		// 跳过高置信度的 Memory
 		if memories[i].Provenance != nil &&
 			memories[i].Provenance.Confidence >= e.config.PreserveHighConfidenceThreshold {
@@ -264,7 +264,7 @@ func (e *ConsolidationEngine) findSimilarGroups(memories []*LogicMemory) [][]*Lo
 
 	// 收集组
 	groups := make(map[int][]*LogicMemory)
-	for i := 0; i < n; i++ {
+	for i := range n {
 		root := find(i)
 		groups[root] = append(groups[root], memories[i])
 	}

@@ -6,6 +6,7 @@ import (
 	"os"
 	"os/exec"
 	"runtime"
+	"slices"
 	"sort"
 	"strings"
 	"time"
@@ -106,13 +107,7 @@ func (pb *PromptBuilder) Build(ctx *PromptContext) (string, error) {
 	for _, module := range pb.modules {
 		// 检查是否被禁用
 		moduleName := module.Name()
-		isDisabled := false
-		for _, disabled := range disabledModules {
-			if disabled == moduleName {
-				isDisabled = true
-				break
-			}
-		}
+		isDisabled := slices.Contains(disabledModules, moduleName)
 		if isDisabled {
 			continue
 		}

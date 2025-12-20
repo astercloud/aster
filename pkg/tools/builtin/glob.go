@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -88,13 +89,13 @@ func (t *GlobTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	recursive := t.getBoolParam(input, "recursive", true)
 
 	if pattern == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("pattern cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("pattern cannot be empty")), nil
 	}
 
 	// 验证搜索路径
 	if err := t.validatePath(path); err != nil {
 		return NewClaudeErrorResponse(
-			fmt.Errorf("invalid search path: %v", err),
+			fmt.Errorf("invalid search path: %w", err),
 			"使用相对路径或允许的绝对路径",
 			"确保路径不包含 '..' 避免路径遍历攻击",
 		), nil

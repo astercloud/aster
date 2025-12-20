@@ -3,6 +3,7 @@ package ratelimit
 import (
 	"fmt"
 	"net/http"
+	"strconv"
 	"time"
 
 	"github.com/gin-gonic/gin"
@@ -42,10 +43,10 @@ func Middleware(config Config, limiter Limiter) gin.HandlerFunc {
 			info := limiter.GetInfo(key)
 
 			// 设置速率限制响应头
-			c.Header("X-RateLimit-Limit", fmt.Sprintf("%d", info.Limit))
+			c.Header("X-RateLimit-Limit", strconv.Itoa(info.Limit))
 			c.Header("X-RateLimit-Remaining", "0")
-			c.Header("X-RateLimit-Reset", fmt.Sprintf("%d", info.ResetAt.Unix()))
-			c.Header("Retry-After", fmt.Sprintf("%d", int(time.Until(info.ResetAt).Seconds())))
+			c.Header("X-RateLimit-Reset", strconv.FormatInt(info.ResetAt.Unix(), 10))
+			c.Header("Retry-After", strconv.Itoa(int(time.Until(info.ResetAt).Seconds())))
 
 			c.JSON(http.StatusTooManyRequests, gin.H{
 				"success": false,
@@ -61,9 +62,9 @@ func Middleware(config Config, limiter Limiter) gin.HandlerFunc {
 
 		// 设置速率限制响应头
 		info := limiter.GetInfo(key)
-		c.Header("X-RateLimit-Limit", fmt.Sprintf("%d", info.Limit))
-		c.Header("X-RateLimit-Remaining", fmt.Sprintf("%d", info.Remaining))
-		c.Header("X-RateLimit-Reset", fmt.Sprintf("%d", info.ResetAt.Unix()))
+		c.Header("X-RateLimit-Limit", strconv.Itoa(info.Limit))
+		c.Header("X-RateLimit-Remaining", strconv.Itoa(info.Remaining))
+		c.Header("X-RateLimit-Reset", strconv.FormatInt(info.ResetAt.Unix(), 10))
 
 		c.Next()
 	}

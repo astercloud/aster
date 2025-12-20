@@ -8,6 +8,7 @@ import (
 	"log"
 	"os"
 	"path/filepath"
+	"strings"
 
 	"github.com/astercloud/aster/pkg/permission"
 	"github.com/astercloud/aster/pkg/types"
@@ -251,8 +252,10 @@ func demonstrateRules(ctx context.Context, tmpDir string) {
 
 func repeatStr(s string, n int) string {
 	result := ""
+	var resultSb254 strings.Builder
 	for i := 0; i < n; i++ {
-		result += s
+		resultSb254.WriteString(s)
 	}
+	result += resultSb254.String()
 	return result
 }

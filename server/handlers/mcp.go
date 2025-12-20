@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -141,7 +142,7 @@ func (h *MCPHandler) Get(c *gin.Context) {
 
 	var server MCPServerRecord
 	if err := (*h.store).Get(ctx, "mcp_servers", id, &server); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -193,7 +194,7 @@ func (h *MCPHandler) Update(c *gin.Context) {
 
 	var server MCPServerRecord
 	if err := (*h.store).Get(ctx, "mcp_servers", id, &server); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -258,7 +259,7 @@ func (h *MCPHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "mcp_servers", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -292,7 +293,7 @@ func (h *MCPHandler) Connect(c *gin.Context) {
 
 	var server MCPServerRecord
 	if err := (*h.store).Get(ctx, "mcp_servers", id, &server); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -344,7 +345,7 @@ func (h *MCPHandler) Disconnect(c *gin.Context) {
 
 	var server MCPServerRecord
 	if err := (*h.store).Get(ctx, "mcp_servers", id, &server); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

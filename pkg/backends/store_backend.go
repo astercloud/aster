@@ -26,7 +26,7 @@ func NewStoreBackend(s store.Store, agentID string) *StoreBackend {
 	return &StoreBackend{
 		store:     s,
 		agentID:   agentID,
-		namespace: fmt.Sprintf("files:%s", agentID),
+		namespace: "files:" + agentID,
 	}
 }
 
@@ -170,7 +170,7 @@ func (b *StoreBackend) Edit(ctx context.Context, path, oldStr, newStr string, re
 	data, err := b.loadFileData(ctx, path)
 	if err != nil {
 		return &EditResult{
-			Error: fmt.Sprintf("file not found: %s", path),
+			Error: "file not found: " + path,
 			Path:  path,
 		}, nil
 	}
@@ -359,7 +359,7 @@ func (b *StoreBackend) saveFileData(ctx context.Context, path string, data *File
 	}
 
 	// 更新文件元信息索引
-	metaKey := fmt.Sprintf("%s:meta", b.namespace)
+	metaKey := b.namespace + ":meta"
 	allMeta, _ := b.loadAllFileMeta(ctx)
 	if allMeta == nil {
 		allMeta = make(map[string]FileMeta)
@@ -381,7 +381,7 @@ func (b *StoreBackend) saveFileData(ctx context.Context, path string, data *File
 
 // loadAllFileMeta 加载所有文件元信息
 func (b *StoreBackend) loadAllFileMeta(ctx context.Context) (map[string]FileMeta, error) {
-	metaKey := fmt.Sprintf("%s:meta", b.namespace)
+	metaKey := b.namespace + ":meta"
 
 	dataInterface, err := b.store.LoadTodos(ctx, metaKey)
 	if err != nil {

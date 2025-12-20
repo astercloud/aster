@@ -25,20 +25,20 @@ graph TB
         UI[前端 UI<br/>HTML/CSS/JS]
         Bridge[Framework Bridge]
     end
-    
+
     subgraph Aster[Aster Core]
         App[Desktop App]
         Agent[Agent]
         Permission[Permission]
         Session[SQLite Session]
     end
-    
+
     UI <-->|事件/消息| Bridge
     Bridge <-->|通信协议| App
     App --> Agent
     App --> Permission
     App --> Session
-    
+
     style UI fill:#3b82f6
     style App fill:#10b981
     style Bridge fill:#f59e0b
@@ -63,12 +63,12 @@ import (
 
 func main() {
     ctx := context.Background()
-    
+
     // 创建 Permission Inspector
     inspector, _ := permission.NewInspector(
         permission.WithMode(permission.ModeSmartApprove),
     )
-    
+
     // 创建桌面应用
     app, err := desktop.NewApp(&desktop.Config{
         Framework:  desktop.FrameworkWails, // 或 FrameworkTauri, FrameworkElectron
@@ -78,7 +78,7 @@ func main() {
     if err != nil {
         log.Fatal(err)
     }
-    
+
     // 启动应用
     if err := app.Start(ctx); err != nil {
         log.Fatal(err)
@@ -105,10 +105,10 @@ func main() {
     app, _ := desktop.NewApp(&desktop.Config{
         Framework: desktop.FrameworkWails,
     })
-    
+
     // 获取 Wails 绑定
     bridge := app.Bridge().(*desktop.WailsBridge)
-    
+
     // Wails 应用配置
     err := wails.Run(&options.App{
         Title:  "Aster Desktop",
@@ -152,10 +152,10 @@ func main() {
         HTTPPort:  8765, // HTTP 端口
         WSPort:    8766, // WebSocket 端口
     })
-    
+
     // 启动服务
     app.Start(context.Background())
-    
+
     // Tauri 前端通过 HTTP/WS 连接
 }
 ```
@@ -197,7 +197,7 @@ func main() {
         HTTPPort:  8765,
         WSPort:    8766,
     })
-    
+
     app.Start(context.Background())
 }
 ```
@@ -213,7 +213,7 @@ let asterProcess;
 app.whenReady().then(() => {
     // 启动 Aster 后端
     asterProcess = spawn('./aster-desktop');
-    
+
     // 创建窗口
     const win = new BrowserWindow({
         width: 1024,
@@ -222,7 +222,7 @@ app.whenReady().then(() => {
             nodeIntegration: true
         }
     });
-    
+
     win.loadFile('index.html');
 });
 

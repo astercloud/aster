@@ -13,6 +13,7 @@ import (
 // 在消息发送到 LLM 前自动检测和脱敏 PII。
 type PIIRedactionMiddleware struct {
 	*middleware.BaseMiddleware
+
 	redactor       *Redactor
 	enableTracking bool                  // 是否启用追踪（用于还原）
 	tracking       map[string][]PIIMatch // 追踪每个 Agent 的 PII 匹配
@@ -245,6 +246,7 @@ type PIIDetectionSummary struct {
 // 根据上下文条件决定是否脱敏。
 type ConditionalPIIMiddleware struct {
 	*middleware.BaseMiddleware
+
 	redactor  *Redactor
 	condition func(context.Context, *middleware.ModelRequest) bool
 }

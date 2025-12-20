@@ -48,7 +48,7 @@ func main() {
 			if data, ok := dataMap["data"].([]string); ok {
 				processed := make([]string, len(data))
 				for i, item := range data {
-					processed[i] = fmt.Sprintf("processed_%s", item)
+					processed[i] = "processed_" + item
 				}
 				return &workflow.StepOutput{
 					Content: map[string]any{
@@ -60,7 +60,7 @@ func main() {
 			}
 		}
 
-		return nil, fmt.Errorf("invalid input: expected map with 'data' field")
+		return nil, errors.New("invalid input: expected map with 'data' field")
 	}))
 
 	// 步骤 3: 转换数据

@@ -38,7 +38,7 @@ func (ms *MockSandbox) Exec(ctx context.Context, cmd string, opts *ExecOptions) 
 	// 模拟命令执行
 	return &ExecResult{
 		Code:   0,
-		Stdout: fmt.Sprintf("Mock output for: %s", cmd),
+		Stdout: "Mock output for: " + cmd,
 		Stderr: "",
 	}, nil
 }

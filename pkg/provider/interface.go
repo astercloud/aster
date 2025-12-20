@@ -210,10 +210,10 @@ type ProviderCapabilities struct {
 	SupportVideo  bool // 是否支持视频
 
 	// 高级能力
-	SupportReasoning       bool // 是否支持推理模型（o1/o3/R1）
-	SupportPromptCache     bool // 是否支持 Prompt Caching
-	SupportJSONMode        bool // 是否支持 JSON 模式
-	SupportFunctionCall    bool // 是否支持 Function Calling
+	SupportReasoning        bool // 是否支持推理模型（o1/o3/R1）
+	SupportPromptCache      bool // 是否支持 Prompt Caching
+	SupportJSONMode         bool // 是否支持 JSON 模式
+	SupportFunctionCall     bool // 是否支持 Function Calling
 	SupportStructuredOutput bool // 是否支持结构化输出（JSON Schema）
 
 	// 限制

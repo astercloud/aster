@@ -1,8 +1,10 @@
 package security
 
 import (
+	"errors"
 	"fmt"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -441,7 +443,7 @@ func (bpe *BasicPolicyEngine) AddPolicy(policy *SecurityPolicy) error {
 	defer bpe.mu.Unlock()
 
 	if policy.ID == "" {
-		return fmt.Errorf("policy ID is required")
+		return errors.New("policy ID is required")
 	}
 
 	if _, exists := bpe.policies[policy.ID]; exists {
@@ -489,7 +491,7 @@ func (bpe *BasicPolicyEngine) UpdatePolicy(policy *SecurityPolicy) error {
 	defer bpe.mu.Unlock()
 
 	if policy.ID == "" {
-		return fmt.Errorf("policy ID is required")
+		return errors.New("policy ID is required")
 	}
 
 	existing, exists := bpe.policies[policy.ID]
@@ -612,10 +614,8 @@ func (bpe *BasicPolicyEngine) matchesFilters(policy *SecurityPolicy, filters map
 // containsAny 检查数组是否包含任意一个元素
 func containsAny(slice []string, elements []string) bool {
 	for _, elem := range elements {
-		for _, item := range slice {
-			if item == elem {
-				return true
-			}
+		if slices.Contains(slice, elem) {
+			return true
 		}
 	}
 	return false
@@ -797,7 +797,7 @@ func (bpe *BasicPolicyEngine) sortPoliciesByPriority(policies []*SecurityPolicy)
 	sorted := make([]*SecurityPolicy, len(policies))
 	copy(sorted, policies)
 
-	for i := 0; i < len(sorted)-1; i++ {
+	for i := range len(sorted) - 1 {
 		for j := i + 1; j < len(sorted); j++ {
 			if sorted[i].Priority < sorted[j].Priority {
 				sorted[i], sorted[j] = sorted[j], sorted[i]
@@ -965,10 +965,8 @@ func (bpe *BasicPolicyEngine) valueInList(value, list any) bool {
 			}
 		}
 	case []string:
-		for _, item := range list {
-			if item == valStr {
-				return true
-			}
+		if slices.Contains(list, valStr) {
+			return true
 		}
 	}
 
@@ -1039,10 +1037,5 @@ func (bpe *BasicPolicyEngine) determineRiskLevel(score float64) RiskLevel {
 
 // containsPolicy 检查字符串是否在数组中
 func containsPolicy(slice []string, item string) bool {
-	for _, s := range slice {
-		if s == item {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(slice, item)
 }

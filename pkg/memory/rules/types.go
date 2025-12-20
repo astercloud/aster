@@ -3,6 +3,7 @@
 package rules
 
 import (
+	"strings"
 	"time"
 )
 
@@ -136,15 +137,17 @@ func (rs *RuleSet) GetRulesContent(projectID string) string {
 	}
 
 	var content string
+	var contentSb139 strings.Builder
 	for _, r := range rules {
-		content += r.Content + "\n\n"
+		contentSb139.WriteString(r.Content + "\n\n")
 	}
+	content += contentSb139.String()
 	return content
 }
 
 // sortRulesByPriority 按优先级排序
 func sortRulesByPriority(rules []*Rule) {
-	for i := 0; i < len(rules)-1; i++ {
+	for i := range len(rules) - 1 {
 		for j := i + 1; j < len(rules); j++ {
 			if rules[j].Priority > rules[i].Priority {
 				rules[i], rules[j] = rules[j], rules[i]

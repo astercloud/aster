@@ -3,6 +3,7 @@ package executionplan
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -71,13 +72,13 @@ type planStepResp struct {
 // Generate 生成执行计划
 func (g *Generator) Generate(ctx context.Context, req *PlanRequest) (*ExecutionPlan, error) {
 	if req.UserRequest == "" {
-		return nil, fmt.Errorf("user request cannot be empty")
+		return nil, errors.New("user request cannot be empty")
 	}
 
 	// 构建可用工具描述
 	toolDescriptions := g.buildToolDescriptions(req.AvailableTools)
 	if toolDescriptions == "" {
-		return nil, fmt.Errorf("no tools available for plan generation")
+		return nil, errors.New("no tools available for plan generation")
 	}
 
 	// 构建提示词
@@ -293,7 +294,7 @@ func (g *Generator) parseResponse(content string) (*ExecutionPlan, error) {
 		// 如果直接解析失败，尝试提取 JSON 部分
 		jsonStr, extractErr := extractJSON(content)
 		if extractErr != nil {
-			return nil, fmt.Errorf("failed to extract JSON from response: %w (original error: %v)", extractErr, err)
+			return nil, fmt.Errorf("failed to extract JSON from response: %w (original error: %w)", extractErr, err)
 		}
 		if err := json.Unmarshal([]byte(jsonStr), &planResp); err != nil {
 			return nil, fmt.Errorf("failed to parse extracted JSON: %w", err)
@@ -339,7 +340,7 @@ func extractJSON(text string) (string, error) {
 	end := strings.LastIndex(text, "}")
 
 	if start == -1 || end == -1 || end <= start {
-		return "", fmt.Errorf("no valid JSON object found in text")
+		return "", errors.New("no valid JSON object found in text")
 	}
 
 	return text[start : end+1], nil
@@ -413,40 +414,40 @@ func getStatusIcon(status StepStatus) string {
 
 // ValidatePlan 验证执行计划
 func (g *Generator) ValidatePlan(plan *ExecutionPlan) []error {
-	var errors []error
+	var errs []error
 
 	if plan.Description == "" {
-		errors = append(errors, fmt.Errorf("plan description is required"))
+		errs = append(errs, errors.New("plan description is required"))
 	}
 
 	if len(plan.Steps) == 0 {
-		errors = append(errors, fmt.Errorf("plan must have at least one step"))
+		errs = append(errs, errors.New("plan must have at least one step"))
 	}
 
 	for i, step := range plan.Steps {
 		// 验证工具是否存在
 		if _, ok := g.tools[step.ToolName]; !ok {
-			errors = append(errors, fmt.Errorf("step %d: unknown tool '%s'", i+1, step.ToolName))
+			errs = append(errs, fmt.Errorf("step %d: unknown tool '%s'", i+1, step.ToolName))
 		}
 
 		if step.Description == "" {
-			errors = append(errors, fmt.Errorf("step %d: description is required", i+1))
+			errs = append(errs, fmt.Errorf("step %d: description is required", i+1))
 		}
 
 		// 验证依赖关系
 		for _, depID := range step.DependsOn {
 			found := false
-			for j := 0; j < i; j++ {
+			for j := range i {
 				if plan.Steps[j].ID == depID {
 					found = true
 					break
 				}
 			}
 			if !found {
-				errors = append(errors, fmt.Errorf("step %d: invalid dependency '%s'", i+1, depID))
+				errs = append(errs, fmt.Errorf("step %d: invalid dependency '%s'", i+1, depID))
 			}
 		}
 	}
 
-	return errors
+	return errs
 }

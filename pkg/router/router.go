@@ -2,6 +2,7 @@ package router
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/types"
@@ -73,7 +74,7 @@ func (r *StaticRouter) SelectModel(_ context.Context, intent *RouteIntent) (*typ
 		if r.defaultModel != nil {
 			return r.defaultModel, nil
 		}
-		return nil, fmt.Errorf("route intent is nil and no default model configured")
+		return nil, errors.New("route intent is nil and no default model configured")
 	}
 
 	// 1. Task + Priority 精确匹配

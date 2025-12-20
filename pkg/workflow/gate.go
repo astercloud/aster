@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -43,8 +44,8 @@ type Gate interface {
 type GateInput struct {
 	StepOutput      *StepOutput
 	PreviousOutputs map[string]*StepOutput
-	Project         interface{} // 项目上下文
-	Constraints     interface{} // 约束条件
+	Project         any // 项目上下文
+	Constraints     any // 约束条件
 	SessionState    map[string]any
 	Metadata        map[string]any
 }
@@ -445,7 +446,7 @@ func NewGateRegistry() *GateRegistry {
 
 func (gr *GateRegistry) Register(gate Gate) error {
 	if gate == nil {
-		return fmt.Errorf("gate cannot be nil")
+		return errors.New("gate cannot be nil")
 	}
 	gr.gates[gate.Name()] = gate
 	return nil

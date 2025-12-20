@@ -190,7 +190,7 @@ async def main():
 asyncio.run(main())
 `
 
-	for i := 0; i < iterations; i++ {
+	for range iterations {
 		start := time.Now()
 		_, _ = runtime.Execute(ctx, simpleCode, map[string]any{})
 		totalDuration += time.Since(start)

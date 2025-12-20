@@ -200,11 +200,11 @@ func (m *Manager) parseMarkdownRules(content, sourcePath string, scope Scope) ([
 
 // extractTitle 从 Markdown 中提取标题
 func extractTitle(content string) string {
-	lines := strings.Split(content, "\n")
-	for _, line := range lines {
+	lines := strings.SplitSeq(content, "\n")
+	for line := range lines {
 		line = strings.TrimSpace(line)
-		if strings.HasPrefix(line, "# ") {
-			return strings.TrimPrefix(line, "# ")
+		if after, ok := strings.CutPrefix(line, "# "); ok {
+			return after
 		}
 	}
 	return ""

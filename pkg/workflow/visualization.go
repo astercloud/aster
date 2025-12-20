@@ -66,7 +66,7 @@ func (v *WorkflowVisualizer) GenerateMermaid() string {
 	for _, edge := range v.workflow.Edges {
 		label := ""
 		if edge.Label != "" {
-			label = fmt.Sprintf(" | %s", edge.Label)
+			label = " | " + edge.Label
 		}
 		builder.WriteString(fmt.Sprintf("  %s --> %s%s\n",
 			edge.From, edge.To, label))
@@ -88,7 +88,7 @@ func (v *WorkflowVisualizer) GenerateASCII() string {
 	copy(sortedNodes, v.workflow.Nodes)
 
 	// 简单的Y坐标排序
-	for i := 0; i < len(sortedNodes)-1; i++ {
+	for i := range len(sortedNodes) - 1 {
 		for j := i + 1; j < len(sortedNodes); j++ {
 			if sortedNodes[i].Position.Y > sortedNodes[j].Position.Y {
 				sortedNodes[i], sortedNodes[j] = sortedNodes[j], sortedNodes[i]

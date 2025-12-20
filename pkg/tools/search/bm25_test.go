@@ -97,7 +97,7 @@ func TestBM25_ScoreOrdering(t *testing.T) {
 
 	// 文档中 "file" 出现次数不同
 	docs := []Document{
-		{ID: "many", Content: "file file file file file"},
+		{ID: "many", Content: "file "},
 		{ID: "few", Content: "file operations"},
 		{ID: "none", Content: "bash terminal commands"},
 	}

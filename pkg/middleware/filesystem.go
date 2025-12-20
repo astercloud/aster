@@ -34,6 +34,7 @@ type FilesystemMiddlewareConfig struct {
 // 4. 路径安全验证
 type FilesystemMiddleware struct {
 	*BaseMiddleware
+
 	backend                 backends.BackendProtocol
 	tokenLimit              int
 	enableEviction          bool
@@ -220,9 +221,11 @@ func splitLines(s string, limit int) []string {
 
 func joinLines(lines []string) string {
 	result := ""
+	var resultSb223 strings.Builder
 	for _, line := range lines {
-		result += line
+		resultSb223.WriteString(line)
 	}
+	result += resultSb223.String()
 	return result
 }
 

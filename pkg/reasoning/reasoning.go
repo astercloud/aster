@@ -4,6 +4,7 @@ import (
 	"context"
 	"encoding/json"
 	"fmt"
+	"strings"
 	"time"
 )
 
@@ -184,16 +185,18 @@ func (c *Chain) Summary() string {
 	summary += fmt.Sprintf("Steps: %d/%d (min: %d, max: %d)\n", len(c.Steps), c.MaxSteps, c.MinSteps, c.MaxSteps)
 	summary += fmt.Sprintf("Status: %s\n\n", c.Status)
 
+	var summarySb187 strings.Builder
 	for i, step := range c.Steps {
-		summary += fmt.Sprintf("Step %d: %s\n", i+1, step.Title)
-		summary += fmt.Sprintf("  Action: %s\n", step.Action)
-		summary += fmt.Sprintf("  Confidence: %.2f\n", step.Confidence)
-		summary += fmt.Sprintf("  Status: %s\n", step.Status)
+		summarySb187.WriteString(fmt.Sprintf("Step %d: %s\n", i+1, step.Title))
+		summarySb187.WriteString(fmt.Sprintf("  Action: %s\n", step.Action))
+		summarySb187.WriteString(fmt.Sprintf("  Confidence: %.2f\n", step.Confidence))
+		summarySb187.WriteString(fmt.Sprintf("  Status: %s\n", step.Status))
 		if step.Result != "" {
-			summary += fmt.Sprintf("  Result: %s\n", truncate(step.Result, 100))
+			summarySb187.WriteString(fmt.Sprintf("  Result: %s\n", truncate(step.Result, 100)))
 		}
-		summary += "\n"
+		summarySb187.WriteString("\n")
 	}
+	summary += summarySb187.String()
 
 	return summary
 }

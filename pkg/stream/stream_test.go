@@ -123,7 +123,7 @@ func TestCopy_Concurrent(t *testing.T) {
 	// 开始写入
 	go func() {
 		defer writer.Close()
-		for i := 0; i < 100; i++ {
+		for i := range 100 {
 			writer.Send(i, nil)
 		}
 	}()
@@ -453,8 +453,7 @@ func BenchmarkCopy(b *testing.B) {
 		data[i] = i
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		reader := FromSlice(data)
 		copies := reader.Copy(3)
 		for _, c := range copies {
@@ -469,8 +468,7 @@ func BenchmarkTransform(b *testing.B) {
 		data[i] = i
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		reader := FromSlice(data)
 		transformed := Transform(reader, func(v int) (int, error) {
 			return v * 2, nil

@@ -8,7 +8,6 @@ import (
 	"time"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/stretchr/testify/require"
 	"github.com/stretchr/testify/suite"
 
 	"github.com/astercloud/aster/pkg/agent"
@@ -45,7 +44,7 @@ func (s *AgentIntegrationSuite) SetupSuite() {
 
 	// 确保工作目录存在
 	err := os.MkdirAll(s.workspace, 0755)
-	require.NoError(s.T(), err, "创建工作目录失败")
+	s.Require().NoError(err, "创建工作目录失败")
 }
 
 // TearDownSuite 在所有测试结束后执行一次
@@ -66,7 +65,7 @@ func (s *AgentIntegrationSuite) SetupTest() {
 
 	var err error
 	s.ag, err = createTestAgent(s.apiKey)
-	require.NoError(s.T(), err, "创建 Agent 失败")
+	s.Require().NoError(err, "创建 Agent 失败")
 
 	// 订阅事件（用于调试）
 	s.eventCh = s.ag.Subscribe(
@@ -111,50 +110,50 @@ func (s *AgentIntegrationSuite) handleEvents() {
 func (s *AgentIntegrationSuite) TestCreateFile() {
 	result, err := s.ag.Chat(s.ctx, "使用 Write 工具在当前目录创建文件 test.txt，文件内容为: Hello World")
 
-	require.NoError(s.T(), err, "Chat 调用失败")
-	require.NotNil(s.T(), result, "结果不应为空")
-	assert.Equal(s.T(), "ok", result.Status, "状态应为 ok")
+	s.Require().NoError(err, "Chat 调用失败")
+	s.Require().NotNil(result, "结果不应为空")
+	s.Equal("ok", result.Status, "状态应为 ok")
 
 	// 等待文件操作完成
 	time.Sleep(300 * time.Millisecond)
 
 	// 验证文件创建
 	data, err := os.ReadFile(s.workspace + "/test.txt")
-	require.NoError(s.T(), err, "文件应该已创建")
-	assert.Equal(s.T(), "Hello World", strings.TrimSpace(string(data)), "文件内容不匹配")
+	s.Require().NoError(err, "文件应该已创建")
+	s.Equal("Hello World", strings.TrimSpace(string(data)), "文件内容不匹配")
 }
 
 func (s *AgentIntegrationSuite) TestReadFile() {
 	// 先创建测试文件
 	testContent := "这是测试内容"
 	err := os.WriteFile(s.workspace+"/test.txt", []byte(testContent), 0644)
-	require.NoError(s.T(), err, "创建测试文件失败")
+	s.Require().NoError(err, "创建测试文件失败")
 
 	result, err := s.ag.Chat(s.ctx, "使用 Read 工具读取 test.txt 文件的内容")
 
-	require.NoError(s.T(), err, "Chat 调用失败")
-	require.NotNil(s.T(), result, "结果不应为空")
-	assert.Equal(s.T(), "ok", result.Status, "状态应为 ok")
+	s.Require().NoError(err, "Chat 调用失败")
+	s.Require().NotNil(result, "结果不应为空")
+	s.Equal("ok", result.Status, "状态应为 ok")
 }
 
 func (s *AgentIntegrationSuite) TestBashCommand() {
 	result, err := s.ag.Chat(s.ctx, "使用 Bash 工具执行命令: ls -la")
 
-	require.NoError(s.T(), err, "Chat 调用失败")
-	require.NotNil(s.T(), result, "结果不应为空")
-	assert.Equal(s.T(), "ok", result.Status, "状态应为 ok")
+	s.Require().NoError(err, "Chat 调用失败")
+	s.Require().NotNil(result, "结果不应为空")
+	s.Equal("ok", result.Status, "状态应为 ok")
 }
 
 func (s *AgentIntegrationSuite) TestAgentStatus() {
 	// 先执行一个简单操作确保有步骤记录
 	_, err := s.ag.Chat(s.ctx, "你好")
-	require.NoError(s.T(), err)
+	s.Require().NoError(err)
 
 	status := s.ag.Status()
 
-	assert.Equal(s.T(), types.AgentStateReady, status.State, "Agent 状态应为 Ready")
-	assert.Greater(s.T(), status.StepCount, 0, "步骤计数应大于 0")
-	assert.NotEmpty(s.T(), status.AgentID, "Agent ID 不应为空")
+	s.Equal(types.AgentStateReady, status.State, "Agent 状态应为 Ready")
+	assert.Positive(s.T(), status.StepCount, "步骤计数应大于 0")
+	s.NotEmpty(status.AgentID, "Agent ID 不应为空")
 
 	s.T().Logf("Agent 状态: ID=%s, State=%s, Steps=%d",
 		status.AgentID, status.State, status.StepCount)
@@ -175,9 +174,9 @@ func (s *AgentIntegrationSuite) TestMultipleBashCommands() {
 		s.Run(tc.name, func() {
 			result, err := s.ag.Chat(s.ctx, tc.prompt)
 
-			require.NoError(s.T(), err, "Chat 调用失败")
-			require.NotNil(s.T(), result, "结果不应为空")
-			assert.Equal(s.T(), "ok", result.Status, "状态应为 ok")
+			s.Require().NoError(err, "Chat 调用失败")
+			s.Require().NotNil(result, "结果不应为空")
+			s.Equal("ok", result.Status, "状态应为 ok")
 		})
 	}
 }

@@ -112,6 +112,7 @@ func NewBaseEvent(eventType EventType, runID string) *BaseEvent {
 // AgentEvent Agent 事件
 type AgentEvent struct {
 	BaseEvent
+
 	AgentID string         `json:"agent_id,omitempty"`
 	Content string         `json:"content,omitempty"`
 	Delta   string         `json:"delta,omitempty"`
@@ -121,6 +122,7 @@ type AgentEvent struct {
 // WorkflowEvent Workflow 事件
 type WorkflowEvent struct {
 	BaseEvent
+
 	WorkflowID string         `json:"workflow_id,omitempty"`
 	StepID     string         `json:"step_id,omitempty"`
 	StepName   string         `json:"step_name,omitempty"`
@@ -132,6 +134,7 @@ type WorkflowEvent struct {
 // TeamEvent Team 事件
 type TeamEvent struct {
 	BaseEvent
+
 	TeamID   string         `json:"team_id,omitempty"`
 	MemberID string         `json:"member_id,omitempty"`
 	Role     string         `json:"role,omitempty"`
@@ -141,6 +144,7 @@ type TeamEvent struct {
 // StatusChangeEvent 状态变更事件
 type StatusChangeEvent struct {
 	BaseEvent
+
 	OldStatus Status `json:"old_status"`
 	NewStatus Status `json:"new_status"`
 	Reason    string `json:"reason,omitempty"`
@@ -149,6 +153,7 @@ type StatusChangeEvent struct {
 // MetricsEvent 指标事件
 type MetricsEvent struct {
 	BaseEvent
+
 	TokensUsed    int     `json:"tokens_used,omitempty"`
 	TokensInput   int     `json:"tokens_input,omitempty"`
 	TokensOutput  int     `json:"tokens_output,omitempty"`

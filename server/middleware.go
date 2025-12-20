@@ -70,7 +70,7 @@ func corsMiddleware(config CORSConfig) gin.HandlerFunc {
 			}
 		}
 
-		if c.Request.Method == "OPTIONS" {
+		if c.Request.Method == http.MethodOptions {
 			c.AbortWithStatus(http.StatusNoContent)
 			return
 		}

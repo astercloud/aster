@@ -2,7 +2,7 @@ package builtin
 
 import (
 	"context"
-	"fmt"
+	"errors"
 
 	"github.com/astercloud/aster/pkg/skills"
 	"github.com/astercloud/aster/pkg/tools"
@@ -50,23 +50,23 @@ func (t *SkillTool) InputSchema() map[string]any {
 func (t *SkillTool) Execute(ctx context.Context, input map[string]any, tc *tools.ToolContext) (any, error) {
 	// 获取 Runtime
 	if tc == nil || tc.Services == nil {
-		return nil, fmt.Errorf("skill_call: ToolContext.Services is nil; skills runtime not available")
+		return nil, errors.New("skill_call: ToolContext.Services is nil; skills runtime not available")
 	}
 
 	rtAny, ok := tc.Services["skills_runtime"]
 	if !ok {
-		return nil, fmt.Errorf("skill_call: skills runtime not found in ToolContext.Services (key: \"skills_runtime\")")
+		return nil, errors.New("skill_call: skills runtime not found in ToolContext.Services (key: \"skills_runtime\")")
 	}
 
 	rt, ok := rtAny.(*skills.Runtime)
 	if !ok || rt == nil {
-		return nil, fmt.Errorf("skill_call: invalid skills runtime type in ToolContext.Services")
+		return nil, errors.New("skill_call: invalid skills runtime type in ToolContext.Services")
 	}
 
 	// 解析输入
 	skillName, ok := input["skill"].(string)
 	if !ok || skillName == "" {
-		return nil, fmt.Errorf("skill_call: \"skill\" must be a non-empty string")
+		return nil, errors.New("skill_call: \"skill\" must be a non-empty string")
 	}
 
 	// params 期望为 map[string]string，但 JSON 反序列化会是 map[string]any

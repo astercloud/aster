@@ -242,8 +242,7 @@ func BenchmarkMiddlewareStack(b *testing.B) {
 	})
 	stack := NewStack([]Middleware{middleware})
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = stack.Tools()
 	}
 }
@@ -253,8 +252,7 @@ func BenchmarkBackendWrite(b *testing.B) {
 	backend := backends.NewStateBackend()
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = backend.Write(ctx, "/bench.txt", "test content")
 	}
 }

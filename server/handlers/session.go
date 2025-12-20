@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -132,7 +133,7 @@ func (h *SessionHandler) Get(c *gin.Context) {
 
 	var session SessionRecord
 	if err := (*h.store).Get(ctx, "sessions", id, &session); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -182,7 +183,7 @@ func (h *SessionHandler) Update(c *gin.Context) {
 
 	var session SessionRecord
 	if err := (*h.store).Get(ctx, "sessions", id, &session); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -241,7 +242,7 @@ func (h *SessionHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "sessions", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -275,7 +276,7 @@ func (h *SessionHandler) GetMessages(c *gin.Context) {
 
 	var session SessionRecord
 	if err := (*h.store).Get(ctx, "sessions", id, &session); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -342,7 +343,7 @@ func (h *SessionHandler) Resume(c *gin.Context) {
 
 	var session SessionRecord
 	if err := (*h.store).Get(ctx, "sessions", id, &session); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

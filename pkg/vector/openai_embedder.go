@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -56,7 +57,7 @@ func (e *OpenAIEmbedder) EmbedText(ctx context.Context, texts []string) ([][]flo
 		return [][]float32{}, nil
 	}
 	if e.APIKey == "" {
-		return nil, fmt.Errorf("API key is required for OpenAIEmbedder")
+		return nil, errors.New("API key is required for OpenAIEmbedder")
 	}
 
 	reqBody := openAIEmbeddingRequest{

@@ -1,6 +1,7 @@
 package telemetry
 
 import (
+	"strings"
 	"sync"
 	"time"
 )
@@ -259,9 +260,11 @@ func makeKey(name string, labels map[string]string) string {
 	}
 
 	key := name
+	var keySb262 strings.Builder
 	for k, v := range labels {
-		key += ":" + k + "=" + v
+		keySb262.WriteString(":" + k + "=" + v)
 	}
+	key += keySb262.String()
 	return key
 }
 

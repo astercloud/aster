@@ -2,6 +2,7 @@ package session
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -118,7 +119,7 @@ func (s *Summarizer) SummarizeSession(ctx context.Context, messages []types.Mess
 // SummarizeIncremental 增量摘要（基于之前的摘要）
 func (s *Summarizer) SummarizeIncremental(ctx context.Context, previousSummary string, newMessages []types.Message) (*SessionSummary, error) {
 	if len(newMessages) == 0 {
-		return nil, fmt.Errorf("no new messages to summarize")
+		return nil, errors.New("no new messages to summarize")
 	}
 
 	prompt := s.buildIncrementalSummaryPrompt(previousSummary, newMessages)

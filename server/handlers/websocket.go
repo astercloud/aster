@@ -216,7 +216,7 @@ func (h *WebSocketHandler) handleMessage(wsConn *WebSocketConnection, msg *WebSo
 	case "permission_decision":
 		h.handlePermissionDecision(wsConn, msg.Payload)
 	default:
-		h.sendError(wsConn, "unknown_message_type", fmt.Sprintf("Unknown message type: %s", msg.Type))
+		h.sendError(wsConn, "unknown_message_type", "Unknown message type: "+msg.Type)
 	}
 }
 
@@ -392,11 +392,13 @@ func (h *WebSocketHandler) handleChat(wsConn *WebSocketConnection, payload map[s
 
 				// Extract text content from event
 				var textContent string
+				var textContentSb395 strings.Builder
 				for _, block := range event.Content.ContentBlocks {
 					if tb, ok := block.(*types.TextBlock); ok {
-						textContent += tb.Text
+						textContentSb395.WriteString(tb.Text)
 					}
 				}
+				textContent += textContentSb395.String()
 
 				if textContent != "" {
 					logging.Info(wsConn.ctx, "websocket.stream.sending_text_delta", map[string]any{

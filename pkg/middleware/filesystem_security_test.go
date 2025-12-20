@@ -389,8 +389,7 @@ func BenchmarkPathValidation(b *testing.B) {
 		"/workspace/./redundant/../path/file.txt",
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		path := paths[i%len(paths)]
 		_, _ = middleware.validatePath(path)
 	}
@@ -410,8 +409,7 @@ func BenchmarkPathValidation_Disabled(b *testing.B) {
 		"~/secrets.txt",
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for i := 0; b.Loop(); i++ {
 		path := paths[i%len(paths)]
 		_, _ = middleware.validatePath(path)
 	}

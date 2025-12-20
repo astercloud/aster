@@ -17,7 +17,7 @@ const (
 	StatusPaused Status = "PAUSED"
 
 	// StatusCancelled 取消
-	StatusCancelled Status = "CANCELLED"
+	StatusCancelled Status = "CANCELED"
 
 	// StatusError 错误
 	StatusError Status = "ERROR"

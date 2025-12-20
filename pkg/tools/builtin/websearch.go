@@ -4,6 +4,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"net/http"
 	"os"
@@ -97,7 +98,7 @@ func (t *WebSearchTool) Execute(ctx context.Context, input map[string]any, tc *t
 	// 2. 解析参数
 	query, ok := input["query"].(string)
 	if !ok || query == "" {
-		return nil, fmt.Errorf("query must be a non-empty string")
+		return nil, errors.New("query must be a non-empty string")
 	}
 
 	maxResults := 5
@@ -165,7 +166,7 @@ func (t *WebSearchTool) Execute(ctx context.Context, input map[string]any, tc *t
 	}
 
 	// 4. 发送请求到 Tavily API
-	req, err := http.NewRequestWithContext(ctx, "POST", "https://api.tavily.com/search", bytes.NewReader(jsonData))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, "https://api.tavily.com/search", bytes.NewReader(jsonData))
 	if err != nil {
 		return map[string]any{
 			"error": fmt.Sprintf("failed to create request: %v", err),

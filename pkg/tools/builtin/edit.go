@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -74,11 +75,11 @@ func (t *EditTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	backup := t.getBoolParam(input, "backup", true)
 
 	if filePath == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("file_path cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("file_path cannot be empty")), nil
 	}
 
 	if oldString == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("old_string cannot be empty")), nil
+		return NewClaudeErrorResponse(errors.New("old_string cannot be empty")), nil
 	}
 
 	// 如果 old_string 和 new_string 相同，直接返回成功但没有修改
@@ -96,7 +97,7 @@ func (t *EditTool) Execute(ctx context.Context, input map[string]any, tc *tools.
 	// 验证文件路径安全性
 	if err := t.validatePath(filePath); err != nil {
 		return NewClaudeErrorResponse(
-			fmt.Errorf("invalid file path: %v", err),
+			fmt.Errorf("invalid file path: %w", err),
 			"使用相对路径或允许的绝对路径",
 			"确保路径不包含 '..' 避免路径遍历攻击",
 		), nil

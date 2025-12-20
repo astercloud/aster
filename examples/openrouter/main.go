@@ -5,6 +5,7 @@ package main
 import (
 	"bufio"
 	"context"
+	"errors"
 	"fmt"
 	"log/slog"
 	"os"
@@ -56,7 +57,7 @@ func run(ctx context.Context, cmd *cli.Command) error {
 	// 检查 API Key
 	apiKey := os.Getenv("OPENROUTER_API_KEY")
 	if apiKey == "" {
-		return fmt.Errorf("需要设置 OPENROUTER_API_KEY 环境变量")
+		return errors.New("需要设置 OPENROUTER_API_KEY 环境变量")
 	}
 
 	baseURL := os.Getenv("OPENROUTER_BASE_URL")

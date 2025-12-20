@@ -245,7 +245,6 @@ type MemoryConfig struct {
 	Namespace string `json:"namespace,omitempty" yaml:"namespace,omitempty"`
 }
 
-
 // AgentTemplateRuntime Agent模板运行时配置
 type AgentTemplateRuntime struct {
 	ExposeThinking          bool                           `json:"expose_thinking,omitempty"`
@@ -273,7 +272,7 @@ type AgentTemplateDefinition struct {
 
 // ModelConfig 模型配置
 type ModelConfig struct {
-	Provider      string        `json:"provider" yaml:"provider"`                             // "anthropic", "openai", etc.
+	Provider      string        `json:"provider" yaml:"provider"` // "anthropic", "openai", etc.
 	Model         string        `json:"model" yaml:"model"`
 	APIKey        string        `json:"api_key,omitempty" yaml:"api_key,omitempty"`
 	BaseURL       string        `json:"base_url,omitempty" yaml:"base_url,omitempty"`

@@ -3,6 +3,7 @@ package security
 import (
 	"context"
 	"crypto/sha256"
+	"encoding/hex"
 	"fmt"
 	"strings"
 )
@@ -164,7 +165,7 @@ func (s *HashStrategy) Redact(match PIIMatch) string {
 	// 使用 SHA256 哈希
 	data := match.Value + s.Salt
 	hash := sha256.Sum256([]byte(data))
-	hashStr := fmt.Sprintf("%x", hash)
+	hashStr := hex.EncodeToString(hash[:])
 
 	if s.ShowPrefix {
 		prefix := hashStr[:min(s.PrefixLength, len(hashStr))]
@@ -346,18 +347,4 @@ func buildByteToRuneMap(text string) []int {
 	byteToRune[len(text)] = runeIndex
 
 	return byteToRune
-}
-
-func max(a, b int) int {
-	if a > b {
-		return a
-	}
-	return b
-}
-
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }

@@ -1,5 +1,5 @@
 # Code Review Assistant Recipe
-# 
+#
 # This recipe configures an AI agent for code review tasks.
 # Usage: aster run --recipe examples/recipes/code-review.yaml
 #
@@ -18,28 +18,28 @@ description: |
 # System instructions for the agent
 instructions: |
   You are a senior software engineer conducting a thorough code review.
-  
+
   ## Your Responsibilities:
   1. **Code Quality**: Check for clean code principles, proper naming, and code organization
   2. **Security**: Identify potential security vulnerabilities (injection, auth issues, etc.)
   3. **Performance**: Look for performance bottlenecks and optimization opportunities
   4. **Best Practices**: Ensure the code follows language-specific best practices
   5. **Testing**: Verify adequate test coverage and test quality
-  
+
   ## Review Process:
   1. First, understand the purpose of the code by reading any documentation
   2. Analyze the code structure and architecture
   3. Check individual functions/methods for issues
   4. Look for patterns that might cause problems at scale
   5. Provide actionable feedback with specific suggestions
-  
+
   ## Output Format:
   For each issue found, provide:
   - **Severity**: Critical / High / Medium / Low / Info
   - **Location**: File and line number
   - **Issue**: Clear description of the problem
   - **Suggestion**: How to fix it with code examples when helpful
-  
+
   Be constructive and educational in your feedback.
 
 # Initial prompt when starting the session
@@ -57,7 +57,7 @@ extensions:
   - type: builtin
     name: filesystem
     description: "File system access for reading code"
-  
+
   # Uncomment to enable git integration
   # - type: stdio
   #   name: git
@@ -72,7 +72,7 @@ parameters:
     requirement: optional
     description: "Directory to review (relative to current working directory)"
     default: "."
-  
+
   - key: language
     input_type: select
     requirement: optional
@@ -85,7 +85,7 @@ parameters:
       - rust
       - java
     default: "go"
-  
+
   - key: focus
     input_type: string
     requirement: optional

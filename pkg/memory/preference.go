@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sort"
 	"strings"
@@ -197,7 +198,7 @@ func (pm *PreferenceManager) GetPreference(
 
 	pref := pm.findExistingPreference(userID, category, key)
 	if pref == nil {
-		return nil, fmt.Errorf("preference not found")
+		return nil, errors.New("preference not found")
 	}
 
 	// 更新访问计数
@@ -238,7 +239,7 @@ func (pm *PreferenceManager) UpdatePreference(
 
 	pref := pm.findExistingPreference(userID, category, key)
 	if pref == nil {
-		return fmt.Errorf("preference not found")
+		return errors.New("preference not found")
 	}
 
 	pref.Value = value

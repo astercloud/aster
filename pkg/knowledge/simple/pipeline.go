@@ -2,7 +2,9 @@ package simple
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 
@@ -29,10 +31,10 @@ type Pipeline struct {
 // NewPipeline 创建知识管线。
 func NewPipeline(cfg PipelineConfig) (*Pipeline, error) {
 	if cfg.Store == nil {
-		return nil, fmt.Errorf("knowledge: store is required")
+		return nil, errors.New("knowledge: store is required")
 	}
 	if cfg.Embedder == nil {
-		return nil, fmt.Errorf("knowledge: embedder is required")
+		return nil, errors.New("knowledge: embedder is required")
 	}
 	if cfg.DefaultTopK <= 0 {
 		cfg.DefaultTopK = 5
@@ -73,11 +75,11 @@ func DefaultInMemoryPipeline() (*Pipeline, error) {
 // - metadata 会透传到向量文档。
 func (p *Pipeline) UpsertText(ctx context.Context, id, text string, metadata map[string]any) ([]string, error) {
 	if strings.TrimSpace(id) == "" {
-		return nil, fmt.Errorf("knowledge: id is required")
+		return nil, errors.New("knowledge: id is required")
 	}
 	chunks := splitParagraphs(text)
 	if len(chunks) == 0 {
-		return nil, fmt.Errorf("knowledge: text is empty")
+		return nil, errors.New("knowledge: text is empty")
 	}
 
 	vecs, err := p.embedder.EmbedText(ctx, chunks)
@@ -99,9 +101,7 @@ func (p *Pipeline) UpsertText(ctx context.Context, id, text string, metadata map
 	for i, chunk := range chunks {
 		chunkID := fmt.Sprintf("%s#%d", id, i)
 		metaCopy := make(map[string]any, len(metadata)+2)
-		for k, v := range metadata {
-			metaCopy[k] = v
-		}
+		maps.Copy(metaCopy, metadata)
 		metaCopy["text"] = chunk
 		metaCopy["chunk_index"] = i
 
@@ -125,7 +125,7 @@ func (p *Pipeline) UpsertText(ctx context.Context, id, text string, metadata map
 // 返回向量命中列表；不在此处做 rerank/过滤，保持简洁。
 func (p *Pipeline) Search(ctx context.Context, query string, topK int, metadata map[string]any) ([]vector.Hit, error) {
 	if strings.TrimSpace(query) == "" {
-		return nil, fmt.Errorf("knowledge: query is empty")
+		return nil, errors.New("knowledge: query is empty")
 	}
 	if topK <= 0 {
 		topK = p.defaultK
@@ -136,7 +136,7 @@ func (p *Pipeline) Search(ctx context.Context, query string, topK int, metadata 
 		return nil, fmt.Errorf("embed query: %w", err)
 	}
 	if len(vecs) == 0 {
-		return nil, fmt.Errorf("embedder returned empty vectors")
+		return nil, errors.New("embedder returned empty vectors")
 	}
 
 	ns := p.namespace

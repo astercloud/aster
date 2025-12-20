@@ -2,6 +2,7 @@ package dashboard
 
 import (
 	"context"
+	"slices"
 	"sort"
 	"sync"
 	"time"
@@ -19,11 +20,11 @@ type Aggregator struct {
 	traceBuilder   *TraceBuilder
 
 	// 缓存
-	mu             sync.RWMutex
-	tokenCache     map[string]*TokenUsageStats // key: period
-	traceCache     map[string]*TraceDetail     // key: traceID
-	cacheTTL       time.Duration
-	lastCacheTime  time.Time
+	mu            sync.RWMutex
+	tokenCache    map[string]*TokenUsageStats // key: period
+	traceCache    map[string]*TraceDetail     // key: traceID
+	cacheTTL      time.Duration
+	lastCacheTime time.Time
 }
 
 // NewAggregator 创建聚合器
@@ -457,10 +458,7 @@ func (a *Aggregator) QueryTraces(ctx context.Context, opts TraceQueryOpts) (*Tra
 		}, nil
 	}
 
-	end := offset + limit
-	if end > len(filtered) {
-		end = len(filtered)
-	}
+	end := min(offset+limit, len(filtered))
 
 	return &TraceListResult{
 		Traces:  filtered[offset:end],
@@ -649,8 +647,8 @@ func (a *Aggregator) GetInsights(ctx context.Context) ([]Insight, error) {
 				Description: "过去 24 小时的错误率超过 5%",
 				Suggestion:  "检查错误日志，识别常见错误模式并修复",
 				Data: map[string]any{
-					"error_rate":   perfStats.ErrorRate,
-					"error_count":  perfStats.ErrorCount,
+					"error_rate":    perfStats.ErrorRate,
+					"error_count":   perfStats.ErrorCount,
 					"request_count": perfStats.RequestCount,
 				},
 				CreatedAt: time.Now(),
@@ -733,9 +731,7 @@ func calculatePercentiles(values []int64) LatencyPercentiles {
 	// 排序
 	sorted := make([]int64, len(values))
 	copy(sorted, values)
-	sort.Slice(sorted, func(i, j int) bool {
-		return sorted[i] < sorted[j]
-	})
+	slices.Sort(sorted)
 
 	n := len(sorted)
 
@@ -831,5 +827,3 @@ func (a *Aggregator) getOverviewStatsFromStore(ctx context.Context, period strin
 		UpdatedAt:    now,
 	}, nil
 }
-
-

@@ -411,7 +411,7 @@ func (s *LoopStep) Execute(ctx context.Context, input *StepInput) *stream.Reader
 		var iterations []*StepOutput
 		var lastOutput *StepOutput
 
-		for i := 0; i < s.maxIterations; i++ {
+		for i := range s.maxIterations {
 			loopInput := &StepInput{
 				Input:               input.Input,
 				PreviousStepOutputs: input.PreviousStepOutputs,

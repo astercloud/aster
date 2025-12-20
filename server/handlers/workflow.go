@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -30,7 +31,7 @@ type WorkflowTrigger struct {
 type WorkflowExecution struct {
 	ID          string         `json:"id"`
 	WorkflowID  string         `json:"workflow_id"`
-	Status      string         `json:"status"` // pending, running, completed, failed, cancelled
+	Status      string         `json:"status"` // pending, running, completed, failed, canceled
 	StartedAt   time.Time      `json:"started_at"`
 	CompletedAt *time.Time     `json:"completed_at,omitempty"`
 	Result      map[string]any `json:"result,omitempty"`
@@ -181,7 +182,7 @@ func (h *WorkflowHandler) Get(c *gin.Context) {
 
 	var workflow WorkflowRecord
 	if err := (*h.store).Get(ctx, "workflows", id, &workflow); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -235,7 +236,7 @@ func (h *WorkflowHandler) Update(c *gin.Context) {
 
 	var workflow WorkflowRecord
 	if err := (*h.store).Get(ctx, "workflows", id, &workflow); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -314,7 +315,7 @@ func (h *WorkflowHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "workflows", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -358,7 +359,7 @@ func (h *WorkflowHandler) Execute(c *gin.Context) {
 	// Check if workflow exists
 	var workflow WorkflowRecord
 	if err := (*h.store).Get(ctx, "workflows", id, &workflow); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -455,7 +456,7 @@ func (h *WorkflowHandler) GetExecutionDetails(c *gin.Context) {
 
 	var execution WorkflowExecution
 	if err := (*h.store).Get(ctx, "workflow_executions", executionID, &execution); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -488,7 +489,7 @@ func (h *WorkflowHandler) Suspend(c *gin.Context) {
 
 	var workflow WorkflowRecord
 	if err := (*h.store).Get(ctx, "workflows", id, &workflow); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -535,7 +536,7 @@ func (h *WorkflowHandler) Resume(c *gin.Context) {
 
 	var workflow WorkflowRecord
 	if err := (*h.store).Get(ctx, "workflows", id, &workflow); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

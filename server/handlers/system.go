@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"runtime"
 	"time"
 
@@ -54,7 +55,7 @@ func (h *SystemHandler) GetConfig(c *gin.Context) {
 
 	var cfg SystemConfigRecord
 	if err := h.store.Get(ctx, "system_config", key, &cfg); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "config not found"}})
 			return
 		}
@@ -100,7 +101,7 @@ func (h *SystemHandler) DeleteConfig(c *gin.Context) {
 	key := c.Param("key")
 
 	if err := h.store.Delete(ctx, "system_config", key); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(404, gin.H{"success": false, "error": gin.H{"code": "not_found", "message": "config not found"}})
 			return
 		}

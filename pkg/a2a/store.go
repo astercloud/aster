@@ -2,6 +2,7 @@ package a2a
 
 import (
 	"fmt"
+	"maps"
 	"sync"
 )
 
@@ -167,9 +168,7 @@ func copyTask(task *Task) *Task {
 	// 拷贝 Metadata
 	if task.Metadata != nil {
 		copied.Metadata = make(Metadata)
-		for k, v := range task.Metadata {
-			copied.Metadata[k] = v
-		}
+		maps.Copy(copied.Metadata, task.Metadata)
 	}
 
 	return copied

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -20,6 +21,7 @@ var wmLog = logging.ForComponent("WorkingMemoryMiddleware")
 // 3. 提供 update_working_memory 工具
 type WorkingMemoryMiddleware struct {
 	*BaseMiddleware
+
 	manager              *memory.WorkingMemoryManager
 	systemPromptTemplate string
 	workingMemoryTools   []tools.Tool
@@ -41,11 +43,11 @@ type WorkingMemoryMiddlewareConfig struct {
 // NewWorkingMemoryMiddleware 创建 Working Memory 中间件
 func NewWorkingMemoryMiddleware(config *WorkingMemoryMiddlewareConfig) (*WorkingMemoryMiddleware, error) {
 	if config == nil {
-		return nil, fmt.Errorf("working memory not configured properly")
+		return nil, errors.New("working memory not configured properly")
 	}
 
 	if config.Backend == nil {
-		return nil, fmt.Errorf("backend is required")
+		return nil, errors.New("backend is required")
 	}
 
 	// 创建 Working Memory 管理器

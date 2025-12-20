@@ -133,15 +133,15 @@ func (s *Scheduler) OnStep(callback StepCallback) func() {
 	s.stepListeners = append(s.stepListeners, callback)
 
 	// 返回取消函数
-	cancelled := false
+	canceled := false
 	return func() {
 		s.mu.Lock()
 		defer s.mu.Unlock()
 
-		if cancelled {
+		if canceled {
 			return
 		}
-		cancelled = true
+		canceled = true
 
 		// 从列表中移除
 		if index < len(s.stepListeners) {

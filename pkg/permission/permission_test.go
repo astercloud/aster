@@ -504,8 +504,7 @@ func BenchmarkCheck(b *testing.B) {
 		Arguments: map[string]any{"path": "/tmp/test.txt"},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = inspector.Check(ctx, call)
 	}
 }
@@ -515,7 +514,7 @@ func BenchmarkCheckWithRules(b *testing.B) {
 	ctx := context.Background()
 
 	// Add some rules
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		inspector.AddRule(Rule{
 			Pattern:   "tool_" + string(rune('a'+i%26)),
 			Decision:  DecisionAllow,
@@ -529,8 +528,7 @@ func BenchmarkCheckWithRules(b *testing.B) {
 		Arguments: map[string]any{"path": "/tmp/test.txt"},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = inspector.Check(ctx, call)
 	}
 }

@@ -164,7 +164,7 @@ func TestMySQLService_AppendEvent(t *testing.T) {
 		// 验证事件已存储
 		events, err := service.GetEvents(ctx, sess.ID, nil)
 		require.NoError(t, err)
-		assert.Equal(t, 1, len(events))
+		assert.Len(t, events, 1)
 		assert.Equal(t, event.ID, events[0].ID)
 	})
 
@@ -232,7 +232,7 @@ func TestMySQLService_AppendEvent(t *testing.T) {
 		for _, e := range events {
 			if e.ID == "evt-003" {
 				found = true
-				assert.Equal(t, 1, len(e.Content.ToolCalls))
+				assert.Len(t, e.Content.ToolCalls, 1)
 				assert.Equal(t, "search", e.Content.ToolCalls[0].Name)
 			}
 		}
@@ -249,7 +249,7 @@ func TestMySQLService_List(t *testing.T) {
 
 	// 创建多个 Sessions
 	userID := "user-list-test"
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		_, err := service.Create(ctx, &session.CreateRequest{
 			AppName: "test-app",
 			UserID:  userID,
@@ -261,7 +261,7 @@ func TestMySQLService_List(t *testing.T) {
 	t.Run("list all for user", func(t *testing.T) {
 		sessions, err := service.List(ctx, userID, nil)
 		require.NoError(t, err)
-		assert.Equal(t, 5, len(sessions))
+		assert.Len(t, sessions, 5)
 	})
 
 	t.Run("list with limit", func(t *testing.T) {
@@ -269,7 +269,7 @@ func TestMySQLService_List(t *testing.T) {
 			Limit: 3,
 		})
 		require.NoError(t, err)
-		assert.Equal(t, 3, len(sessions))
+		assert.Len(t, sessions, 3)
 	})
 
 	t.Run("list with offset", func(t *testing.T) {
@@ -278,7 +278,7 @@ func TestMySQLService_List(t *testing.T) {
 			Offset: 2,
 		})
 		require.NoError(t, err)
-		assert.Equal(t, 2, len(sessions))
+		assert.Len(t, sessions, 2)
 	})
 }
 
@@ -336,7 +336,7 @@ func TestMySQLService_GetEvents(t *testing.T) {
 	require.NoError(t, err)
 
 	// 创建多个事件
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		event := &session.Event{
 			ID:           fmt.Sprintf("evt-%03d", i),
 			Timestamp:    time.Now().Add(time.Duration(i) * time.Millisecond),
@@ -357,7 +357,7 @@ func TestMySQLService_GetEvents(t *testing.T) {
 	t.Run("get all events", func(t *testing.T) {
 		events, err := service.GetEvents(ctx, sess.ID, nil)
 		require.NoError(t, err)
-		assert.Equal(t, 10, len(events))
+		assert.Len(t, events, 10)
 	})
 
 	t.Run("get events with limit", func(t *testing.T) {
@@ -365,7 +365,7 @@ func TestMySQLService_GetEvents(t *testing.T) {
 			Limit: 5,
 		})
 		require.NoError(t, err)
-		assert.Equal(t, 5, len(events))
+		assert.Len(t, events, 5)
 	})
 
 	t.Run("filter by invocation_id", func(t *testing.T) {
@@ -401,9 +401,9 @@ func TestMySQLService_Concurrency(t *testing.T) {
 	errCh := make(chan error, numGoroutines*eventsPerGoroutine)
 	doneCh := make(chan struct{})
 
-	for i := 0; i < numGoroutines; i++ {
+	for i := range numGoroutines {
 		go func(goroutineID int) {
-			for j := 0; j < eventsPerGoroutine; j++ {
+			for j := range eventsPerGoroutine {
 				event := &session.Event{
 					ID:           fmt.Sprintf("evt-g%d-e%d", goroutineID, j),
 					Timestamp:    time.Now(),
@@ -426,7 +426,7 @@ func TestMySQLService_Concurrency(t *testing.T) {
 	}
 
 	// 等待所有 goroutine 完成
-	for i := 0; i < numGoroutines; i++ {
+	for range numGoroutines {
 		<-doneCh
 	}
 	close(errCh)
@@ -436,12 +436,12 @@ func TestMySQLService_Concurrency(t *testing.T) {
 	for err := range errCh {
 		errors = append(errors, err)
 	}
-	assert.Equal(t, 0, len(errors), "No errors should occur during concurrent operations")
+	assert.Empty(t, errors, "No errors should occur during concurrent operations")
 
 	// 验证所有事件都已插入
 	events, err := service.GetEvents(ctx, sess.ID, nil)
 	require.NoError(t, err)
-	assert.Equal(t, numGoroutines*eventsPerGoroutine, len(events))
+	assert.Len(t, events, numGoroutines*eventsPerGoroutine)
 }
 
 // TestMySQLService_JSONColumns 测试 MySQL JSON 列功能
@@ -488,7 +488,7 @@ func TestMySQLService_JSONColumns(t *testing.T) {
 	// 验证 JSON 数据正确存储和检索
 	events, err := service.GetEvents(ctx, sess.ID, nil)
 	require.NoError(t, err)
-	assert.Equal(t, 1, len(events))
+	assert.Len(t, events, 1)
 
 	metadata := events[0].Metadata
 	assert.Equal(t, "测试中文", metadata["chinese"])

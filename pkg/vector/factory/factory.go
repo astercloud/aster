@@ -1,6 +1,7 @@
 package factory
 
 import (
+	"errors"
 	"fmt"
 
 	"github.com/astercloud/aster/pkg/vector"
@@ -122,7 +123,7 @@ func createOpenAIEmbedder(config map[string]any) (vector.Embedder, error) {
 	}
 
 	if apiKey == "" {
-		return nil, fmt.Errorf("api_key is required for OpenAI embedder")
+		return nil, errors.New("api_key is required for OpenAI embedder")
 	}
 
 	return vector.NewOpenAIEmbedder(baseURL, apiKey, model), nil

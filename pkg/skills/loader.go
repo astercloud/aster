@@ -2,6 +2,7 @@ package skills
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -50,7 +51,7 @@ func (sl *SkillLoader) parse(name, content string) (*SkillDefinition, error) {
 	// 分割 YAML frontmatter 和 Markdown 内容
 	parts := strings.Split(content, "---")
 	if len(parts) < 3 {
-		return nil, fmt.Errorf("invalid skill format: missing YAML frontmatter")
+		return nil, errors.New("invalid skill format: missing YAML frontmatter")
 	}
 
 	skill := &SkillDefinition{
@@ -119,7 +120,7 @@ func (sl *SkillLoader) parseYAML(yamlContent string, skill *SkillDefinition) err
 
 	// 验证名称和描述
 	if skill.Name == "" {
-		return fmt.Errorf("skill name is required")
+		return errors.New("skill name is required")
 	}
 	if !skillNamePattern.MatchString(skill.Name) {
 		return fmt.Errorf("invalid skill name %q: must be 1-64 characters of lowercase letters, numbers, and hyphens", skill.Name)

@@ -5,7 +5,9 @@ import (
 	"crypto/rand"
 	"encoding/hex"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/astercloud/aster/pkg/actor"
@@ -47,7 +49,7 @@ func (s *Server) HandleRequest(ctx context.Context, agentID string, req *JSONRPC
 		return s.handleTasksCancel(ctx, agentID, req)
 	default:
 		return NewErrorResponse(req.ID, ErrorCodeMethodNotFound,
-			fmt.Sprintf("method not found: %s", req.Method), nil)
+			"method not found: "+req.Method, nil)
 	}
 }
 
@@ -63,8 +65,8 @@ func (s *Server) GetAgentCard(agentID string) (*AgentCard, error) {
 	// TODO: 未来可以从 Agent 的元数据中动态获取这些信息
 	card := &AgentCard{
 		Name:        agentID,
-		Description: fmt.Sprintf("Aster AI Agent: %s", agentID),
-		URL:         fmt.Sprintf("/a2a/%s", agentID),
+		Description: "Aster AI Agent: " + agentID,
+		URL:         "/a2a/" + agentID,
 		Provider: Provider{
 			Organization: "Aster",
 			URL:          "https://github.com/astercloud/aster",
@@ -122,13 +124,13 @@ func (s *Server) handleMessageSend(ctx context.Context, agentID string, req *JSO
 		task.UpdateStatus(TaskStateFailed, &Message{
 			MessageID: generateID(),
 			Role:      "agent",
-			Parts:     []Part{{Kind: "text", Text: fmt.Sprintf("agent not found: %s", agentID)}},
+			Parts:     []Part{{Kind: "text", Text: "agent not found: " + agentID}},
 			Kind:      "message",
 		})
 		if err := s.taskStore.Save(agentID, task); err != nil {
 			a2aLog.Warn(ctx, "save task error", map[string]any{"error": err})
 		}
-		return NewErrorResponse(req.ID, ErrorCodeInternalError, fmt.Sprintf("agent not found: %s", agentID), nil)
+		return NewErrorResponse(req.ID, ErrorCodeInternalError, "agent not found: "+agentID, nil)
 	}
 
 	// 提取文本内容
@@ -237,7 +239,7 @@ func (s *Server) handleTasksCancel(_ context.Context, agentID string, req *JSONR
 	task.UpdateStatus(TaskStateCanceled, &Message{
 		MessageID: generateID(),
 		Role:      "agent",
-		Parts:     []Part{{Kind: "text", Text: "Task cancelled by request."}},
+		Parts:     []Part{{Kind: "text", Text: "Task canceled by request."}},
 		Kind:      "message",
 	})
 
@@ -247,7 +249,7 @@ func (s *Server) handleTasksCancel(_ context.Context, agentID string, req *JSONR
 
 	return NewSuccessResponse(req.ID, &TasksCancelResult{
 		Success: true,
-		Message: "Task cancelled successfully",
+		Message: "Task canceled successfully",
 	})
 }
 
@@ -284,7 +286,7 @@ func (s *Server) loadOrCreateTask(agentID, taskID, contextID string, metadata Me
 // parseParams 解析 JSON-RPC 参数
 func parseParams(params any, target any) error {
 	if params == nil {
-		return fmt.Errorf("params is required")
+		return errors.New("params is required")
 	}
 
 	// 先序列化再反序列化，确保类型正确
@@ -315,7 +317,7 @@ func generateID() string {
 	b := make([]byte, 16)
 	if _, err := rand.Read(b); err != nil {
 		a2aLog.Warn(context.Background(), "generate ID error", map[string]any{"error": err})
-		return fmt.Sprintf("%d", time.Now().UnixNano())
+		return strconv.FormatInt(time.Now().UnixNano(), 10)
 	}
 	return hex.EncodeToString(b)
 }

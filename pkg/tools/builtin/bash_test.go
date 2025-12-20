@@ -1,7 +1,7 @@
 package builtin
 
 import (
-	"fmt"
+	"errors"
 	"os"
 	"strings"
 	"testing"
@@ -289,7 +289,7 @@ func TestBashTool_ConcurrentExecution(t *testing.T) {
 		}
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("Tool execution failed")
+			return errors.New("Tool execution failed")
 		}
 		return nil
 	})

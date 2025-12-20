@@ -3,6 +3,7 @@ package builtin
 import (
 	"fmt"
 	"os"
+	"slices"
 	"strings"
 	"testing"
 	"time"
@@ -410,13 +411,7 @@ func TestKillShellTool_InvalidSignal(t *testing.T) {
 		// 如果成功，验证使用了合理的信号
 		validSignals := []string{"SIGTERM", "SIGINT", "SIGHUP", "SIGQUIT"}
 		signal := result["signal"].(string)
-		signalValid := false
-		for _, valid := range validSignals {
-			if signal == valid {
-				signalValid = true
-				break
-			}
-		}
+		signalValid := slices.Contains(validSignals, signal)
 		if !signalValid {
 			t.Logf("Unknown signal used: %s", signal)
 		}
@@ -462,7 +457,7 @@ func TestKillShellTool_ConcurrentKill(t *testing.T) {
 	taskIDs := []string{}
 	numTasks := 3
 
-	for i := 0; i < numTasks; i++ {
+	for i := range numTasks {
 		bashInput := map[string]any{
 			"command":    fmt.Sprintf("sleep 5 && echo 'Task %d completed'", i),
 			"background": true,

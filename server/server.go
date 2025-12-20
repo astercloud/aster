@@ -2,6 +2,7 @@ package server
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"net/http"
 	"time"
@@ -57,7 +58,7 @@ func New(config *Config, deps *Dependencies, opts ...Option) (*Server, error) {
 	}
 
 	if deps == nil {
-		return nil, fmt.Errorf("dependencies cannot be nil")
+		return nil, errors.New("dependencies cannot be nil")
 	}
 
 	// Set Gin mode based on config

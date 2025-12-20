@@ -281,7 +281,7 @@ func TestSubAgentMiddleware_ListSubagents(t *testing.T) {
 	taskTool := getTool[*TaskTool](t, mw, "task")
 	ctx := context.Background()
 
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_, err := taskTool.Execute(ctx, map[string]any{
 			"description":   "list job",
 			"subagent_type": "worker",

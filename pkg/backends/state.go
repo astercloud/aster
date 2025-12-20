@@ -3,6 +3,7 @@ package backends
 import (
 	"context"
 	"fmt"
+	"maps"
 	"path/filepath"
 	"regexp"
 	"strings"
@@ -181,7 +182,7 @@ func (b *StateBackend) Edit(ctx context.Context, path, oldStr, newStr string, re
 	data, exists := b.files[path]
 	if !exists {
 		return &EditResult{
-			Error: fmt.Sprintf("file not found: %s", path),
+			Error: "file not found: " + path,
 			Path:  path,
 		}, nil
 	}
@@ -334,9 +335,7 @@ func (b *StateBackend) GetFiles() map[string]*FileData {
 	defer b.mu.RUnlock()
 
 	result := make(map[string]*FileData, len(b.files))
-	for k, v := range b.files {
-		result[k] = v
-	}
+	maps.Copy(result, b.files)
 	return result
 }
 
@@ -346,7 +345,5 @@ func (b *StateBackend) LoadFiles(files map[string]*FileData) {
 	defer b.mu.Unlock()
 
 	b.files = make(map[string]*FileData, len(files))
-	for k, v := range files {
-		b.files[k] = v
-	}
+	maps.Copy(b.files, files)
 }

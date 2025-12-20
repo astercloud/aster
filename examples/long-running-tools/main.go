@@ -4,8 +4,10 @@ package main
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"log"
+	"strconv"
 	"time"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -226,6 +228,7 @@ func (t *MockDataProcessingTool) Execute(ctx context.Context, args map[string]an
 // MockFileUploadTool 模拟文件上传工具
 type MockFileUploadTool struct {
 	*tools.BaseLongRunningTool
+
 	executor *tools.LongRunningExecutor
 }
 
@@ -242,7 +245,7 @@ func NewMockFileUploadTool(executor *tools.LongRunningExecutor) *MockFileUploadT
 
 func (t *MockFileUploadTool) StartAsync(ctx context.Context, args map[string]any) (string, error) {
 	// 使用自定义的执行逻辑
-	taskID := "task_" + fmt.Sprintf("%d", time.Now().UnixNano())
+	taskID := "task_" + strconv.FormatInt(time.Now().UnixNano(), 10)
 
 	// 创建任务状态
 	status := &tools.TaskStatus{
@@ -289,7 +292,7 @@ func (t *MockFileUploadTool) StartAsync(ctx context.Context, args map[string]any
 
 func (t *MockFileUploadTool) Execute(ctx context.Context, args map[string]any) (any, error) {
 	// 简化的同步执行
-	return nil, fmt.Errorf("use StartAsync for file upload")
+	return nil, errors.New("use StartAsync for file upload")
 }
 
 // ============================================================

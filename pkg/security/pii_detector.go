@@ -121,8 +121,8 @@ func (d *RegexPIIDetector) ContainsPII(ctx context.Context, text string) (bool, 
 // sortMatchesByPosition 按起始位置排序匹配结果。
 func sortMatchesByPosition(matches []PIIMatch) {
 	// 简单的冒泡排序
-	for i := 0; i < len(matches)-1; i++ {
-		for j := 0; j < len(matches)-i-1; j++ {
+	for i := range len(matches) - 1 {
+		for j := range len(matches) - i - 1 {
 			if matches[j].Start > matches[j+1].Start {
 				matches[j], matches[j+1] = matches[j+1], matches[j]
 			}

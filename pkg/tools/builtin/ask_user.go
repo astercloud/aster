@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -243,7 +244,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 		// 但我们不清理 pending request，让用户仍然可以响应
 		// 启动一个后台 goroutine 来等待用户响应并清理
 		// 重要：创建新的 timeout，因为原来的 timeout 可能已经过了一段时间
-		askUserLog.Info(context.Background(), "context cancelled, but keeping request alive for user response", map[string]any{"request_id": requestID})
+		askUserLog.Info(context.Background(), "context canceled, but keeping request alive for user response", map[string]any{"request_id": requestID})
 		newTimeout := time.After(2 * time.Hour) // 创建新的 2 小时超时
 		go func() {
 			select {
@@ -271,7 +272,7 @@ func (t *AskUserQuestionTool) Execute(ctx context.Context, input map[string]any,
 func (t *AskUserQuestionTool) parseQuestions(value any) ([]types.Question, error) {
 	questionsRaw, ok := value.([]any)
 	if !ok {
-		return nil, fmt.Errorf("questions must be an array")
+		return nil, errors.New("questions must be an array")
 	}
 
 	questions := make([]types.Question, 0, len(questionsRaw))
@@ -364,7 +365,7 @@ func (t *AskUserQuestionTool) ReceiveAnswer(requestID string, answers map[string
 	case ch <- answers:
 		return nil
 	default:
-		return fmt.Errorf("response channel is full or closed")
+		return errors.New("response channel is full or closed")
 	}
 }
 

@@ -3,6 +3,7 @@ package store
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"time"
 
@@ -30,7 +31,7 @@ type RedisConfig struct {
 // NewRedisStore 创建 Redis Store
 func NewRedisStore(config RedisConfig) (*RedisStore, error) {
 	if config.Addr == "" {
-		return nil, fmt.Errorf("redis addr is required")
+		return nil, errors.New("redis addr is required")
 	}
 
 	client := redis.NewClient(&redis.Options{
@@ -91,7 +92,7 @@ func (rs *RedisStore) LoadMessages(ctx context.Context, agentID string) ([]types
 	key := rs.prefix + "messages:" + agentID
 
 	data, err := rs.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return []types.Message{}, nil // 未找到返回空列表
 	}
 	if err != nil {
@@ -118,7 +119,7 @@ func (rs *RedisStore) TrimMessages(ctx context.Context, agentID string, maxMessa
 	return rs.client.Watch(ctx, func(tx *redis.Tx) error {
 		// 读取当前消息
 		data, err := tx.Get(ctx, key).Bytes()
-		if err == redis.Nil {
+		if errors.Is(err, redis.Nil) {
 			return nil // 不存在，无需修剪
 		}
 		if err != nil {
@@ -168,7 +169,7 @@ func (rs *RedisStore) LoadToolCallRecords(ctx context.Context, agentID string) (
 	key := rs.prefix + "tools:" + agentID
 
 	data, err := rs.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return []types.ToolCallRecord{}, nil
 	}
 	if err != nil {
@@ -200,7 +201,7 @@ func (rs *RedisStore) LoadSnapshot(ctx context.Context, agentID string, snapshot
 	key := rs.prefix + "snapshot:" + agentID + ":" + snapshotID
 
 	data, err := rs.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return nil, ErrNotFound
 	}
 	if err != nil {
@@ -257,7 +258,7 @@ func (rs *RedisStore) LoadInfo(ctx context.Context, agentID string) (*types.Agen
 	key := rs.prefix + "info:" + agentID
 
 	data, err := rs.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return nil, ErrNotFound
 	}
 	if err != nil {
@@ -289,7 +290,7 @@ func (rs *RedisStore) LoadTodos(ctx context.Context, agentID string) (any, error
 	key := rs.prefix + "todos:" + agentID
 
 	data, err := rs.client.Get(ctx, key).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return nil, nil
 	}
 	if err != nil {
@@ -348,7 +349,7 @@ func (rs *RedisStore) Get(ctx context.Context, collection, key string, dest any)
 	redisKey := rs.prefix + collection + ":" + key
 
 	data, err := rs.client.Get(ctx, redisKey).Bytes()
-	if err == redis.Nil {
+	if errors.Is(err, redis.Nil) {
 		return ErrNotFound
 	}
 	if err != nil {

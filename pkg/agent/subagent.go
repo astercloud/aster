@@ -3,6 +3,8 @@ package agent
 import (
 	"context"
 	"fmt"
+	"maps"
+	"strings"
 	"sync"
 	"time"
 
@@ -37,7 +39,7 @@ type SubAgentHandle struct {
 	Agent         *Agent
 	Request       *types.SubAgentRequest
 	StartTime     time.Time
-	Status        string // "running", "completed", "failed", "cancelled"
+	Status        string // "running", "completed", "failed", "canceled"
 	Result        *types.SubAgentResult
 	CancelFunc    context.CancelFunc
 	ProgressChan  chan *types.SubAgentProgressEvent
@@ -452,7 +454,7 @@ func (m *SubAgentManager) Cancel(taskID string) error {
 	}
 
 	handle.CancelFunc()
-	handle.Status = "cancelled"
+	handle.Status = "canceled"
 
 	return nil
 }
@@ -505,16 +507,14 @@ func (m *SubAgentManager) buildAgentConfig(spec *types.SubAgentSpec, req *types.
 	// 构建元数据
 	metadata := make(map[string]any)
 	if req.Context != nil {
-		for k, v := range req.Context {
-			metadata[k] = v
-		}
+		maps.Copy(metadata, req.Context)
 	}
 	metadata["subagent_task_id"] = taskID
 	metadata["subagent_type"] = spec.Name
 	metadata["parent_agent_id"] = req.ParentAgentID
 
 	config := &types.AgentConfig{
-		AgentID:    fmt.Sprintf("subagent-%s", taskID[:8]),
+		AgentID:    "subagent-" + taskID[:8],
 		TemplateID: templateID,
 		Metadata:   metadata,
 	}
@@ -541,9 +541,11 @@ func (m *SubAgentManager) buildTaskMessage(req *types.SubAgentRequest, spec *typ
 	// 添加上下文信息
 	if len(req.Context) > 0 {
 		msg += "\n## Context\n\n"
+		var msgSb544 strings.Builder
 		for k, v := range req.Context {
-			msg += fmt.Sprintf("- **%s**: %v\n", k, v)
+			msgSb544.WriteString(fmt.Sprintf("- **%s**: %v\n", k, v))
 		}
+		msg += msgSb544.String()
 	}
 
 	// 添加约束提醒
@@ -633,11 +635,11 @@ func (m *SubAgentManager) convertToProgressEvent(handle *SubAgentHandle, env typ
 		progress = 30
 	case *types.ProgressToolStartEvent:
 		phase = "tool_use"
-		message = fmt.Sprintf("Using tool: %s", e.Call.Name)
+		message = "Using tool: " + e.Call.Name
 		progress = 50
 	case *types.ProgressToolEndEvent:
 		phase = "tool_use"
-		message = fmt.Sprintf("Tool completed: %s", e.Call.Name)
+		message = "Tool completed: " + e.Call.Name
 		progress = 70
 	default:
 		return nil

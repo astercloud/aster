@@ -2,7 +2,9 @@ package structured
 
 import (
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
 	"reflect"
 	"strings"
 )
@@ -196,25 +198,25 @@ func (g *SchemaGenerator) typeToSchema(typ reflect.Type) (map[string]any, error)
 func (g *SchemaGenerator) Validate(schema map[string]any) error {
 	// 检查必需字段
 	if _, ok := schema["type"]; !ok {
-		return fmt.Errorf("schema must have 'type' field")
+		return errors.New("schema must have 'type' field")
 	}
 
 	schemaType, ok := schema["type"].(string)
 	if !ok {
-		return fmt.Errorf("'type' must be a string")
+		return errors.New("'type' must be a string")
 	}
 
 	switch schemaType {
 	case "object":
 		// 对象类型应有 properties
 		if _, ok := schema["properties"]; !ok {
-			return fmt.Errorf("object type must have 'properties'")
+			return errors.New("object type must have 'properties'")
 		}
 
 	case "array":
 		// 数组类型应有 items
 		if _, ok := schema["items"]; !ok {
-			return fmt.Errorf("array type must have 'items'")
+			return errors.New("array type must have 'items'")
 		}
 	}
 
@@ -224,7 +226,7 @@ func (g *SchemaGenerator) Validate(schema map[string]any) error {
 // MergeSchemas 合并多个 Schema（用于复杂场景）
 func (g *SchemaGenerator) MergeSchemas(schemas ...map[string]any) (map[string]any, error) {
 	if len(schemas) == 0 {
-		return nil, fmt.Errorf("no schemas to merge")
+		return nil, errors.New("no schemas to merge")
 	}
 
 	result := make(map[string]any)
@@ -234,9 +236,7 @@ func (g *SchemaGenerator) MergeSchemas(schemas ...map[string]any) (map[string]an
 	for _, schema := range schemas {
 		// 合并 properties
 		if props, ok := schema["properties"].(map[string]any); ok {
-			for k, v := range props {
-				properties[k] = v
-			}
+			maps.Copy(properties, props)
 		}
 
 		// 合并 required
@@ -256,17 +256,17 @@ func (g *SchemaGenerator) MergeSchemas(schemas ...map[string]any) (map[string]an
 
 // JSONSchema JSON Schema 定义（结构化版本）
 type JSONSchema struct {
-	Type        string                  `json:"type,omitempty"`
-	Description string                  `json:"description,omitempty"`
-	Properties  map[string]*JSONSchema  `json:"properties,omitempty"`
-	Items       *JSONSchema             `json:"items,omitempty"`
-	Required    []string                `json:"required,omitempty"`
-	Enum        []any                   `json:"enum,omitempty"`
-	Minimum     *float64                `json:"minimum,omitempty"`
-	Maximum     *float64                `json:"maximum,omitempty"`
-	Pattern     string                  `json:"pattern,omitempty"`
-	Format      string                  `json:"format,omitempty"`
-	Default     any                     `json:"default,omitempty"`
+	Type        string                 `json:"type,omitempty"`
+	Description string                 `json:"description,omitempty"`
+	Properties  map[string]*JSONSchema `json:"properties,omitempty"`
+	Items       *JSONSchema            `json:"items,omitempty"`
+	Required    []string               `json:"required,omitempty"`
+	Enum        []any                  `json:"enum,omitempty"`
+	Minimum     *float64               `json:"minimum,omitempty"`
+	Maximum     *float64               `json:"maximum,omitempty"`
+	Pattern     string                 `json:"pattern,omitempty"`
+	Format      string                 `json:"format,omitempty"`
+	Default     any                    `json:"default,omitempty"`
 }
 
 // ToJSON 将 JSONSchema 转换为 JSON 字符串

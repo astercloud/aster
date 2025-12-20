@@ -180,7 +180,7 @@ go func() {
         if permEvent, ok := event.Event.(*types.ControlPermissionRequiredEvent); ok {
             // 显示审批 UI
             showApprovalDialog(permEvent)
-            
+
             // 发送审批决定
             agent.ApprovePermission(permEvent.RequestID, true, "用户批准")
         }

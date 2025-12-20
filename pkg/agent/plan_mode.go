@@ -3,6 +3,7 @@ package agent
 import (
 	"context"
 	"fmt"
+	"slices"
 	"strings"
 	"sync"
 
@@ -163,8 +164,7 @@ func (m *PlanModeManager) validateWriteCall(input map[string]any) (bool, string)
 		}
 	}
 
-	return false, fmt.Sprintf("In Plan Mode, Write is only allowed to plan files. Allowed path: %s",
-		m.state.PlanFilePath)
+	return false, "In Plan Mode, Write is only allowed to plan files. Allowed path: " + m.state.PlanFilePath
 }
 
 // validateTaskCall 验证 Task 工具调用
@@ -176,13 +176,11 @@ func (m *PlanModeManager) validateTaskCall(input map[string]any) (bool, string) 
 
 	// Plan 模式下只允许 Explore 类型的子代理
 	allowedSubagents := []string{"Explore"}
-	for _, allowed := range allowedSubagents {
-		if subagentType == allowed {
-			return true, ""
-		}
+	if slices.Contains(allowedSubagents, subagentType) {
+		return true, ""
 	}
 
-	return false, fmt.Sprintf("In Plan Mode, only Explore subagent is allowed. Got: %s", subagentType)
+	return false, "In Plan Mode, only Explore subagent is allowed. Got: " + subagentType
 }
 
 // getAllowedToolsList 获取允许的工具列表字符串

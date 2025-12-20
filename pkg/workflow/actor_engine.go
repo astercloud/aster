@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -149,7 +150,7 @@ func (e *ActorEngine) SpawnAgent(ctx context.Context, nodeID string, agentConfig
 
 	// 设置属性
 	props := &actor.Props{
-		Name:               fmt.Sprintf("agent-%s", nodeID),
+		Name:               "agent-" + nodeID,
 		MailboxSize:        100,
 		SupervisorStrategy: e.actorConfig.SupervisorStrategy,
 	}
@@ -319,7 +320,7 @@ func (c *CoordinatorActor) executeWorkflowAsync(execution *WorkflowExecution, st
 	// 查找开始节点
 	startNodes := c.findStartNodes(execution.Definition)
 	if len(startNodes) == 0 {
-		state.errorCh <- fmt.Errorf("no start node found")
+		state.errorCh <- errors.New("no start node found")
 		return
 	}
 
@@ -379,7 +380,7 @@ func (c *CoordinatorActor) executeNodes(execution *WorkflowExecution, state *wor
 // executeTaskNodeWithActor 使用 Actor 执行任务节点
 func (c *CoordinatorActor) executeTaskNodeWithActor(execution *WorkflowExecution, state *workflowState, node *NodeDef) error {
 	if node.Agent == nil {
-		return fmt.Errorf("task node requires agent configuration")
+		return errors.New("task node requires agent configuration")
 	}
 
 	// 获取或创建 Agent PID
@@ -437,7 +438,7 @@ func (c *CoordinatorActor) executeTaskNodeWithActor(execution *WorkflowExecution
 // executeParallelNodeWithActors 使用 Actor 执行并行节点
 func (c *CoordinatorActor) executeParallelNodeWithActors(execution *WorkflowExecution, state *workflowState, node *NodeDef) error {
 	if node.Parallel == nil || len(node.Parallel.Branches) == 0 {
-		return fmt.Errorf("parallel node requires branches")
+		return errors.New("parallel node requires branches")
 	}
 
 	var wg sync.WaitGroup

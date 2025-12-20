@@ -3,10 +3,13 @@ package builtin
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
+	"maps"
 	"os"
 	"os/exec"
 	"path/filepath"
+	"strconv"
 	"strings"
 	"sync"
 	"time"
@@ -132,7 +135,7 @@ func (sm *FileSubagentManager) StartSubagent(ctx context.Context, config *Subage
 	// 构建启动命令
 	cmd, err := sm.buildSubagentCommand(config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to build subagent command: %v", err)
+		return nil, fmt.Errorf("failed to build subagent command: %w", err)
 	}
 
 	// 启动子代理进程
@@ -149,10 +152,10 @@ func (sm *FileSubagentManager) StartSubagent(ctx context.Context, config *Subage
 	}
 
 	// 创建输出文件
-	outputFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.output", config.ID))
+	outputFile := filepath.Join(sm.dataDir, config.ID+".output")
 	outFile, err := os.Create(outputFile)
 	if err != nil {
-		return nil, fmt.Errorf("failed to create output file: %v", err)
+		return nil, fmt.Errorf("failed to create output file: %w", err)
 	}
 
 	cmdObj.Stdout = outFile
@@ -162,7 +165,7 @@ func (sm *FileSubagentManager) StartSubagent(ctx context.Context, config *Subage
 	err = cmdObj.Start()
 	if err != nil {
 		_ = outFile.Close()
-		return nil, fmt.Errorf("failed to start subagent: %v", err)
+		return nil, fmt.Errorf("failed to start subagent: %w", err)
 	}
 
 	// 更新实例信息
@@ -196,13 +199,11 @@ func (sm *FileSubagentManager) ResumeSubagent(taskID string) (*SubagentInstance,
 	ctx := context.Background()
 	newInstance, err := sm.StartSubagent(ctx, instance.Config)
 	if err != nil {
-		return nil, fmt.Errorf("failed to resume subagent: %v", err)
+		return nil, fmt.Errorf("failed to resume subagent: %w", err)
 	}
 
 	// 保留原有元数据
-	for k, v := range instance.Metadata {
-		newInstance.Metadata[k] = v
-	}
+	maps.Copy(newInstance.Metadata, instance.Metadata)
 
 	return newInstance, nil
 }
@@ -287,10 +288,10 @@ func (sm *FileSubagentManager) GetSubagentOutput(taskID string) (string, error) 
 		return "", err
 	}
 
-	outputFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.output", taskID))
+	outputFile := filepath.Join(sm.dataDir, taskID+".output")
 	data, err := os.ReadFile(outputFile)
 	if err != nil {
-		return "", fmt.Errorf("failed to read output file: %v", err)
+		return "", fmt.Errorf("failed to read output file: %w", err)
 	}
 
 	return string(data), nil
@@ -315,14 +316,14 @@ func (sm *FileSubagentManager) CleanupSubagent(taskID string) error {
 	}
 
 	// 删除输出文件
-	outputFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.output", taskID))
+	outputFile := filepath.Join(sm.dataDir, taskID+".output")
 	_ = os.Remove(outputFile)
 
 	// 删除实例记录
 	delete(sm.agents, taskID)
 
 	// 删除实例文件
-	instanceFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.json", taskID))
+	instanceFile := filepath.Join(sm.dataDir, taskID+".json")
 	_ = os.Remove(instanceFile)
 
 	return nil
@@ -348,11 +349,11 @@ func (sm *FileSubagentManager) buildSubagentCommand(config *SubagentConfig) (str
 	subagentCmd := fmt.Sprintf("%s subagent --type=%s --prompt='%s'", exePath, config.Type, strings.ReplaceAll(config.Prompt, "'", "'\"'\"'"))
 
 	if config.Model != "" {
-		subagentCmd += fmt.Sprintf(" --model=%s", config.Model)
+		subagentCmd += " --model=" + config.Model
 	}
 
 	if config.Timeout > 0 {
-		subagentCmd += fmt.Sprintf(" --timeout=%s", config.Timeout.String())
+		subagentCmd += " --timeout=" + config.Timeout.String()
 	}
 
 	if config.MaxTokens > 0 {
@@ -395,7 +396,8 @@ func (sm *FileSubagentManager) monitorSubagent(ctx context.Context, instance *Su
 	instance.LastUpdate = now
 
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			instance.ExitCode = exitErr.ExitCode()
 			instance.Status = "failed"
 			instance.Error = err.Error()
@@ -416,7 +418,7 @@ func (sm *FileSubagentManager) monitorSubagent(ctx context.Context, instance *Su
 
 // updateSubagentOutput 更新子代理输出
 func (sm *FileSubagentManager) updateSubagentOutput(instance *SubagentInstance) {
-	outputFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.output", instance.ID))
+	outputFile := filepath.Join(sm.dataDir, instance.ID+".output")
 	data, err := os.ReadFile(outputFile)
 	if err == nil {
 		instance.Output = string(data)
@@ -430,7 +432,7 @@ func (sm *FileSubagentManager) updateResourceUsage(instance *SubagentInstance) {
 	}
 
 	// 简化实现：使用ps命令获取进程资源信息
-	cmd := exec.Command("ps", "-p", fmt.Sprintf("%d", instance.PID), "-o", "rss,pcpu", "--no-headers")
+	cmd := exec.Command("ps", "-p", strconv.Itoa(instance.PID), "-o", "rss,pcpu", "--no-headers")
 	output, err := cmd.Output()
 	if err != nil {
 		return
@@ -451,11 +453,11 @@ func (sm *FileSubagentManager) updateResourceUsage(instance *SubagentInstance) {
 
 // saveSubagent 保存子代理信息到文件
 func (sm *FileSubagentManager) saveSubagent(instance *SubagentInstance) error {
-	instanceFile := filepath.Join(sm.dataDir, fmt.Sprintf("%s.json", instance.ID))
+	instanceFile := filepath.Join(sm.dataDir, instance.ID+".json")
 
 	data, err := json.MarshalIndent(instance, "", "  ")
 	if err != nil {
-		return fmt.Errorf("failed to marshal subagent: %v", err)
+		return fmt.Errorf("failed to marshal subagent: %w", err)
 	}
 
 	return os.WriteFile(instanceFile, data, 0644)
@@ -465,7 +467,7 @@ func (sm *FileSubagentManager) saveSubagent(instance *SubagentInstance) error {
 func (sm *FileSubagentManager) loadSubagents() error {
 	files, err := os.ReadDir(sm.dataDir)
 	if err != nil {
-		return fmt.Errorf("failed to read data directory: %v", err)
+		return fmt.Errorf("failed to read data directory: %w", err)
 	}
 
 	for _, file := range files {

@@ -135,7 +135,7 @@ func TestDefaultCompressionService_Stats(t *testing.T) {
 	prompt := generateTestPrompt()
 
 	// 执行几次压缩
-	for i := 0; i < 3; i++ {
+	for range 3 {
 		_, err := svc.CompressSystemPrompt(context.Background(), prompt, &CompressOptions{
 			Mode:     ModeSimple,
 			Level:    LevelModerate,
@@ -387,9 +387,9 @@ func generateTestPrompt() string {
 	sb.WriteString("3. Use examples when helpful\n\n")
 
 	// 添加一些填充内容
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		sb.WriteString("## Section ")
-		sb.WriteString(string(rune('A' + i)))
+		sb.WriteRune(rune('A' + i))
 		sb.WriteString("\n")
 		sb.WriteString("This is some filler content for testing purposes. ")
 		sb.WriteString("It helps verify that compression works correctly ")

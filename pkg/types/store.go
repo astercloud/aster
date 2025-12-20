@@ -37,7 +37,7 @@ const (
 	ToolCallStatusRunning   ToolCallStatus = "running"   // 执行中
 	ToolCallStatusCompleted ToolCallStatus = "completed" // 已完成
 	ToolCallStatusFailed    ToolCallStatus = "failed"    // 失败
-	ToolCallStatusCancelled ToolCallStatus = "cancelled" // 已取消
+	ToolCallStatusCancelled ToolCallStatus = "canceled"  // 已取消
 )
 
 // Snapshot Agent 状态快照
@@ -63,7 +63,7 @@ const (
 	AgentStateWaiting   AgentState = "waiting"   // 等待中（等待工具调用结果）
 	AgentStateCompleted AgentState = "completed" // 已完成
 	AgentStateFailed    AgentState = "failed"    // 失败
-	AgentStateCancelled AgentState = "cancelled" // 已取消
+	AgentStateCancelled AgentState = "canceled"  // 已取消
 )
 
 // AgentStatus Agent 实时状态
@@ -135,13 +135,13 @@ type PropertySchema struct {
 type ToolCallState string
 
 const (
-	ToolCallStatePending    ToolCallState = "pending"    // 待执行
-	ToolCallStateQueued     ToolCallState = "queued"     // 已排队
-	ToolCallStateExecuting  ToolCallState = "executing"  // 执行中
-	ToolCallStateCompleted  ToolCallState = "completed"  // 已完成
-	ToolCallStateFailed     ToolCallState = "failed"     // 失败
-	ToolCallStateCancelling ToolCallState = "cancelling" // 取消中
-	ToolCallStateCancelled  ToolCallState = "cancelled"  // 已取消
+	ToolCallStatePending    ToolCallState = "pending"   // 待执行
+	ToolCallStateQueued     ToolCallState = "queued"    // 已排队
+	ToolCallStateExecuting  ToolCallState = "executing" // 执行中
+	ToolCallStateCompleted  ToolCallState = "completed" // 已完成
+	ToolCallStateFailed     ToolCallState = "failed"    // 失败
+	ToolCallStateCancelling ToolCallState = "canceling" // 取消中
+	ToolCallStateCancelled  ToolCallState = "canceled"  // 已取消
 )
 
 // ToolCallApproval 工具调用审批

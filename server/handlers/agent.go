@@ -156,7 +156,7 @@ func (h *AgentHandler) Get(c *gin.Context) {
 
 	var agent AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agent); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -188,7 +188,7 @@ func (h *AgentHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "agents", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -239,7 +239,7 @@ func (h *AgentHandler) Update(c *gin.Context) {
 	// 获取现有 Agent
 	var agentRecord AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agentRecord); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -340,7 +340,7 @@ func (h *AgentHandler) Run(c *gin.Context) {
 	// Get agent record
 	var agentRecord AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agentRecord); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -422,7 +422,7 @@ func (h *AgentHandler) Send(c *gin.Context) {
 	// Get agent record
 	var agentRecord AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agentRecord); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -488,7 +488,7 @@ func (h *AgentHandler) GetStatus(c *gin.Context) {
 	// Get agent record
 	var agentRecord AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agentRecord); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -525,7 +525,7 @@ func (h *AgentHandler) Resume(c *gin.Context) {
 	// Get agent record
 	var agentRecord AgentRecord
 	if err := (*h.store).Get(ctx, "agents", id, &agentRecord); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -778,11 +778,13 @@ func (h *AgentHandler) StreamChat(c *gin.Context) {
 		if event != nil {
 			// Extract text content from event
 			var textContent string
+			var textContentSb781 strings.Builder
 			for _, block := range event.Content.ContentBlocks {
 				if tb, ok := block.(*types.TextBlock); ok {
-					textContent += tb.Text
+					textContentSb781.WriteString(tb.Text)
 				}
 			}
+			textContent += textContentSb781.String()
 
 			if textContent != "" {
 				c.SSEvent("message", gin.H{

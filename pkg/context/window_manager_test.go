@@ -226,7 +226,7 @@ func TestContextWindowManager_AutoCompress(t *testing.T) {
 	manager := NewContextWindowManager(config, counter, strategy)
 
 	// 添加多条消息，触发自动压缩
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		err := manager.AddMessage(context.Background(), Message{
 			Role:    "user",
 			Content: "This is a test message that should trigger compression eventually.",
@@ -259,7 +259,7 @@ func TestContextWindowManager_ManualCompress(t *testing.T) {
 	manager := NewContextWindowManager(config, counter, strategy)
 
 	// 添加多条消息
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		err := manager.AddMessage(context.Background(), Message{
 			Role:    "user",
 			Content: "Test message",
@@ -338,7 +338,7 @@ func TestContextWindowManager_Reset(t *testing.T) {
 	manager := NewContextWindowManager(config, counter, strategy)
 
 	// 添加消息并压缩
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		_ = manager.AddMessage(context.Background(), Message{
 			Role:    "user",
 			Content: "Test",

@@ -2,6 +2,7 @@ package skills
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -38,7 +39,7 @@ func NewRuntime(loader *SkillLoader, sb sandbox.Sandbox) *Runtime {
 // 具体参数到命令行的映射由脚本自身负责，Runtime 不做 Skill 特定解析。
 func (r *Runtime) Execute(ctx context.Context, skillName string, params map[string]string) (*ExecutionResult, error) {
 	if r.loader == nil || r.sandbox == nil {
-		return nil, fmt.Errorf("skills runtime not properly initialized")
+		return nil, errors.New("skills runtime not properly initialized")
 	}
 
 	// 从 loader 加载 Skill 定义
@@ -116,22 +117,22 @@ func buildCommand(workDir string, skill *SkillDefinition) string {
 		if entry == "" {
 			return ""
 		}
-		return fmt.Sprintf("python %s", entry)
+		return "python " + entry
 	case "node", "nodejs":
 		if entry == "" {
 			return ""
 		}
-		return fmt.Sprintf("node %s", entry)
+		return "node " + entry
 	case "bash":
 		if entry == "" {
 			return ""
 		}
-		return fmt.Sprintf("bash %s", entry)
+		return "bash " + entry
 	case "sh":
 		if entry == "" {
 			return ""
 		}
-		return fmt.Sprintf("sh %s", entry)
+		return "sh " + entry
 	default:
 		// 未知 runtime：如果 entry 不是空，就直接当作命令执行
 		if entry != "" {

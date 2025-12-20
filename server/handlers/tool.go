@@ -1,6 +1,7 @@
 package handlers
 
 import (
+	"errors"
 	"net/http"
 	"time"
 
@@ -139,7 +140,7 @@ func (h *ToolHandler) Get(c *gin.Context) {
 
 	var tool ToolRecord
 	if err := (*h.store).Get(ctx, "tools", id, &tool); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -193,7 +194,7 @@ func (h *ToolHandler) Update(c *gin.Context) {
 
 	var tool ToolRecord
 	if err := (*h.store).Get(ctx, "tools", id, &tool); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -264,7 +265,7 @@ func (h *ToolHandler) Delete(c *gin.Context) {
 	id := c.Param("id")
 
 	if err := (*h.store).Delete(ctx, "tools", id); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{
@@ -314,7 +315,7 @@ func (h *ToolHandler) Execute(c *gin.Context) {
 	// Check if tool exists
 	var tool ToolRecord
 	if err := (*h.store).Get(ctx, "tools", id, &tool); err != nil {
-		if err == store.ErrNotFound {
+		if errors.Is(err, store.ErrNotFound) {
 			c.JSON(http.StatusNotFound, gin.H{
 				"success": false,
 				"error": gin.H{

@@ -4,7 +4,7 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
-	"fmt"
+	"errors"
 	"sync"
 	"time"
 )
@@ -125,7 +125,7 @@ func (s *MemoryAPIKeyStore) Get(ctx context.Context, key string) (*APIKeyInfo, e
 
 	info, exists := s.keys[key]
 	if !exists {
-		return nil, fmt.Errorf("api key not found")
+		return nil, errors.New("api key not found")
 	}
 
 	return info, nil

@@ -3,6 +3,7 @@ package cloud
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"strings"
@@ -14,6 +15,7 @@ import (
 // VolcengineSandbox 火山引擎沙箱
 type VolcengineSandbox struct {
 	*sandbox.RemoteSandbox
+
 	config    *VolcengineConfig
 	mcpClient *MCPClient
 	sessionID string
@@ -41,10 +43,10 @@ type VolcengineConfig struct {
 // NewVolcengineSandbox 创建火山引擎沙箱
 func NewVolcengineSandbox(config *VolcengineConfig) (*VolcengineSandbox, error) {
 	if config.Endpoint == "" {
-		return nil, fmt.Errorf("endpoint is required")
+		return nil, errors.New("endpoint is required")
 	}
 	if config.AccessKey == "" || config.SecretKey == "" {
-		return nil, fmt.Errorf("access credentials are required")
+		return nil, errors.New("access credentials are required")
 	}
 
 	// 设置默认值

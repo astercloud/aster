@@ -1,5 +1,7 @@
 package types
 
+import "strings"
+
 // StreamChunkType 流式响应块类型
 type StreamChunkType string
 
@@ -236,9 +238,11 @@ func (acc *StreamAccumulator) ToMessage() Message {
 // GetReasoningText 获取所有推理文本
 func (acc *StreamAccumulator) GetReasoningText() string {
 	var text string
+	var textSb239 strings.Builder
 	for _, r := range acc.Reasoning {
-		text += r.Thought + "\n"
+		textSb239.WriteString(r.Thought + "\n")
 	}
+	text += textSb239.String()
 	return text
 }
 

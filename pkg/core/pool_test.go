@@ -148,7 +148,7 @@ func TestPool_MaxCapacity(t *testing.T) {
 	ctx := context.Background()
 
 	// 创建 maxAgents 个 Agent
-	for i := 0; i < maxAgents; i++ {
+	for i := range maxAgents {
 		config := createTestConfig("test-agent-" + string(rune('1'+i)))
 		_, err := pool.Create(ctx, config)
 		if err != nil {
@@ -312,7 +312,7 @@ func TestPool_ConcurrentAccess(t *testing.T) {
 	var wg sync.WaitGroup
 
 	// 并发创建 Agent
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
@@ -334,7 +334,7 @@ func TestPool_ConcurrentAccess(t *testing.T) {
 	}
 
 	// 并发读取 Agent
-	for i := 0; i < concurrency; i++ {
+	for i := range concurrency {
 		wg.Add(1)
 		go func(idx int) {
 			defer wg.Done()
@@ -361,7 +361,7 @@ func TestPool_Shutdown(t *testing.T) {
 	ctx := context.Background()
 
 	// 创建多个 Agent
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		config := createTestConfig("test-agent-" + string(rune('1'+i)))
 		_, err := pool.Create(ctx, config)
 		if err != nil {
@@ -398,7 +398,7 @@ func TestPool_ForEach(t *testing.T) {
 
 	// 创建 Agent
 	agentCount := 5
-	for i := 0; i < agentCount; i++ {
+	for i := range agentCount {
 		config := createTestConfig("test-agent-" + string(rune('1'+i)))
 		_, err := pool.Create(ctx, config)
 		if err != nil {

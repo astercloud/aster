@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"maps"
 	"testing"
 
 	"github.com/astercloud/aster/pkg/tools"
@@ -213,9 +214,7 @@ func TestHumanInTheLoopMiddleware_Edit(t *testing.T) {
 		ApprovalHandler: func(ctx context.Context, request *ReviewRequest) ([]Decision, error) {
 			// 编辑参数
 			editedInput := make(map[string]any)
-			for k, v := range request.ActionRequests[0].Input {
-				editedInput[k] = v
-			}
+			maps.Copy(editedInput, request.ActionRequests[0].Input)
 			editedInput["param"] = "edited_value"
 
 			return []Decision{

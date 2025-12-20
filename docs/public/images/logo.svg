@@ -6,13 +6,13 @@
       <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
-    
+
     <!-- 星尘粒子渐变 -->
     <radialGradient id="stardustGradient">
       <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.8" />
     </radialGradient>
-    
+
     <!-- 发光效果 -->
     <filter id="glow">
       <feGaussianBlur stdDeviation="2" result="coloredBlur"/>
@@ -22,28 +22,28 @@
       </feMerge>
     </filter>
   </defs>
-  
+
   <!-- 背景 -->
   <rect width="600" height="200" fill="transparent"/>
-  
+
   <!-- Logo图标部分 -->
   <g transform="translate(60, 100)">
     <!-- 中心六边形枢纽 -->
     <g filter="url(#glow)">
-      <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15" 
-               fill="url(#primaryGradient)" 
-               stroke="#ffffff" 
+      <polygon points="0,-30 26,-15 26,15 0,30 -26,15 -26,-15"
+               fill="url(#primaryGradient)"
+               stroke="#ffffff"
                stroke-width="2"
                opacity="0.95"/>
-      
+
       <!-- 内部核心 -->
-      <circle cx="0" cy="0" r="12" 
-              fill="#ffffff" 
+      <circle cx="0" cy="0" r="12"
+              fill="#ffffff"
               opacity="0.9"/>
-      <circle cx="0" cy="0" r="8" 
+      <circle cx="0" cy="0" r="8"
               fill="url(#primaryGradient)"/>
     </g>
-    
+
     <!-- 星尘粒子 - 汇聚效果 -->
     <!-- 第一层 - 较大的星尘 -->
     <circle cx="50" cy="-40" r="4" fill="url(#stardustGradient)" opacity="0.8">
@@ -62,7 +62,7 @@
       <animate attributeName="cx" values="-48;-24;-48" dur="2.9s" repeatCount="indefinite"/>
       <animate attributeName="opacity" values="0.8;1;0.8" dur="2.9s" repeatCount="indefinite"/>
     </circle>
-    
+
     <!-- 第二层 - 中等星尘 -->
     <circle cx="40" cy="0" r="2.5" fill="#8b5cf6" opacity="0.6">
       <animate attributeName="cx" values="40;20;40" dur="2.5s" repeatCount="indefinite"/>
@@ -76,7 +76,7 @@
     <circle cx="0" cy="45" r="2" fill="#8b5cf6" opacity="0.5">
       <animate attributeName="cy" values="45;23;45" dur="2.4s" repeatCount="indefinite"/>
     </circle>
-    
+
     <!-- 第三层 - 小星尘 -->
     <circle cx="65" cy="-20" r="1.5" fill="#6366f1" opacity="0.4"/>
     <circle cx="-65" cy="-15" r="1.5" fill="#8b5cf6" opacity="0.4"/>
@@ -86,50 +86,50 @@
     <circle cx="-35" cy="-30" r="1" fill="#3b82f6" opacity="0.3"/>
     <circle cx="38" cy="32" r="1" fill="#6366f1" opacity="0.3"/>
     <circle cx="-38" cy="28" r="1" fill="#8b5cf6" opacity="0.3"/>
-    
+
     <!-- 连接线 - 象征汇聚 -->
-    <line x1="50" y1="-40" x2="26" y2="-15" 
-          stroke="url(#primaryGradient)" 
-          stroke-width="1" 
+    <line x1="50" y1="-40" x2="26" y2="-15"
+          stroke="url(#primaryGradient)"
+          stroke-width="1"
           opacity="0.3"/>
-    <line x1="-50" y1="-35" x2="-26" y2="-15" 
-          stroke="url(#primaryGradient)" 
-          stroke-width="1" 
+    <line x1="-50" y1="-35" x2="-26" y2="-15"
+          stroke="url(#primaryGradient)"
+          stroke-width="1"
           opacity="0.3"/>
-    <line x1="55" y1="30" x2="26" y2="15" 
-          stroke="url(#primaryGradient)" 
-          stroke-width="1" 
+    <line x1="55" y1="30" x2="26" y2="15"
+          stroke="url(#primaryGradient)"
+          stroke-width="1"
           opacity="0.3"/>
-    <line x1="-48" y1="35" x2="-26" y2="15" 
-          stroke="url(#primaryGradient)" 
-          stroke-width="1" 
+    <line x1="-48" y1="35" x2="-26" y2="15"
+          stroke="url(#primaryGradient)"
+          stroke-width="1"
           opacity="0.3"/>
   </g>
-  
+
   <!-- 文字部分 -->
   <g transform="translate(180, 100)">
     <!-- 英文名称 Aster -->
-    <text x="0" y="-15" 
-          font-family="'SF Pro Display', -apple-system, sans-serif" 
-          font-size="48" 
-          font-weight="700" 
+    <text x="0" y="-15"
+          font-family="'SF Pro Display', -apple-system, sans-serif"
+          font-size="48"
+          font-weight="700"
           fill="url(#primaryGradient)">Aster</text>
-    
+
     <!-- 中文名称 -->
-    <text x="0" y="30" 
-          font-family="'PingFang SC', 'Microsoft YaHei', sans-serif" 
-          font-size="24" 
-          font-weight="500" 
+    <text x="0" y="30"
+          font-family="'PingFang SC', 'Microsoft YaHei', sans-serif"
+          font-size="24"
+          font-weight="500"
           fill="#64748b">星尘云枢</text>
-    
+
     <!-- 分隔符 -->
     <circle cx="140" cy="8" r="2" fill="#cbd5e1"/>
-    
+
     <!-- Slogan -->
-    <text x="155" y="15" 
-          font-family="'SF Pro Display', -apple-system, sans-serif" 
-          font-size="16" 
-          font-weight="400" 
+    <text x="155" y="15"
+          font-family="'SF Pro Display', -apple-system, sans-serif"
+          font-size="16"
+          font-weight="400"
           fill="#94a3b8"
           letter-spacing="0.5">AI Agent Framework</text>
   </g>

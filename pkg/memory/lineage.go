@@ -2,7 +2,9 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"slices"
 	"sync"
 
 	"github.com/astercloud/aster/pkg/logging"
@@ -122,11 +124,8 @@ func (lg *LineageGraph) GetMemoriesBySource(sourceID string) []string {
 
 	var result []string
 	for memID, metadata := range lg.memoryMetadata {
-		for _, sid := range metadata.SourceIDs {
-			if sid == sourceID {
-				result = append(result, memID)
-				break
-			}
+		if slices.Contains(metadata.SourceIDs, sourceID) {
+			result = append(result, memID)
 		}
 	}
 	return result
@@ -182,7 +181,7 @@ func NewLineageManager() *LineageManager {
 // TrackMemoryCreation 追踪记忆创建事件。
 func (lm *LineageManager) TrackMemoryCreation(memoryID string, provenance *MemoryProvenance, derivedFromIDs []string) error {
 	if memoryID == "" {
-		return fmt.Errorf("memoryID is required")
+		return errors.New("memoryID is required")
 	}
 
 	metadata := &LineageMetadata{

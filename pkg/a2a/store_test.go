@@ -93,15 +93,15 @@ func TestInMemoryTaskStore_Cancellation(t *testing.T) {
 	store.AddCancellation(task.ID)
 
 	// 检查取消状态
-	cancelled := store.IsCanceled(task.ID)
-	assert.True(t, cancelled)
+	canceled := store.IsCanceled(task.ID)
+	assert.True(t, canceled)
 
 	// 移除取消信号
 	store.RemoveCancellation(task.ID)
 
 	// 再次检查
-	cancelled = store.IsCanceled(task.ID)
-	assert.False(t, cancelled)
+	canceled = store.IsCanceled(task.ID)
+	assert.False(t, canceled)
 }
 
 func TestInMemoryTaskStore_Concurrency(t *testing.T) {
@@ -112,7 +112,7 @@ func TestInMemoryTaskStore_Concurrency(t *testing.T) {
 	const numTasks = 100
 	done := make(chan bool, numTasks)
 
-	for i := 0; i < numTasks; i++ {
+	for i := range numTasks {
 		go func(id int) {
 			task := NewTask(string(rune('a'+id)), "context-1")
 			_ = store.Save(agentID, task)
@@ -121,14 +121,14 @@ func TestInMemoryTaskStore_Concurrency(t *testing.T) {
 	}
 
 	// 等待所有任务完成
-	for i := 0; i < numTasks; i++ {
+	for range numTasks {
 		<-done
 	}
 
 	// 验证任务已保存(数量可能少于numTasks,因为有ID冲突)
 	tasks, err := store.List(agentID)
 	require.NoError(t, err)
-	assert.Greater(t, len(tasks), 0)
+	assert.NotEmpty(t, tasks)
 }
 
 func TestTask_StateTransitions(t *testing.T) {

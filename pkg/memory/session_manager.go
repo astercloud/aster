@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -158,17 +159,17 @@ func (m *SessionMemoryManager) ShareMemory(
 
 	// 检查权限（只有所有者可以共享）
 	if memory.OwnerID != fromSessionID {
-		return fmt.Errorf("only owner can share memory")
+		return errors.New("only owner can share memory")
 	}
 
 	// 检查是否启用共享
 	if !m.config.EnableSharing {
-		return fmt.Errorf("sharing is disabled")
+		return errors.New("sharing is disabled")
 	}
 
 	// 检查共享数量限制
 	if len(memory.SharedWith) >= m.config.MaxSharedSessions {
-		return fmt.Errorf("max shared sessions limit reached")
+		return errors.New("max shared sessions limit reached")
 	}
 
 	// 添加共享权限
@@ -198,7 +199,7 @@ func (m *SessionMemoryManager) RevokeAccess(
 
 	// 检查权限
 	if memory.OwnerID != fromSessionID {
-		return fmt.Errorf("only owner can revoke access")
+		return errors.New("only owner can revoke access")
 	}
 
 	// 删除共享权限
@@ -227,7 +228,7 @@ func (m *SessionMemoryManager) GetMemory(
 
 	// 检查访问权限
 	if !m.hasAccess(memory, sessionID, AccessRead) {
-		return nil, fmt.Errorf("access denied")
+		return nil, errors.New("access denied")
 	}
 
 	return memory, nil
@@ -251,7 +252,7 @@ func (m *SessionMemoryManager) UpdateMemory(
 
 	// 检查写权限
 	if !m.hasAccess(memory, sessionID, AccessWrite) {
-		return fmt.Errorf("write access denied")
+		return errors.New("write access denied")
 	}
 
 	// 更新内容
@@ -280,7 +281,7 @@ func (m *SessionMemoryManager) DeleteMemory(
 
 	// 只有所有者可以删除
 	if memory.OwnerID != sessionID {
-		return fmt.Errorf("only owner can delete memory")
+		return errors.New("only owner can delete memory")
 	}
 
 	// 从所有索引中移除

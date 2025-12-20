@@ -5,12 +5,12 @@
       <stop offset="50%" style="stop-color:#8b5cf6;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#3b82f6;stop-opacity:1" />
     </linearGradient>
-    
+
     <radialGradient id="starGrad">
       <stop offset="0%" style="stop-color:#ffffff;stop-opacity:1" />
       <stop offset="100%" style="stop-color:#6366f1;stop-opacity:0.6" />
     </radialGradient>
-    
+
     <filter id="glow2">
       <feGaussianBlur stdDeviation="1.5" result="coloredBlur"/>
       <feMerge>
@@ -19,67 +19,67 @@
       </feMerge>
     </filter>
   </defs>
-  
+
   <!-- 背景 -->
   <rect width="800" height="120" fill="transparent"/>
-  
+
   <!-- Logo图标 -->
   <g transform="translate(80, 60)">
     <!-- 中心枢纽 - 六边形 -->
     <g filter="url(#glow2)">
-      <polygon points="0,-24 21,-12 21,12 0,24 -21,12 -21,-12" 
-               fill="url(#grad1)" 
-               stroke="#ffffff" 
+      <polygon points="0,-24 21,-12 21,12 0,24 -21,12 -21,-12"
+               fill="url(#grad1)"
+               stroke="#ffffff"
                stroke-width="2"
                opacity="0.95"/>
       <circle cx="0" cy="0" r="10" fill="#ffffff" opacity="0.9"/>
       <circle cx="0" cy="0" r="6" fill="url(#grad1)"/>
     </g>
-    
+
     <!-- 星尘粒子 -->
     <circle cx="40" cy="-30" r="3" fill="url(#starGrad)" opacity="0.8"/>
     <circle cx="-40" cy="-28" r="2.5" fill="url(#starGrad)" opacity="0.7"/>
     <circle cx="42" cy="25" r="2.5" fill="url(#starGrad)" opacity="0.75"/>
     <circle cx="-38" cy="28" r="3" fill="url(#starGrad)" opacity="0.8"/>
-    
+
     <circle cx="32" cy="0" r="2" fill="#8b5cf6" opacity="0.6"/>
     <circle cx="-32" cy="0" r="2" fill="#3b82f6" opacity="0.6"/>
     <circle cx="0" cy="-35" r="1.5" fill="#6366f1" opacity="0.5"/>
     <circle cx="0" cy="35" r="1.5" fill="#8b5cf6" opacity="0.5"/>
-    
+
     <circle cx="50" cy="-15" r="1.2" fill="#6366f1" opacity="0.4"/>
     <circle cx="-50" cy="-12" r="1.2" fill="#8b5cf6" opacity="0.4"/>
     <circle cx="48" cy="18" r="1.2" fill="#3b82f6" opacity="0.4"/>
     <circle cx="-48" cy="20" r="1.2" fill="#6366f1" opacity="0.4"/>
-    
+
     <!-- 汇聚线条 -->
     <line x1="40" y1="-30" x2="21" y2="-12" stroke="url(#grad1)" stroke-width="0.8" opacity="0.3"/>
     <line x1="-40" y1="-28" x2="-21" y2="-12" stroke="url(#grad1)" stroke-width="0.8" opacity="0.3"/>
     <line x1="42" y1="25" x2="21" y2="12" stroke="url(#grad1)" stroke-width="0.8" opacity="0.3"/>
     <line x1="-38" y1="28" x2="-21" y2="12" stroke="url(#grad1)" stroke-width="0.8" opacity="0.3"/>
   </g>
-  
+
   <!-- 文字 -->
   <g transform="translate(200, 60)">
     <!-- 主标题 -->
-    <text x="0" y="5" 
-          font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif" 
-          font-size="56" 
-          font-weight="700" 
+    <text x="0" y="5"
+          font-family="'SF Pro Display', -apple-system, BlinkMacSystemFont, sans-serif"
+          font-size="56"
+          font-weight="700"
           fill="url(#grad1)"
           letter-spacing="-1">Aster</text>
-    
-    <text x="205" y="5" 
-          font-family="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif" 
-          font-size="32" 
-          font-weight="600" 
+
+    <text x="205" y="5"
+          font-family="'PingFang SC', 'Hiragino Sans GB', 'Microsoft YaHei', sans-serif"
+          font-size="32"
+          font-weight="600"
           fill="#64748b">星尘云枢</text>
-    
+
     <!-- 副标题 -->
-    <text x="0" y="32" 
-          font-family="'SF Pro Display', -apple-system, sans-serif" 
-          font-size="14" 
-          font-weight="400" 
+    <text x="0" y="32"
+          font-family="'SF Pro Display', -apple-system, sans-serif"
+          font-size="14"
+          font-weight="400"
           fill="#94a3b8"
           letter-spacing="1">WHERE STARDUST CONVERGES, INTELLIGENCE EMERGES</text>
   </g>

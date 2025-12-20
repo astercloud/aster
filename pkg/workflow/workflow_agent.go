@@ -61,7 +61,7 @@ func (wa *WorkflowAgent) CreateWorkflowTool(
 ) WorkflowToolFunc {
 	return func(ctx context.Context, query string) (any, error) {
 		if wa.workflow == nil {
-			return nil, fmt.Errorf("no workflow attached to agent")
+			return nil, errors.New("no workflow attached to agent")
 		}
 
 		workflowInput := &WorkflowInput{
@@ -170,7 +170,7 @@ func (wa *WorkflowAgent) GetWorkflowHistory() []WorkflowHistoryItem {
 	numRuns := min(len(runs), wa.NumHistoryRuns)
 
 	history := make([]WorkflowHistoryItem, numRuns)
-	for i := 0; i < numRuns; i++ {
+	for i := range numRuns {
 		run := runs[len(runs)-numRuns+i]
 		history[i] = WorkflowHistoryItem{
 			RunID:     run.RunID,
@@ -194,7 +194,7 @@ func (wa *WorkflowAgent) Run(ctx context.Context, input string) (string, error) 
 	wa.mu.RUnlock()
 
 	if workflow == nil {
-		return "", fmt.Errorf("no workflow attached to agent")
+		return "", errors.New("no workflow attached to agent")
 	}
 
 	workflowInput := &WorkflowInput{

@@ -2,7 +2,9 @@ package workflow
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 )
@@ -23,8 +25,8 @@ type StateMachine interface {
 	GetLastTransition() *StateTransition
 
 	// 持久化
-	SaveState(ctx context.Context, stateData map[string]interface{}) error
-	LoadState(ctx context.Context) (map[string]interface{}, error)
+	SaveState(ctx context.Context, stateData map[string]any) error
+	LoadState(ctx context.Context) (map[string]any, error)
 }
 
 // State 状态接口
@@ -79,7 +81,7 @@ type StateTransition struct {
 	To        string
 	Timestamp time.Time
 	Duration  float64
-	Metadata  map[string]interface{}
+	Metadata  map[string]any
 }
 
 // StateMachineImpl 状态机实现
@@ -89,15 +91,15 @@ type StateMachineImpl struct {
 	transitions     map[string][]*Transition
 	currentState    string
 	history         []*StateTransition
-	stateData       map[string]interface{}
+	stateData       map[string]any
 	mu              sync.RWMutex
 	persistentStore StatePersistentStore
 }
 
 // StatePersistentStore 状态持久化接口
 type StatePersistentStore interface {
-	Save(ctx context.Context, stateID string, data map[string]interface{}) error
-	Load(ctx context.Context, stateID string) (map[string]interface{}, error)
+	Save(ctx context.Context, stateID string, data map[string]any) error
+	Load(ctx context.Context, stateID string) (map[string]any, error)
 }
 
 // NewStateMachine 创建状态机
@@ -108,7 +110,7 @@ func NewStateMachine(name string, initialState string, store StatePersistentStor
 		transitions:     make(map[string][]*Transition),
 		currentState:    initialState,
 		history:         make([]*StateTransition, 0),
-		stateData:       make(map[string]interface{}),
+		stateData:       make(map[string]any),
 		persistentStore: store,
 	}
 }
@@ -238,7 +240,7 @@ func (sm *StateMachineImpl) performTransition(ctx context.Context, from, to stri
 		To:        to,
 		Timestamp: startTime,
 		Duration:  time.Since(startTime).Seconds(),
-		Metadata:  make(map[string]interface{}),
+		Metadata:  make(map[string]any),
 	}
 	sm.history = append(sm.history, transition)
 
@@ -271,22 +273,18 @@ func (sm *StateMachineImpl) GetLastTransition() *StateTransition {
 }
 
 // SaveState 保存状态
-func (sm *StateMachineImpl) SaveState(ctx context.Context, stateData map[string]interface{}) error {
+func (sm *StateMachineImpl) SaveState(ctx context.Context, stateData map[string]any) error {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	if sm.persistentStore == nil {
-		return fmt.Errorf("persistent store not configured")
+		return errors.New("persistent store not configured")
 	}
 
 	// 合并当前状态数据
-	data := make(map[string]interface{})
-	for k, v := range sm.stateData {
-		data[k] = v
-	}
-	for k, v := range stateData {
-		data[k] = v
-	}
+	data := make(map[string]any)
+	maps.Copy(data, sm.stateData)
+	maps.Copy(data, stateData)
 
 	data["_current_state"] = sm.currentState
 	data["_state_machine_name"] = sm.name
@@ -295,12 +293,12 @@ func (sm *StateMachineImpl) SaveState(ctx context.Context, stateData map[string]
 }
 
 // LoadState 加载状态
-func (sm *StateMachineImpl) LoadState(ctx context.Context) (map[string]interface{}, error) {
+func (sm *StateMachineImpl) LoadState(ctx context.Context) (map[string]any, error) {
 	sm.mu.Lock()
 	defer sm.mu.Unlock()
 
 	if sm.persistentStore == nil {
-		return nil, fmt.Errorf("persistent store not configured")
+		return nil, errors.New("persistent store not configured")
 	}
 
 	data, err := sm.persistentStore.Load(ctx, sm.name)

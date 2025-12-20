@@ -3,6 +3,7 @@ package executionplan
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -71,10 +72,10 @@ func (e *Executor) Execute(ctx context.Context, plan *ExecutionPlan, toolCtx *to
 	// 检查计划是否可以执行
 	if !plan.CanExecute() {
 		if plan.Options != nil && plan.Options.RequireApproval && !plan.IsApproved() {
-			return fmt.Errorf("plan requires user approval before execution")
+			return errors.New("plan requires user approval before execution")
 		}
 		if plan.Status == StatusExecuting {
-			return fmt.Errorf("plan is already executing")
+			return errors.New("plan is already executing")
 		}
 		if plan.IsCompleted() {
 			return fmt.Errorf("plan has already completed with status: %s", plan.Status)
@@ -283,7 +284,7 @@ func (e *Executor) executeStep(ctx context.Context, plan *ExecutionPlan, step *S
 	tool, ok := e.tools[step.ToolName]
 	if !ok {
 		step.Status = StepStatusFailed
-		step.Error = fmt.Sprintf("tool not found: %s", step.ToolName)
+		step.Error = "tool not found: " + step.ToolName
 		return fmt.Errorf("tool not found: %s", step.ToolName)
 	}
 
@@ -321,10 +322,9 @@ func (e *Executor) executeStep(ctx context.Context, plan *ExecutionPlan, step *S
 	// 重试逻辑
 	var result any
 	var execErr error
-	maxRetries := step.MaxRetries
-	if maxRetries <= 0 {
-		maxRetries = 0 // 默认不重试
-	}
+	maxRetries := max(step.MaxRetries,
+		// 默认不重试
+		0)
 
 retryLoop:
 	for attempt := 0; attempt <= maxRetries; attempt++ {

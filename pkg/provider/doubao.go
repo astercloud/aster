@@ -1,7 +1,7 @@
 package provider
 
 import (
-	"fmt"
+	"errors"
 
 	"github.com/astercloud/aster/pkg/types"
 )
@@ -15,6 +15,7 @@ const (
 // 字节跳动的企业级 AI 服务，基于火山引擎
 type DoubaoProvider struct {
 	*OpenAICompatibleProvider
+
 	endpointID string // 模型端点 ID
 }
 
@@ -29,7 +30,7 @@ func NewDoubaoProvider(config *types.ModelConfig, dbConfig *DoubaoConfig) (Provi
 	if dbConfig == nil || dbConfig.EndpointID == "" {
 		// 尝试从 Model 字段获取 endpoint_id
 		if config.Model == "" {
-			return nil, fmt.Errorf("doubao: endpoint_id is required")
+			return nil, errors.New("doubao: endpoint_id is required")
 		}
 		dbConfig = &DoubaoConfig{
 			EndpointID: config.Model,

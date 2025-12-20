@@ -4,6 +4,7 @@ import (
 	"context"
 	"fmt"
 	"iter"
+	"maps"
 	"sync"
 	"time"
 
@@ -78,9 +79,7 @@ func (s *InMemoryService) Update(ctx context.Context, req *UpdateRequest) error 
 	}
 
 	if req.Metadata != nil {
-		for k, v := range req.Metadata {
-			session.metadata[k] = v
-		}
+		maps.Copy(session.metadata, req.Metadata)
 	}
 
 	session.lastUpdateTime = time.Now()
@@ -306,9 +305,7 @@ func (s *inMemoryState) All() iter.Seq2[string, any] {
 
 	// 复制数据以避免并发问题
 	snapshot := make(map[string]any, len(s.data))
-	for k, v := range s.data {
-		snapshot[k] = v
-	}
+	maps.Copy(snapshot, s.data)
 
 	return func(yield func(string, any) bool) {
 		for k, v := range snapshot {

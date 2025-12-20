@@ -3,6 +3,7 @@ package core
 import (
 	"context"
 	"fmt"
+	"maps"
 	"regexp"
 	"sync"
 	"time"
@@ -164,9 +165,7 @@ func (r *Room) Broadcast(ctx context.Context, text string) error {
 
 	// 复制成员列表
 	targets := make(map[string]string, len(r.members))
-	for name, agentID := range r.members {
-		targets[name] = agentID
-	}
+	maps.Copy(targets, r.members)
 
 	r.mu.RUnlock()
 

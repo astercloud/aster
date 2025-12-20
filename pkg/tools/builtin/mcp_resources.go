@@ -2,6 +2,7 @@ package builtin
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -198,11 +199,11 @@ func (t *ReadMcpResourceTool) Execute(ctx context.Context, input map[string]any,
 	start := time.Now()
 
 	if server == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("server is required")), nil
+		return NewClaudeErrorResponse(errors.New("server is required")), nil
 	}
 
 	if uri == "" {
-		return NewClaudeErrorResponse(fmt.Errorf("uri is required")), nil
+		return NewClaudeErrorResponse(errors.New("uri is required")), nil
 	}
 
 	// 读取 MCP 资源
@@ -233,7 +234,7 @@ func (t *ReadMcpResourceTool) Execute(ctx context.Context, input map[string]any,
 
 func (t *ReadMcpResourceTool) readResource(ctx context.Context, serverName, uri string, tc *tools.ToolContext) ([]MCPResourceContent, error) {
 	if tc == nil || tc.MCPManager == nil {
-		return nil, fmt.Errorf("MCP manager not available")
+		return nil, errors.New("MCP manager not available")
 	}
 
 	server, exists := tc.MCPManager.GetServer(serverName)
@@ -245,7 +246,7 @@ func (t *ReadMcpResourceTool) readResource(ctx context.Context, serverName, uri 
 	// 这里需要根据实际的 MCP 服务器接口来实现
 	_ = server // 使用 server 变量
 
-	return nil, fmt.Errorf("resource reading not yet implemented for this server")
+	return nil, errors.New("resource reading not yet implemented for this server")
 }
 
 func (t *ReadMcpResourceTool) Prompt() string {

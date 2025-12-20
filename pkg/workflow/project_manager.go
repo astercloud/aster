@@ -2,6 +2,7 @@ package workflow
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -12,11 +13,11 @@ type ProjectManager interface {
 	CreateProject(ctx context.Context, spec *ProjectSpec) (string, error)
 
 	// 读取项目
-	LoadProject(ctx context.Context, projectID string) (interface{}, error)
+	LoadProject(ctx context.Context, projectID string) (any, error)
 	GetProjectMetadata(ctx context.Context, projectID string) (*ProjectMetadata, error)
 
 	// 更新项目
-	SaveProject(ctx context.Context, projectID string, data interface{}) error
+	SaveProject(ctx context.Context, projectID string, data any) error
 	UpdateProjectMetadata(ctx context.Context, projectID string, metadata *ProjectMetadata) error
 
 	// 删除项目
@@ -37,26 +38,26 @@ type ProjectManager interface {
 
 // ProjectSpec 项目规范
 type ProjectSpec struct {
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        string                 `json:"type"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Tags        []string               `json:"tags,omitempty"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Type        string         `json:"type"`
+	Metadata    map[string]any `json:"metadata,omitempty"`
+	Tags        []string       `json:"tags,omitempty"`
 }
 
 // ProjectMetadata 项目元数据
 type ProjectMetadata struct {
-	ID          string                 `json:"id"`
-	Name        string                 `json:"name"`
-	Description string                 `json:"description"`
-	Type        string                 `json:"type"`
-	Status      string                 `json:"status"` // draft, in_progress, completed, archived
-	CreatedAt   int64                  `json:"created_at"`
-	UpdatedAt   int64                  `json:"updated_at"`
-	CreatedBy   string                 `json:"created_by,omitempty"`
-	Tags        []string               `json:"tags,omitempty"`
-	Metadata    map[string]interface{} `json:"metadata,omitempty"`
-	Size        int64                  `json:"size,omitempty"`
+	ID          string         `json:"id"`
+	Name        string         `json:"name"`
+	Description string         `json:"description"`
+	Type        string         `json:"type"`
+	Status      string         `json:"status"` // draft, in_progress, completed, archived
+	CreatedAt   int64          `json:"created_at"`
+	UpdatedAt   int64          `json:"updated_at"`
+	CreatedBy   string         `json:"created_by,omitempty"`
+	Tags        []string       `json:"tags,omitempty"`
+	Metadata    map[string]any `json:"metadata,omitempty"`
+	Size        int64          `json:"size,omitempty"`
 }
 
 // ProjectFilter 项目过滤器
@@ -70,26 +71,26 @@ type ProjectFilter struct {
 
 // ProjectSnapshot 项目快照
 type ProjectSnapshot struct {
-	ID          string      `json:"id"`
-	ProjectID   string      `json:"project_id"`
-	Description string      `json:"description"`
-	CreatedAt   int64       `json:"created_at"`
-	CreatedBy   string      `json:"created_by,omitempty"`
-	Metadata    interface{} `json:"metadata,omitempty"`
+	ID          string `json:"id"`
+	ProjectID   string `json:"project_id"`
+	Description string `json:"description"`
+	CreatedAt   int64  `json:"created_at"`
+	CreatedBy   string `json:"created_by,omitempty"`
+	Metadata    any    `json:"metadata,omitempty"`
 }
 
 // ===== 内存实现 =====
 
 // InMemoryProjectManager 内存项目管理器实现
 type InMemoryProjectManager struct {
-	projects  map[string]interface{}
+	projects  map[string]any
 	metadata  map[string]*ProjectMetadata
 	snapshots map[string][]*ProjectSnapshot
 }
 
 func NewInMemoryProjectManager() *InMemoryProjectManager {
 	return &InMemoryProjectManager{
-		projects:  make(map[string]interface{}),
+		projects:  make(map[string]any),
 		metadata:  make(map[string]*ProjectMetadata),
 		snapshots: make(map[string][]*ProjectSnapshot),
 	}
@@ -97,11 +98,11 @@ func NewInMemoryProjectManager() *InMemoryProjectManager {
 
 func (pm *InMemoryProjectManager) CreateProject(ctx context.Context, spec *ProjectSpec) (string, error) {
 	if spec == nil {
-		return "", fmt.Errorf("project spec cannot be nil")
+		return "", errors.New("project spec cannot be nil")
 	}
 
 	if spec.Name == "" {
-		return "", fmt.Errorf("project name is required")
+		return "", errors.New("project name is required")
 	}
 
 	projectID := generateProjectID()
@@ -119,13 +120,13 @@ func (pm *InMemoryProjectManager) CreateProject(ctx context.Context, spec *Proje
 	}
 
 	pm.metadata[projectID] = metadata
-	pm.projects[projectID] = make(map[string]interface{})
+	pm.projects[projectID] = make(map[string]any)
 	pm.snapshots[projectID] = make([]*ProjectSnapshot, 0)
 
 	return projectID, nil
 }
 
-func (pm *InMemoryProjectManager) LoadProject(ctx context.Context, projectID string) (interface{}, error) {
+func (pm *InMemoryProjectManager) LoadProject(ctx context.Context, projectID string) (any, error) {
 	data, exists := pm.projects[projectID]
 	if !exists {
 		return nil, fmt.Errorf("project not found: %s", projectID)
@@ -141,7 +142,7 @@ func (pm *InMemoryProjectManager) GetProjectMetadata(ctx context.Context, projec
 	return metadata, nil
 }
 
-func (pm *InMemoryProjectManager) SaveProject(ctx context.Context, projectID string, data interface{}) error {
+func (pm *InMemoryProjectManager) SaveProject(ctx context.Context, projectID string, data any) error {
 	if _, exists := pm.projects[projectID]; !exists {
 		return fmt.Errorf("project not found: %s", projectID)
 	}
@@ -283,7 +284,7 @@ func generateSnapshotID() string {
 }
 
 func getTimestamp() int64 {
-	return int64(time.Now().Unix())
+	return time.Now().Unix()
 }
 
 func hasAnyTag(tags, filterTags []string) bool {

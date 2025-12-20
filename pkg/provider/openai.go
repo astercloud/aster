@@ -1,6 +1,8 @@
 package provider
 
 import (
+	"slices"
+
 	"github.com/astercloud/aster/pkg/types"
 )
 
@@ -76,12 +78,7 @@ func (p *OpenAIProvider) Capabilities() ProviderCapabilities {
 // isReasoningModel 检查是否是推理模型
 func isReasoningModel(model string) bool {
 	reasoningModels := []string{"o1", "o3", "o1-mini", "o3-mini", "o1-preview"}
-	for _, rm := range reasoningModels {
-		if model == rm {
-			return true
-		}
-	}
-	return false
+	return slices.Contains(reasoningModels, model)
 }
 
 // OpenAIFactory OpenAI 工厂

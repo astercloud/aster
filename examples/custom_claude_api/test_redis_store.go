@@ -79,10 +79,10 @@ func main() {
 	// 3. 创建 Sandbox
 	fmt.Println("\n【步骤 3】创建 Sandbox")
 	sb, err := sandbox.NewLocalSandbox(&sandbox.LocalSandboxConfig{
-		WorkDir:          "./workspace",
-		EnforceBoundary:  false,
-		SecurityLevel:    1,
-		AllowedCommands:  nil,
+		WorkDir:           "./workspace",
+		EnforceBoundary:   false,
+		SecurityLevel:     1,
+		AllowedCommands:   nil,
 		ForbiddenCommands: nil,
 	})
 	if err != nil {

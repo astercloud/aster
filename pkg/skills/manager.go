@@ -4,6 +4,7 @@ import (
 	"archive/zip"
 	"bytes"
 	"context"
+	"errors"
 	"fmt"
 	"io"
 	"os"
@@ -96,7 +97,7 @@ func (m *Manager) List(ctx context.Context) ([]Info, error) {
 // zip 内部应包含单个根目录或直接包含 SKILL.md；会被展开到 baseDir/skillID 下。
 func (m *Manager) InstallFromZip(ctx context.Context, skillID string, r io.ReaderAt, size int64) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 
 	zr, err := zip.NewReader(r, size)
@@ -147,7 +148,7 @@ func (m *Manager) InstallFromZip(ctx context.Context, skillID string, r io.Reade
 // srcDir 应包含 SKILL.md。
 func (m *Manager) InstallFromDir(ctx context.Context, skillID string, srcDir string) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 
 	srcDir = filepath.Clean(srcDir)
@@ -191,7 +192,7 @@ func (m *Manager) InstallFromDir(ctx context.Context, skillID string, srcDir str
 // 同时假设 baseDir 对应的是本地可写路径。
 func (m *Manager) Uninstall(ctx context.Context, skillID string) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 
 	// 删除主目录 skills/skillID
@@ -238,10 +239,10 @@ func (m *Manager) InstallFromZipBytes(ctx context.Context, skillID string, data 
 // files 的 key 为相对路径（相对于 skillID 根目录），value 为文件内容。
 func (m *Manager) InstallFromFiles(ctx context.Context, skillID string, files map[string]string) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 	if len(files) == 0 {
-		return fmt.Errorf("files must not be empty")
+		return errors.New("files must not be empty")
 	}
 
 	for rel, content := range files {
@@ -260,7 +261,7 @@ func (m *Manager) InstallFromFiles(ctx context.Context, skillID string, files ma
 // ListVersions 列出指定 Skill ID 的所有版本(包括无版本的主版本)。
 func (m *Manager) ListVersions(ctx context.Context, skillID string) ([]Info, error) {
 	if strings.TrimSpace(skillID) == "" {
-		return nil, fmt.Errorf("skill id must not be empty")
+		return nil, errors.New("skill id must not be empty")
 	}
 
 	all, err := m.List(ctx)
@@ -284,7 +285,7 @@ func (m *Manager) ListVersions(ctx context.Context, skillID string) ([]Info, err
 // 如果 version 为空, 等价于 InstallFromFiles(skillID, files)。
 func (m *Manager) InstallVersionFromFiles(ctx context.Context, skillID, version string, files map[string]string) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 	id := skillID
 	if strings.TrimSpace(version) != "" {
@@ -297,7 +298,7 @@ func (m *Manager) InstallVersionFromFiles(ctx context.Context, skillID, version 
 // 如果 version 为空, 等价于 Uninstall(skillID)。
 func (m *Manager) DeleteVersion(ctx context.Context, skillID, version string) error {
 	if strings.TrimSpace(skillID) == "" {
-		return fmt.Errorf("skill id must not be empty")
+		return errors.New("skill id must not be empty")
 	}
 	if strings.TrimSpace(version) == "" {
 		return m.Uninstall(ctx, skillID)

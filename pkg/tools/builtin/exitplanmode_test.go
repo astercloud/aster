@@ -1,6 +1,7 @@
 package builtin
 
 import (
+	"errors"
 	"fmt"
 	"os"
 	"path/filepath"
@@ -391,16 +392,16 @@ func TestExitPlanModeTool_ConcurrentAccess(t *testing.T) {
 
 		result := ExecuteToolWithInput(t, tool, input)
 		if !result["ok"].(bool) {
-			return fmt.Errorf("ExitPlanMode operation failed")
+			return errors.New("ExitPlanMode operation failed")
 		}
 
 		// 验证基本响应
 		if _, exists := result["plan_id"]; !exists {
-			return fmt.Errorf("Missing plan_id in result")
+			return errors.New("Missing plan_id in result")
 		}
 
 		if result["status"].(string) != "pending_approval" {
-			return fmt.Errorf("Expected pending_approval status")
+			return errors.New("Expected pending_approval status")
 		}
 
 		return nil

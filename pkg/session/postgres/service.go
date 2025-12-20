@@ -3,6 +3,7 @@ package postgres
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"time"
@@ -61,7 +62,7 @@ func NewService(cfg *Config) (*Service, error) {
 	}
 
 	if cfg.DSN == "" {
-		return nil, fmt.Errorf("DSN is required")
+		return nil, errors.New("DSN is required")
 	}
 
 	// 打开数据库连接
@@ -150,7 +151,7 @@ func (s *Service) Get(ctx context.Context, sessionID string) (*session.SessionDa
 	if err := s.db.WithContext(ctx).
 		Where("id = ?", sessionID).
 		First(&model).Error; err != nil {
-		if err == gorm.ErrRecordNotFound {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, session.ErrSessionNotFound
 		}
 		return nil, fmt.Errorf("get session: %w", err)

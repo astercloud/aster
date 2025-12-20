@@ -68,6 +68,7 @@ type WorkflowRunEvalRequest struct {
 // WorkflowRunEvalResponse 在 WorkflowRunResponse 基础上增加 eval_scores 字段。
 type WorkflowRunEvalResponse struct {
 	WorkflowRunResponse
+
 	EvalScores []evals.ScoreResult `json:"eval_scores,omitempty"`
 }
 

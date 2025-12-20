@@ -2,6 +2,7 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"path/filepath"
 	"regexp"
@@ -54,10 +55,10 @@ type SearchMatch struct {
 // NewManager 创建 Memory 管理器
 func NewManager(cfg *ManagerConfig) (*Manager, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("memory.ManagerConfig cannot be nil")
+		return nil, errors.New("memory.ManagerConfig cannot be nil")
 	}
 	if cfg.Backend == nil {
-		return nil, fmt.Errorf("memory.Manager requires a non-nil Backend")
+		return nil, errors.New("memory.Manager requires a non-nil Backend")
 	}
 
 	memoryPath := cfg.MemoryPath
@@ -88,7 +89,7 @@ func (m *Manager) ListFiles(ctx context.Context) ([]backends.FileInfo, error) {
 // name 为相对于 memoryPath 的路径,例如 "project_notes.md" 或 "user/alice.md"
 func (m *Manager) ReadFile(ctx context.Context, name string) (string, error) {
 	if name == "" {
-		return "", fmt.Errorf("memory.ReadFile: name cannot be empty")
+		return "", errors.New("memory.ReadFile: name cannot be empty")
 	}
 	path := m.resolvePath(name)
 	return m.backend.Read(ctx, path, 0, 0)
@@ -100,10 +101,10 @@ func (m *Manager) ReadFile(ctx context.Context, name string) (string, error) {
 // content: 记忆内容正文
 func (m *Manager) AppendNote(ctx context.Context, file, title, content string) (string, error) {
 	if file == "" {
-		return "", fmt.Errorf("memory.AppendNote: file cannot be empty")
+		return "", errors.New("memory.AppendNote: file cannot be empty")
 	}
 	if strings.TrimSpace(content) == "" {
-		return "", fmt.Errorf("memory.AppendNote: content cannot be empty")
+		return "", errors.New("memory.AppendNote: content cannot be empty")
 	}
 
 	path := m.resolvePath(file)
@@ -143,10 +144,10 @@ func (m *Manager) AppendNote(ctx context.Context, file, title, content string) (
 // 与 AppendNote 不同,该方法会丢弃原有内容,仅保留新的标题与正文
 func (m *Manager) OverwriteWithNote(ctx context.Context, file, title, content string) (string, error) {
 	if file == "" {
-		return "", fmt.Errorf("memory.OverwriteWithNote: file cannot be empty")
+		return "", errors.New("memory.OverwriteWithNote: file cannot be empty")
 	}
 	if strings.TrimSpace(content) == "" {
-		return "", fmt.Errorf("memory.OverwriteWithNote: content cannot be empty")
+		return "", errors.New("memory.OverwriteWithNote: content cannot be empty")
 	}
 
 	path := m.resolvePath(file)
@@ -169,11 +170,11 @@ func (m *Manager) OverwriteWithNote(ctx context.Context, file, title, content st
 // 默认使用大小写不敏感的字面量匹配,可选正则模式
 func (m *Manager) Search(ctx context.Context, opts *SearchOptions) ([]SearchMatch, error) {
 	if opts == nil {
-		return nil, fmt.Errorf("memory.Search: options cannot be nil")
+		return nil, errors.New("memory.Search: options cannot be nil")
 	}
 	rawQuery := strings.TrimSpace(opts.Query)
 	if rawQuery == "" {
-		return nil, fmt.Errorf("memory.Search: query cannot be empty")
+		return nil, errors.New("memory.Search: query cannot be empty")
 	}
 
 	var pattern string

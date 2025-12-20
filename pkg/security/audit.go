@@ -3,6 +3,7 @@ package security
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -421,7 +422,7 @@ func NewInMemoryAuditLog(config *AuditConfiguration) *InMemoryAuditLog {
 	}
 
 	// 启动工作协程
-	for i := 0; i < al.workers; i++ {
+	for range al.workers {
 		go al.eventWorker()
 	}
 
@@ -457,7 +458,7 @@ func (al *InMemoryAuditLog) LogEventAsync(event AuditEvent) error {
 	case al.eventChan <- event:
 		return nil
 	case <-time.After(time.Second):
-		return fmt.Errorf("audit log buffer full, event dropped")
+		return errors.New("audit log buffer full, event dropped")
 	}
 }
 
@@ -594,7 +595,7 @@ func (al *InMemoryAuditLog) sortEvents(events []*AuditEvent, orderBy string, des
 	switch orderBy {
 	case "timestamp":
 		if desc {
-			for i := 0; i < len(events)-1; i++ {
+			for i := range len(events) - 1 {
 				for j := i + 1; j < len(events); j++ {
 					if events[i].Timestamp.Before(events[j].Timestamp) {
 						events[i], events[j] = events[j], events[i]
@@ -602,7 +603,7 @@ func (al *InMemoryAuditLog) sortEvents(events []*AuditEvent, orderBy string, des
 				}
 			}
 		} else {
-			for i := 0; i < len(events)-1; i++ {
+			for i := range len(events) - 1 {
 				for j := i + 1; j < len(events); j++ {
 					if events[i].Timestamp.After(events[j].Timestamp) {
 						events[i], events[j] = events[j], events[i]
@@ -831,16 +832,18 @@ func (al *InMemoryAuditLog) exportToCSV(events []*AuditEvent) ([]byte, error) {
 	var csv string
 	csv += "ID,Timestamp,Type,Severity,UserID,Message\n"
 
+	var csvSb834 strings.Builder
 	for _, event := range events {
-		csv += fmt.Sprintf("%s,%s,%s,%s,%s,\"%s\"\n",
+		csvSb834.WriteString(fmt.Sprintf("%s,%s,%s,%s,%s,\"%s\"\n",
 			event.ID,
 			event.Timestamp.Format(time.RFC3339),
 			event.Type,
 			event.Severity,
 			event.UserID,
 			event.Message,
-		)
+		))
 	}
+	csv += csvSb834.String()
 
 	return []byte(csv), nil
 }

@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -30,7 +32,7 @@ func newGoroutineSubagentManager(mw *SubAgentMiddleware) *goroutineSubagentManag
 
 func (gm *goroutineSubagentManager) StartSubagent(ctx context.Context, config *builtin.SubagentConfig) (*builtin.SubagentInstance, error) {
 	if config == nil {
-		return nil, fmt.Errorf("subagent config cannot be nil")
+		return nil, errors.New("subagent config cannot be nil")
 	}
 
 	subagent, err := gm.middleware.GetSubAgent(config.Type)
@@ -56,9 +58,7 @@ func (gm *goroutineSubagentManager) StartSubagent(ctx context.Context, config *b
 		LastUpdate: time.Now(),
 		Command:    "goroutine",
 	}
-	for k, v := range configCopy.Metadata {
-		instance.Metadata[k] = v
-	}
+	maps.Copy(instance.Metadata, configCopy.Metadata)
 
 	var execCtx context.Context
 	var cancel context.CancelFunc

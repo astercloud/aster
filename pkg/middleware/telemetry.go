@@ -44,6 +44,7 @@ type TelemetryMiddlewareConfig struct {
 // 用于追踪 Agent 的 LLM 调用和工具执行
 type TelemetryMiddleware struct {
 	*BaseMiddleware
+
 	tracer            telemetry.Tracer
 	agentID           string
 	agentName         string

@@ -2,6 +2,7 @@ package security
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"testing"
 	"time"
@@ -41,7 +42,7 @@ func (m *mockAuditLog) GetEvent(eventID string) (*AuditEvent, error) {
 			return &m.events[i], nil
 		}
 	}
-	return nil, fmt.Errorf("event not found")
+	return nil, errors.New("event not found")
 }
 
 func (m *mockAuditLog) GetEventsByUser(userID string, limit int) ([]*AuditEvent, error) {
@@ -390,7 +391,7 @@ func TestAccessController_ConcurrentAccess(t *testing.T) {
 
 	// 并发创建多个用户
 	done := make(chan bool)
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		go func(id int) {
 			user := &User{
 				ID:       fmt.Sprintf("user%d", id),
@@ -403,12 +404,12 @@ func TestAccessController_ConcurrentAccess(t *testing.T) {
 	}
 
 	// 等待所有操作完成
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		<-done
 	}
 
 	// 验证所有用户都创建成功
-	for i := 0; i < 10; i++ {
+	for i := range 10 {
 		_, err := ac.GetUser(fmt.Sprintf("user%d", i))
 		if err != nil {
 			t.Errorf("user%d not found", i)

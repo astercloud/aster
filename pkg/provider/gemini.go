@@ -5,6 +5,7 @@ import (
 	"bytes"
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"io"
 	"net/http"
@@ -83,7 +84,7 @@ type GeminiFunctionDeclaration struct {
 // NewGeminiProvider 创建 Gemini 提供商
 func NewGeminiProvider(config *types.ModelConfig) (Provider, error) {
 	if config.APIKey == "" {
-		return nil, fmt.Errorf("gemini: API key is required")
+		return nil, errors.New("gemini: API key is required")
 	}
 
 	// 设置默认模型
@@ -123,7 +124,7 @@ func (p *GeminiProvider) Stream(
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(bodyBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -170,7 +171,7 @@ func (p *GeminiProvider) Complete(
 		return nil, fmt.Errorf("failed to marshal request: %w", err)
 	}
 
-	req, err := http.NewRequestWithContext(ctx, "POST", url, bytes.NewReader(bodyBytes))
+	req, err := http.NewRequestWithContext(ctx, http.MethodPost, url, bytes.NewReader(bodyBytes))
 	if err != nil {
 		return nil, err
 	}
@@ -505,18 +506,18 @@ func (p *GeminiProvider) parseStreamChunk(chunk map[string]any) []StreamChunk {
 func (p *GeminiProvider) parseCompleteResponse(apiResp map[string]any) (types.Message, error) {
 	candidates, ok := apiResp["candidates"].([]any)
 	if !ok || len(candidates) == 0 {
-		return types.Message{}, fmt.Errorf("no candidates in response")
+		return types.Message{}, errors.New("no candidates in response")
 	}
 
 	candidate := candidates[0].(map[string]any)
 	content, ok := candidate["content"].(map[string]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("no content in candidate")
+		return types.Message{}, errors.New("no content in candidate")
 	}
 
 	parts, ok := content["parts"].([]any)
 	if !ok {
-		return types.Message{}, fmt.Errorf("no parts in content")
+		return types.Message{}, errors.New("no parts in content")
 	}
 
 	// 构建消息

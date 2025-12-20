@@ -2,7 +2,7 @@ package memory
 
 import (
 	"context"
-	"fmt"
+	"errors"
 	"strings"
 	"testing"
 	"time"
@@ -372,7 +372,7 @@ func TestMergeMetadata(t *testing.T) {
 func TestLLMProviderError(t *testing.T) {
 	strategy := NewRedundancyStrategy(0.85)
 	llm := &MockLLMProvider{
-		Error: fmt.Errorf("LLM API error"),
+		Error: errors.New("LLM API error"),
 	}
 
 	memories := []MemoryWithScore{

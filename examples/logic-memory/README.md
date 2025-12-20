@@ -95,4 +95,3 @@ go fmt ./examples/logic-memory
 - [Logic Memory 完整文档](../../docs/content/04.memory/11.logic-memory.md)
 - [Logic Memory 设计计划](../../docs/content/04.memory/12.logic-memory-plan.md)
 - [Memory 系统总览](../../docs/content/04.memory/1.overview.md)
-

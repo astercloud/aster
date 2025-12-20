@@ -166,7 +166,6 @@ func (js *JSONStore) TrimMessages(ctx context.Context, agentID string, maxMessag
 	return js.saveJSON(path, trimmedMessages)
 }
 
-
 // SaveToolCallRecords 保存工具调用记录
 func (js *JSONStore) SaveToolCallRecords(ctx context.Context, agentID string, records []types.ToolCallRecord) error {
 	js.mu.Lock()

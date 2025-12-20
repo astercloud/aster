@@ -167,7 +167,7 @@ func TestTelemetryMiddleware_WrapModelCall_Error(t *testing.T) {
 	}
 
 	_, err := m.WrapModelCall(ctx, req, handler)
-	if err != expectedErr {
+	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expected error '%v', got '%v'", expectedErr, err)
 	}
 
@@ -291,7 +291,7 @@ func TestTelemetryMiddleware_WrapToolCall_Error(t *testing.T) {
 	}
 
 	_, err := m.WrapToolCall(ctx, req, handler)
-	if err != expectedErr {
+	if !errors.Is(err, expectedErr) {
 		t.Fatalf("expected error '%v', got '%v'", expectedErr, err)
 	}
 

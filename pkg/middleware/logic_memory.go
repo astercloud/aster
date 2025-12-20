@@ -2,7 +2,9 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"strings"
 	"sync"
 	"time"
@@ -22,6 +24,7 @@ var lmLog = logging.ForComponent("LogicMemoryMiddleware")
 // 3. 提供 Logic Memory 管理工具供 Agent 主动查询和更新
 type LogicMemoryMiddleware struct {
 	*BaseMiddleware
+
 	manager            *logic.Manager
 	config             *LogicMemoryMiddlewareConfig
 	logicMemoryTools   []tools.Tool
@@ -83,11 +86,11 @@ type LogicMemoryMiddlewareConfig struct {
 // NewLogicMemoryMiddleware 创建 Logic Memory 中间件
 func NewLogicMemoryMiddleware(config *LogicMemoryMiddlewareConfig) (*LogicMemoryMiddleware, error) {
 	if config == nil {
-		return nil, fmt.Errorf("logic memory config is required")
+		return nil, errors.New("logic memory config is required")
 	}
 
 	if config.Manager == nil {
-		return nil, fmt.Errorf("logic memory manager is required")
+		return nil, errors.New("logic memory manager is required")
 	}
 
 	// 设置默认值
@@ -296,9 +299,7 @@ func (m *LogicMemoryMiddleware) CaptureUserMessage(namespace, content string, me
 		Data:      map[string]any{"content": content},
 		Timestamp: time.Now(),
 	}
-	for k, v := range metadata {
-		event.Data[k] = v
-	}
+	maps.Copy(event.Data, metadata)
 	m.captureEvent(event)
 }
 
@@ -313,9 +314,7 @@ func (m *LogicMemoryMiddleware) CaptureUserFeedback(namespace string, feedback s
 		},
 		Timestamp: time.Now(),
 	}
-	for k, v := range metadata {
-		event.Data[k] = v
-	}
+	maps.Copy(event.Data, metadata)
 	m.captureEvent(event)
 }
 
@@ -330,9 +329,7 @@ func (m *LogicMemoryMiddleware) CaptureUserRevision(namespace string, original, 
 		},
 		Timestamp: time.Now(),
 	}
-	for k, v := range metadata {
-		event.Data[k] = v
-	}
+	maps.Copy(event.Data, metadata)
 	m.captureEvent(event)
 }
 

@@ -2,6 +2,7 @@ package interfaces
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 	"time"
@@ -35,6 +36,7 @@ type AGUIInterfaceOptions struct {
 // 提供可视化的 Agent 管理和监控界面。
 type AGUIInterface struct {
 	*asteros.BaseInterface
+
 	opts *AGUIInterfaceOptions
 	os   *asteros.AsterOS
 
@@ -201,7 +203,7 @@ func (i *AGUIInterface) syncLoop(ctx context.Context) {
 // syncAll 同步所有资源
 func (i *AGUIInterface) syncAll() error {
 	if !i.isConnected() {
-		return fmt.Errorf("not connected to control plane")
+		return errors.New("not connected to control plane")
 	}
 
 	// TODO: 实现实际的同步逻辑

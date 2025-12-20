@@ -2,6 +2,7 @@ package guardrails
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"os"
 
@@ -85,7 +86,7 @@ func (g *OpenAIModerationGuardrail) Description() string {
 // Check 检查内容
 func (g *OpenAIModerationGuardrail) Check(ctx context.Context, input *GuardrailInput) error {
 	if g.apiKey == "" {
-		return fmt.Errorf("OpenAI API key not configured")
+		return errors.New("OpenAI API key not configured")
 	}
 
 	client := openai.NewClient(g.apiKey)

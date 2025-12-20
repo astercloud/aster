@@ -75,7 +75,7 @@ func TestWebSearchTool_SuccessfulSearch(t *testing.T) {
 	// 创建模拟 Tavily API 的测试服务器
 	server := newLocalHTTPServerWS(t, http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		// 验证请求方法和头部
-		if r.Method != "POST" {
+		if r.Method != http.MethodPost {
 			t.Errorf("Expected POST method, got %s", r.Method)
 		}
 

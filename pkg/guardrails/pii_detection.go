@@ -2,6 +2,7 @@ package guardrails
 
 import (
 	"context"
+	"maps"
 	"regexp"
 	"strings"
 )
@@ -110,12 +111,8 @@ func (g *PIIDetectionGuardrail) Check(ctx context.Context, input *GuardrailInput
 
 	// 检查所有模式
 	allPatterns := make(map[string]*regexp.Regexp)
-	for k, v := range g.piiPatterns {
-		allPatterns[k] = v
-	}
-	for k, v := range g.customPatterns {
-		allPatterns[k] = v
-	}
+	maps.Copy(allPatterns, g.piiPatterns)
+	maps.Copy(allPatterns, g.customPatterns)
 
 	for piiType, pattern := range allPatterns {
 		if pattern.MatchString(content) {

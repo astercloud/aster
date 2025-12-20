@@ -3,6 +3,7 @@ package workflow
 import (
 	"context"
 	"encoding/json"
+	"errors"
 	"fmt"
 	"strings"
 	"sync"
@@ -43,11 +44,11 @@ type ConditionalConfig struct {
 // NewConditionalAgent 创建条件Agent
 func NewConditionalAgent(config ConditionalConfig) (*ConditionalAgent, error) {
 	if config.Name == "" {
-		return nil, fmt.Errorf("conditional agent name is required")
+		return nil, errors.New("conditional agent name is required")
 	}
 
 	if len(config.Conditions) == 0 {
-		return nil, fmt.Errorf("at least one condition is required")
+		return nil, errors.New("at least one condition is required")
 	}
 
 	// 按优先级排序条件
@@ -55,7 +56,7 @@ func NewConditionalAgent(config ConditionalConfig) (*ConditionalAgent, error) {
 	copy(conditions, config.Conditions)
 
 	// 简单排序（优先级高的在前）
-	for i := range len(conditions) {
+	for i := range conditions {
 		for j := i + 1; j < len(conditions); j++ {
 			if conditions[i].Priority < conditions[j].Priority {
 				conditions[i], conditions[j] = conditions[j], conditions[i]
@@ -93,7 +94,7 @@ func (c *ConditionalAgent) Execute(ctx context.Context, message string) *stream.
 		if selectedBranch == nil {
 			// 使用默认分支
 			if c.defaultBranch == nil {
-				writer.Send(nil, fmt.Errorf("no condition matched and no default branch provided"))
+				writer.Send(nil, errors.New("no condition matched and no default branch provided"))
 				return
 			}
 
@@ -104,7 +105,7 @@ func (c *ConditionalAgent) Execute(ctx context.Context, message string) *stream.
 				Author:    "system",
 				Content: types.Message{
 					Role:    types.MessageRoleAssistant,
-					Content: fmt.Sprintf("No condition matched, using default branch: %s", c.defaultBranch.ID),
+					Content: "No condition matched, using default branch: " + c.defaultBranch.ID,
 				},
 				Metadata: map[string]any{
 					"branch_type": "default",
@@ -231,11 +232,11 @@ const (
 // NewParallelConditionalAgent 创建并行条件Agent
 func NewParallelConditionalAgent(config ParallelConditionalConfig) (*ParallelConditionalAgent, error) {
 	if config.Name == "" {
-		return nil, fmt.Errorf("parallel conditional agent name is required")
+		return nil, errors.New("parallel conditional agent name is required")
 	}
 
 	if len(config.Conditions) == 0 {
-		return nil, fmt.Errorf("at least one condition is required")
+		return nil, errors.New("at least one condition is required")
 	}
 
 	maxParallel := config.MaxParallel
@@ -283,7 +284,7 @@ func (p *ParallelConditionalAgent) Execute(ctx context.Context, message string) 
 		if len(results) == 0 {
 			// 没有匹配的条件，使用默认分支
 			if p.defaultAgent == nil {
-				writer.Send(nil, fmt.Errorf("no condition matched and no default branch provided"))
+				writer.Send(nil, errors.New("no condition matched and no default branch provided"))
 				return
 			}
 
@@ -294,7 +295,7 @@ func (p *ParallelConditionalAgent) Execute(ctx context.Context, message string) 
 				Author:    "system",
 				Content: types.Message{
 					Role:    types.MessageRoleAssistant,
-					Content: fmt.Sprintf("No conditions matched, using default branch: %s", p.defaultAgent.ID),
+					Content: "No conditions matched, using default branch: " + p.defaultAgent.ID,
 				},
 				Metadata: map[string]any{
 					"branch_type": "default",
@@ -491,11 +492,11 @@ type SwitchConfig struct {
 // NewSwitchAgent 创建Switch Agent
 func NewSwitchAgent(config SwitchConfig) (*SwitchAgent, error) {
 	if config.Name == "" {
-		return nil, fmt.Errorf("switch agent name is required")
+		return nil, errors.New("switch agent name is required")
 	}
 
 	if config.Variable == "" {
-		return nil, fmt.Errorf("switch variable is required")
+		return nil, errors.New("switch variable is required")
 	}
 
 	return &SwitchAgent{
@@ -619,8 +620,8 @@ func (s *SwitchAgent) matchCaseValue(switchValue, caseValue string) bool {
 
 	// 范围匹配 (caseValue可以是 "value1,value2,value3")
 	if strings.Contains(caseValue, ",") {
-		values := strings.Split(caseValue, ",")
-		for _, v := range values {
+		values := strings.SplitSeq(caseValue, ",")
+		for v := range values {
 			if strings.EqualFold(strings.TrimSpace(v), switchValue) {
 				return true
 			}
@@ -696,11 +697,11 @@ type MultiLevelConditionalConfig struct {
 // NewMultiLevelConditionalAgent 创建多级条件Agent
 func NewMultiLevelConditionalAgent(config MultiLevelConditionalConfig) (*MultiLevelConditionalAgent, error) {
 	if config.Name == "" {
-		return nil, fmt.Errorf("multi-level conditional agent name is required")
+		return nil, errors.New("multi-level conditional agent name is required")
 	}
 
 	if len(config.Levels) == 0 {
-		return nil, fmt.Errorf("at least one level is required")
+		return nil, errors.New("at least one level is required")
 	}
 
 	maxDepth := config.MaxDepth

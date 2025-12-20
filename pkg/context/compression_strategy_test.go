@@ -7,7 +7,7 @@ import (
 
 func createTestMessages(count int) []Message {
 	messages := make([]Message, count)
-	for i := 0; i < count; i++ {
+	for i := range count {
 		role := "user"
 		if i%2 == 0 {
 			role = "assistant"
@@ -446,8 +446,7 @@ func BenchmarkSlidingWindowStrategy_Compress(b *testing.B) {
 	messages := createTestMessages(100)
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = strategy.Compress(ctx, messages, config)
 	}
 }
@@ -459,8 +458,7 @@ func BenchmarkPriorityBasedStrategy_Compress(b *testing.B) {
 	messages := createTestMessages(100)
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = strategy.Compress(ctx, messages, config)
 	}
 }
@@ -472,8 +470,7 @@ func BenchmarkTokenBasedStrategy_Compress(b *testing.B) {
 	messages := createTestMessages(100)
 	ctx := context.Background()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = strategy.Compress(ctx, messages, config)
 	}
 }

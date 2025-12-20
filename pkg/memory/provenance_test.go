@@ -117,7 +117,7 @@ func TestProvenance_Corroborate(t *testing.T) {
 	}
 
 	// Multiple corroborations
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		p.Corroborate("source-" + string(rune('3'+i)))
 	}
 

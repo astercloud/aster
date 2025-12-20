@@ -2,6 +2,7 @@ package pgvector
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -47,17 +48,17 @@ type Store struct {
 // New 创建 PgVector 向量存储。
 func New(cfg *Config) (*Store, error) {
 	if cfg == nil {
-		return nil, fmt.Errorf("config is required")
+		return nil, errors.New("config is required")
 	}
 	if cfg.DSN == "" {
-		return nil, fmt.Errorf("dsn is required")
+		return nil, errors.New("dsn is required")
 	}
 	table := cfg.Table
 	if table == "" {
 		table = "agent_vectors"
 	}
 	if cfg.Dimension <= 0 {
-		return nil, fmt.Errorf("dimension must be > 0")
+		return nil, errors.New("dimension must be > 0")
 	}
 	metric := strings.ToLower(cfg.Metric)
 	if metric == "" {

@@ -1,5 +1,7 @@
 package types
 
+import "strings"
+
 // MultimodalContent 多模态内容接口
 // 扩展 ContentBlock 以支持图片、音频、视频等多模态输入
 type MultimodalContent interface {
@@ -120,11 +122,13 @@ type ContentBlockHelper struct{}
 // ExtractText 从 ContentBlocks 中提取所有文本
 func (h ContentBlockHelper) ExtractText(blocks []ContentBlock) string {
 	var text string
+	var textSb123 strings.Builder
 	for _, block := range blocks {
 		if tb, ok := block.(*TextBlock); ok {
-			text += tb.Text
+			textSb123.WriteString(tb.Text)
 		}
 	}
+	text += textSb123.String()
 	return text
 }
 

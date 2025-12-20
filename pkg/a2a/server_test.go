@@ -227,8 +227,8 @@ func TestServer_HandleRequest_TasksCancel(t *testing.T) {
 	assert.NotNil(t, resp.Result)
 
 	// 验证取消标记已设置
-	cancelled := taskStore.IsCanceled(task.ID)
-	assert.True(t, cancelled)
+	canceled := taskStore.IsCanceled(task.ID)
+	assert.True(t, canceled)
 
 	// 验证任务状态已更新
 	updatedTask, err := taskStore.Load(agentID, task.ID)

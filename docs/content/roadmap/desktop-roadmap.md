@@ -272,7 +272,7 @@ func (m *BackendManager) Start(ctx context.Context) error {
         "--data-dir", m.dataDir,
         "--store", "sqlite",
     )
-    
+
     if err := m.cmd.Start(); err != nil {
         return err
     }
@@ -336,7 +336,7 @@ import (
     "bufio"
     "fmt"
     "os"
-    
+
     "github.com/astercloud/aster/pkg/agent"
 )
 
@@ -344,23 +344,23 @@ func runSession(args []string) error {
     // 解析参数
     recipeFile := flagSet.String("recipe", "", "Recipe file to use")
     workDir := flagSet.String("dir", ".", "Working directory")
-    
+
     // 加载配置
     cfg := loadConfig()
-    
+
     // 创建 Agent
     a, err := agent.New(agent.WithConfig(cfg))
     if err != nil {
         return err
     }
-    
+
     // REPL 循环
     scanner := bufio.NewScanner(os.Stdin)
     fmt.Print("aster> ")
-    
+
     for scanner.Scan() {
         input := scanner.Text()
-        
+
         // 处理特殊命令
         switch input {
         case "/exit", "/quit":
@@ -372,7 +372,7 @@ func runSession(args []string) error {
             printHelp()
             continue
         }
-        
+
         // 发送到 Agent
         for event := range a.Run(ctx, input) {
             switch e := event.(type) {
@@ -387,10 +387,10 @@ func runSession(args []string) error {
                 }
             }
         }
-        
+
         fmt.Print("\naster> ")
     }
-    
+
     return nil
 }
 ```
@@ -438,7 +438,7 @@ providers:
     provider: anthropic
     model: claude-sonnet-4-20250514
     env_api_key: ANTHROPIC_API_KEY
-  
+
   fast:
     provider: openai
     model: gpt-4o-mini
@@ -455,7 +455,7 @@ extensions:
   - name: filesystem
     type: builtin
     enabled: true
-  
+
   - name: git
     type: stdio
     cmd: npx

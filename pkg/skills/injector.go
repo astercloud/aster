@@ -124,7 +124,7 @@ func (i *Injector) InjectToUserMessage(userMessage string, skills []*SkillDefini
 			if baseDir != "" {
 				skillFileHint = fmt.Sprintf("%s/%s/SKILL.md", baseDir, path)
 			} else {
-				skillFileHint = fmt.Sprintf("%s/SKILL.md", path)
+				skillFileHint = path + "/SKILL.md"
 			}
 		}
 
@@ -183,7 +183,7 @@ func (i *Injector) injectToSystemPrompt(basePrompt string, skills []*SkillDefini
 			if baseDir != "" {
 				skillFileHint = fmt.Sprintf("%s/%s/SKILL.md", baseDir, path)
 			} else {
-				skillFileHint = fmt.Sprintf("%s/SKILL.md", path)
+				skillFileHint = path + "/SKILL.md"
 			}
 		}
 

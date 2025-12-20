@@ -424,7 +424,7 @@ func RankByQuality(
 	copy(ranked, memories)
 
 	// 按质量综合得分排序
-	for i := range len(ranked) {
+	for i := range ranked {
 		for j := i + 1; j < len(ranked); j++ {
 			// 获取质量分数
 			scoreI := ranked[i].Score

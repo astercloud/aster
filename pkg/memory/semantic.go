@@ -2,7 +2,9 @@ package memory
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"strings"
 
 	"github.com/astercloud/aster/pkg/vector"
 )
@@ -115,10 +117,10 @@ func (sm *SemanticMemory) IndexWithProvenance(ctx context.Context, docID string,
 		return nil
 	}
 	if !sm.cfg.EnableProvenance {
-		return fmt.Errorf("provenance not enabled")
+		return errors.New("provenance not enabled")
 	}
 	if provenance == nil {
-		return fmt.Errorf("provenance is required")
+		return errors.New("provenance is required")
 	}
 
 	// 追踪谱系
@@ -135,7 +137,7 @@ func (sm *SemanticMemory) IndexWithProvenance(ctx context.Context, docID string,
 // indexInternal 内部索引方法。
 func (sm *SemanticMemory) indexInternal(ctx context.Context, docID string, text string, meta map[string]any, provenance *MemoryProvenance) error {
 	if docID == "" || text == "" {
-		return fmt.Errorf("docID and text are required")
+		return errors.New("docID and text are required")
 	}
 
 	vecs, err := sm.cfg.Embedder.EmbedText(ctx, []string{text})
@@ -143,7 +145,7 @@ func (sm *SemanticMemory) indexInternal(ctx context.Context, docID string, text 
 		return fmt.Errorf("embed text: %w", err)
 	}
 	if len(vecs) == 0 {
-		return fmt.Errorf("embedder returned empty vectors")
+		return errors.New("embedder returned empty vectors")
 	}
 
 	// 将文本复制到 metadata 中, 方便检索结果直接携带原文片段。
@@ -190,7 +192,7 @@ func (sm *SemanticMemory) Search(ctx context.Context, query string, meta map[str
 		return nil, fmt.Errorf("embed query: %w", err)
 	}
 	if len(vecs) == 0 {
-		return nil, fmt.Errorf("embedder returned empty vectors")
+		return nil, errors.New("embedder returned empty vectors")
 	}
 
 	return sm.cfg.Store.Query(ctx, vector.Query{
@@ -323,7 +325,7 @@ func (sm *SemanticMemory) SearchBySourceType(ctx context.Context, query string, 
 // 返回被删除的记忆ID列表。
 func (sm *SemanticMemory) PruneMemories(ctx context.Context, namespace string) ([]string, error) {
 	if !sm.cfg.EnableProvenance || sm.cfg.ConfidenceCalculator == nil {
-		return nil, fmt.Errorf("provenance or confidence calculator not enabled")
+		return nil, errors.New("provenance or confidence calculator not enabled")
 	}
 
 	// TODO: 这需要 VectorStore 支持列举所有文档的功能
@@ -357,7 +359,7 @@ func (sm *SemanticMemory) DeleteMemoryWithLineage(ctx context.Context, memoryID 
 // 这需要先检索记忆，然后提取 Provenance。
 func (sm *SemanticMemory) GetMemoryProvenance(ctx context.Context, query string, meta map[string]any) (*MemoryProvenance, error) {
 	if !sm.cfg.EnableProvenance {
-		return nil, fmt.Errorf("provenance not enabled")
+		return nil, errors.New("provenance not enabled")
 	}
 
 	hits, err := sm.Search(ctx, query, meta, 1)
@@ -366,7 +368,7 @@ func (sm *SemanticMemory) GetMemoryProvenance(ctx context.Context, query string,
 	}
 
 	if len(hits) == 0 {
-		return nil, fmt.Errorf("no memory found")
+		return nil, errors.New("no memory found")
 	}
 
 	return FromMetadata(hits[0].Metadata), nil
@@ -395,7 +397,7 @@ func (sm *SemanticMemory) UpdateMetadata(ctx context.Context, docID string, meta
 	// 目前大多数向量数据库不支持原地更新元数据
 	// 需要重新索引或使用专门的更新 API
 
-	return fmt.Errorf("UpdateMetadata not fully implemented yet")
+	return errors.New("UpdateMetadata not fully implemented yet")
 }
 
 // SearchAndFormat 执行向量检索并格式化为 Markdown，用于 RAG 场景。
@@ -420,6 +422,7 @@ func (sm *SemanticMemory) SearchAndFormat(ctx context.Context, query string, met
 	result += "## Relevant Context\n\n"
 	result += fmt.Sprintf("Found %d relevant documents:\n\n", len(hits))
 
+	var resultSb423 strings.Builder
 	for i, hit := range hits {
 		// 获取文本内容
 		text := ""
@@ -431,23 +434,26 @@ func (sm *SemanticMemory) SearchAndFormat(ctx context.Context, query string, met
 		score := hit.Score
 		scorePercent := int(score * 100)
 
-		result += fmt.Sprintf("### %d. (Relevance: %d%%)\n\n", i+1, scorePercent)
+		resultSb423.WriteString(fmt.Sprintf("### %d. (Relevance: %d%%)\n\n", i+1, scorePercent))
 
 		if text != "" {
-			result += text + "\n\n"
+			resultSb423.WriteString(text + "\n\n")
 		}
 
 		// 添加元数据（可选）
 		if len(hit.Metadata) > 1 { // 除了 text 之外还有其他元数据
-			result += "**Metadata:**\n"
+			resultSb423.WriteString("**Metadata:**\n")
+			var resultSb443 strings.Builder
 			for k, v := range hit.Metadata {
 				if k != "text" { // 跳过已显示的 text
-					result += fmt.Sprintf("- %s: %v\n", k, v)
+					resultSb443.WriteString(fmt.Sprintf("- %s: %v\n", k, v))
 				}
 			}
-			result += "\n"
+			resultSb423.WriteString(resultSb443.String())
+			resultSb423.WriteString("\n")
 		}
 	}
+	result += resultSb423.String()
 
 	return result, nil
 }

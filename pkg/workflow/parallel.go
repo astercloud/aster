@@ -247,7 +247,7 @@ func (p *ParallelWorkFlowAgent) mergeResults(results []*ParallelBranchResult) ma
 
 		// 合并输出
 		if result.Output != nil {
-			merged[fmt.Sprintf("branch_%s", result.Branch.ID)] = result.Output
+			merged["branch_"+result.Branch.ID] = result.Output
 		}
 	}
 
@@ -305,7 +305,7 @@ const (
 	AsyncBranchStatusRunning   AsyncBranchStatus = "running"
 	AsyncBranchStatusCompleted AsyncBranchStatus = "completed"
 	AsyncBranchStatusFailed    AsyncBranchStatus = "failed"
-	AsyncBranchStatusCancelled AsyncBranchStatus = "cancelled"
+	AsyncBranchStatusCancelled AsyncBranchStatus = "canceled"
 )
 
 // AsyncMetrics 异步指标

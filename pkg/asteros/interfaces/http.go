@@ -27,6 +27,7 @@ type HTTPInterfaceOptions struct {
 // 提供标准的 RESTful API 端点。
 type HTTPInterface struct {
 	*asteros.BaseInterface
+
 	opts *HTTPInterfaceOptions
 	os   *asteros.AsterOS
 }

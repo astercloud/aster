@@ -1,6 +1,7 @@
 package store
 
 import (
+	"errors"
 	"fmt"
 	"time"
 )
@@ -48,7 +49,7 @@ func NewStore(config Config) (Store, error) {
 
 	case StoreTypeRedis:
 		if config.RedisAddr == "" {
-			return nil, fmt.Errorf("redis_addr is required for redis store")
+			return nil, errors.New("redis_addr is required for redis store")
 		}
 
 		redisConfig := RedisConfig{
@@ -63,7 +64,7 @@ func NewStore(config Config) (Store, error) {
 
 	case StoreTypeMySQL:
 		if config.MySQLDSN == "" {
-			return nil, fmt.Errorf("mysql_dsn is required for mysql store")
+			return nil, errors.New("mysql_dsn is required for mysql store")
 		}
 
 		mysqlConfig := MySQLConfig{

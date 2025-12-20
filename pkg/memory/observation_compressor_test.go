@@ -34,9 +34,9 @@ func TestDefaultObservationCompressor_Compress_LongContent(t *testing.T) {
 
 	// 生成长内容
 	var builder strings.Builder
-	for i := 0; i < 200; i++ {
+	for i := range 200 {
 		builder.WriteString("Line ")
-		builder.WriteString(string(rune('0' + i%10)))
+		builder.WriteRune(rune('0' + i%10))
 		builder.WriteString(": This is a test line with some content\n")
 	}
 	longContent := builder.String()
@@ -148,13 +148,13 @@ func TestDefaultObservationCompressor_CompressByToolType_Bash(t *testing.T) {
 
 	// 生成 Bash 输出（包含错误）
 	var builder strings.Builder
-	for i := 0; i < 100; i++ {
+	for i := range 100 {
 		builder.WriteString("Output line ")
-		builder.WriteString(string(rune('0' + i%10)))
+		builder.WriteRune(rune('0' + i%10))
 		builder.WriteString("\n")
 	}
 	builder.WriteString("Error: Something went wrong\n")
-	for i := 0; i < 50; i++ {
+	for range 50 {
 		builder.WriteString("More output\n")
 	}
 
@@ -175,7 +175,7 @@ func TestDefaultObservationCompressor_CompressByToolType_Grep(t *testing.T) {
 
 	// 生成搜索结果
 	var builder strings.Builder
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		builder.WriteString("/path/to/file.go:123: match found\n")
 	}
 

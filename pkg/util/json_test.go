@@ -16,7 +16,7 @@ func TestMarshalDeterministic_Map(t *testing.T) {
 
 	// 多次序列化，确保结果一致
 	var results []string
-	for i := 0; i < 10; i++ {
+	for range 10 {
 		data, err := MarshalDeterministic(m)
 		if err != nil {
 			t.Fatalf("MarshalDeterministic failed: %v", err)
@@ -115,7 +115,7 @@ func TestMarshalDeterministic_Struct(t *testing.T) {
 
 	// 验证结果是确定性的
 	var results []string
-	for i := 0; i < 5; i++ {
+	for range 5 {
 		d, _ := MarshalDeterministic(o)
 		results = append(results, string(d))
 	}
@@ -289,7 +289,7 @@ func TestStandardJSONIsNonDeterministic(t *testing.T) {
 
 	// 多次序列化，看是否产生不同结果
 	seen := make(map[string]bool)
-	for i := 0; i < 100; i++ {
+	for range 100 {
 		data, _ := json.Marshal(m)
 		seen[string(data)] = true
 	}

@@ -2,6 +2,7 @@ package middleware
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -19,6 +20,7 @@ var sumLog = logging.ForComponent("SummarizationMiddleware")
 // 4. 用总结消息替换旧的历史记录
 type SummarizationMiddleware struct {
 	*BaseMiddleware
+
 	maxTokensBeforeSummary int
 	messagesToKeep         int
 	summaryPrefix          string
@@ -46,7 +48,7 @@ type SummarizationMiddlewareConfig struct {
 // NewSummarizationMiddleware 创建中间件
 func NewSummarizationMiddleware(config *SummarizationMiddlewareConfig) (*SummarizationMiddleware, error) {
 	if config == nil {
-		return nil, fmt.Errorf("config cannot be nil")
+		return nil, errors.New("config cannot be nil")
 	}
 
 	if config.MaxTokensBeforeSummary <= 0 {
@@ -316,7 +318,7 @@ func extractConversationPhases(messages []types.Message) []ConversationPhase {
 		// 提取关键点
 		point := ""
 		if msg.Role == types.MessageRoleUser {
-			point = fmt.Sprintf("User: %s", truncateString(content, 100))
+			point = "User: " + truncateString(content, 100)
 		} else if msg.Role == types.MessageRoleAssistant {
 			// 检查是否有工具调用
 			hasToolUse := false
@@ -329,7 +331,7 @@ func extractConversationPhases(messages []types.Message) []ConversationPhase {
 			if hasToolUse {
 				point = "Assistant executed tools"
 			} else {
-				point = fmt.Sprintf("Assistant: %s", truncateString(content, 80))
+				point = "Assistant: " + truncateString(content, 80)
 			}
 		}
 
@@ -406,8 +408,8 @@ func extractFileReferences(messages []types.Message) []string {
 		content := extractMessageContent(msg)
 
 		// 简单的文件路径检测
-		words := strings.Fields(content)
-		for _, word := range words {
+		words := strings.FieldsSeq(content)
+		for word := range words {
 			// 检测常见文件扩展名
 			if strings.HasSuffix(word, ".go") ||
 				strings.HasSuffix(word, ".ts") ||
@@ -522,8 +524,8 @@ func extractPendingTasks(messages []types.Message) []string {
 		// 检查 TODO 标记
 		if strings.Contains(content, "TODO") || strings.Contains(content, "待办") ||
 			strings.Contains(content, "需要") || strings.Contains(content, "接下来") {
-			lines := strings.Split(content, "\n")
-			for _, line := range lines {
+			lines := strings.SplitSeq(content, "\n")
+			for line := range lines {
 				if strings.Contains(line, "TODO") || strings.Contains(line, "- [ ]") {
 					tasks = append(tasks, strings.TrimSpace(line))
 				}
@@ -589,7 +591,7 @@ func defaultTokenCounter(messages []types.Message) int {
 				// 估算 input 的大小
 				totalChars += len(fmt.Sprintf("%v", b.Input))
 			case *types.ToolResultBlock:
-				totalChars += len(fmt.Sprintf("%v", b.Content))
+				totalChars += len(b.Content)
 			}
 		}
 	}

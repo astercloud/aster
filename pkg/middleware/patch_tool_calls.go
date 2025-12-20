@@ -17,6 +17,7 @@ var ptcLog = logging.ForComponent("PatchToolCallsMiddleware")
 // 3. 记录失败的工具调用供调试
 type PatchToolCallsMiddleware struct {
 	*BaseMiddleware
+
 	enableLogging  bool
 	failedCalls    []FailedToolCall
 	maxFailedCalls int

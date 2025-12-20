@@ -126,7 +126,7 @@ func TestChainShouldContinue(t *testing.T) {
 			})
 
 			// 添加步骤
-			for i := 0; i < tt.stepCount; i++ {
+			for range tt.stepCount {
 				step := Step{
 					Title:      "Test Step",
 					Confidence: 0.9,

@@ -204,7 +204,7 @@ func TestInMemoryStore_GetTopK(t *testing.T) {
 	ctx := context.Background()
 	namespace := "user:123"
 
-	for i := 0; i < 5; i++ {
+	for i := range 5 {
 		require.NoError(t, store.Save(ctx, &LogicMemory{
 			Namespace: namespace,
 			Key:       string(rune('a' + i)),

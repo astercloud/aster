@@ -8,6 +8,7 @@ import (
 	"fmt"
 	"io"
 	"log"
+	"strings"
 	"time"
 
 	"github.com/astercloud/aster/pkg/agent"
@@ -184,13 +185,15 @@ func (a *SemanticQAWorkflowAgent) Execute(ctx context.Context, message string) *
 		}
 
 		contextText := ""
+		var contextTextSb187 strings.Builder
 		for i, h := range hits {
 			if i > 0 {
-				contextText += "\n\n"
+				contextTextSb187.WriteString("\n\n")
 			}
 			text, _ := h.Metadata["text"].(string)
-			contextText += fmt.Sprintf("[DOC %d] %s", i+1, text)
+			contextTextSb187.WriteString(fmt.Sprintf("[DOC %d] %s", i+1, text))
 		}
+		contextText += contextTextSb187.String()
 
 		if writer.Send(&session.Event{
 			ID:           fmt.Sprintf("evt-%s-context-%d", a.name, time.Now().UnixNano()),

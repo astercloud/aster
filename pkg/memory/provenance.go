@@ -1,6 +1,7 @@
 package memory
 
 import (
+	"slices"
 	"time"
 )
 
@@ -117,10 +118,8 @@ func calculateInitialConfidence(sourceType SourceType, isExplicit bool) float64 
 // 用于追踪记忆被多个来源确认。
 func (p *MemoryProvenance) AddSource(sourceID string) {
 	// 检查是否已存在
-	for _, s := range p.Sources {
-		if s == sourceID {
-			return
-		}
+	if slices.Contains(p.Sources, sourceID) {
+		return
 	}
 	p.Sources = append(p.Sources, sourceID)
 	p.UpdatedAt = time.Now()

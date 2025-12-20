@@ -162,7 +162,7 @@ func TestIsCompleted(t *testing.T) {
 		{"executing", StatusExecuting, false},
 		{"completed", StatusCompleted, true},
 		{"failed", StatusFailed, true},
-		{"cancelled", StatusCancelled, true},
+		{"canceled", StatusCancelled, true},
 		{"partial", StatusPartial, false},
 	}
 
@@ -218,7 +218,7 @@ func TestCanExecute(t *testing.T) {
 		{"executing", StatusExecuting, true, true, false, false},
 		{"completed", StatusCompleted, true, true, false, false},
 		{"failed", StatusFailed, true, true, false, false},
-		{"cancelled", StatusCancelled, true, true, false, false},
+		{"canceled", StatusCancelled, true, true, false, false},
 		{"approved status, approved", StatusApproved, true, true, false, true},
 	}
 

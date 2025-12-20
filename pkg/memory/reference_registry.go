@@ -254,7 +254,7 @@ func (r *InMemoryReferenceRegistry) evictOldest() {
 // sortByLastAccessed 按最后访问时间排序（降序）
 func sortByLastAccessed(refs []ReferenceInfo) {
 	// 简单的冒泡排序，因为通常数据量不大
-	for i := 0; i < len(refs)-1; i++ {
+	for i := range len(refs) - 1 {
 		for j := i + 1; j < len(refs); j++ {
 			if refs[j].LastAccessed.After(refs[i].LastAccessed) {
 				refs[i], refs[j] = refs[j], refs[i]

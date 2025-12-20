@@ -4,12 +4,14 @@ import (
 	"context"
 	"crypto/rand"
 	"encoding/hex"
+	"errors"
 	"fmt"
 	"os"
 	"os/exec"
 	"path/filepath"
 	"regexp"
 	"runtime"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -412,7 +414,7 @@ func (ls *LocalSandbox) Exec(ctx context.Context, cmd string, opts *ExecOptions)
 		return &ExecResult{
 			Code:   1,
 			Stdout: "",
-			Stderr: fmt.Sprintf("Dangerous command blocked: %s", blockReason),
+			Stderr: "Dangerous command blocked: " + blockReason,
 		}, nil
 	}
 
@@ -423,7 +425,7 @@ func (ls *LocalSandbox) Exec(ctx context.Context, cmd string, opts *ExecOptions)
 			return &ExecResult{
 				Code:   1,
 				Stdout: "",
-				Stderr: fmt.Sprintf("Path security violation: %s", pathIssue),
+				Stderr: "Path security violation: " + pathIssue,
 			}, nil
 		}
 	}
@@ -499,7 +501,8 @@ func (ls *LocalSandbox) execWithLimits(ctx context.Context, cmd string, opts *Ex
 	}
 
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			return &ExecResult{
 				Code:   exitErr.ExitCode(),
 				Stdout: string(output),
@@ -628,7 +631,7 @@ func (ls *LocalSandbox) checkDangerousCommand(cmd string) string {
 
 	for _, pattern := range dangerousPatterns {
 		if pattern.MatchString(normalizedCmd) {
-			return fmt.Sprintf("matches dangerous pattern: %s", pattern.String()[:min(50, len(pattern.String()))])
+			return "matches dangerous pattern: " + pattern.String()[:min(50, len(pattern.String()))]
 		}
 	}
 
@@ -718,7 +721,7 @@ func (ls *LocalSandbox) checkPathSecurity(cmd string) string {
 		// 检查是否访问敏感路径
 		for _, sensitive := range sensitivePaths {
 			if strings.HasPrefix(absPath, sensitive) {
-				return fmt.Sprintf("access to sensitive path: %s", sensitive)
+				return "access to sensitive path: " + sensitive
 			}
 		}
 
@@ -726,7 +729,7 @@ func (ls *LocalSandbox) checkPathSecurity(cmd string) string {
 		if strings.Contains(path, "..") {
 			// 检查规范化后是否超出工作目录
 			if ls.enforceBoundary && !ls.fs.IsInside(absPath) {
-				return fmt.Sprintf("path traversal detected: %s", path)
+				return "path traversal detected: " + path
 			}
 		}
 	}
@@ -893,14 +896,6 @@ func (ls *LocalSandbox) AddBlockedCommand(cmd string) {
 // RemoveBlockedCommand 移除阻止命令
 func (ls *LocalSandbox) RemoveBlockedCommand(cmd string) {
 	delete(ls.blockedCommands, cmd)
-}
-
-// min 返回两个整数中的较小值
-func min(a, b int) int {
-	if a < b {
-		return a
-	}
-	return b
 }
 
 // Watch 监听文件变更
@@ -1105,7 +1100,8 @@ func (ls *LocalSandbox) execDirect(ctx context.Context, cmd string, opts *ExecOp
 
 	output, err := command.CombinedOutput()
 	if err != nil {
-		if exitErr, ok := err.(*exec.ExitError); ok {
+		exitErr := &exec.ExitError{}
+		if errors.As(err, &exitErr) {
 			return &ExecResult{
 				Code:   exitErr.ExitCode(),
 				Stdout: string(output),
@@ -1218,11 +1214,5 @@ func (ls *LocalSandbox) CheckUnixSocketAccess(socketPath string) bool {
 		return true
 	}
 
-	for _, allowed := range ls.networkConfig.AllowUnixSockets {
-		if socketPath == allowed {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(ls.networkConfig.AllowUnixSockets, socketPath)
 }

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 	"io"
+	"maps"
 	"time"
 
 	"github.com/astercloud/aster/pkg/store"
@@ -147,10 +148,10 @@ func (w *Workflow) WithSession(sessionID string) *Workflow {
 // Validate 验证配置
 func (w *Workflow) Validate() error {
 	if w.Name == "" {
-		return fmt.Errorf("workflow name is required")
+		return errors.New("workflow name is required")
 	}
 	if len(w.Steps) == 0 {
-		return fmt.Errorf("workflow must have at least one step")
+		return errors.New("workflow must have at least one step")
 	}
 
 	stepNames := make(map[string]bool)
@@ -205,7 +206,7 @@ func (w *Workflow) GetSession(sessionID string) (*WorkflowSession, error) {
 	}
 
 	if sessionID == "" {
-		return nil, fmt.Errorf("no session_id provided")
+		return nil, errors.New("no session_id provided")
 	}
 
 	// 从缓存获取
@@ -232,9 +233,7 @@ func (w *Workflow) CreateSession(sessionID, userID string) *WorkflowSession {
 
 	// 初始化会话状态
 	if w.SessionState != nil {
-		for k, v := range w.SessionState {
-			session.State[k] = v
-		}
+		maps.Copy(session.State, w.SessionState)
 	}
 
 	// 缓存会话
@@ -270,7 +269,7 @@ func (w *Workflow) GetOrCreateSession(sessionID, userID string) *WorkflowSession
 // GetRun 获取运行记录
 func (w *Workflow) GetRun(runID string) (*WorkflowRun, error) {
 	if w.workflowSession == nil {
-		return nil, fmt.Errorf("no active session")
+		return nil, errors.New("no active session")
 	}
 
 	for _, run := range w.workflowSession.History {
@@ -285,11 +284,11 @@ func (w *Workflow) GetRun(runID string) (*WorkflowRun, error) {
 // GetLastRun 获取最后一次运行
 func (w *Workflow) GetLastRun() (*WorkflowRun, error) {
 	if w.workflowSession == nil {
-		return nil, fmt.Errorf("no active session")
+		return nil, errors.New("no active session")
 	}
 
 	if len(w.workflowSession.History) == 0 {
-		return nil, fmt.Errorf("no runs found")
+		return nil, errors.New("no runs found")
 	}
 
 	return w.workflowSession.History[len(w.workflowSession.History)-1], nil
@@ -358,14 +357,10 @@ func (w *Workflow) Execute(ctx context.Context, input *WorkflowInput) *stream.Re
 		// 合并会话状态
 		sessionState := make(map[string]any)
 		if session.State != nil {
-			for k, v := range session.State {
-				sessionState[k] = v
-			}
+			maps.Copy(sessionState, session.State)
 		}
 		if input.SessionState != nil {
-			for k, v := range input.SessionState {
-				sessionState[k] = v
-			}
+			maps.Copy(sessionState, input.SessionState)
 		}
 
 		stepOutputs := make(map[string]*StepOutput)

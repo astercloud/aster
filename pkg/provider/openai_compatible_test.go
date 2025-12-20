@@ -564,8 +564,7 @@ func BenchmarkProviderCreation(b *testing.B) {
 
 	factory := NewMultiProviderFactory()
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_, _ = factory.Create(config)
 	}
 }
@@ -588,8 +587,7 @@ func BenchmarkMessageConversion(b *testing.B) {
 		{Role: types.RoleUser, Content: "How are you?"},
 	}
 
-	b.ResetTimer()
-	for i := 0; i < b.N; i++ {
+	for b.Loop() {
 		_ = baseProvider.convertMessages(messages)
 	}
 }

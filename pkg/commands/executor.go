@@ -2,6 +2,7 @@ package commands
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -120,11 +121,11 @@ func (e *Executor) CheckCapabilities(cmd *CommandDefinition) error {
 		switch capability {
 		case "tool-calling":
 			if !e.capabilities.SupportToolCalling {
-				return fmt.Errorf("command requires tool-calling support")
+				return errors.New("command requires tool-calling support")
 			}
 		case "system-prompt":
 			if !e.capabilities.SupportSystemPrompt {
-				return fmt.Errorf("command requires system-prompt support")
+				return errors.New("command requires system-prompt support")
 			}
 		}
 	}

@@ -1,6 +1,7 @@
 package dashboard
 
 import (
+	"maps"
 	"strings"
 	"sync"
 )
@@ -17,14 +18,10 @@ func NewCostCalculator(customPricing map[string]ModelPricing) *CostCalculator {
 	pricing := make(map[string]ModelPricing)
 
 	// 复制默认定价
-	for k, v := range DefaultModelPricing {
-		pricing[k] = v
-	}
+	maps.Copy(pricing, DefaultModelPricing)
 
 	// 合并自定义定价
-	for k, v := range customPricing {
-		pricing[k] = v
-	}
+	maps.Copy(pricing, customPricing)
 
 	return &CostCalculator{
 		pricing:  pricing,
@@ -222,9 +219,7 @@ func (cc *CostCalculator) ListPricing() map[string]ModelPricing {
 	defer cc.mu.RUnlock()
 
 	result := make(map[string]ModelPricing)
-	for k, v := range cc.pricing {
-		result[k] = v
-	}
+	maps.Copy(result, cc.pricing)
 
 	return result
 }
@@ -314,7 +309,7 @@ func sprintf(format string, a float64) string {
 func floatToString(f float64, precision int) string {
 	// 使用整数运算避免浮点精度问题
 	multiplier := int64(1)
-	for i := 0; i < precision; i++ {
+	for range precision {
 		multiplier *= 10
 	}
 

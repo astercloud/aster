@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"path/filepath"
 	"regexp"
+	"slices"
 	"strings"
 	"sync"
 	"time"
@@ -385,13 +386,7 @@ func (i *EnhancedInspector) isExcludedCommand(toolName string, args map[string]a
 	}
 
 	// 检查工具名称
-	for _, excluded := range settings.ExcludedCommands {
-		if toolName == excluded {
-			return true
-		}
-	}
-
-	return false
+	return slices.Contains(settings.ExcludedCommands, toolName)
 }
 
 // isEditTool 检查是否为编辑工具
@@ -653,12 +648,12 @@ func (i *EnhancedInspector) matchPattern(pattern, toolName string) bool {
 	if pattern == toolName {
 		return true
 	}
-	if strings.HasSuffix(pattern, "*") {
-		prefix := strings.TrimSuffix(pattern, "*")
+	if before, ok := strings.CutSuffix(pattern, "*"); ok {
+		prefix := before
 		return strings.HasPrefix(toolName, prefix)
 	}
-	if strings.HasPrefix(pattern, "*") {
-		suffix := strings.TrimPrefix(pattern, "*")
+	if after, ok := strings.CutPrefix(pattern, "*"); ok {
+		suffix := after
 		return strings.HasSuffix(toolName, suffix)
 	}
 	return false
@@ -737,7 +732,7 @@ func (i *EnhancedInspector) RecordDecision(req *Request, decision Decision, note
 			Decision:  DecisionAllow,
 			RiskLevel: req.RiskLevel,
 			CreatedAt: time.Now(),
-			Note:      fmt.Sprintf("Auto-created from allow_always: %s", note),
+			Note:      "Auto-created from allow_always: " + note,
 		})
 	case DecisionDenyAlways:
 		i.AddRule(Rule{
@@ -745,7 +740,7 @@ func (i *EnhancedInspector) RecordDecision(req *Request, decision Decision, note
 			Decision:  DecisionDeny,
 			RiskLevel: req.RiskLevel,
 			CreatedAt: time.Now(),
-			Note:      fmt.Sprintf("Auto-created from deny_always: %s", note),
+			Note:      "Auto-created from deny_always: " + note,
 		})
 	}
 

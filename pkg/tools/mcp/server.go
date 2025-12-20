@@ -2,6 +2,7 @@ package mcp
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"sync"
 
@@ -31,11 +32,11 @@ type MCPServerConfig struct {
 // NewMCPServer 创建 MCP Server 连接
 func NewMCPServer(config *MCPServerConfig, registry *tools.Registry) (*MCPServer, error) {
 	if config.ServerID == "" {
-		return nil, fmt.Errorf("server_id is required")
+		return nil, errors.New("server_id is required")
 	}
 
 	if config.Endpoint == "" {
-		return nil, fmt.Errorf("endpoint is required")
+		return nil, errors.New("endpoint is required")
 	}
 
 	// 创建 MCP 客户端
@@ -75,7 +76,7 @@ func (s *MCPServer) RegisterTools() error {
 	defer s.mu.RUnlock()
 
 	if len(s.tools) == 0 {
-		return fmt.Errorf("no tools available, call Connect() first")
+		return errors.New("no tools available, call Connect() first")
 	}
 
 	// 为每个 MCP 工具创建工厂并注册

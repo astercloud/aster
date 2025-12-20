@@ -2,7 +2,9 @@ package tools
 
 import (
 	"context"
+	"errors"
 	"fmt"
+	"maps"
 	"sync"
 	"time"
 
@@ -69,7 +71,7 @@ func (s TaskState) String() string {
 	case TaskStateFailed:
 		return "failed"
 	case TaskStateCancelled:
-		return "cancelled"
+		return "canceled"
 	default:
 		return "unknown"
 	}
@@ -131,7 +133,7 @@ func (e *LongRunningExecutor) StartAsync(
 			if taskCtx.Err() == context.Canceled {
 				_ = e.updateStatus(taskID, func(s *TaskStatus) {
 					s.State = TaskStateCancelled
-					s.Error = fmt.Errorf("task cancelled")
+					s.Error = errors.New("task canceled")
 					s.EndTime = &now
 				})
 			} else {
@@ -253,9 +255,7 @@ func (e *LongRunningExecutor) Cleanup(before time.Time) int {
 func (e *LongRunningExecutor) UpdateProgress(taskID string, progress float64, metadata map[string]any) error {
 	return e.updateStatus(taskID, func(s *TaskStatus) {
 		s.Progress = progress
-		for k, v := range metadata {
-			s.Metadata[k] = v
-		}
+		maps.Copy(s.Metadata, metadata)
 	})
 }
 
@@ -289,9 +289,7 @@ func copyMetadata(src map[string]any) map[string]any {
 	}
 
 	dst := make(map[string]any, len(src))
-	for k, v := range src {
-		dst[k] = v
-	}
+	maps.Copy(dst, src)
 	return dst
 }
 
@@ -304,6 +302,7 @@ func generateTaskID() string {
 // 可以嵌入到具体工具中
 type BaseLongRunningTool struct {
 	BaseTool
+
 	executor *LongRunningExecutor
 }
 
@@ -340,7 +339,7 @@ func (t *BaseLongRunningTool) Cancel(ctx context.Context, taskID string) error {
 
 // Execute 需要由具体工具实现
 func (t *BaseLongRunningTool) Execute(ctx context.Context, args map[string]any, tc *ToolContext) (any, error) {
-	return nil, fmt.Errorf("Execute() must be implemented by concrete tool")
+	return nil, errors.New("Execute() must be implemented by concrete tool")
 }
 
 // WaitFor 等待任务完成（辅助函数）

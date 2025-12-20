@@ -7,6 +7,7 @@ package actor
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 )
@@ -48,12 +49,12 @@ func (p *PID) Tell(msg Message) {
 // Request 发送请求并等待响应（同步调用）
 func (p *PID) Request(msg Message, timeout time.Duration) (Message, error) {
 	if p.system == nil {
-		return nil, fmt.Errorf("actor system not available")
+		return nil, errors.New("actor system not available")
 	}
 	return p.system.Request(p, msg, timeout)
 }
 
-// Actor Actor 接口
+// Actor
 // 实现此接口即可成为 Actor
 type Actor interface {
 	// Receive 处理接收到的消息
