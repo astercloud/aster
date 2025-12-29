@@ -2,6 +2,7 @@ package provider
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"strings"
 
@@ -32,7 +33,7 @@ type GatewayProvider struct {
 // - 其他 -> OpenAI 兼容协议
 func NewGatewayProvider(config *types.ModelConfig) (Provider, error) {
 	if config.BaseURL == "" {
-		return nil, fmt.Errorf("gateway provider requires base_url")
+		return nil, errors.New("gateway provider requires base_url")
 	}
 
 	g := &GatewayProvider{
