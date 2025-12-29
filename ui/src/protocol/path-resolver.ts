@@ -434,6 +434,87 @@ export function deleteData(data: DataMap, path: string): boolean {
 }
 
 /**
+ * 在数据模型中添加数据（add 操作）
+ *
+ * 行为：
+ * - 如果目标是数组：追加元素（value 为数组时追加所有元素）
+ * - 如果目标是对象：合并属性（value 必须是对象）
+ * - 如果路径不存在：创建路径并设置值
+ *
+ * @param data - 数据模型（会被修改）
+ * @param path - JSON Pointer 路径
+ * @param value - 要添加的值
+ * @returns 是否添加成功
+ */
+export function addData(data: DataMap, path: string, value: DataValue): boolean {
+  if (!isValidJsonPointer(path)) {
+    return false;
+  }
+
+  // 空路径：合并到根对象
+  if (path === '') {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(data, value);
+      return true;
+    }
+    return false;
+  }
+
+  // 获取当前值
+  const current = getData(data, path);
+
+  // 路径不存在：创建并设置
+  if (current === null) {
+    return setData(data, path, value);
+  }
+
+  // 目标是数组：追加元素
+  if (Array.isArray(current)) {
+    if (Array.isArray(value)) {
+      current.push(...value);
+    }
+    else {
+      current.push(value);
+    }
+    return true;
+  }
+
+  // 目标是对象：合并属性
+  if (typeof current === 'object' && current !== null) {
+    if (typeof value === 'object' && value !== null && !Array.isArray(value)) {
+      Object.assign(current, value);
+      return true;
+    }
+    return false;
+  }
+
+  // 基本类型：无法添加，改为替换
+  return setData(data, path, value);
+}
+
+/**
+ * 移除数据模型中指定路径的数据（remove 操作）
+ *
+ * 与 deleteData 相同，但提供更语义化的名称
+ *
+ * @param data - 数据模型（会被修改）
+ * @param path - JSON Pointer 路径
+ * @returns 是否移除成功
+ */
+export function removeData(data: DataMap, path: string): boolean {
+  // 空路径：清空整个数据模型
+  if (path === '' || path === '/') {
+    const keys = Object.keys(data);
+    for (const key of keys) {
+      delete data[key];
+    }
+    return true;
+  }
+
+  return deleteData(data, path);
+}
+
+/**
  * 获取路径的父路径
  *
  * @param path - JSON Pointer 路径

@@ -10,13 +10,12 @@
  * - The renderer should emit correct `ui:action` events to the Control channel
  */
 
-import { describe, expect, it, vi, beforeEach } from 'vitest';
+import { describe, expect, it, vi } from 'vitest';
 import * as fc from 'fast-check';
 import { ref } from 'vue';
 import {
   useUIAction,
   createUIActionContext,
-  UI_ACTION_CONTEXT_KEY,
   type UIActionContext,
   type UIActionEmitter,
 } from '@/composables/useUIAction';
@@ -67,12 +66,19 @@ const payloadArb: fc.Arbitrary<Record<string, unknown>> = fc.dictionary(
 );
 
 /**
+ * Generate ISO timestamp string
+ */
+const timestampArb = fc.integer({ min: 1577836800000, max: 1893456000000 }).map(ts => new Date(ts).toISOString());
+
+/**
  * Generate complete UIActionEvent
  */
 const uiActionEventArb: fc.Arbitrary<UIActionEvent> = fc.record({
   surfaceId: surfaceIdArb,
   componentId: componentIdArb,
   action: actionNameArb,
+  timestamp: timestampArb,
+  context: payloadArb,
   payload: fc.option(payloadArb, { nil: undefined }),
 });
 
@@ -87,11 +93,11 @@ function createMockContext(): {
   context: UIActionContext;
   emitSpy: ReturnType<typeof vi.fn>;
 } {
-  const emitSpy = vi.fn<[UIActionEvent], void>();
+  const emitSpy = vi.fn();
   const isConnected = ref(true);
 
   const context: UIActionContext = {
-    emitAction: emitSpy,
+    emitAction: emitSpy as UIActionEmitter,
     isConnected,
   };
 
@@ -118,20 +124,13 @@ describe('useUIAction', () => {
           fc.property(surfaceIdArb, componentIdArb, actionNameArb, (surfaceId, componentId, action) => {
             const { context, emitSpy } = createMockContext();
 
-            // Create useUIAction with options
-            const { emitAction } = useUIAction({
-              surfaceId,
-              componentId,
-            });
-
-            // Manually inject context behavior by calling emitFullAction
-            const { emitFullAction } = useUIAction({});
-
             // Create expected event
             const expectedEvent: UIActionEvent = {
               surfaceId,
               componentId,
               action,
+              timestamp: new Date().toISOString(),
+              context: {},
             };
 
             // Emit via context directly
@@ -141,10 +140,10 @@ describe('useUIAction', () => {
             expect(emitSpy).toHaveBeenCalledTimes(1);
             expect(emitSpy).toHaveBeenCalledWith(expectedEvent);
 
-            const emittedEvent = emitSpy.mock.calls[0][0];
-            expect(emittedEvent.surfaceId).toBe(surfaceId);
-            expect(emittedEvent.componentId).toBe(componentId);
-            expect(emittedEvent.action).toBe(action);
+            const emittedEvent = emitSpy.mock.calls[0]?.[0];
+            expect(emittedEvent?.surfaceId).toBe(surfaceId);
+            expect(emittedEvent?.componentId).toBe(componentId);
+            expect(emittedEvent?.action).toBe(action);
           }),
           { numRuns: 100 },
         );
@@ -160,14 +159,14 @@ describe('useUIAction', () => {
 
             // Verify payload is preserved
             expect(emitSpy).toHaveBeenCalledTimes(1);
-            const emittedEvent = emitSpy.mock.calls[0][0];
+            const emittedEvent = emitSpy.mock.calls[0]?.[0];
 
-            expect(emittedEvent.surfaceId).toBe(event.surfaceId);
-            expect(emittedEvent.componentId).toBe(event.componentId);
-            expect(emittedEvent.action).toBe(event.action);
+            expect(emittedEvent?.surfaceId).toBe(event.surfaceId);
+            expect(emittedEvent?.componentId).toBe(event.componentId);
+            expect(emittedEvent?.action).toBe(event.action);
 
             if (event.payload !== undefined) {
-              expect(emittedEvent.payload).toEqual(event.payload);
+              expect(emittedEvent?.payload).toEqual(event.payload);
             }
           }),
           { numRuns: 100 },
@@ -204,7 +203,7 @@ describe('useUIAction', () => {
             context2.emitAction(event);
 
             // Both should receive identical events
-            expect(emitSpy1.mock.calls[0][0]).toEqual(emitSpy2.mock.calls[0][0]);
+            expect(emitSpy1.mock.calls[0]?.[0]).toEqual(emitSpy2.mock.calls[0]?.[0]);
           }),
           { numRuns: 100 },
         );
@@ -224,7 +223,7 @@ describe('useUIAction', () => {
             expect(emitSpy).toHaveBeenCalledTimes(events.length);
 
             events.forEach((event, index) => {
-              expect(emitSpy.mock.calls[index][0]).toEqual(event);
+              expect(emitSpy.mock.calls[index]?.[0]).toEqual(event);
             });
           }),
           { numRuns: 100 },
@@ -236,7 +235,7 @@ describe('useUIAction', () => {
       it('should reflect connection state correctly', () => {
         fc.assert(
           fc.property(fc.boolean(), (connected) => {
-            const emitSpy = vi.fn<[UIActionEvent], void>();
+            const emitSpy = vi.fn() as UIActionEmitter;
             const isConnected = ref(connected);
 
             const context: UIActionContext = {
@@ -256,7 +255,7 @@ describe('useUIAction', () => {
     it('should create valid context with all required properties', () => {
       fc.assert(
         fc.property(fc.boolean(), (connected) => {
-          const emitAction = vi.fn<[UIActionEvent], void>();
+          const emitAction = vi.fn() as UIActionEmitter;
           const isConnected = ref(connected);
 
           const context = createUIActionContext(emitAction, isConnected);
@@ -272,7 +271,7 @@ describe('useUIAction', () => {
     it('should allow emitting events through created context', () => {
       fc.assert(
         fc.property(uiActionEventArb, (event) => {
-          const emitAction = vi.fn<[UIActionEvent], void>();
+          const emitAction = vi.fn() as UIActionEmitter;
           const isConnected = ref(true);
 
           const context = createUIActionContext(emitAction, isConnected);
@@ -340,13 +339,15 @@ describe('useUIAction', () => {
             surfaceId,
             componentId,
             action,
+            timestamp: new Date().toISOString(),
+            context: {},
             // payload is undefined
           };
 
           context.emitAction(event);
 
           expect(emitSpy).toHaveBeenCalledWith(event);
-          expect(emitSpy.mock.calls[0][0].payload).toBeUndefined();
+          expect(emitSpy.mock.calls[0]?.[0]?.payload).toBeUndefined();
         }),
         { numRuns: 100 },
       );
@@ -361,13 +362,15 @@ describe('useUIAction', () => {
             surfaceId,
             componentId,
             action,
+            timestamp: new Date().toISOString(),
+            context: {},
             payload: {},
           };
 
           context.emitAction(event);
 
           expect(emitSpy).toHaveBeenCalledWith(event);
-          expect(emitSpy.mock.calls[0][0].payload).toEqual({});
+          expect(emitSpy.mock.calls[0]?.[0]?.payload).toEqual({});
         }),
         { numRuns: 100 },
       );
@@ -387,12 +390,14 @@ describe('useUIAction', () => {
               surfaceId,
               componentId,
               action,
+              timestamp: new Date().toISOString(),
+              context: {},
               payload,
             };
 
             context.emitAction(event);
 
-            expect(emitSpy.mock.calls[0][0].payload).toEqual(payload);
+            expect(emitSpy.mock.calls[0]?.[0]?.payload).toEqual(payload);
           },
         ),
         { numRuns: 100 },

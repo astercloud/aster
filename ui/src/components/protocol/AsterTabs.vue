@@ -24,6 +24,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { DataValue, UIActionEvent, PropertyValue } from '@/types/ui-protocol';
+import { createUIActionEvent } from '@/types/ui-protocol';
 import { useAsterDataBinding } from '@/composables/useAsterDataBinding';
 import { useUIAction } from '@/composables/useUIAction';
 
@@ -95,12 +96,12 @@ function handleTabClick(tabId: string) {
 
   // Emit action event
   if (props.componentId && props.surfaceId) {
-    const event: UIActionEvent = {
-      surfaceId: props.surfaceId,
-      componentId: props.componentId,
-      action: 'tab-change',
-      payload: { tabId },
-    };
+    const event = createUIActionEvent(
+      props.surfaceId,
+      props.componentId,
+      'tab-change',
+      { tabId },
+    );
     emit('action', event);
     emitFullAction(event);
   }

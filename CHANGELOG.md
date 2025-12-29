@@ -1,5 +1,77 @@
 # Changelog
 
+## [v0.35.0] - 2025-12-29
+
+### Added
+
+- **UI Protocol A2UI v0.9 对齐增强**
+  - `createSurface` 消息类型：支持创建 Surface 并指定 `catalogId` 组件目录
+  - `DataModelOperation` 操作类型：支持 `add`（追加/合并）、`replace`（替换）、`remove`（删除）三种数据操作
+  - `actionContext` 按钮属性：点击时自动解析路径引用，收集表单数据到 `UIActionEvent.context`
+  - `ValidationError` 标准格式：JSON Pointer 路径指向错误位置，便于 LLM 自我纠正
+  - `ClientMessage` 类型：`UserActionMessage` 和 `ProtocolError` 客户端到服务端消息
+  - 简化 `PropertyValue` 格式：支持 A2UI 风格直接字面值（string/number/boolean）
+  - `UIActionEvent` 增强：添加 `timestamp`（ISO 8601）和 `context` 字段
+
+- **Go 类型定义** (`pkg/types/ui_protocol.go`)
+  - `DataModelOperation` 枚举类型
+  - `CreateSurfaceMessage` 结构体
+  - `ClientMessage`、`UserActionMessage` 类型
+  - `ProtocolError`、`ValidationError` 错误类型
+  - `ButtonProps.ActionContext` 字段
+  - `UIActionEvent.Timestamp`、`UIActionEvent.Context` 字段
+
+- **TypeScript 类型定义** (`ui/src/types/ui-protocol.ts`)
+  - 完整的 A2UI 对齐类型定义
+  - `parseExtendedPropertyValue()`、`normalizePropertyValue()` 工具函数
+  - `createUIActionEvent()`、`createUserActionMessage()` 工厂函数
+  - `createValidationError()`、`createGenericError()` 错误创建函数
+
+- **MessageProcessor 增强** (`ui/src/protocol/message-processor.ts`)
+  - `processCreateSurface()` 方法
+  - `validateMessage()` 消息验证方法
+  - `addDataToSurface()`、`removeDataFromSurface()` 数据操作方法
+  - `resolveActionContext()` 上下文解析方法
+  - Surface `catalogId` 存储支持
+
+- **Client Message 模块** (`ui/src/protocol/client-message.ts`)
+  - `createUserActionMessage()` 用户动作消息创建
+  - `createErrorMessage()` 错误消息创建
+  - `resolveActionContext()` 路径引用解析
+  - `serializeClientMessage()`、`parseClientMessage()` 序列化函数
+
+- **Path Resolver 增强** (`ui/src/protocol/path-resolver.ts`)
+  - `addData()` 函数：数组追加、对象合并、路径创建
+  - `removeData()` 函数：值删除、数组元素删除并重新索引
+
+### Changed
+
+- **AsterButton 组件**：支持 `actionContext` 属性，点击时自动解析并包含在事件中
+- **useUIAction composable**：使用 `createUIActionEvent()` 生成标准格式事件
+
+### Tests
+
+- 新增 8 个测试文件，共 173+ 新测试用例
+  - `data-operations.spec.ts` - 数据模型操作单元测试
+  - `action-context.spec.ts` - Action Context 解析测试
+  - `property-value-parsing.spec.ts` - 简化属性值格式测试
+  - `create-surface.spec.ts` - CreateSurface 消息测试
+  - `validation-error.spec.ts` - 验证错误格式测试
+  - `data-operations.property.spec.ts` - 数据操作属性测试 (Property 17, 18)
+  - `action-context.property.spec.ts` - Action Context 属性测试 (Property 19)
+  - `property-value.property.spec.ts` - 属性值兼容性测试 (Property 20)
+- Go 类型测试：12 个新测试用例覆盖所有 A2UI 类型
+
+### Documentation
+
+- 更新 UI Protocol 文档 (`docs/content/02.core-concepts/19.ui-protocol.md`)
+  - 添加 `createSurface` 消息说明
+  - 添加数据模型操作类型 (add/replace/remove) 说明
+  - 添加 Action Context 使用示例
+  - 添加简化属性值格式说明
+  - 添加验证错误格式说明
+  - 添加 Client-to-Server 消息说明
+
 ## [v0.33.0] - 2025-12-28
 
 ### Added

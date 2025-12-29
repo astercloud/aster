@@ -469,3 +469,400 @@ func boolPtr(b bool) *bool {
 func propValuePtr(p PropertyValue) *PropertyValue {
 	return &p
 }
+
+
+// ===================
+// A2UI Alignment Tests
+// ===================
+
+// TestDataModelOperationRoundTrip 测试 DataModelOperation 序列化往返
+func TestDataModelOperationRoundTrip(t *testing.T) {
+	testCases := []struct {
+		name string
+		op   DataModelOperation
+	}{
+		{"Add", DataModelOperationAdd},
+		{"Replace", DataModelOperationReplace},
+		{"Remove", DataModelOperationRemove},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			msg := DataModelUpdateMessage{
+				SurfaceID: "test-surface",
+				Path:      "/items",
+				Op:        tc.op,
+				Contents:  map[string]any{"value": "test"},
+			}
+
+			jsonBytes, err := json.Marshal(msg)
+			if err != nil {
+				t.Fatalf("Marshal error: %v", err)
+			}
+
+			var parsed DataModelUpdateMessage
+			if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+				t.Fatalf("Unmarshal error: %v", err)
+			}
+
+			if parsed.Op != tc.op {
+				t.Errorf("Op mismatch: got %v, want %v", parsed.Op, tc.op)
+			}
+		})
+	}
+}
+
+// TestCreateSurfaceMessageRoundTrip 测试 CreateSurfaceMessage 序列化往返
+func TestCreateSurfaceMessageRoundTrip(t *testing.T) {
+	testCases := []struct {
+		name      string
+		surfaceID string
+		catalogID string
+	}{
+		{"WithCatalogID", "surface-1", "https://example.com/catalog/v1"},
+		{"WithoutCatalogID", "surface-2", ""},
+		{"URLCatalogID", "surface-3", "https://components.example.com/catalog/v2.0"},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			original := CreateSurfaceMessage{
+				SurfaceID: tc.surfaceID,
+				CatalogID: tc.catalogID,
+			}
+
+			jsonBytes, err := json.Marshal(original)
+			if err != nil {
+				t.Fatalf("Marshal error: %v", err)
+			}
+
+			var parsed CreateSurfaceMessage
+			if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+				t.Fatalf("Unmarshal error: %v", err)
+			}
+
+			if parsed.SurfaceID != original.SurfaceID {
+				t.Errorf("SurfaceID mismatch: got %v, want %v", parsed.SurfaceID, original.SurfaceID)
+			}
+			if parsed.CatalogID != original.CatalogID {
+				t.Errorf("CatalogID mismatch: got %v, want %v", parsed.CatalogID, original.CatalogID)
+			}
+		})
+	}
+}
+
+// TestAsterUIMessageWithCreateSurface 测试 AsterUIMessage 包含 CreateSurface
+func TestAsterUIMessageWithCreateSurface(t *testing.T) {
+	msg := AsterUIMessage{
+		CreateSurface: &CreateSurfaceMessage{
+			SurfaceID: "new-surface",
+			CatalogID: "https://example.com/catalog",
+		},
+	}
+
+	jsonBytes, err := json.Marshal(msg)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed AsterUIMessage
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.CreateSurface == nil {
+		t.Fatal("CreateSurface should not be nil")
+	}
+	if parsed.CreateSurface.SurfaceID != "new-surface" {
+		t.Errorf("SurfaceID mismatch: got %v", parsed.CreateSurface.SurfaceID)
+	}
+	if parsed.CreateSurface.CatalogID != "https://example.com/catalog" {
+		t.Errorf("CatalogID mismatch: got %v", parsed.CreateSurface.CatalogID)
+	}
+}
+
+// TestValidationErrorRoundTrip 测试 ValidationError 序列化往返
+func TestValidationErrorRoundTrip(t *testing.T) {
+	original := NewValidationError("surface-1", "/dataModelUpdate/contents", "contents is required")
+
+	jsonBytes, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed ProtocolError
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.Code != string(ValidationErrorCodeValidationFailed) {
+		t.Errorf("Code mismatch: got %v, want %v", parsed.Code, ValidationErrorCodeValidationFailed)
+	}
+	if parsed.SurfaceID != original.SurfaceID {
+		t.Errorf("SurfaceID mismatch: got %v, want %v", parsed.SurfaceID, original.SurfaceID)
+	}
+	if parsed.Path != original.Path {
+		t.Errorf("Path mismatch: got %v, want %v", parsed.Path, original.Path)
+	}
+	if parsed.Message != original.Message {
+		t.Errorf("Message mismatch: got %v, want %v", parsed.Message, original.Message)
+	}
+	if !parsed.IsValidationError() {
+		t.Error("IsValidationError should return true")
+	}
+}
+
+// TestGenericErrorRoundTrip 测试 GenericError 序列化往返
+func TestGenericErrorRoundTrip(t *testing.T) {
+	original := NewGenericError(
+		"UNKNOWN_COMPONENT",
+		"surface-1",
+		"Component type not found",
+		map[string]any{"componentType": "CustomWidget"},
+	)
+
+	jsonBytes, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed ProtocolError
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.Code != "UNKNOWN_COMPONENT" {
+		t.Errorf("Code mismatch: got %v", parsed.Code)
+	}
+	if parsed.SurfaceID != original.SurfaceID {
+		t.Errorf("SurfaceID mismatch: got %v", parsed.SurfaceID)
+	}
+	if parsed.Message != original.Message {
+		t.Errorf("Message mismatch: got %v", parsed.Message)
+	}
+	if parsed.Details == nil {
+		t.Error("Details should not be nil")
+	}
+	if parsed.IsValidationError() {
+		t.Error("IsValidationError should return false for generic error")
+	}
+}
+
+// TestClientMessageRoundTrip 测试 ClientMessage 序列化往返
+func TestClientMessageRoundTrip(t *testing.T) {
+	t.Run("UserAction", func(t *testing.T) {
+		original := ClientMessage{
+			UserAction: &UserActionMessage{
+				Name:              "submit",
+				SurfaceID:         "form-surface",
+				SourceComponentID: "submit-btn",
+				Timestamp:         "2024-01-15T10:30:00.000Z",
+				Context:           map[string]any{"formData": "test"},
+			},
+		}
+
+		jsonBytes, err := json.Marshal(original)
+		if err != nil {
+			t.Fatalf("Marshal error: %v", err)
+		}
+
+		var parsed ClientMessage
+		if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+			t.Fatalf("Unmarshal error: %v", err)
+		}
+
+		if parsed.UserAction == nil {
+			t.Fatal("UserAction should not be nil")
+		}
+		if parsed.UserAction.Name != original.UserAction.Name {
+			t.Errorf("Name mismatch: got %v", parsed.UserAction.Name)
+		}
+		if parsed.UserAction.SurfaceID != original.UserAction.SurfaceID {
+			t.Errorf("SurfaceID mismatch: got %v", parsed.UserAction.SurfaceID)
+		}
+		if parsed.UserAction.SourceComponentID != original.UserAction.SourceComponentID {
+			t.Errorf("SourceComponentID mismatch: got %v", parsed.UserAction.SourceComponentID)
+		}
+		if parsed.UserAction.Timestamp != original.UserAction.Timestamp {
+			t.Errorf("Timestamp mismatch: got %v", parsed.UserAction.Timestamp)
+		}
+	})
+
+	t.Run("Error", func(t *testing.T) {
+		original := ClientMessage{
+			Error: NewValidationError("surface-1", "/path", "error message"),
+		}
+
+		jsonBytes, err := json.Marshal(original)
+		if err != nil {
+			t.Fatalf("Marshal error: %v", err)
+		}
+
+		var parsed ClientMessage
+		if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+			t.Fatalf("Unmarshal error: %v", err)
+		}
+
+		if parsed.Error == nil {
+			t.Fatal("Error should not be nil")
+		}
+		if parsed.Error.Code != string(ValidationErrorCodeValidationFailed) {
+			t.Errorf("Code mismatch: got %v", parsed.Error.Code)
+		}
+	})
+}
+
+// TestUIActionEventRoundTrip 测试 UIActionEvent 序列化往返
+func TestUIActionEventRoundTrip(t *testing.T) {
+	original := UIActionEvent{
+		SurfaceID:   "surface-1",
+		ComponentID: "button-1",
+		Action:      "click",
+		Timestamp:   "2024-01-15T10:30:00.000Z",
+		Context:     map[string]any{"key": "value"},
+		Payload:     map[string]any{"extra": "data"},
+	}
+
+	jsonBytes, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed UIActionEvent
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.SurfaceID != original.SurfaceID {
+		t.Errorf("SurfaceID mismatch: got %v", parsed.SurfaceID)
+	}
+	if parsed.ComponentID != original.ComponentID {
+		t.Errorf("ComponentID mismatch: got %v", parsed.ComponentID)
+	}
+	if parsed.Action != original.Action {
+		t.Errorf("Action mismatch: got %v", parsed.Action)
+	}
+	if parsed.Timestamp != original.Timestamp {
+		t.Errorf("Timestamp mismatch: got %v", parsed.Timestamp)
+	}
+	if parsed.Context == nil {
+		t.Error("Context should not be nil")
+	}
+	if parsed.Payload == nil {
+		t.Error("Payload should not be nil")
+	}
+}
+
+// TestButtonPropsWithActionContext 测试 ButtonProps 包含 ActionContext
+func TestButtonPropsWithActionContext(t *testing.T) {
+	original := ButtonProps{
+		Label:   NewLiteralString("Submit"),
+		Action:  "submit",
+		Variant: ButtonVariantPrimary,
+		ActionContext: map[string]PropertyValue{
+			"userName": NewPathReference("/user/name"),
+			"formId":   NewLiteralString("form-1"),
+		},
+	}
+
+	jsonBytes, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed ButtonProps
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.ActionContext == nil {
+		t.Fatal("ActionContext should not be nil")
+	}
+	if len(parsed.ActionContext) != 2 {
+		t.Errorf("ActionContext length mismatch: got %v, want 2", len(parsed.ActionContext))
+	}
+
+	userName, ok := parsed.ActionContext["userName"]
+	if !ok {
+		t.Error("userName not found in ActionContext")
+	}
+	if !userName.IsPathReference() {
+		t.Error("userName should be a path reference")
+	}
+	if *userName.Path != "/user/name" {
+		t.Errorf("userName path mismatch: got %v", *userName.Path)
+	}
+
+	formId, ok := parsed.ActionContext["formId"]
+	if !ok {
+		t.Error("formId not found in ActionContext")
+	}
+	if !formId.IsLiteralString() {
+		t.Error("formId should be a literal string")
+	}
+	if *formId.LiteralString != "form-1" {
+		t.Errorf("formId value mismatch: got %v", *formId.LiteralString)
+	}
+}
+
+// TestBeginRenderingWithCatalogID 测试 BeginRenderingMessage 包含 CatalogID
+func TestBeginRenderingWithCatalogID(t *testing.T) {
+	original := BeginRenderingMessage{
+		SurfaceID: "surface-1",
+		Root:      "root-component",
+		Styles:    map[string]string{"--primary": "#007bff"},
+		CatalogID: "https://example.com/catalog/v2",
+	}
+
+	jsonBytes, err := json.Marshal(original)
+	if err != nil {
+		t.Fatalf("Marshal error: %v", err)
+	}
+
+	var parsed BeginRenderingMessage
+	if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+		t.Fatalf("Unmarshal error: %v", err)
+	}
+
+	if parsed.CatalogID != original.CatalogID {
+		t.Errorf("CatalogID mismatch: got %v, want %v", parsed.CatalogID, original.CatalogID)
+	}
+}
+
+// TestDataModelUpdateWithOp 测试 DataModelUpdateMessage 包含 Op 字段
+func TestDataModelUpdateWithOp(t *testing.T) {
+	testCases := []struct {
+		name     string
+		op       DataModelOperation
+		contents any
+	}{
+		{"AddToArray", DataModelOperationAdd, []string{"new-item"}},
+		{"ReplaceValue", DataModelOperationReplace, map[string]any{"key": "value"}},
+		{"RemoveValue", DataModelOperationRemove, nil},
+	}
+
+	for _, tc := range testCases {
+		t.Run(tc.name, func(t *testing.T) {
+			original := DataModelUpdateMessage{
+				SurfaceID: "surface-1",
+				Path:      "/items",
+				Op:        tc.op,
+				Contents:  tc.contents,
+			}
+
+			jsonBytes, err := json.Marshal(original)
+			if err != nil {
+				t.Fatalf("Marshal error: %v", err)
+			}
+
+			var parsed DataModelUpdateMessage
+			if err := json.Unmarshal(jsonBytes, &parsed); err != nil {
+				t.Fatalf("Unmarshal error: %v", err)
+			}
+
+			if parsed.Op != tc.op {
+				t.Errorf("Op mismatch: got %v, want %v", parsed.Op, tc.op)
+			}
+		})
+	}
+}

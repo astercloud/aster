@@ -11,6 +11,8 @@ package types
 type MessageOperation string
 
 const (
+	// MessageOperationCreateSurface 创建 Surface 操作
+	MessageOperationCreateSurface MessageOperation = "createSurface"
 	// MessageOperationSurfaceUpdate Surface 更新操作
 	MessageOperationSurfaceUpdate MessageOperation = "surfaceUpdate"
 	// MessageOperationDataModelUpdate 数据模型更新操作
@@ -21,9 +23,23 @@ const (
 	MessageOperationDeleteSurface MessageOperation = "deleteSurface"
 )
 
+// DataModelOperation 数据模型操作类型
+type DataModelOperation string
+
+const (
+	// DataModelOperationAdd 添加操作（数组追加或对象合并）
+	DataModelOperationAdd DataModelOperation = "add"
+	// DataModelOperationReplace 替换操作（默认）
+	DataModelOperationReplace DataModelOperation = "replace"
+	// DataModelOperationRemove 删除操作
+	DataModelOperationRemove DataModelOperation = "remove"
+)
+
 // AsterUIMessage Aster UI 协议主消息结构
-// 支持四种操作类型，每次消息只包含一种操作
+// 支持五种操作类型，每次消息只包含一种操作
 type AsterUIMessage struct {
+	// CreateSurface 创建 Surface 消息
+	CreateSurface *CreateSurfaceMessage `json:"createSurface,omitempty"`
 	// SurfaceUpdate Surface 更新消息
 	SurfaceUpdate *SurfaceUpdateMessage `json:"surfaceUpdate,omitempty"`
 	// DataModelUpdate 数据模型更新消息
@@ -32,6 +48,15 @@ type AsterUIMessage struct {
 	BeginRendering *BeginRenderingMessage `json:"beginRendering,omitempty"`
 	// DeleteSurface 删除 Surface 消息
 	DeleteSurface *DeleteSurfaceMessage `json:"deleteSurface,omitempty"`
+}
+
+// CreateSurfaceMessage 创建 Surface 消息
+// 用于创建新的 Surface 并指定组件目录
+type CreateSurfaceMessage struct {
+	// SurfaceID Surface 唯一标识符
+	SurfaceID string `json:"surfaceId"`
+	// CatalogID 组件目录标识符（推荐使用 URL 格式）
+	CatalogID string `json:"catalogId,omitempty"`
 }
 
 // SurfaceUpdateMessage Surface 更新消息
@@ -50,8 +75,10 @@ type DataModelUpdateMessage struct {
 	SurfaceID string `json:"surfaceId"`
 	// Path JSON Pointer 路径，默认 "/" 表示根路径
 	Path string `json:"path,omitempty"`
-	// Contents 数据内容
-	Contents any `json:"contents"`
+	// Op 操作类型：add/replace/remove，默认 replace
+	Op DataModelOperation `json:"op,omitempty"`
+	// Contents 数据内容（op 为 remove 时可选）
+	Contents any `json:"contents,omitempty"`
 }
 
 // BeginRenderingMessage 开始渲染消息
@@ -63,6 +90,8 @@ type BeginRenderingMessage struct {
 	Root string `json:"root"`
 	// Styles CSS 自定义属性（主题化支持）
 	Styles map[string]string `json:"styles,omitempty"`
+	// CatalogID 组件目录标识符（可选，覆盖 createSurface 中的值）
+	CatalogID string `json:"catalogId,omitempty"`
 }
 
 // DeleteSurfaceMessage 删除 Surface 消息
@@ -350,6 +379,8 @@ type ButtonProps struct {
 	Disabled *PropertyValue `json:"disabled,omitempty"`
 	// Icon 图标名称
 	Icon *PropertyValue `json:"icon,omitempty"`
+	// ActionContext 动作上下文（点击时自动解析路径引用）
+	ActionContext map[string]PropertyValue `json:"actionContext,omitempty"`
 }
 
 // Alignment 对齐方式
@@ -619,8 +650,89 @@ type UIActionEvent struct {
 	ComponentID string `json:"componentId"`
 	// Action 动作标识符
 	Action string `json:"action"`
-	// Payload 附加数据
+	// Timestamp ISO 8601 时间戳
+	Timestamp string `json:"timestamp"`
+	// Context 解析后的上下文数据
+	Context map[string]any `json:"context"`
+	// Payload 附加数据（向后兼容）
 	Payload map[string]any `json:"payload,omitempty"`
+}
+
+// ===================
+// Client-to-Server Messages
+// ===================
+
+// ClientMessage 客户端到服务端消息
+type ClientMessage struct {
+	// UserAction 用户动作消息
+	UserAction *UserActionMessage `json:"userAction,omitempty"`
+	// Error 错误消息
+	Error *ProtocolError `json:"error,omitempty"`
+}
+
+// UserActionMessage 用户动作消息
+type UserActionMessage struct {
+	// Name 动作名称
+	Name string `json:"name"`
+	// SurfaceID Surface ID
+	SurfaceID string `json:"surfaceId"`
+	// SourceComponentID 触发动作的组件 ID
+	SourceComponentID string `json:"sourceComponentId"`
+	// Timestamp ISO 8601 时间戳
+	Timestamp string `json:"timestamp"`
+	// Context 解析后的上下文数据
+	Context map[string]any `json:"context"`
+}
+
+// ===================
+// Validation Error Types
+// ===================
+
+// ValidationErrorCode 验证错误代码
+type ValidationErrorCode string
+
+const (
+	// ValidationErrorCodeValidationFailed 验证失败
+	ValidationErrorCodeValidationFailed ValidationErrorCode = "VALIDATION_FAILED"
+)
+
+// ProtocolError 协议错误（联合类型）
+type ProtocolError struct {
+	// Code 错误代码
+	Code string `json:"code"`
+	// SurfaceID Surface ID
+	SurfaceID string `json:"surfaceId"`
+	// Path JSON Pointer 路径（验证错误时使用）
+	Path string `json:"path,omitempty"`
+	// Message 错误消息
+	Message string `json:"message"`
+	// Details 错误详情（通用错误时使用）
+	Details map[string]any `json:"details,omitempty"`
+}
+
+// IsValidationError 判断是否为验证错误
+func (e *ProtocolError) IsValidationError() bool {
+	return e.Code == string(ValidationErrorCodeValidationFailed)
+}
+
+// NewValidationError 创建验证错误
+func NewValidationError(surfaceID, path, message string) *ProtocolError {
+	return &ProtocolError{
+		Code:      string(ValidationErrorCodeValidationFailed),
+		SurfaceID: surfaceID,
+		Path:      path,
+		Message:   message,
+	}
+}
+
+// NewGenericError 创建通用错误
+func NewGenericError(code, surfaceID, message string, details map[string]any) *ProtocolError {
+	return &ProtocolError{
+		Code:      code,
+		SurfaceID: surfaceID,
+		Message:   message,
+		Details:   details,
+	}
 }
 
 // ===================

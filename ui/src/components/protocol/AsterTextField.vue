@@ -32,6 +32,7 @@
 <script setup lang="ts">
 import { computed } from 'vue';
 import type { DataValue, PropertyValue, UIActionEvent } from '@/types/ui-protocol';
+import { createUIActionEvent } from '@/types/ui-protocol';
 import { useAsterDataBinding } from '@/composables/useAsterDataBinding';
 import { useUIAction } from '@/composables/useUIAction';
 
@@ -134,12 +135,12 @@ function handleInput(event: Event) {
 function handleSubmit(event: KeyboardEvent) {
   // Emit submit action when Enter is pressed (Ctrl+Enter for multiline)
   if (props.componentId && props.surfaceId) {
-    const actionEvent: UIActionEvent = {
-      surfaceId: props.surfaceId,
-      componentId: props.componentId,
-      action: 'submit',
-      payload: { value: currentValue.value },
-    };
+    const actionEvent = createUIActionEvent(
+      props.surfaceId,
+      props.componentId,
+      'submit',
+      { value: currentValue.value },
+    );
     emit('action', actionEvent);
     emitFullAction(actionEvent);
   }

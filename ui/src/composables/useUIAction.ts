@@ -10,6 +10,7 @@
 
 import { inject, type Ref } from 'vue';
 import type { UIActionEvent } from '@/types/ui-protocol';
+import { createUIActionEvent } from '@/types/ui-protocol';
 
 /**
  * UI Action emitter function type
@@ -90,12 +91,12 @@ export function useUIAction(options: UseUIActionOptions = {}): UseUIActionReturn
       return;
     }
 
-    const event: UIActionEvent = {
-      surfaceId: options.surfaceId,
-      componentId: options.componentId,
+    const event = createUIActionEvent(
+      options.surfaceId,
+      options.componentId,
       action,
-      payload,
-    };
+      payload ?? {},
+    );
 
     emitFullAction(event);
   }

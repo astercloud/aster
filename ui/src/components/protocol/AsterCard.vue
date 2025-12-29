@@ -16,6 +16,7 @@
 
 <script setup lang="ts">
 import type { UIActionEvent } from '@/types/ui-protocol';
+import { createUIActionEvent } from '@/types/ui-protocol';
 import { useUIAction } from '@/composables/useUIAction';
 
 /**
@@ -50,11 +51,12 @@ const { emitFullAction } = useUIAction({
 
 function handleClick() {
   if (props.clickable && props.action && props.componentId && props.surfaceId) {
-    const event: UIActionEvent = {
-      surfaceId: props.surfaceId,
-      componentId: props.componentId,
-      action: props.action,
-    };
+    const event = createUIActionEvent(
+      props.surfaceId,
+      props.componentId,
+      props.action,
+      {},
+    );
     emit('action', event);
     emitFullAction(event);
   }

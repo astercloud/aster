@@ -8,6 +8,7 @@
 
 import type {
   AsterUIMessage,
+  CreateSurfaceMessage,
   SurfaceUpdateMessage,
   DataModelUpdateMessage,
   BeginRenderingMessage,
@@ -19,9 +20,10 @@ import type {
   AnyComponentNode,
   ComponentArrayReference,
   PropertyValue,
+  ValidationError,
 } from '@/types/ui-protocol';
-import { getComponentTypeName, getComponentProps, isPathReference } from '@/types/ui-protocol';
-import { getData, setData } from './path-resolver';
+import { getComponentTypeName, getComponentProps, isPathReference, createValidationError } from '@/types/ui-protocol';
+import { getData, setData, addData, removeData } from './path-resolver';
 import { getDefaultRegistry } from './standard-components';
 import type { ComponentRegistry } from './registry';
 
@@ -67,13 +69,14 @@ export class ProcessorError extends Error {
 /**
  * Create an empty Surface
  */
-function createEmptySurface(): Surface {
+function createEmptySurface(catalogId?: string): Surface {
   return {
     rootComponentId: null,
     componentTree: null,
     dataModel: {},
     components: new Map(),
     styles: {},
+    catalogId,
   };
 }
 
@@ -92,7 +95,7 @@ function createStreamingState(): StreamingState {
  * Message Processor
  *
  * Processes AsterUIMessage and manages Surface state.
- * Handles four message types: surfaceUpdate, dataModelUpdate, beginRendering, deleteSurface.
+ * Handles five message types: createSurface, surfaceUpdate, dataModelUpdate, beginRendering, deleteSurface.
  * Supports streaming rendering with incremental component updates.
  */
 export class MessageProcessor {
@@ -107,6 +110,9 @@ export class MessageProcessor {
 
   /** Event listeners for surface changes */
   private listeners: Map<string, Set<(surface: Surface) => void>> = new Map();
+
+  /** Validation errors */
+  private validationErrors: ValidationError[] = [];
 
   constructor(registry?: ComponentRegistry) {
     this.registry = registry ?? getDefaultRegistry();
@@ -146,6 +152,110 @@ export class MessageProcessor {
   clearSurfaces(): void {
     this.surfaces.clear();
     this.streamingStates.clear();
+    this.validationErrors = [];
+  }
+
+  /**
+   * Get validation errors
+   */
+  getValidationErrors(): readonly ValidationError[] {
+    return this.validationErrors;
+  }
+
+  /**
+   * Clear validation errors
+   */
+  clearValidationErrors(): void {
+    this.validationErrors = [];
+  }
+
+  /**
+   * Validate a message and return errors if any
+   */
+  validateMessage(message: AsterUIMessage): ValidationError[] {
+    const errors: ValidationError[] = [];
+
+    // Check that exactly one message type is present
+    const messageTypes = [
+      message.createSurface,
+      message.surfaceUpdate,
+      message.dataModelUpdate,
+      message.beginRendering,
+      message.deleteSurface,
+    ].filter(Boolean);
+
+    if (messageTypes.length === 0) {
+      errors.push(createValidationError('', '/', 'Message must contain exactly one operation type'));
+    }
+    else if (messageTypes.length > 1) {
+      errors.push(createValidationError('', '/', 'Message must contain exactly one operation type'));
+    }
+
+    // Validate createSurface
+    if (message.createSurface) {
+      if (!message.createSurface.surfaceId) {
+        errors.push(createValidationError('', '/createSurface/surfaceId', 'surfaceId is required'));
+      }
+    }
+
+    // Validate surfaceUpdate
+    if (message.surfaceUpdate) {
+      if (!message.surfaceUpdate.surfaceId) {
+        errors.push(createValidationError('', '/surfaceUpdate/surfaceId', 'surfaceId is required'));
+      }
+      if (!Array.isArray(message.surfaceUpdate.components)) {
+        errors.push(createValidationError(
+          message.surfaceUpdate.surfaceId || '',
+          '/surfaceUpdate/components',
+          'components must be an array',
+        ));
+      }
+    }
+
+    // Validate dataModelUpdate
+    if (message.dataModelUpdate) {
+      if (!message.dataModelUpdate.surfaceId) {
+        errors.push(createValidationError('', '/dataModelUpdate/surfaceId', 'surfaceId is required'));
+      }
+      const op = message.dataModelUpdate.op;
+      if (op && !['add', 'replace', 'remove'].includes(op)) {
+        errors.push(createValidationError(
+          message.dataModelUpdate.surfaceId || '',
+          '/dataModelUpdate/op',
+          'op must be "add", "replace", or "remove"',
+        ));
+      }
+      if (op !== 'remove' && message.dataModelUpdate.contents === undefined) {
+        errors.push(createValidationError(
+          message.dataModelUpdate.surfaceId || '',
+          '/dataModelUpdate/contents',
+          'contents is required for add and replace operations',
+        ));
+      }
+    }
+
+    // Validate beginRendering
+    if (message.beginRendering) {
+      if (!message.beginRendering.surfaceId) {
+        errors.push(createValidationError('', '/beginRendering/surfaceId', 'surfaceId is required'));
+      }
+      if (!message.beginRendering.root) {
+        errors.push(createValidationError(
+          message.beginRendering.surfaceId || '',
+          '/beginRendering/root',
+          'root is required',
+        ));
+      }
+    }
+
+    // Validate deleteSurface
+    if (message.deleteSurface) {
+      if (!message.deleteSurface.surfaceId) {
+        errors.push(createValidationError('', '/deleteSurface/surfaceId', 'surfaceId is required'));
+      }
+    }
+
+    return errors;
   }
 
   /**
@@ -161,6 +271,17 @@ export class MessageProcessor {
    * Process a single message
    */
   processMessage(message: AsterUIMessage): void {
+    // Validate message first
+    const errors = this.validateMessage(message);
+    if (errors.length > 0) {
+      this.validationErrors.push(...errors);
+      console.warn('Message validation failed:', errors);
+      return;
+    }
+
+    if (message.createSurface) {
+      this.processCreateSurface(message.createSurface);
+    }
     if (message.surfaceUpdate) {
       this.processSurfaceUpdate(message.surfaceUpdate);
     }
@@ -173,6 +294,24 @@ export class MessageProcessor {
     if (message.deleteSurface) {
       this.processDeleteSurface(message.deleteSurface);
     }
+  }
+
+  /**
+   * Process createSurface message
+   * Creates a new surface with optional catalogId
+   */
+  private processCreateSurface(message: CreateSurfaceMessage): void {
+    const { surfaceId, catalogId } = message;
+
+    // Create new surface (or reset existing)
+    const surface = createEmptySurface(catalogId);
+    this.surfaces.set(surfaceId, surface);
+
+    // Create streaming state
+    const streamingState = createStreamingState();
+    this.streamingStates.set(surfaceId, streamingState);
+
+    this.notifyListeners(surfaceId, surface);
   }
 
   /**
@@ -197,9 +336,6 @@ export class MessageProcessor {
       this.streamingStates.set(surfaceId, streamingState);
     }
 
-    // Track newly added component IDs for streaming
-    const newComponentIds: string[] = [];
-
     // Merge components by ID (incremental update)
     for (const component of components) {
       // Validate component type
@@ -214,15 +350,12 @@ export class MessageProcessor {
       surface.components.set(component.id, component);
 
       if (isNew) {
-        newComponentIds.push(component.id);
         // Remove from pending if it was waiting
         streamingState.pendingComponentIds.delete(component.id);
       }
     }
 
     // Rebuild component tree if root is set
-    // In streaming mode, this allows rendering available components
-    // even if not all referenced components are defined yet
     if (surface.rootComponentId) {
       this.rebuildComponentTree(surface, streamingState);
     }
@@ -233,9 +366,10 @@ export class MessageProcessor {
   /**
    * Process dataModelUpdate message
    * Updates data model and triggers reactive UI updates
+   * Supports add/replace/remove operations
    */
   private processDataModelUpdate(message: DataModelUpdateMessage): void {
-    const { surfaceId, path, contents } = message;
+    const { surfaceId, path, op, contents } = message;
 
     // Get or create surface
     let surface = this.surfaces.get(surfaceId);
@@ -247,18 +381,48 @@ export class MessageProcessor {
     // Get streaming state
     const streamingState = this.streamingStates.get(surfaceId);
 
-    // Update data model
+    // Determine operation (default to replace)
+    const operation = op ?? 'replace';
     const targetPath = path ?? '/';
 
-    if (targetPath === '/' || targetPath === '') {
-      // Replace entire data model
-      if (typeof contents === 'object' && contents !== null && !Array.isArray(contents)) {
-        surface.dataModel = contents as DataMap;
-      }
-    }
-    else {
-      // Partial update
-      setData(surface.dataModel, targetPath, contents);
+    // Execute operation
+    switch (operation) {
+      case 'add':
+        if (contents !== undefined) {
+          if (targetPath === '/' || targetPath === '') {
+            // Add to root: merge if object
+            if (typeof contents === 'object' && contents !== null && !Array.isArray(contents)) {
+              Object.assign(surface.dataModel, contents);
+            }
+          }
+          else {
+            addData(surface.dataModel, targetPath, contents);
+          }
+        }
+        break;
+
+      case 'remove':
+        if (targetPath === '/' || targetPath === '') {
+          // Clear entire data model
+          surface.dataModel = {};
+        }
+        else {
+          removeData(surface.dataModel, targetPath);
+        }
+        break;
+
+      case 'replace':
+      default:
+        if (targetPath === '/' || targetPath === '') {
+          // Replace entire data model
+          if (typeof contents === 'object' && contents !== null && !Array.isArray(contents)) {
+            surface.dataModel = contents as DataMap;
+          }
+        }
+        else if (contents !== undefined) {
+          setData(surface.dataModel, targetPath, contents);
+        }
+        break;
     }
 
     // Rebuild component tree to reflect data changes
@@ -272,15 +436,15 @@ export class MessageProcessor {
   /**
    * Process beginRendering message
    * Starts rendering with specified root component
-   * Supports streaming mode where beginRendering can be called before all components are defined
+   * Supports streaming mode and catalogId
    */
   private processBeginRendering(message: BeginRenderingMessage): void {
-    const { surfaceId, root, styles } = message;
+    const { surfaceId, root, styles, catalogId } = message;
 
     // Get or create surface
     let surface = this.surfaces.get(surfaceId);
     if (!surface) {
-      surface = createEmptySurface();
+      surface = createEmptySurface(catalogId);
       this.surfaces.set(surfaceId, surface);
     }
 
@@ -299,12 +463,16 @@ export class MessageProcessor {
       surface.styles = { ...surface.styles, ...styles };
     }
 
+    // Set catalogId (override if provided)
+    if (catalogId) {
+      surface.catalogId = catalogId;
+    }
+
     // Check if root component exists - if not, we're in streaming mode
     if (!surface.components.has(root)) {
       streamingState.isStreaming = true;
       streamingState.pendingComponentIds.add(root);
       console.warn(`Root component ${root} not found. Entering streaming mode.`);
-      // Don't build tree yet, wait for components
       this.notifyListeners(surfaceId, surface);
       return;
     }
@@ -734,6 +902,65 @@ export class MessageProcessor {
     }
 
     return result;
+  }
+
+  /**
+   * Add data to a surface's data model
+   */
+  addDataToSurface(surfaceId: string, path: string, value: DataValue): boolean {
+    const surface = this.surfaces.get(surfaceId);
+    if (!surface) {
+      return false;
+    }
+
+    const result = addData(surface.dataModel, path, value);
+
+    if (result && surface.rootComponentId) {
+      const streamingState = this.streamingStates.get(surfaceId);
+      this.rebuildComponentTree(surface, streamingState);
+      this.notifyListeners(surfaceId, surface);
+    }
+
+    return result;
+  }
+
+  /**
+   * Remove data from a surface's data model
+   */
+  removeDataFromSurface(surfaceId: string, path: string): boolean {
+    const surface = this.surfaces.get(surfaceId);
+    if (!surface) {
+      return false;
+    }
+
+    const result = removeData(surface.dataModel, path);
+
+    if (result && surface.rootComponentId) {
+      const streamingState = this.streamingStates.get(surfaceId);
+      this.rebuildComponentTree(surface, streamingState);
+      this.notifyListeners(surfaceId, surface);
+    }
+
+    return result;
+  }
+
+  /**
+   * Resolve action context from a Button's actionContext
+   */
+  resolveActionContext(
+    surfaceId: string,
+    actionContext: Record<string, PropertyValue>,
+  ): Record<string, unknown> {
+    const surface = this.surfaces.get(surfaceId);
+    if (!surface) {
+      return {};
+    }
+
+    const resolved: Record<string, unknown> = {};
+    for (const [key, value] of Object.entries(actionContext)) {
+      resolved[key] = this.resolvePropertyValue(value, surface.dataModel);
+    }
+    return resolved;
   }
 
   /**

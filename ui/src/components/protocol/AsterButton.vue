@@ -11,15 +11,18 @@
 </template>
 
 <script setup lang="ts">
-import { computed } from 'vue';
-import type { ButtonVariant, UIActionEvent } from '@/types/ui-protocol';
+import { computed, inject } from 'vue';
+import type { ButtonVariant, UIActionEvent, PropertyValue, DataMap } from '@/types/ui-protocol';
+import { createUIActionEvent } from '@/types/ui-protocol';
 import { useUIAction } from '@/composables/useUIAction';
+import { resolveActionContext } from '@/protocol/client-message';
 
 /**
  * AsterButton Component
  *
  * Button with variants and action emission.
  * Emits action events both as Vue events and to the Control channel.
+ * Supports actionContext for automatic form data collection.
  */
 
 interface Props {
@@ -30,6 +33,7 @@ interface Props {
   variant?: ButtonVariant;
   disabled?: boolean;
   icon?: string;
+  actionContext?: Record<string, PropertyValue>;
 }
 
 const props = withDefaults(defineProps<Props>(), {
@@ -42,6 +46,9 @@ const props = withDefaults(defineProps<Props>(), {
 const emit = defineEmits<{
   action: [event: UIActionEvent];
 }>();
+
+// Inject data model from parent surface (if available)
+const dataModel = inject<DataMap>('surfaceDataModel', {});
 
 // Setup UI action emitter
 const { emitFullAction } = useUIAction({
@@ -60,11 +67,18 @@ const variantClass = computed(() => {
 
 function handleClick() {
   if (!props.disabled && props.componentId && props.surfaceId && props.action) {
-    const event: UIActionEvent = {
-      surfaceId: props.surfaceId,
-      componentId: props.componentId,
-      action: props.action,
-    };
+    // Resolve action context if provided
+    const context = props.actionContext
+      ? resolveActionContext(props.actionContext, dataModel)
+      : {};
+
+    const event = createUIActionEvent(
+      props.surfaceId,
+      props.componentId,
+      props.action,
+      context,
+    );
+
     emit('action', event);
     emitFullAction(event);
   }

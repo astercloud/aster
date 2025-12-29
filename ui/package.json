@@ -1,6 +1,6 @@
 {
   "name": "@aster/ui",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "description": "Universal AI Agent UI SDK for Aster Framework - Production Ready",
   "type": "module",
   "main": "dist/aster-ui.umd.js",
